@@ -1,0 +1,36 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ArtemisManagerUI.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ModInstallFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ServerIPOrName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConnectOnStart" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="IsAMaster" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="NetworkPassword" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ArtemisInstallFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Program Files (x86)\Artemis</Value>
+    </Setting>
+    <Setting Name="ArtemisServer" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ArtemisPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2010</Value>
+    </Setting>
+    <Setting Name="ListeningPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2011</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

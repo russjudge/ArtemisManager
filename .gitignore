@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/ArtemisManager/obj
+*.user
+/AMCommunicator/obj
+/AMCommunicator/bin/Debug/net7.0
+/AMCommunicatorTests/bin/Debug/net7.0
+/AMCommunicatorTests/bin/Release/net7.0
+/AMCommunicatorTests/obj
+/ArtemisManager/bin/Debug/net7.0-windows
+/ArtemisManagerUI/bin/Debug/net7.0-windows
+/ArtemisManagerUI/obj

@@ -1,0 +1,59 @@
+﻿<Window x:Class="ArtemisManagerUI.Main"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ArtemisManagerUI" FontSize="14"
+        mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
+        Title="Artemis Manager" SizeToContent="Height" Width="800">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <TextBlock Text="This Hostname:" FontWeight="Bold" Padding="0,0,5,0"/>
+            <TextBlock Text="{Binding Hostname, ElementName=uc}" />
+            <TextBlock Text="This IP:" FontWeight="Bold" Padding="20,0,5,0"/>
+            <TextBlock Text="{Binding IP, ElementName=uc}" />
+            <TextBlock Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" />
+            <TextBlock Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc}" />
+
+        </StackPanel>
+        <WrapPanel DockPanel.Dock="Top">
+            <Button Click="OnStartServer" ToolTip="Remove me later--do this at startup instead." >Connect</Button>
+            <Button Click="OnRebroadcast" ToolTip="Broadcasts on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">Rebroadcast presence</Button>
+        </WrapPanel>
+    <Grid DockPanel.Dock="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+    </Grid>
+        <GroupBox DockPanel.Dock="Right">
+            <GroupBox.Header>
+                <Label Content="Activity" />
+            </GroupBox.Header>
+            <ListBox Name="StatusList" ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" Height="500" />
+        </GroupBox>
+        <TabControl
+            ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding IP}" />
+                        <TextBlock Text=" - " />
+                        <TextBlock Text="{Binding Hostname}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <Button Content="Disconnect"></Button>
+                    </WrapPanel>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </DockPanel>
+</Window>

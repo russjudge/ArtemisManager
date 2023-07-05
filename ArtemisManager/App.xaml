@@ -1,0 +1,11 @@
+﻿<Application x:Class="ArtemisManager.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ArtemisManager"
+             xmlns:ui="clr-namespace:ArtemisManagerUI;assembly=ArtemisManagerUI"
+             StartupUri="pack://application:,,,/ArtemisManagerUI;component/Main.xaml"
+              Startup="OnStartup" DispatcherUnhandledException="OnError" >
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
