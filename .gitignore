@@ -13,3 +13,5 @@
 /ArtemisManager/bin/Debug/net7.0-windows
 /ArtemisManagerUI/bin/Debug/net7.0-windows
 /ArtemisManagerUI/obj
+/ArtemisManagerAction/bin/Debug/net7.0
+/ArtemisManagerAction/obj
