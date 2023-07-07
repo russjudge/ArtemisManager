@@ -6,18 +6,18 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMCommunicator
+namespace AMCommunicator.Messages
 {
-    
-    public class NetworkMessage : INetworkMessage
+
+    internal class NetworkMessage : INetworkMessage
     {
-       
+
         public static NetworkMessage? GetMessage(byte[] data)
         {
             NetworkMessage? retVal = null;
             MessageCommand cmd = (MessageCommand)BitConverter.ToInt16(data, CommandPosition);
-            
-            foreach(var tp in Assembly.GetExecutingAssembly().GetTypes())
+
+            foreach (var tp in Assembly.GetExecutingAssembly().GetTypes())
             {
                 if (tp.GetInterface(nameof(INetworkMessage)) != null)
                 {
@@ -33,19 +33,17 @@ namespace AMCommunicator
                             }
                         }
                     }
-                    
-
                 }
             }
             return retVal;
         }
-        
-        protected NetworkMessage() 
+
+        protected NetworkMessage()
         {
             Source = Network.GetMyIP();
             LoadPropertyDictionary();
             Unspecified = Array.Empty<byte>();
-           
+
         }
 
         public NetworkMessage(byte[] bytes)
@@ -57,7 +55,7 @@ namespace AMCommunicator
         }
         void LoadPropertyDictionary()
         {
-            foreach (var property in this.GetType().GetProperties())
+            foreach (var property in GetType().GetProperties())
             {
                 var attribute = property.GetCustomAttribute<NetworkMessageAttribute>();
                 if (attribute != null)
@@ -69,7 +67,7 @@ namespace AMCommunicator
             }
             sortedPropertyKeys.Sort();
         }
-        
+
         private void LoadBytes(byte[] bytes)
         {
 
@@ -114,6 +112,12 @@ namespace AMCommunicator
                         propertyDictionary[key].SetValue(this, (MessageCommand)BitConverter.ToInt16(bytes, position));
                         position += 2;
                     }
+                    else if (propertyDictionary[key].PropertyType == typeof(IPAddress))
+                    {
+                        propertyDictionary[key].SetValue(this, new IPAddress(BitConverter.ToInt64(bytes, position)));
+                        position += 8;
+
+                    }
 
                 }
                 else
@@ -139,27 +143,31 @@ namespace AMCommunicator
         private readonly List<int> sortedPropertyKeys = new();
 
         public const int MinimumMessageLength = 4;
-        public const int LengthPosition = 0;
-        public const int LengthSequence = 0;
-        public const int CommandSequence = 1;
-        public const int CommandPosition = 4;
+        
+        public const int LengthSequence = 1;
+        public const int LengthLength = 4;
+        public const int LengthPosition = MessageVersionPosition + MessageVersionLength;
+        public const int CommandSequence = 2;
+        public const int MessageVersionPosition = 0;
+        public const int MessageVersionSequence = 0;
+        public const int MessageVersionLength = 2;
+        public const int CommandPosition = LengthPosition + LengthLength;
         public const int MaxSequence = 99999;
+
+        [NetworkMessage(Sequence = MessageVersionSequence)]
+        public short MessageVersion { get; set; }
 
         [NetworkMessage(Sequence = LengthSequence)]
         public int Length { get; set; }
 
         [NetworkMessage(Sequence = CommandSequence)]
         public MessageCommand Command { get; set; }
-
-
-
-
         public IPAddress? Source { get; set; }
 
 
         [NetworkMessage(Sequence = MaxSequence)]
         public byte[] Unspecified { get; set; }
-        
+
 
         public byte[] GetBytes()
         {
@@ -179,7 +187,7 @@ namespace AMCommunicator
                         retVal.Add(0);
                     }
                 }
-                else if(propertyDictionary[key].PropertyType == typeof(byte))
+                else if (propertyDictionary[key].PropertyType == typeof(byte))
                 {
                     if (value != null)
                     {
@@ -232,7 +240,7 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        retVal.AddRange(BitConverter.GetBytes((int)4));
+                        retVal.AddRange(BitConverter.GetBytes(4));
                     }
 
                 }
@@ -247,6 +255,17 @@ namespace AMCommunicator
                         retVal.AddRange(new byte[2]);
                     }
                 }
+                else if (propertyDictionary[key].PropertyType == typeof(IPAddress))
+                {
+                    if (value != null)
+                    {
+                        retVal.AddRange(BitConverter.GetBytes(((IPAddress)value).Address));
+                    }
+                    else
+                    {
+                        retVal.AddRange(new byte[8]);
+                    }
+                }
 
             }
             Length = retVal.Count;
@@ -254,12 +273,6 @@ namespace AMCommunicator
             var lengthBytes = BitConverter.GetBytes(Length);
             Array.Copy(lengthBytes, 0, buffer, LengthPosition, lengthBytes.Length);
 
-
-            /*
-
-            retVal.AddRange(BitConverter.GetBytes(ID));
-            retVal.AddRange(BitConverter.GetBytes(PlayOrDismiss));
-            */
             return buffer;
         }
     }

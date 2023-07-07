@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMCommunicator
+namespace AMCommunicator.Messages
 {
 
     [NetworkMessageCommand(MessageCommand.ChangePassword)]
-    public class ChangePasswordMessage : NetworkMessageAbstract
+    internal class ChangePasswordMessage : NetworkMessageAbstract
     {
+        public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ChangePasswordMessage(byte[] data) : base(data) { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -18,17 +19,16 @@ namespace AMCommunicator
         {
             NewPassword = new MessageString(Network.Password);
         }
+        public ChangePasswordMessage(string newPassword) : base()
+        {
+            NewPassword = new(newPassword);
+        }
         protected override void SetCommand()
         {
             Command = MessageCommand.ChangePassword;
+            MessageVersion = ThisVersion;
         }
-        public MessageString NewPassword { get; set; }
-        /*
-         *  public const int ChangePassword = 4;
-        public const int PCAction = 5;
-        public const int UpdateCheck = 6;
-        public const int AretmisAction = 7;
-        public const int SetClientInfo = 8;
-         * */
+        public MessageString NewPassword { get; private set; }
+      
     }
 }

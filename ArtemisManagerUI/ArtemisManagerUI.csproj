@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AMCommunicator\AMCommunicator.csproj" />
+    <ProjectReference Include="..\ArtemisManagerAction\ArtemisManagerAction.csproj" />
   </ItemGroup>
 
   <ItemGroup>

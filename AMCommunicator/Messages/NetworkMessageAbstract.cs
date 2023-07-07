@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMCommunicator
+namespace AMCommunicator.Messages
 {
-    public abstract class NetworkMessageAbstract : NetworkMessage
+    internal abstract class NetworkMessageAbstract : NetworkMessage
     {
-        protected NetworkMessageAbstract() : base() 
+        protected NetworkMessageAbstract() : base()
         {
             SetCommand();
         }
@@ -18,6 +18,6 @@ namespace AMCommunicator
         }
         protected abstract void SetCommand();
 
-        
+
     }
 }

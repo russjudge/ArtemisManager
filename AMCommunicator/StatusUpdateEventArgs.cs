@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator
 {
-    public class StatusUpdate: EventArgs
+    public class StatusUpdateEventArgs: EventArgs
     {
-        public StatusUpdate(string message, params object[] options)
+        public StatusUpdateEventArgs(string message, params object[] options)
         {
             Message = string.Format(message, options); 
         }

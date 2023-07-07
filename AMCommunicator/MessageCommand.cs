@@ -16,6 +16,10 @@ namespace AMCommunicator
         PCAction = 5,
         UpdateCheck = 6,
         AretmisAction = 7,
+        Communication = 8,
+        Ping = 9,
+        ChangeAppSetting = 10,
+        Alert = 11,
     }
 
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMCommunicator
+namespace AMCommunicator.Messages
 {
 
     internal class NetworkMessageCommandAttribute : Attribute

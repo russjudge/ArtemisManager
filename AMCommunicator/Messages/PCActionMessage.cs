@@ -5,42 +5,43 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AMCommunicator
+namespace AMCommunicator.Messages
 {
 
     [NetworkMessageCommand(MessageCommand.PCAction)]
-    public class PCActionMessage : NetworkMessageAbstract
+    internal class PCActionMessage : NetworkMessageAbstract
     {
+        public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public PCActionMessage(byte[] data) : base(data) { }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public PCActionMessage() : base()
         {
-            
+
         }
-        public enum Actions : short
+        public PCActionMessage(PCActions action, bool force) : base()
         {
-            CloseApp,
-            ShutdownPC,
-            RestartPC,
-            CheckForUpdate,
-            DisconnectThisConnection
+            Force = force;
+            SetAction(action);
         }
-        public void SetAction(Actions action)
+
+        public void SetAction(PCActions action)
         {
             Action = (short)action;
         }
-        public Actions GetAction()
+        public PCActions GetAction()
         {
-            return (Actions)Action;
+            return (PCActions)Action;
         }
         [NetworkMessage(Sequence = 4)]
-        public short Action { get; set; }
+        public short Action { get; private set; }
+        public bool Force { get; private set; }
 
         protected override void SetCommand()
         {
             Command = MessageCommand.PCAction;
+            MessageVersion = ThisVersion;
         }
     }
 }

@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AMCommunicatorTests", "AMCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerUI", "ArtemisManagerUI\ArtemisManagerUI.csproj", "{35E9D8C3-399F-48A9-BE8A-A69A8B00CD09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtemisManagerAction", "ArtemisManagerAction\ArtemisManagerAction.csproj", "{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{35E9D8C3-399F-48A9-BE8A-A69A8B00CD09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35E9D8C3-399F-48A9-BE8A-A69A8B00CD09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35E9D8C3-399F-48A9-BE8A-A69A8B00CD09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

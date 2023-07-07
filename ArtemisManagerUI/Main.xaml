@@ -4,54 +4,113 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArtemisManagerUI" FontSize="14"
+        xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
         Title="Artemis Manager" SizeToContent="Height" Width="800">
+    <Window.Resources>
+        <converter:DateFormatter x:Key="DateFormatter" />
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5,5,5,5" />
+            <Setter Property="Margin" Value="2,2,2,2" />
+        </Style>
+    </Window.Resources>
     <DockPanel>
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+        <DockPanel DockPanel.Dock="Top">
             <TextBlock Text="This Hostname:" FontWeight="Bold" Padding="0,0,5,0"/>
             <TextBlock Text="{Binding Hostname, ElementName=uc}" />
             <TextBlock Text="This IP:" FontWeight="Bold" Padding="20,0,5,0"/>
             <TextBlock Text="{Binding IP, ElementName=uc}" />
-            <TextBlock Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" />
-            <TextBlock Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc}" />
+            <TextBlock Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" ToolTip="Used to restrict access to the peer-to-peer network"/>
+            <TextBox  ToolTip="Used to restrict access to the peer-to-peer network" Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
 
-        </StackPanel>
+        </DockPanel>
         <WrapPanel DockPanel.Dock="Top">
-            <Button Click="OnStartServer" ToolTip="Remove me later--do this at startup instead." >Connect</Button>
-            <Button Click="OnRebroadcast" ToolTip="Broadcasts on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">Rebroadcast presence</Button>
+            <Button
+                Click="OnStartServer"
+                ToolTip="Initiates the peer-to-peer network and announces itself to any other active peers."
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >Start Network Communication</Button>
+            <Button
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Click="OnRebroadcast"
+                ToolTip="Broadcasts on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
+                Re-announce this client
+            </Button>
+            <CheckBox Margin="5,0,0,0" Padding="2,0,0,0" IsChecked="{Binding Path=AutoStartServer, ElementName=uc, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="Start Network Communication as soon as this application starts."/>
         </WrapPanel>
-    <Grid DockPanel.Dock="Top">
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        
-    </Grid>
-        <GroupBox DockPanel.Dock="Right">
+        <Grid DockPanel.Dock="Top" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="7*"/>
+                <ColumnDefinition Width="93*"/>
+                <ColumnDefinition Width="100*"/>
+            </Grid.ColumnDefinitions>
+
+        </Grid>
+        <DockPanel DockPanel.Dock="Right" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+            <GroupBox DockPanel.Dock="Bottom" >
+                <GroupBox.Header>
+                    <Label Content="Activity" />
+                </GroupBox.Header>
+                <ListBox Name="StatusList" ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" Height="500" Width="300"  VerticalAlignment="Top" />
+            </GroupBox>
+            <GroupBox DockPanel.Dock="Top" MinHeight="200">
             <GroupBox.Header>
-                <Label Content="Activity" />
+                <Label Content="Chat" />
             </GroupBox.Header>
-            <ListBox Name="StatusList" ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" Height="500" />
+            <ListBox ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
+                            <TextBlock Text="> " />
+                            <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
+                            <TextBlock Text="{Binding Message}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </GroupBox>
-        <TabControl
+            
+        </DockPanel>
+        <TabControl Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
             ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding IP}" />
-                        <TextBlock Text=" - " />
-                        <TextBlock Text="{Binding Hostname}" />
-                    </StackPanel>
+                    <TextBlock Text="{Binding Hostname}" />
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <WrapPanel>
-                        <Button Content="Disconnect"></Button>
-                    </WrapPanel>
+                    <GroupBox>
+                        <GroupBox.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding IP}" />
+                                <TextBlock Text=" - " />
+                                <TextBlock Text="{Binding Hostname}" />
+                            </StackPanel>
+                        </GroupBox.Header>
+                    
+                    <DockPanel>
+                    <WrapPanel DockPanel.Dock="Top">
+                        <Button Content="Disconnect" Click="OnDisconnect" CommandParameter="{Binding}"></Button>
+                        <Button Content="Ping" Click="OnPing" CommandParameter="{Binding}"></Button>
+                            <Button Content="Restart PC" Click="OnPing" CommandParameter="{Binding}"></Button>
+                            <Button Content="Shutdown PC" Click="OnPing" CommandParameter="{Binding}"></Button>
+                            <Button Content="Check for Software Update" Click="OnPing" CommandParameter="{Binding}"></Button>
+                        </WrapPanel>
+                        
+                        
+                        <DockPanel DockPanel.Dock="Bottom">
+                            
+                            <Button IsDefault="true" DockPanel.Dock="Right" Tag="{Binding ElementName=MessageLine, Path=Text, Mode=TwoWay}" Content=">>" Click="OnSendMessage" CommandParameter="{Binding}"/>
+                            <TextBox Name="MessageLine" VerticalAlignment="Center"  />
+                        </DockPanel>
+                        <TextBlock />
+                    </DockPanel>
+                    </GroupBox>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
