@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    public enum AlertItems : short
+    public enum ArtemisActions
     {
-        MessageVersionMismatch,
+        StartArtemis,
+        StopArtemis,
+        ActivateMod,
+        DeactivateMod,
+        ResetToVanilla
     }
 }

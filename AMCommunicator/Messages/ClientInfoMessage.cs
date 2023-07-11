@@ -9,54 +9,48 @@ namespace AMCommunicator.Messages
 {
 
     [NetworkMessageCommand(MessageCommand.ClientInfo)]
-    internal class ClientInfoMessage : NetworkMessageAbstract
+    internal class ClientInfoMessage : NetworkMessage
     {
         public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 
-        public ClientInfoMessage(byte[] data) : base(data) 
+        internal ClientInfoMessage() : base()
         {
-            if (AllDrives == null)
-            {
-                AllDrives = new MessageString(string.Empty);
-            }
-            if (GeneralSettings == null)
-            {
-                GeneralSettings = new MessageString(string.Empty);
-            }
-            if (AppVersion == null)
-            {
-                AppVersion = new MessageString(string.Empty);
-            }
-            if (InstalledMissions == null)
-            {
-                InstalledMissions = new MessageString(string.Empty);
-            }
-            if (InstalledMods == null)
-            {
-                InstalledMods = new MessageString(string.Empty);
-            }
+            AppVersion = string.Empty;
+            InstalledMods = Array.Empty<string>();
+            InstalledMissions= Array.Empty<string>();
+            AllDrives = Array.Empty<string>();
+            GeneralSettings = string.Empty;
         }
-
-
         public ClientInfoMessage(bool isMaster, bool connectOnStart, string[] installedMods,
             string[] installedMissions, bool artemisIsRunning, bool isUsingThisAppControlledArtemis, bool appInStartFolder) : base()
         {
-            IsMaster= isMaster;
+            IsMaster = isMaster;
 
-            AppVersion = new MessageString(Assembly.GetEntryAssembly().GetName().Version.ToString());
-            ConnectOnstart= connectOnStart;
-            InstalledMods = new MessageString(string.Join("|", installedMods));
-            InstalledMissions = new MessageString(string.Join("|", installedMissions));
-            ArtemisIsRunning= artemisIsRunning;
-            IsUsingThisAppControlledArtemis= isUsingThisAppControlledArtemis;
-            AppInStartFolder= appInStartFolder;
+            AppVersion = string.Empty;
             var assm = Assembly.GetEntryAssembly();
-            var location = new FileInfo(assm.Location);
+            if (assm != null)
+            {
+                var nm = assm.GetName();
+                if (nm != null)
+                {
+                    if (nm.Version != null)
+                    {
+                        AppVersion = nm.Version.ToString();
+                    }
+                }
+            }
+            ConnectOnstart = connectOnStart;
+            InstalledMods = installedMods;
+            InstalledMissions = installedMissions;
+            ArtemisIsRunning = artemisIsRunning;
+            IsUsingThisAppControlledArtemis = isUsingThisAppControlledArtemis;
+            AppInStartFolder = appInStartFolder;
+           
             var drives = DriveInfo.GetDrives();
-            List<string> dd = new List<string>();
+            List<string> dd = new();
             foreach (var drive in drives)
             {
-                if (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData).Substring(0,1)))
+                if (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)[..1]))
                 {
                     FreeSpaceOnAppDrive = drive.AvailableFreeSpace;
                 }
@@ -66,52 +60,40 @@ namespace AMCommunicator.Messages
                 }
 
             }
-            AllDrives = new MessageString(string.Join("|", dd.ToArray()));
+            AllDrives = dd.ToArray();
 
-            GeneralSettings = new MessageString(string.Empty);
+            GeneralSettings = string.Empty;
         }
-        protected override void SetCommand()
+        protected override void SetMessageVersion()
         {
-            Command = MessageCommand.ClientInfo;
             MessageVersion = ThisVersion;
         }
+        public bool IsMaster { get; protected set; }
 
+        public string AppVersion { get; protected set; }
 
-        [NetworkMessage(Sequence = 10)]
-        public bool IsMaster { get; set; }
+        public bool ConnectOnstart { get; protected set; }
 
-        
-        [NetworkMessage(Sequence = 20)]
-        public MessageString AppVersion { get; set; }
-
-        [NetworkMessage(Sequence = 30)]
-        public bool ConnectOnstart { get; set; }
-
-        [NetworkMessage(Sequence = 40)]
-        public MessageString InstalledMods { get; set; }
+        public string[] InstalledMods { get; protected set; }
 
 
         //Reserved for future use: Installed missions will be part of phase 2.
-        [NetworkMessage(Sequence = 70)]
-        public MessageString InstalledMissions { get; set; }
-        [NetworkMessage(Sequence = 100)]
-        public bool ArtemisIsRunning { get; set; }
+        public string[] InstalledMissions { get; protected set; }
+
+        public bool ArtemisIsRunning { get; protected set; }
         //Below is to differentiate from Artemis running from original install and Artemis running from folder controlled by this application.
         //  This is useful to warn of potential issues.
-        [NetworkMessage(Sequence = 110)]
-        public bool IsUsingThisAppControlledArtemis { get; set; }
-        [NetworkMessage(Sequence = 120)]
-        public bool AppInStartFolder { get; set; }
-        [NetworkMessage(Sequence = 130)]
+        public bool IsUsingThisAppControlledArtemis { get; protected set; }
 
-        public long FreeSpaceOnAppDrive { get; set; }
+        public bool AppInStartFolder { get; protected set; }
 
-        [NetworkMessage(Sequence = 140)]
-        public MessageString AllDrives { get; set; }
+
+        public long FreeSpaceOnAppDrive { get; protected set; }
+
+        public string[] AllDrives { get; protected set; }
 
         //This is a catch-all.
-        [NetworkMessage(Sequence = 400)]
-        public MessageString GeneralSettings { get; set; }
+        public string GeneralSettings { get; protected set; }
     }
 }
 

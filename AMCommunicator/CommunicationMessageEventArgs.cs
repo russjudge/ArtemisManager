@@ -8,12 +8,12 @@ namespace AMCommunicator
 {
     public class CommunicationMessageEventArgs : EventArgs
     {
-        public CommunicationMessageEventArgs(string host, string message) 
+        public CommunicationMessageEventArgs(string? host, string message) 
         {
             Host = host;
             Message = message;
         }
         public string Message { get; private set; }
-        public string Host { get; private set; }
+        public string? Host { get; private set; }
     }
 }

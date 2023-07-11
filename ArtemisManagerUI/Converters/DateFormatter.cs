@@ -18,8 +18,7 @@ namespace ArtemisManagerUI.Converters
             }
             else
             {
-                string parm = parameter as string;
-                if (parm == null)
+                if (parameter is not string parm)
                 {
                     return value;
                 }

@@ -33,10 +33,12 @@ namespace ArtemisManagerUI
             Chat = new();
             MyNetwork = Network.GetNetwork("");
             Status = new ObservableCollection<string>();
-            ConnectedPCs = new();
-            ConnectedPCs.Add(new PCItem("All Connections", IPAddress.Any));
-            
-            
+            ConnectedPCs = new()
+            {
+                new PCItem("All Connections", IPAddress.Any)
+            };
+
+
             InitializeComponent();
 
         }
@@ -55,7 +57,7 @@ namespace ArtemisManagerUI
          *ArtemisServer
          *ArtemisPort
         */
-        private void OnLoaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs? e)
         {
             if (Properties.Settings.Default.UpgradeRequired)
             {
@@ -128,7 +130,10 @@ namespace ArtemisManagerUI
                             Properties.Settings.Default.Save();
                             foreach (var pc in me.ConnectedPCs)
                             {
-                                me.MyNetwork.SendChangeSetting(pc.IP, "ConnectOnStart", me.AutoStartServer.ToString());
+                                if (pc.IP != null)
+                                {
+                                    me.MyNetwork.SendChangeSetting(pc.IP, "ConnectOnStart", me.AutoStartServer.ToString());
+                                }
                             }
                             
                             break;
@@ -196,7 +201,10 @@ namespace ArtemisManagerUI
                                 //TODO: Send notice of update to all PCs
                                 foreach (var pc in me.ConnectedPCs)
                                 {
-                                    me.MyNetwork.SendChangePassword(pc.IP, me.Password);
+                                    if (pc.IP != null)
+                                    {
+                                        me.MyNetwork.SendChangePassword(pc.IP, me.Password);
+                                    }
                                 }
                                 break;
                             case MessageBoxResult.No:
@@ -263,7 +271,10 @@ namespace ArtemisManagerUI
                         Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
                         foreach (var pc in me.ConnectedPCs)
                         {
-                            me.MyNetwork.SendChangeSetting(pc.IP, "ListeningPort", Properties.Settings.Default.ListeningPort.ToString());
+                            if (pc.IP != null)
+                            {
+                                me.MyNetwork.SendChangeSetting(pc.IP, "ListeningPort", Properties.Settings.Default.ListeningPort.ToString());
+                            }
                         }
 
                     }
@@ -403,10 +414,13 @@ namespace ArtemisManagerUI
 
                 foreach (var item in ConnectedPCs)
                 {
-                    if (item.IP.ToString().Equals(e.Source.ToString()))
+                    if (item.IP != null && e.Source != null)
                     {
-                        item.LoadClientInfoData(e);
-                        break;
+                        if (item.IP.ToString().Equals(e.Source.ToString()))
+                        {
+                            item.LoadClientInfoData(e);
+                            break;
+                        }
                     }
                 }
             }
@@ -437,7 +451,7 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnStartServer(object sender, RoutedEventArgs e)
+        private void OnStartServer(object sender, RoutedEventArgs? e)
         {
             DoStartServer();
         }
@@ -454,7 +468,10 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_CommunicationMessageReceived(object? sender, CommunicationMessageEventArgs e)
         {
-            AddChatLine(e.Host, e.Message);
+            if (e.Host != null)
+            {
+                AddChatLine(e.Host, e.Message);
+            }
         }
 
         private void MyNetwork_ActionCommand(object? sender, ActionCommandEventArgs e)
@@ -479,7 +496,7 @@ namespace ArtemisManagerUI
             UpdateStatus(string.Format("Connection to: {0} - {1} CLOSED", e.Address.ToString(), e.Hostname));
             RemovePC(e.Address);
         }
-        void RemovePC(IPAddress address)
+        void RemovePC(IPAddress? address)
         {
             if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
             {
@@ -503,7 +520,7 @@ namespace ArtemisManagerUI
                         ConnectedPCs.Remove(remover);
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
 
                 }
@@ -555,33 +572,36 @@ namespace ArtemisManagerUI
             UpdateStatus(string.Format("Connection Requested from: {0} - {1}", e.Address.ToString(), e.Hostname));
         }
 
-        private void MyNetwork_ItemRequested(object? sender, ItemRequestEventArgs e)
+        private void MyNetwork_ItemRequested(object? sender, ItemRequestEventArgs? e)
         {
             //throw new NotImplementedException();
         }
 
-        private void OnRebroadcast(object sender, RoutedEventArgs e)
+        private void OnRebroadcast(object sender, RoutedEventArgs? e)
         {
             MyNetwork.BroadcastMe();
         }
 
-        private void OnClosed(object sender, EventArgs e)
+        private void OnClosed(object sender, EventArgs? e)
         {
             MyNetwork.HaltAll();
         }
 
-        private void OnDisconnect(object sender, RoutedEventArgs e)
+        private void OnDisconnect(object sender, RoutedEventArgs? e)
         {
             PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null)
+            if (item != null && item.IP != null)
             {
                 if (item.IP.ToString() == IPAddress.Any.ToString())
                 {
                     foreach (var pcItem in ConnectedPCs)
                     {
-                        if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                        if (pcItem.IP != null)
                         {
-                            MyNetwork.Halt(pcItem.IP);
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.Halt(pcItem.IP);
+                            }
                         }
                     }
                 }
@@ -593,7 +613,7 @@ namespace ArtemisManagerUI
             }
 
         }
-        private static PCItem? GetItem(ICommandSource commandSource)
+        private static PCItem? GetItem(ICommandSource? commandSource)
         {
             if (commandSource != null)
             {
@@ -605,18 +625,21 @@ namespace ArtemisManagerUI
             }
 
         }
-        private void OnPing(object sender, RoutedEventArgs e)
+        private void OnPing(object sender, RoutedEventArgs? e)
         {
             PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null)
+            if (item != null && item.IP != null)
             {
                 if (item.IP.ToString() == IPAddress.Any.ToString())
                 {
                     foreach (var pcItem in ConnectedPCs)
                     {
-                        if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                        if (pcItem.IP != null)
                         {
-                            MyNetwork.SendPing(pcItem.IP);
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.SendPing(pcItem.IP);
+                            }
                         }
                     }
                 }
@@ -625,31 +648,39 @@ namespace ArtemisManagerUI
                     MyNetwork.SendPing(item.IP);
                 }
             }
+
         }
 
-        private void OnSendMessage(object sender, RoutedEventArgs e)
+        private void OnSendMessage(object sender, RoutedEventArgs? e)
         {
             PCItem? item = GetItem((ICommandSource)sender);
             Button btn = (Button)sender;
             if (item != null)
             {
-                string msg = btn.Tag.ToString();
+                string? msg = btn.Tag?.ToString();
                 btn.Tag = "";
-                if (item.IP.ToString() == IPAddress.Any.ToString())
+
+                if (item.IP?.ToString() == IPAddress.Any.ToString())
                 {
                     foreach (var pcItem in ConnectedPCs)
                     {
-                        if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                        if (pcItem.IP?.ToString() != IPAddress.Any.ToString() && msg != null)
                         {
-                            AddChatLine("LOCALHOST -> " + pcItem.Hostname, msg);
-                            MyNetwork.SendMessage(pcItem.IP, msg);
+                            if (pcItem.IP != null)
+                            {
+                                AddChatLine("LOCALHOST -> " + pcItem.Hostname, msg);
+                                MyNetwork.SendMessage(pcItem.IP, msg);
+                            }
                         }
                     }
                 }
                 else
                 {
-                    AddChatLine("LOCALHOST -> " + item.Hostname, msg);
-                    MyNetwork.SendMessage(item.IP, msg);
+                    if (msg != null && item.IP != null)
+                    {
+                        AddChatLine("LOCALHOST -> " + item.Hostname, msg);
+                        MyNetwork.SendMessage(item.IP, msg);
+                    }
                 }
             }
         }

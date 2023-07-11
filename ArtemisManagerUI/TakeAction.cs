@@ -28,8 +28,6 @@ namespace ArtemisManagerUI
         }
         public static bool ProcessPCAction(ActionCommands action, bool force, IPAddress? source)
         {
-            
-            bool WasProcessed = false;
             if (!force)
             {
                 //if (MessageBox.Show("The follow action is being requested: " + action.ToString() + ".\r\nDo you wish to allow this?", "Action requested", MessageBoxButton.YesNo) == MessageBoxResult.No)
@@ -37,6 +35,8 @@ namespace ArtemisManagerUI
                 //    return false;
                 //}
             }
+
+            bool WasProcessed;
             switch (action)
             {
                 case ActionCommands.CloseApp:
@@ -70,16 +70,20 @@ namespace ArtemisManagerUI
                         jsonMods.Add(mod.GetJSON());
                     }
 
+#pragma warning disable CS8604 // Possible null reference argument.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                     Network.Current.SendClientInfo(
                         source, Properties.Settings.Default.IsAMaster,
                         Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
-                        System.Array.Empty<string>(), 
+                        System.Array.Empty<string>(),
                         ArtemisManagerAction.ArtemisManager.IsArtemisRunning(),
                         ArtemisManagerAction.ArtemisManager.IsRunningArtemisUnderMyControl(),
                         IsThisAppInStartup());
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8604 // Possible null reference argument.
                     WasProcessed = true;
                     break;
-                default: 
+                default:
                     WasProcessed = false;
                     break;
 
@@ -106,7 +110,11 @@ namespace ArtemisManagerUI
                 var data = Lnk.Lnk.LoadFile(targetLink);
                 if (data != null)
                 {
-                    retVal = data.SourceFile.StartsWith(System.Reflection.Assembly.GetEntryAssembly().Location, StringComparison.InvariantCultureIgnoreCase);
+                    var asm = System.Reflection.Assembly.GetEntryAssembly();
+                    if (asm != null)
+                    {
+                        retVal = data.SourceFile.StartsWith(asm.Location, StringComparison.InvariantCultureIgnoreCase);
+                    }
                 }
             }
             return retVal;
@@ -114,21 +122,24 @@ namespace ArtemisManagerUI
         public static void CreateShortcutInStartup()
         {
             var temp = Path.GetTempFileName() + ".vbs";
-            string appLocation = System.Reflection.Assembly.GetEntryAssembly().Location;
-            string appName = appLocation.Substring(0, appLocation.Length - 4);
-            using (StreamWriter sw = new StreamWriter(temp))
+            var asm = System.Reflection.Assembly.GetEntryAssembly();
+            if (asm != null)
             {
-                sw.WriteLine("Set oWS = WScript.CreateObject(\"WScript.Shell\")");
+                string appLocation = asm.Location;
+                string appName = appLocation.Substring(0, appLocation.Length - 4);
+                using (StreamWriter sw = new(temp))
+                {
+                    sw.WriteLine("Set oWS = WScript.CreateObject(\"WScript.Shell\")");
 
-                sw.WriteLine("sLinkFile = \"" + Path.Combine(StartupFolder, appName + ".lnk") + "\"");
-                sw.WriteLine("Set oLink = oWS.CreateShortcut(sLinkFile)");
-                sw.WriteLine("oLink.TargetPath = \"" + appLocation + "\"");
-                sw.WriteLine("oLink.IconLocation = \"" + appLocation + ", 2\"");
-                sw.WriteLine("oLink.Description = \"Artemis Manager\"");
-                sw.WriteLine("oLink.Save");
-                sw.WriteLine("objFSO.DeleteFile(\"" + temp + "\")");
-            }
-            System.Diagnostics.Process.Start("cscript " + temp);
+                    sw.WriteLine("sLinkFile = \"" + Path.Combine(StartupFolder, appName + ".lnk") + "\"");
+                    sw.WriteLine("Set oLink = oWS.CreateShortcut(sLinkFile)");
+                    sw.WriteLine("oLink.TargetPath = \"" + appLocation + "\"");
+                    sw.WriteLine("oLink.IconLocation = \"" + appLocation + ", 2\"");
+                    sw.WriteLine("oLink.Description = \"Artemis Manager\"");
+                    sw.WriteLine("oLink.Save");
+                    sw.WriteLine("objFSO.DeleteFile(\"" + temp + "\")");
+                }
+                System.Diagnostics.Process.Start("cscript " + temp);
                 /*
                  * Set oWS = WScript.CreateObject("WScript.Shell")
 sLinkFile = "C:\MyShortcut.LNK"
@@ -142,6 +153,7 @@ Set oLink = oWS.CreateShortcut(sLinkFile)
  '  oLink.WorkingDirectory = "C:\Program Files\MyApp"
 oLink.Save
                  * */
+            }
         }
     }
 }

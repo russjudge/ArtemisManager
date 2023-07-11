@@ -9,12 +9,9 @@ namespace AMCommunicator.Messages
 {
 
     [NetworkMessageCommand(MessageCommand.PCAction)]
-    internal class PCActionMessage : NetworkMessageAbstract
+    internal class PCActionMessage : NetworkMessage
     {
         public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public PCActionMessage(byte[] data) : base(data) { }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public PCActionMessage() : base()
         {
@@ -23,24 +20,14 @@ namespace AMCommunicator.Messages
         public PCActionMessage(PCActions action, bool force) : base()
         {
             Force = force;
-            SetAction(action);
+            Action = action;
         }
 
-        public void SetAction(PCActions action)
-        {
-            Action = (short)action;
-        }
-        public PCActions GetAction()
-        {
-            return (PCActions)Action;
-        }
-        [NetworkMessage(Sequence = 4)]
-        public short Action { get; private set; }
-        public bool Force { get; private set; }
+        public PCActions Action { get; protected set; }
+        public bool Force { get; protected set; }
 
-        protected override void SetCommand()
+        protected override void SetMessageVersion()
         {
-            Command = MessageCommand.PCAction;
             MessageVersion = ThisVersion;
         }
     }

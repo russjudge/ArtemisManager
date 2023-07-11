@@ -10,7 +10,7 @@ namespace AMCommunicator
 {
     internal class ConnectionTracker
     {
-        public ConnectionTracker(string hostname, IPAddress address, NetworkStream stream, Socket socket, Thread thread)
+        public ConnectionTracker(string hostname, IPAddress address, NetworkStream? stream, Socket socket, Thread? thread)
         {
             Hostname = hostname;
             Address = address;
@@ -20,9 +20,9 @@ namespace AMCommunicator
         }
         public string Hostname { get; private set; }
         public IPAddress Address { get; private set; }
-        public NetworkStream Stream { get; private set; }
+        public NetworkStream? Stream { get; private set; }
         public Socket Socket { get; private set; }
-        public Thread Thread { get; private set; }
+        public Thread? Thread { get; private set; }
 
     }
 }

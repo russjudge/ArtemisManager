@@ -94,7 +94,7 @@ namespace ArtemisManagerAction
                     retVal = wrkKey.GetValue(string.Empty) as string;
                     if (retVal != null)
                     {
-                        FileInfo f = new FileInfo(retVal);
+                        FileInfo f = new (retVal);
                         if (f.Exists)
                         {
                             retVal = f.DirectoryName;
@@ -143,25 +143,23 @@ namespace ArtemisManagerAction
                 if (File.Exists(changesFile))
                 {
 
-                    using (StreamReader sr = new StreamReader(changesFile))
+                    using StreamReader sr = new(changesFile);
+                    string? line;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        string? line;
-                        while ((line = sr.ReadLine()) != null)
+                        if (line.Contains("changes for", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            if (line.Contains("changes for", StringComparison.InvariantCultureIgnoreCase))
+                            int i = line.IndexOf(" V");
+                            if (i > -1)
                             {
-                                int i = line.IndexOf(" V");
-                                if (i > -1)
+                                int j = line.IndexOf(" ");
+                                if (j < 0)
                                 {
-                                    int j = line.IndexOf(" ");
-                                    if (j < 0)
-                                    {
-                                        j = line.Length;
-                                    }
-                                    retVal = line.Substring(i + 2, j - (i + 2));
+                                    j = line.Length;
                                 }
-                                break;
+                                retVal = line.Substring(i + 2, j - (i + 2));
                             }
+                            break;
                         }
                     }
                 }

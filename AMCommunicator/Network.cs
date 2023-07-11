@@ -21,7 +21,7 @@ namespace AMCommunicator
 
         //TODO: Master/slave relationship?  --later.
         public static string Password { get; set; }
-        private ManualResetEvent mreSender = new(false);
+        private readonly ManualResetEvent mreSender = new(false);
         
         private Network()
         {
@@ -31,10 +31,7 @@ namespace AMCommunicator
         public static Network? Current { get; private set; }
         public static Network GetNetwork(string password)
         {
-            if (Current == null)
-            {
-                Current = new Network();
-            }
+            Current ??= new Network();
             Password = password;
             return Current;
         }
@@ -110,8 +107,10 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                PingMessage msg = new PingMessage();
-                msg.Acknowledge = true;
+                PingMessage msg = new()
+                {
+                    Acknowledge = true
+                };
                 Transmit(connection.Stream, msg);
             }
 
@@ -120,7 +119,7 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                PCActionMessage msg = new PCActionMessage(action, force);
+                PCActionMessage msg = new(action, force);
                 
                 Transmit(connection.Stream, msg);
             }
@@ -129,7 +128,7 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                CommunicationMessage msg = new CommunicationMessage(message);
+                CommunicationMessage msg = new(message);
 
                 Transmit(connection.Stream, msg);
             }
@@ -138,7 +137,7 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                ChangeAppSettingMessage msg = new ChangeAppSettingMessage(settingName, settingTarget);
+                ChangeAppSettingMessage msg = new(settingName, settingTarget);
 
                 Transmit(connection.Stream, msg);
             }
@@ -147,7 +146,7 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                ChangePasswordMessage msg = new ChangePasswordMessage(newPassword);
+                ChangePasswordMessage msg = new(newPassword);
 
                 Transmit(connection.Stream, msg);
             }
@@ -156,7 +155,7 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                AlertMessage msg = new AlertMessage(alert, relatedData);
+                AlertMessage msg = new(alert, relatedData);
 
                 Transmit(connection.Stream, msg);
             }
@@ -166,17 +165,16 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                ClientInfoMessage msg = new ClientInfoMessage(isMaster, connectOnStart, installedMods,
-                    installedMissions, artemisIsRunning, isUsingThisAppControlledArtemis, appInStartFolder );
+                ClientInfoMessage msg = new(isMaster, connectOnStart, installedMods, installedMissions, artemisIsRunning, isUsingThisAppControlledArtemis, appInStartFolder);
 
                 Transmit(connection.Stream, msg);
             }
         }
         //For tracking and processing on active connections.
-        Dictionary<IPAddress, ConnectionTracker> activeConnections = new();
+        private readonly Dictionary<IPAddress, ConnectionTracker> activeConnections = new();
 
         //ONLY for starting connections.
-        Queue<connectionQueueItem> queuedClients = new();
+        private readonly Queue<ConnectionQueueItem> queuedClients = new();
         /// <summary>
         /// This starts the TCP connection linking the command structure together.
         /// A TCP connection has been received here.
@@ -189,97 +187,99 @@ namespace AMCommunicator
             var queuedItem = queuedClients.Dequeue();
             try
             {
-                var generalEndPoint = queuedItem.client.Client.RemoteEndPoint;
+                
+                var generalEndPoint = queuedItem.Client.Client.RemoteEndPoint;
                 if (generalEndPoint != null)
                 {
                     var endPoint = (IPEndPoint)generalEndPoint;
                     remoteAddress = endPoint?.Address;
-                    if (remoteAddress == null)
-                    {
-                        remoteAddress = IPAddress.None;
-                    }
+                    remoteAddress ??= IPAddress.None;
                     if (remoteAddress != null && remoteAddress != MyIP && remoteAddress != IPAddress.None && remoteAddress != IPAddress.Any)  //Don't want to connect to self or broadcast.
                     {
                         if (!activeConnections.ContainsKey(remoteAddress))
                         {
                             hostname = Dns.GetHostEntry(remoteAddress).HostName;
-                            ConnectionTracker trackItem = new ConnectionTracker(hostname, remoteAddress, queuedItem.client.GetStream(), queuedItem.client.Client, queuedItem.thread);
-
-                            activeConnections.Add(remoteAddress, trackItem);
-                            TCPStarter.Set();
-                            RaiseConnectionReceived(remoteAddress, hostname);
-                            byte[] buff;
-                            List<byte> buffer;
-                            int bytesRead = 0;
-                            if (!queuedItem.FromListener)
+                            ConnectionTracker trackItem = new(hostname, remoteAddress, queuedItem.Client.GetStream(), queuedItem.Client.Client, queuedItem.Thread);
+                            if (trackItem.Stream != null)
                             {
-                                RaiseStatusUpdate("Sending Handshake to {0}:{1}", remoteAddress.ToString(), hostname);
-                                //MUST SEND handshake item first here.
-                                HandshakeMessage msg = new HandshakeMessage();
-                                Transmit(trackItem.Stream, msg);
-                                SendPCAction(remoteAddress, PCActions.SendClientInformation, true);
-                            }
-                            do
-                            {
-                                RaiseStatusUpdate("Beginning read of stream loop for {0}", hostname);
+                                activeConnections.Add(remoteAddress, trackItem);
+                                TCPStarter.Set();
+                                RaiseConnectionReceived(remoteAddress, hostname);
+                                byte[] buff;
+                                List<byte> buffer;
+                                int bytesRead = 0;
+                                if (!queuedItem.FromListener)
+                                {
+                                    RaiseStatusUpdate("Sending Handshake to {0}:{1}", remoteAddress.ToString(), hostname);
+                                    //MUST SEND handshake item first here.
+                                    HandshakeMessage msg = new();
+                                    Transmit(trackItem.Stream, msg);
+                                    SendPCAction(remoteAddress, PCActions.SendClientInformation, true);
+                                }
                                 do
                                 {
-                                    buff = new byte[NetworkMessage.LengthPosition + NetworkMessage.LengthLength];
-                                    buffer = new List<byte>();
-                                    bytesRead = trackItem.Stream.Read(buff, 0, buff.Length);
-                                    RaiseStatusUpdate("Read packet length: {0} bytes from {1}", bytesRead, hostname);
-                                    if (bytesRead > 0)
+                                    RaiseStatusUpdate("Beginning read of stream loop for {0}", hostname);
+                                    do
                                     {
-                                        byte[] wrkByte = new byte[bytesRead];
-                                        Array.Copy(buff, 0, wrkByte, 0, bytesRead);
-                                        buffer.AddRange(wrkByte);
-                                    }
-
-                                } while (buffer.Count < (NetworkMessage.LengthPosition + NetworkMessage.LengthLength) && bytesRead > 0);
-                                if (bytesRead > 0)
-                                {
-                                    int msgLength = BitConverter.ToInt32(buffer.ToArray(), NetworkMessage.LengthPosition);
-
-                                    RaiseStatusUpdate("Packet Length: {0}", msgLength);
-                                    List<byte> newBuffer = new List<byte>(buffer.ToArray());
-
-                                    while (newBuffer.Count < msgLength && bytesRead > 0)
-                                    {
-                                        buff = new byte[msgLength - newBuffer.Count];
+                                        buff = new byte[NetworkMessageHeader.JSONDefinitionLengthPosition + NetworkMessageHeader.JSONDefinitionLength];
+                                        buffer = new List<byte>();
                                         bytesRead = trackItem.Stream.Read(buff, 0, buff.Length);
-
+                                        RaiseStatusUpdate("Read packet length: {0} bytes from {1}", bytesRead, hostname);
                                         if (bytesRead > 0)
                                         {
                                             byte[] wrkByte = new byte[bytesRead];
                                             Array.Copy(buff, 0, wrkByte, 0, bytesRead);
-                                            newBuffer.AddRange(wrkByte);
+                                            buffer.AddRange(wrkByte);
                                         }
-                                    }
-                                    RaiseStatusUpdate("Finished reading Packet for host {0}.  Full packet size: {1} (includes Length property)", hostname, newBuffer.Count);
 
-                                    var theMessage = NetworkMessage.GetMessage(newBuffer.ToArray());
-                                    if (theMessage != null)
+                                    } while (buffer.Count < (NetworkMessageHeader.JSONDefinitionLengthPosition + NetworkMessageHeader.JSONDefinitionLength) && bytesRead > 0);
+
+
+
+                                    if (bytesRead > 0)
                                     {
 
-                                        theMessage.Source = remoteAddress;
-                                        RaiseStatusUpdate("{0} message received from {1}.  Processing...", theMessage.GetType().Name, hostname);
-                                        disconnect = ProcessMessage(trackItem.Stream, theMessage);
-                                        RaiseStatusUpdate("Done processing {0} from {1}...Disconnect required = {2}", theMessage.GetType().Name, hostname, disconnect);
+                                        int msgLength = BitConverter.ToInt32(buffer.ToArray(), NetworkMessageHeader.JSONDefinitionLengthPosition + NetworkMessageHeader.JSONDefinitionLength) + NetworkMessageHeader.HeaderLength;
+
+                                        RaiseStatusUpdate("Packet Length: {0}", msgLength);
+                                        List<byte> newBuffer = new(buffer.ToArray());
+
+                                        while (newBuffer.Count < msgLength && bytesRead > 0)
+                                        {
+                                            buff = new byte[msgLength - newBuffer.Count];
+                                            bytesRead = trackItem.Stream.Read(buff, 0, buff.Length);
+
+                                            if (bytesRead > 0)
+                                            {
+                                                byte[] wrkByte = new byte[bytesRead];
+                                                Array.Copy(buff, 0, wrkByte, 0, bytesRead);
+                                                newBuffer.AddRange(wrkByte);
+                                            }
+                                        }
+                                        RaiseStatusUpdate("Finished reading Packet for host {0}.  Full packet size: {1} (includes Length property)", hostname, newBuffer.Count);
+                                        NetworkMessageHeader header = new(newBuffer.ToArray());
+
+                                        if (!string.IsNullOrEmpty(header.JSON))
+                                        {
+                                            RaiseStatusUpdate("{0} message received from {1}.  Processing...", header.Command, hostname);
+                                            disconnect = ProcessMessage(trackItem.Stream, header, hostname);
+                                            RaiseStatusUpdate("Done processing {0} from {1}...Disconnect required = {2}", header.Command, hostname, disconnect);
+                                        }
+                                        else
+                                        {
+                                            RaiseStatusUpdate("Unable to convert packet to a network message for packet form host {0}.  Disconnecting from host.", hostname);
+                                            disconnect = true;
+                                        }
                                     }
                                     else
                                     {
-                                        RaiseStatusUpdate("Unable to convert packet to a network message for packet form host {0}.  Disconnecting from host.", hostname);
-                                        disconnect = true;
+                                        abort = true;
+
+                                        mreSender.Set();
                                     }
-                                }
-                                else
-                                {
-                                    abort = true;
 
-                                    mreSender.Set();
-                                }
-
-                            } while (!abort && !disconnect);
+                                } while (!abort && !disconnect);
+                            }
                         }
                         else
                         {
@@ -288,7 +288,14 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        RaiseStatusUpdate("Invalid connection request: request to connect to IP: {0}", remoteAddress);
+                        if (remoteAddress != null)
+                        {
+                            RaiseStatusUpdate("Invalid connection request: request to connect to IP: {0}", remoteAddress);
+                        }
+                        else
+                        {
+                            RaiseStatusUpdate("Invalid connection request: request to connect to IP: unknown");
+                        }
                     }
                 }
                 else
@@ -318,14 +325,14 @@ namespace AMCommunicator
             }
             finally
             {
-                if (queuedItem.client != null)
+                if (queuedItem.Client != null && remoteAddress != null)
                 {
                     activeConnections.Remove(remoteAddress);
                 }
-                if (queuedItem.client != null && queuedItem.client.Connected)
+                if (queuedItem.Client != null && queuedItem.Client.Connected)
                 {
-                    queuedItem.client.Client.Shutdown(SocketShutdown.Both);
-                    queuedItem.client.Close();
+                    queuedItem.Client.Client.Shutdown(SocketShutdown.Both);
+                    queuedItem.Client.Close();
                 }
             }
             ConnectionClosed?.Invoke(this, new ConnectionRequestEventArgs(remoteAddress, hostname));
@@ -338,48 +345,48 @@ namespace AMCommunicator
         {
             MessageVersionMismatch?.Invoke(this, new VersionMismatchEventArgs(expected, actual, source));
         }
-        bool ProcessMessage(NetworkStream stream, NetworkMessage? message)
+        bool ProcessMessage(NetworkStream stream, NetworkMessageHeader? message, string hostname)
         {
             bool disconnect = false;
             if (message != null)
             {
-                RaiseStatusUpdate("Processing command: {0} for host {1}", message.Command.ToString(), message.Source);
+                RaiseStatusUpdate("Processing command: {0} for host {1}", message.Command.ToString(), hostname);
             }
             
             switch (message?.Command)
             {
                 case MessageCommand.Handshake:
-                    disconnect = ProcessHandshake(stream, (HandshakeMessage)message);
+                    disconnect = ProcessHandshake(stream, message?.GetItem<HandshakeMessage>());
                     break;
                 case MessageCommand.ClientInfo:
-                    disconnect= ProcessClientInfoMessage(stream, (ClientInfoMessage)message);
+                    disconnect= ProcessClientInfoMessage(stream, message?.GetItem<ClientInfoMessage>());
                     break;
                 case MessageCommand.RequestItem:
-                    disconnect = ProcessRequestItem(stream, (RequestItemMessage)message);
+                    disconnect = ProcessRequestItem(stream, message?.GetItem<RequestItemMessage>());
                     break;
                 case MessageCommand.Item:
                     break;
                 case MessageCommand.ChangePassword:
-                    ProcessPasswordChange(stream, (ChangePasswordMessage)message);
+                    ProcessPasswordChange(stream, message?.GetItem<ChangePasswordMessage>());
                     break;
                 case MessageCommand.PCAction:
-                    disconnect = ProcessPCAction(stream, (PCActionMessage)message);
+                    disconnect = ProcessPCAction(stream, message?.GetItem<PCActionMessage>(), hostname);
                     break;
                 case MessageCommand.UpdateCheck:
                     break;
                 case MessageCommand.AretmisAction:
                     break;
                 case MessageCommand.Communication:
-                    disconnect = ProcessCommunication(stream, (CommunicationMessage)message);
+                    disconnect = ProcessCommunication(stream, message?.GetItem<CommunicationMessage>());
                     break;
                 case MessageCommand.Ping:
-                    disconnect = ProcessPing(stream, (PingMessage)message);
+                    disconnect = ProcessPing(stream, message?.GetItem<PingMessage>());
                     break;
                 case MessageCommand.ChangeAppSetting:
-                    disconnect = ProcessChangeSetting(stream, (ChangeAppSettingMessage)message);
+                    disconnect = ProcessChangeSetting(stream, message?.GetItem<ChangeAppSettingMessage>());
                     break;
                 case MessageCommand.Alert:
-                    disconnect = ProcessAlert(stream, (AlertMessage)message);
+                    disconnect = ProcessAlert(stream, message?.GetItem<AlertMessage>());
                     break;
                // case MessageCommand.SetClientInfo:
                //  break;
@@ -413,73 +420,121 @@ namespace AMCommunicator
             else
             {
                 RaiseStatusUpdate("Transmitting {0}", msg.GetType().Name);
-                var bytes = msg.GetBytes();
+                var data = new NetworkMessageHeader(msg);
+
+                var bytes = data.GetBytes();
                 stream.Write(bytes, 0, bytes.Length);
             }
         }
-        private bool ProcessAlert(NetworkStream? stream, AlertMessage msg)
+        private bool ProcessAlert(NetworkStream? stream, AlertMessage? msg)
         {
-            AlertReceived?.Invoke(this, new AlertEventArgs(msg.Source, msg.GetAlertItem(), msg.RelatedData.Message));
+            if (msg != null)
+            {
+                AlertReceived?.Invoke(this, new AlertEventArgs(msg.Source, msg.AlertItem, msg.RelatedData));
+            }
             return false;
         }
-        private bool ProcessChangeSetting(NetworkStream? stream, ChangeAppSettingMessage msg)
+        private bool ProcessChangeSetting(NetworkStream? stream, ChangeAppSettingMessage? msg)
         {
-            if (msg.MessageVersion != ChangeAppSettingMessage.ThisVersion)
+            if (msg != null)
             {
-                //We might be unattended here, so we need to alert the sender of an issue.
-                SendAlert(msg.Source, AlertItems.MessageVersionMismatch, 
-                    string.Format("ChangeAppSettingsMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
-                    ChangeAppSettingMessage.ThisVersion, msg.MessageVersion));
+                if (msg.MessageVersion != ChangeAppSettingMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //We might be unattended here, so we need to alert the sender of an issue.
+                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                            string.Format("ChangeAppSettingsMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
+                            ChangeAppSettingMessage.ThisVersion, msg.MessageVersion));
+                    }
+                }
+                else
+                {
+                    ChangeSetting?.Invoke(this, new ChangeSettingEventArgs(msg.SettingName, msg.SettingValue));
 
-            }
-            else
-            {
-                ChangeSetting?.Invoke(this, new ChangeSettingEventArgs(msg.SettingName.Message, msg.SettingValue.Message));
-                
+                }
             }
             return false;
         }
-        private bool ProcessPasswordChange(NetworkStream? stream, ChangePasswordMessage msg)
+        private bool ProcessPasswordChange(NetworkStream? stream, ChangePasswordMessage? msg)
         {
-            if (msg.MessageVersion != ChangePasswordMessage.ThisVersion)
+            if (msg != null)
             {
-                SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("ChangePasswordMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Password cannot be changed.\r\nIf this peer is restarted, it will not be able to reconnect to the peer-to-peer network until the password is manually changed.",
-                  ChangePasswordMessage.ThisVersion, msg.MessageVersion));
+                if (msg.MessageVersion != ChangePasswordMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("ChangePasswordMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Password cannot be changed.\r\nIf this peer is restarted, it will not be able to reconnect to the peer-to-peer network until the password is manually changed.",
+                          ChangePasswordMessage.ThisVersion, msg.MessageVersion));
+                    }
+                }
+                else
+                {
+                    PasswordChanged?.Invoke(this, new CommunicationMessageEventArgs(msg.Source?.ToString(), msg.NewPassword));
+                }
+                return false;
             }
             else
             {
-                PasswordChanged?.Invoke(this, new CommunicationMessageEventArgs(msg.Source.ToString(), msg.NewPassword.Message));
+                return true;
             }
-            return false;
+            
         }
-        private bool ProcessCommunication(NetworkStream? stream, CommunicationMessage msg)
+        private bool ProcessCommunication(NetworkStream? stream, CommunicationMessage? msg)
         {
             bool disconnect = false;
-            if (msg.MessageVersion != CommunicationMessage.ThisVersion)
+            if (msg != null)
             {
-                SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("CommunicationMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. .",
-                  CommunicationMessage.ThisVersion, msg.MessageVersion));
+                if (msg.MessageVersion != CommunicationMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("CommunicationMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. .",
+                          CommunicationMessage.ThisVersion, msg.MessageVersion));
+                    }
+                }
+                CommunicationMessageReceived?.Invoke(this, new CommunicationMessageEventArgs(msg.Source?.ToString(), msg.Message));
             }
-            CommunicationMessageReceived?.Invoke(this, new CommunicationMessageEventArgs(msg.Source.ToString(), msg.Message.Message));
-
             return disconnect;
         }
         
-        private bool ProcessPing(NetworkStream stream, PingMessage msg)
+        private bool ProcessPing(NetworkStream stream, PingMessage? msg)
         {
-            if (msg.MessageVersion != PingMessage.ThisVersion)
+            if (msg != null)
             {
-                SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("PingMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
-                  PingMessage.ThisVersion, msg.MessageVersion));
-            }
+                if (msg.MessageVersion != PingMessage.ThisVersion)
+                {
+                    if (msg.Source != null)
+                    {
+                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("PingMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
+                          PingMessage.ThisVersion, msg.MessageVersion));
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
 
-            if (msg.Acknowledge)
-            {
-                msg.Acknowledge = false;
-                Transmit(stream, msg);
+                if (msg.Acknowledge)
+                {
+                    msg.Acknowledge = false;
+                    Transmit(stream, msg);
+                }
             }
             return false;
         }
@@ -487,141 +542,198 @@ namespace AMCommunicator
         {
             ActionCommand?.Invoke(this, new ActionCommandEventArgs(action, force, source));
         }
-        private bool ProcessPCAction(NetworkStream stream, PCActionMessage msg)
+        private bool ProcessPCAction(NetworkStream stream, PCActionMessage? msg, string hostname)
         {
-            if ((PCActions)msg.Action != PCActions.CheckForUpdate && msg.MessageVersion != PCActionMessage.ThisVersion)
+            if (msg != null)
             {
-                SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("PCActionMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process PC Action until update is performed.",
-                  PCActionMessage.ThisVersion, msg.MessageVersion));
-                return false;
-            }
-            else
-            {
-                switch ((PCActions)msg.Action)
+                if ((PCActions)msg.Action != PCActions.CheckForUpdate && msg.MessageVersion != PCActionMessage.ThisVersion)
                 {
-                    case PCActions.DisconnectThisConnection:
-                        RaiseStatusUpdate("Disconnect requested from host {0}.", msg.Source);
-                        return true;
-                    case PCActions.CheckForUpdate:
-                        RaiseStatusUpdate("Software Update check requested from {0}", msg.Source);
-                        RaiseActionCommand(ActionCommands.UpdateCheck, msg.Force, msg.Source);
+                    if (msg.Source != null)
+                    {
+                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("PCActionMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process PC Action until update is performed.",
+                          PCActionMessage.ThisVersion, msg.MessageVersion));
                         return false;
-                    case PCActions.ShutdownPC:
-                        RaiseStatusUpdate("PC Shutdown requested from {0}", msg.Source);
-                        RaiseActionCommand(ActionCommands.ShutdownPC, msg.Force, msg.Source);
+                    }
+                    else
+                    {
                         return true;
-                    case PCActions.RestartPC:
-                        RaiseStatusUpdate("PC Restart requested from {0}", msg.Source);
-                        RaiseActionCommand(ActionCommands.RestartPC, msg.Force, msg.Source);
-                        return true;
-                    case PCActions.CloseApp:
-                        RaiseStatusUpdate("Application Close requested from {0}", msg.Source);
-                        RaiseActionCommand(ActionCommands.CloseApp, msg.Force, msg.Source);
-                        return true;
-                    case PCActions.SendClientInformation:
-                        RaiseStatusUpdate("Client Information requested from {0}", msg.Source);
-                        RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, msg.Source);
-                        return false;
-                    default:
-                        RaiseStatusUpdate("Invalid PCAction requested from host {0}", msg.Source);
-                        return false;
+                    }
+                }
+                else
+                {
+                    switch ((PCActions)msg.Action)
+                    {
+                        case PCActions.DisconnectThisConnection:
+                            RaiseStatusUpdate("Disconnect requested from host {0}.", hostname);
+                            return true;
+                        case PCActions.CheckForUpdate:
+                            RaiseStatusUpdate("Software Update check requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.UpdateCheck, msg.Force, msg.Source);
+                            return false;
+                        case PCActions.ShutdownPC:
+                            RaiseStatusUpdate("PC Shutdown requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.ShutdownPC, msg.Force, msg.Source);
+                            return true;
+                        case PCActions.RestartPC:
+                            RaiseStatusUpdate("PC Restart requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.RestartPC, msg.Force, msg.Source);
+                            return true;
+                        case PCActions.CloseApp:
+                            RaiseStatusUpdate("Application Close requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.CloseApp, msg.Force, msg.Source);
+                            return true;
+                        case PCActions.SendClientInformation:
+                            RaiseStatusUpdate("Client Information requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, msg.Source);
+                            return false;
+                        default:
+                            RaiseStatusUpdate("Invalid PCAction requested from host {0}", hostname);
+                            return false;
+                    }
                 }
             }
+            return false;
         }
 
-        private bool ProcessRequestItem(NetworkStream stream, RequestItemMessage msg)
+        private bool ProcessRequestItem(NetworkStream stream, RequestItemMessage? msg)
         {
-            if (msg.MessageVersion != RequestItemMessage.ThisVersion)
+            if (msg != null)
             {
-                SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("RequestItemMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process request until update is performed.",
-                  RequestItemMessage.ThisVersion, msg.MessageVersion));
-                return false;
+                if (msg.MessageVersion != RequestItemMessage.ThisVersion)
+                {
+                    if (msg.Source != null)
+                    {
+                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("RequestItemMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process request until update is performed.",
+                          RequestItemMessage.ThisVersion, msg.MessageVersion));
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    ItemRequested?.Invoke(this, new ItemRequestEventArgs(msg.Source, msg.ItemIdentifier));
+                }
             }
-            else
-            {
-                ItemRequested?.Invoke(this, new ItemRequestEventArgs(msg.Source, msg.ItemIdentifier.Message));
-                return false;
-            }
+            return false;
         }
 
-        private bool ProcessHandshake(NetworkStream stream, HandshakeMessage message)
+        private bool ProcessHandshake(NetworkStream stream, HandshakeMessage? message)
         {
-            //Skip version check if the password is invalid.
-            if (message.IsValid() && message.MessageVersion != HandshakeMessage.ThisVersion)
+            bool retVal = false;
+            if (message != null)
             {
-                SendAlert(message.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("HandshakeMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
-                  HandshakeMessage.ThisVersion, message.MessageVersion));
-            }
-            bool retVal = !message.IsValid();
-            if (retVal)
-            {
-                SendPCAction(message.Source, PCActions.SendClientInformation, true);
+                if (message.IsValid() && message.MessageVersion != HandshakeMessage.ThisVersion)
+                {
+                    if (message.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        SendAlert(message.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("HandshakeMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
+                          HandshakeMessage.ThisVersion, message.MessageVersion));
+                    }
+                }
+                retVal = !message.IsValid();
+                if (retVal)
+                {
+                    if (message.Source == null)
+                    {
+                        retVal = true;
+                    }
+                    else
+                    {
+                        SendPCAction(message.Source, PCActions.SendClientInformation, true);
+                    }
+                }
             }
             return retVal;
         }
 
 
-        private bool ProcessClientInfoMessage(NetworkStream stream, ClientInfoMessage message)
+        private bool ProcessClientInfoMessage(NetworkStream stream, ClientInfoMessage? message)
         {
-            if (message.MessageVersion != ClientInfoMessage.ThisVersion)
+            if (message != null)
             {
-                SendAlert(message.Source, AlertItems.MessageVersionMismatch,
-                  string.Format("ClientInfoMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process Information until update is performed.",
-                  ClientInfoMessage.ThisVersion, message.MessageVersion));
-            }
-            else
-            {
-                ClientInfoReceived?.Invoke(this, new ClientInfoEventArgs(message));
+
+                if (message.MessageVersion != ClientInfoMessage.ThisVersion)
+                {
+                    if (message.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        SendAlert(message.Source, AlertItems.MessageVersionMismatch,
+                          string.Format("ClientInfoMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process Information until update is performed.",
+                          ClientInfoMessage.ThisVersion, message.MessageVersion));
+                    }
+                }
+                else
+                {
+                    ClientInfoReceived?.Invoke(this, new ClientInfoEventArgs(message));
+                }
             }
             return false;
         }
 
-        class connectionQueueItem
+        class ConnectionQueueItem
         {
-            public connectionQueueItem(TcpClient client, Thread thread, bool fromListener)
+            public ConnectionQueueItem(TcpClient client, Thread thread, bool fromListener)
             {
-                this.client = client;
+                this.Client = client;
                 FromListener = fromListener;
-                this.thread = thread;
-                stream = null;
+                this.Thread = thread;
+                Stream = null;
             }
-            public TcpClient client { get; set; }
-            public Thread thread { get; set; }
+            public TcpClient Client { get; set; }
+            public Thread Thread { get; set; }
             public bool FromListener { get; set; }
-            public NetworkStream? stream { get; set; }
+            public NetworkStream? Stream { get; set; }
         }
         void QueueThread(TcpClient client, bool fromListener)
         {
-            ThreadStart start = new ThreadStart(StartConnection);
+            ThreadStart start = new(StartConnection);
             Thread thd = new(start);
-            connectionQueueItem itemToQueue = new connectionQueueItem(client, thd, fromListener);
+            ConnectionQueueItem itemToQueue = new(client, thd, fromListener);
             queuedClients.Enqueue(itemToQueue);
             thd.Start();
         }
         TcpListener? server = null;
-        ManualResetEvent TCPStarter = new ManualResetEvent(true);
+        private readonly ManualResetEvent TCPStarter = new(true);
         private void ListenTCP()
         {
             try
             {
-                RaiseStatusUpdate("Setting listener for IPAddress: {0}, on port: {1}", MyIP, ConnectionPort);
-                server = new TcpListener(MyIP, ConnectionPort);
-
-                // Start listening for client requests.
-                server.Start();
-                RaiseStatusUpdate("TCP Listener server started.");
-                // Enter the listening loop.
-                while (!abort)
+                if (MyIP == null)
                 {
-                    TCPStarter.WaitOne();
-                    RaiseStatusUpdate("Waiting for remote TCP Client to connect...");
-                    TcpClient client = server.AcceptTcpClient();
-                    RaiseStatusUpdate("TCP client has connected...");
-                    QueueThread(client, true);
-                    TCPStarter.Reset();
+                    RaiseStatusUpdate("Setting listener for IPAddress: NULL, on port: {0}", ConnectionPort);
+                }
+                else
+                {
+                    RaiseStatusUpdate("Setting listener for IPAddress: {0}, on port: {1}", MyIP, ConnectionPort);
+
+
+                    server = new TcpListener(MyIP, ConnectionPort);
+
+                    // Start listening for client requests.
+                    server.Start();
+                    RaiseStatusUpdate("TCP Listener server started.");
+                    // Enter the listening loop.
+                    while (!abort)
+                    {
+                        TCPStarter.WaitOne();
+                        RaiseStatusUpdate("Waiting for remote TCP Client to connect...");
+                        TcpClient client = server.AcceptTcpClient();
+                        RaiseStatusUpdate("TCP client has connected...");
+                        QueueThread(client, true);
+                        TCPStarter.Reset();
+                    }
                 }
             }
             catch (ThreadInterruptedException) 
@@ -641,8 +753,8 @@ namespace AMCommunicator
         
         private void ListenUDP()
         {
-            using UdpClient client = new UdpClient();
-            IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, udpPort);
+            using UdpClient client = new();
+            IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, udpPort);
             activeConnections.Add(IPAddress.Any, new ConnectionTracker("UDP Listener Service", IPAddress.Any, null, client.Client, null));
             
             client.Client.Bind(RemoteIpEndPoint);
@@ -661,7 +773,7 @@ namespace AMCommunicator
                         {
                             RaiseStatusUpdate("Broadcast source: {0}", data[1]);
                             IPAddress address = IPAddress.Parse(data[1]);
-                            if (address.ToString() == MyIP.ToString())
+                            if (address?.ToString() == MyIP?.ToString())
                             {
                                 RaiseStatusUpdate("Invalid connection IP--received self. rejecting.");
                             }
@@ -675,9 +787,8 @@ namespace AMCommunicator
                                     }
                                     else
                                     {
-                                        int port;
 
-                                        if (int.TryParse(data[2], out port))
+                                        if (int.TryParse(data[2], out int port))
                                         {
                                             RaiseConnectionRequested(address, "unknown");
                                             Connect(address, port);
@@ -690,7 +801,14 @@ namespace AMCommunicator
                                 }
                                 else
                                 {
-                                    RaiseStatusUpdate("Invalid connection IP: {0}", address);
+                                    if (address == null)
+                                    {
+                                        RaiseStatusUpdate("Invalid connection IP: NULL");
+                                    }
+                                    else
+                                    {
+                                        RaiseStatusUpdate("Invalid connection IP: {0}", address);
+                                    }
                                 }
                             }
                         }
@@ -732,7 +850,7 @@ namespace AMCommunicator
         public void Connect()
         {
             RaiseStatusUpdate("Starting Connection Services...");
-            ThreadStart start = new ThreadStart(ListenTCP);
+            ThreadStart start = new(ListenTCP);
             Thread thd = new(start);
             thd.Start();
            
@@ -748,9 +866,9 @@ namespace AMCommunicator
             if (MyIP != null)
             {
                 RaiseStatusUpdate("Broadcasting to Peers");
-                using UdpClient client = new UdpClient();
+                using UdpClient client = new();
                 
-                string msg = string.Format("-AM-|{0}|{1}|{2}", MyIP.ToString(), ConnectionPort, MyHostname );
+                string msg = string.Format("-AM-|{0}|{1}|{2}", MyIP?.ToString(), ConnectionPort, MyHostname );
                 client.EnableBroadcast=true;
                 client.ExclusiveAddressUse = false;
                 client.MulticastLoopback = false;

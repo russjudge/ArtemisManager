@@ -14,8 +14,7 @@ namespace ArtemisManagerUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            IPAddress ip = value as IPAddress;
-            if (ip != null)
+            if (value is IPAddress ip)
             {
                 if (ip.ToString() == IPAddress.Any.ToString() || ip.ToString() == IPAddress.None.ToString())
                 {

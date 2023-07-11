@@ -30,7 +30,7 @@ namespace ArtemisManagerUI
             IsMaster = info.IsMaster;
             AppVersion= info.AppVersion;
             ConnectOnstart = info.ConnectOnStart;
-            foreach (var item in info.InstalledMods.Split("|"))
+            foreach (var item in info.InstalledMods)
             {
                 if (!string.IsNullOrEmpty(item))
                 {
@@ -46,7 +46,7 @@ namespace ArtemisManagerUI
             IsUsingThisAppControlledArtemis = info.IsUsingThisAppContorlledArtemis;
             AppInStartFolder= info.AppInStartFolder;
             FreeSpaceOnAppDrive = info.FreeSpaceOnAppSrive;
-            foreach(var item in info.AllDrives.Split("|"))
+            foreach(var item in info.AllDrives)
             {
                 AllDrives.Add(item);
             }

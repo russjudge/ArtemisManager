@@ -50,30 +50,30 @@ namespace ArtemisManagerAction
         private string description = string.Empty;
         public string Description
         {
-            get { return key; }
+            get { return description; }
             set
             {
-                key = value;
+                description = value;
                 DoChanged();
             }
         }
         private string author = string.Empty;
         public string Author
         {
-            get { return key; }
+            get { return author; }
             set
             {
-                key = value;
+                author = value;
                 DoChanged();
             }
         }
         private string version = string.Empty;
         public string Version
         {
-            get { return key; }
+            get { return version; }
             set
             {
-                key = value;
+                version = value;
                 DoChanged();
             }
         }
