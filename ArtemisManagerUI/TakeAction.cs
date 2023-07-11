@@ -3,6 +3,7 @@ using Lnk;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Windows;
@@ -12,7 +13,8 @@ namespace ArtemisManagerUI
 {
     public static class TakeAction
     {
-        public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", "Startup");
+        public static readonly string StartupFolder = 
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", "Startup");
         public static void ChangeSetting(string settingName,string value)
         {
             switch(settingName)
@@ -104,20 +106,40 @@ namespace ArtemisManagerUI
         public static bool IsThisAppInStartup()
         {
             bool retVal = false;
-            string targetLink = Path.Combine(StartupFolder, "Artemis.lnk");
-            if (File.Exists(targetLink))
+            var asm = System.Reflection.Assembly.GetEntryAssembly();
+            if (asm != null)
             {
-                var data = Lnk.Lnk.LoadFile(targetLink);
-                if (data != null)
+                string appLocation = asm.Location;
+                FileInfo fle = new FileInfo(appLocation);
+                string target = Path.Combine(StartupFolder, fle.Name.Replace(".dll", string.Empty) + ".lnk");
+
+                if (File.Exists(target))
                 {
-                    var asm = System.Reflection.Assembly.GetEntryAssembly();
-                    if (asm != null)
+                    var data = Lnk.Lnk.LoadFile(target);
+                    if (data != null)
                     {
-                        retVal = data.SourceFile.StartsWith(asm.Location, StringComparison.InvariantCultureIgnoreCase);
+                        retVal = data.LocalPath.StartsWith(appLocation.Replace(".dll", ".exe"), StringComparison.InvariantCultureIgnoreCase);
                     }
                 }
             }
             return retVal;
+        }
+        public static void RemoveShortcutFromStartup()
+        {
+            var assm = System.Reflection.Assembly.GetEntryAssembly();
+            if (assm != null)
+            {
+                string loc = assm.Location.Replace(".dll", ".exe");
+                foreach (var l in new DirectoryInfo(StartupFolder).GetFiles("*.lnk"))
+                {
+                    var lnkFile = Lnk.Lnk.LoadFile(l.FullName);
+                    if (lnkFile.LocalPath == loc)
+                    {
+                        l.Delete();
+                        break;
+                    }
+                }
+            }
         }
         public static void CreateShortcutInStartup()
         {
@@ -126,21 +148,33 @@ namespace ArtemisManagerUI
             if (asm != null)
             {
                 string appLocation = asm.Location;
-                string appName = appLocation.Substring(0, appLocation.Length - 4);
+                FileInfo fle = new FileInfo(appLocation);
+                string target = Path.Combine(StartupFolder, fle.Name.Replace(".dll", string.Empty) + ".lnk");
+                string commandLine = "cscript";
                 using (StreamWriter sw = new(temp))
                 {
                     sw.WriteLine("Set oWS = WScript.CreateObject(\"WScript.Shell\")");
-
-                    sw.WriteLine("sLinkFile = \"" + Path.Combine(StartupFolder, appName + ".lnk") + "\"");
+                    
+                    sw.WriteLine("sLinkFile = \"" + target + "\"");
                     sw.WriteLine("Set oLink = oWS.CreateShortcut(sLinkFile)");
-                    sw.WriteLine("oLink.TargetPath = \"" + appLocation + "\"");
+                    sw.WriteLine("oLink.TargetPath = \"" + appLocation.Replace(".dll", ".exe") + "\"");
                     sw.WriteLine("oLink.IconLocation = \"" + appLocation + ", 2\"");
                     sw.WriteLine("oLink.Description = \"Artemis Manager\"");
                     sw.WriteLine("oLink.Save");
-                    sw.WriteLine("objFSO.DeleteFile(\"" + temp + "\")");
+                    //sw.WriteLine("objFSO.DeleteFile(\"" + temp + "\")");
                 }
-                System.Diagnostics.Process.Start("cscript " + temp);
-                /*
+                var startInfo = new System.Diagnostics.ProcessStartInfo(commandLine, temp);
+                startInfo.ErrorDialog = true;
+
+                var process = new System.Diagnostics.Process();
+                
+                process.StartInfo = startInfo;
+                process.Start();
+
+                process.WaitForExit();
+                File.Delete(temp);
+                    
+                                /*
                  * Set oWS = WScript.CreateObject("WScript.Shell")
 sLinkFile = "C:\MyShortcut.LNK"
 Set oLink = oWS.CreateShortcut(sLinkFile)

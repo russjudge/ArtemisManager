@@ -11,6 +11,7 @@
         <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
         <converter:DateFormatter x:Key="DateFormatter" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:NullToVisibility x:Key="NullToVisibility" />
         <Style TargetType="Button">
             <Setter Property="Padding" Value="5,5,5,5" />
             <Setter Property="Margin" Value="2,2,2,2" />
@@ -40,13 +41,42 @@
             <CheckBox Margin="5,0,0,0" Padding="2,0,0,0" IsChecked="{Binding Path=AutoStartServer, ElementName=uc, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="Start Network Communication as soon as this application starts."/>
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
-            <Button Content="Snapshot Current Artemis Install" ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager."></Button>
+            <Button
+                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
+                Content="Snapshot Current Artemis Install" ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager."></Button>
             
-            <Button Content="Install A Mod" />
-            
-            <Button Content="Start Artemis SBS" ToolTip="Note: this does not tell the peers to start Artemis SBS" />
-            <Button Content="Stop Artemis SBS" />
+            <Button
+                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
+                Content="Install A Mod" />
+            <TextBlock
+                Foreground="Red" FontWeight="Bold"
+                Margin="5,0,5,0" VerticalAlignment="Center"
+                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
+                Text="Artemis Install Not Found." />
+            <Button
+                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
+                Content="Browse to Artemis Install Folder" />
 
+            <AdornerDecorator
+                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
+                <Button
+                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Content="Start Artemis SBS"
+                    ToolTip="Note: this does not tell the peers to start Artemis SBS" />
+            </AdornerDecorator>
+            <AdornerDecorator Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
+                <Button
+                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Content="Stop Artemis SBS" />
+            </AdornerDecorator>
+            <Button
+                Click="OnPutInStartup"
+                Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                Content="Add Manager to Windows Startup" />
+            <Button
+                Click="OnRemoveFromStartup"
+                Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Content="Remove Manger from Windows Startup" />
         </WrapPanel>
         <Grid DockPanel.Dock="Top" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
             <Grid.RowDefinitions>

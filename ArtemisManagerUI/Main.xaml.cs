@@ -37,8 +37,9 @@ namespace ArtemisManagerUI
             {
                 new PCItem("All Connections", IPAddress.Any)
             };
-
-
+            this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
+            ArtemisInstallFolder = ArtemisManager.AutoDetectArtemisInstallPath();
+            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
             InitializeComponent();
 
         }
@@ -95,6 +96,9 @@ namespace ArtemisManagerUI
           DependencyProperty.Register(nameof(IsStarted), typeof(bool),
               typeof(Main));
 
+        /// <summary>
+        /// Identifies whether or not this app has completed loading and is running.
+        /// </summary>
         public bool IsStarted
         {
             get
@@ -337,6 +341,24 @@ namespace ArtemisManagerUI
 
             }
         }
+        public static readonly DependencyProperty InWindowsStartupFolderProperty =
+          DependencyProperty.Register(nameof(InWindowsStartupFolder), typeof(bool),
+              typeof(Main));
+
+        public bool InWindowsStartupFolder
+        {
+            get
+            {
+                return (bool)this.GetValue(InWindowsStartupFolderProperty);
+
+            }
+            set
+            {
+                this.SetValue(InWindowsStartupFolderProperty, value);
+
+            }
+        }
+
         public static readonly DependencyProperty ChatsProperty =
           DependencyProperty.Register(nameof(Chat), typeof(ObservableCollection<ChatMessage>),
               typeof(Main));
@@ -353,7 +375,7 @@ namespace ArtemisManagerUI
                 this.SetValue(ChatsProperty, value);
             }
         }
-      
+
         public void AddChatLine(string source, string message)
         {
             if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
@@ -384,6 +406,41 @@ namespace ArtemisManagerUI
 
             }
         }
+
+        public static readonly DependencyProperty ArtemisInstallFolderProperty =
+          DependencyProperty.Register(nameof(ArtemisInstallFolder), typeof(string),
+              typeof(Main));
+
+        public string? ArtemisInstallFolder
+        {
+            get
+            {
+                return (string?)this.GetValue(ArtemisInstallFolderProperty);
+
+            }
+            set
+            {
+                this.SetValue(ArtemisInstallFolderProperty, value);
+            }
+        }
+        public static readonly DependencyProperty IsArtemisRunningProperty =
+       DependencyProperty.Register(nameof(IsArtemisRunning), typeof(bool),
+           typeof(Main));
+
+        public bool IsArtemisRunning
+        {
+            get
+            {
+                return (bool)this.GetValue(IsArtemisRunningProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsArtemisRunningProperty, value);
+            }
+        }
+        
+
         void DoStartServer()
         {
             UpdateStatus("Starting Connection Service");
@@ -683,6 +740,18 @@ namespace ArtemisManagerUI
                     }
                 }
             }
+        }
+
+        private void OnPutInStartup(object sender, RoutedEventArgs e)
+        {
+            TakeAction.CreateShortcutInStartup();
+            this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
+            
+        }
+        private void OnRemoveFromStartup(object sender, RoutedEventArgs e)
+        {
+            TakeAction.RemoveShortcutFromStartup();
+            this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
         }
     }
 }

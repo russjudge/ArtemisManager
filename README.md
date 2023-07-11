@@ -21,7 +21,6 @@ Phase 1
 - Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
 
 Current TODO:
--- Add retrieval of app settings from peers, including whether or not app is in start folder.
 -- Add command to add app to start folder.
 -- Add basic Update check and download and update apply.
 -- Add local snapshotting of vanilla Artemis folder.  Include this process automatically at startup so long as there is no Artemis snapshot.  Include check for version change and creating a snapshot
