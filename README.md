@@ -96,3 +96,7 @@ Phase 3
 	-- add buttons for opening applications such as blender for editing the ship images.
 
 
+Stuff that will NOT be done:
+-- Mission editor/scripting.  There is already an adaquate tool for this.
+-- DMX editor.  There appears to already be an adaquate tool for this, though I have not tested it.
+-- Graphics for Artemis SBS.  No modeling, no meshes, nothing of this.  This isn't where my expertise lies and would be nothing be frustration if I were to even try.

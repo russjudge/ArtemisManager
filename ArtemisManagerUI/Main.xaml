@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:ArtemisManagerUI" FontSize="14"
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
-        Title="Artemis Manager" SizeToContent="Height" Width="800">
+        Title="Artemis Manager" SizeToContent="Height" Width="1250">
     <Window.Resources>
+        <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
         <converter:DateFormatter x:Key="DateFormatter" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
         <Style TargetType="Button">
@@ -38,6 +39,15 @@
             </Button>
             <CheckBox Margin="5,0,0,0" Padding="2,0,0,0" IsChecked="{Binding Path=AutoStartServer, ElementName=uc, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="Start Network Communication as soon as this application starts."/>
         </WrapPanel>
+        <WrapPanel DockPanel.Dock="Top">
+            <Button Content="Snapshot Current Artemis Install" ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager."></Button>
+            
+            <Button Content="Install A Mod" />
+            
+            <Button Content="Start Artemis SBS" ToolTip="Note: this does not tell the peers to start Artemis SBS" />
+            <Button Content="Stop Artemis SBS" />
+
+        </WrapPanel>
         <Grid DockPanel.Dock="Top" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -49,7 +59,13 @@
             </Grid.ColumnDefinitions>
 
         </Grid>
+        
         <DockPanel DockPanel.Dock="Right" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+            <GroupBox DockPanel.Dock="Left" Width="300" >
+                <GroupBox.Header>
+                    <Label Content="Installed Mods" />
+                </GroupBox.Header>
+            </GroupBox>
             <GroupBox DockPanel.Dock="Bottom" >
                 <GroupBox.Header>
                     <Label Content="Activity" />
@@ -74,8 +90,10 @@
             </ListBox>
         </GroupBox>
             
+            
         </DockPanel>
-        <TabControl Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+        <GroupBox Header="Connected Peers" BorderThickness="2,2,2,2" BorderBrush="CadetBlue" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+        <TabControl  
             ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
@@ -94,14 +112,33 @@
                         </GroupBox.Header>
                     
                     <DockPanel>
-                    <WrapPanel DockPanel.Dock="Top">
-                        <Button Content="Disconnect" Click="OnDisconnect" CommandParameter="{Binding}"></Button>
-                        <Button Content="Ping" Click="OnPing" CommandParameter="{Binding}"></Button>
-                            <Button Content="Restart PC" Click="OnPing" CommandParameter="{Binding}"></Button>
-                            <Button Content="Shutdown PC" Click="OnPing" CommandParameter="{Binding}"></Button>
-                            <Button Content="Check for Software Update" Click="OnPing" CommandParameter="{Binding}"></Button>
-                        </WrapPanel>
-                        
+                            <GroupBox DockPanel.Dock="Top" Header="Peer Actions">
+                                <WrapPanel>
+                                    <Button Content="Disconnect" Click="OnDisconnect" CommandParameter="{Binding}" ToolTip="Orders the peer to disconnect.  Useful for kicking someone out.  Change the password after disconnecting to prevent them from reconnecting."></Button>
+                                    <Button Content="Ping" Click="OnPing" ToolTip="Pings peer to confirm connection." CommandParameter="{Binding}"></Button>
+                                    <Button Content="Restart PC" Click="OnPing" CommandParameter="{Binding}"></Button>
+                                    <Button Content="Shutdown PC" Click="OnPing" CommandParameter="{Binding}"></Button>
+                                    <Button Content="Check for Software Update" Click="OnPing" CommandParameter="{Binding}" ToolTip="Orders the peer to check for an update to this application."></Button>
+                                </WrapPanel>
+                            </GroupBox>
+                            <GroupBox DockPanel.Dock="Top" Header="Artemis SBS Actions">
+                                <WrapPanel>
+                                    <Button Content="Install Mod"></Button>
+                                    <Button Content="Activate Mod"></Button><!-- This: Remove and add this button on each mod in list in Info. -->
+                                        <Button
+                                            Content="Start Artemis SBS"
+                                            ToolTip="Starts Artemis SBS on peer."
+                                            Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" />
+                                        <Button
+                                            Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                                            Content="Stop Artemis SBS" />
+                                    </WrapPanel>
+                            </GroupBox>
+                                <GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
+                                <local:PeerInfoControl ItemData="{Binding}" >
+                                    
+                                </local:PeerInfoControl>
+                            </GroupBox>
                         
                         <DockPanel DockPanel.Dock="Bottom">
                             
@@ -114,5 +151,6 @@
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
+        </GroupBox>
     </DockPanel>
 </Window>

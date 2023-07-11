@@ -78,7 +78,8 @@ namespace AMCommunicator.Messages
                 {
                     if (propertyDictionary[key].PropertyType == typeof(bool))
                     {
-                        propertyDictionary[key].SetValue(this, BitConverter.ToBoolean(bytes, position));
+                        var boolItem = BitConverter.ToBoolean(bytes, position);
+                        propertyDictionary[key].SetValue(this,boolItem);
                         position++;
                     }
                     else if (propertyDictionary[key].PropertyType == typeof(byte))
@@ -99,6 +100,11 @@ namespace AMCommunicator.Messages
                     else if (propertyDictionary[key].PropertyType == typeof(long))
                     {
                         propertyDictionary[key].SetValue(this, BitConverter.ToInt64(bytes, position));
+                        position += 8;
+                    }
+                    else if (propertyDictionary[key].PropertyType == typeof(double))
+                    {
+                        propertyDictionary[key].SetValue(this, BitConverter.ToDouble(bytes, position));
                         position += 8;
                     }
                     else if (propertyDictionary[key].PropertyType == typeof(MessageString))
@@ -180,7 +186,8 @@ namespace AMCommunicator.Messages
                 {
                     if (value != null)
                     {
-                        retVal.AddRange(BitConverter.GetBytes((bool)value));
+                        var boolBytes = BitConverter.GetBytes((bool)value);
+                        retVal.AddRange(boolBytes);
                     }
                     else
                     {
@@ -225,6 +232,17 @@ namespace AMCommunicator.Messages
                     if (value != null)
                     {
                         retVal.AddRange(BitConverter.GetBytes((long)value));
+                    }
+                    else
+                    {
+                        retVal.AddRange(new byte[8]);
+                    }
+                }
+                else if (propertyDictionary[key].PropertyType == typeof(double))
+                {
+                    if (value != null)
+                    {
+                        retVal.AddRange(BitConverter.GetBytes((double)value));
                     }
                     else
                     {

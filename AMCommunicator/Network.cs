@@ -161,15 +161,13 @@ namespace AMCommunicator
                 Transmit(connection.Stream, msg);
             }
         }
-        public void SendClientInfo(IPAddress target, bool isMaster, int appVersion, bool connectOnStart, string[] installedMods,
-            string[] archivedMods, string[] installedArchivedVersions, string[] installedMissions, string[] activeMissions,
-            int activeArtemisVersion, bool artemisIsRunning, bool isUsingThisAppControlledArtemis, bool appInStartFolder)
+        public void SendClientInfo(IPAddress target, bool isMaster, bool connectOnStart, string[] installedMods,
+            string[] installedMissions, bool artemisIsRunning, bool isUsingThisAppControlledArtemis, bool appInStartFolder)
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                ClientInfoMessage msg = new ClientInfoMessage(isMaster, appVersion, connectOnStart, installedMods, archivedMods,
-                    installedArchivedVersions, installedMissions, activeMissions,
-                    activeArtemisVersion, artemisIsRunning, isUsingThisAppControlledArtemis, appInStartFolder );
+                ClientInfoMessage msg = new ClientInfoMessage(isMaster, connectOnStart, installedMods,
+                    installedMissions, artemisIsRunning, isUsingThisAppControlledArtemis, appInStartFolder );
 
                 Transmit(connection.Stream, msg);
             }
@@ -219,6 +217,7 @@ namespace AMCommunicator
                                 //MUST SEND handshake item first here.
                                 HandshakeMessage msg = new HandshakeMessage();
                                 Transmit(trackItem.Stream, msg);
+                                SendPCAction(remoteAddress, PCActions.SendClientInformation, true);
                             }
                             do
                             {
@@ -404,7 +403,7 @@ namespace AMCommunicator
         public event EventHandler<CommunicationMessageEventArgs>? PasswordChanged;
         public event EventHandler<VersionMismatchEventArgs>? MessageVersionMismatch;
         public event EventHandler<AlertEventArgs>? AlertReceived;
-
+        public event EventHandler<ClientInfoEventArgs>? ClientInfoReceived;
         void Transmit(NetworkStream? stream, NetworkMessage msg)
         {
             if (stream == null)
@@ -520,6 +519,10 @@ namespace AMCommunicator
                         RaiseStatusUpdate("Application Close requested from {0}", msg.Source);
                         RaiseActionCommand(ActionCommands.CloseApp, msg.Force, msg.Source);
                         return true;
+                    case PCActions.SendClientInformation:
+                        RaiseStatusUpdate("Client Information requested from {0}", msg.Source);
+                        RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, msg.Source);
+                        return false;
                     default:
                         RaiseStatusUpdate("Invalid PCAction requested from host {0}", msg.Source);
                         return false;
@@ -552,7 +555,12 @@ namespace AMCommunicator
                   string.Format("HandshakeMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
                   HandshakeMessage.ThisVersion, message.MessageVersion));
             }
-            return !message.IsValid();
+            bool retVal = !message.IsValid();
+            if (retVal)
+            {
+                SendPCAction(message.Source, PCActions.SendClientInformation, true);
+            }
+            return retVal;
         }
 
 
@@ -566,6 +574,7 @@ namespace AMCommunicator
             }
             else
             {
+                ClientInfoReceived?.Invoke(this, new ClientInfoEventArgs(message));
             }
             return false;
         }

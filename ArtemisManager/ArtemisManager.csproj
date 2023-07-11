@@ -16,6 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AMCommunicator\AMCommunicator.csproj" />
+    <ProjectReference Include="..\ArtemisManagerAction\ArtemisManagerAction.csproj" />
     <ProjectReference Include="..\ArtemisManagerUI\ArtemisManagerUI.csproj" />
   </ItemGroup>
 

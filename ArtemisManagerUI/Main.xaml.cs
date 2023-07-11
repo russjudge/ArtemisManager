@@ -388,8 +388,32 @@ namespace ArtemisManagerUI
             MyNetwork.PasswordChanged += MyNetwork_PasswordChanged;
             MyNetwork.ChangeSetting += MyNetwork_ChangeSetting;
             MyNetwork.AlertReceived += MyNetwork_AlertReceived;
+            MyNetwork.ClientInfoReceived += MyNetwork_ClientInfoReceived;
             MyNetwork.Connect();
             IsStarted = true;
+        }
+        void LoadClientInfoData(ClientInfoEventArgs e)
+        {
+            if (Thread.CurrentThread != this.Dispatcher.Thread)
+            {
+                this.Dispatcher.Invoke(new Action<ClientInfoEventArgs>(LoadClientInfoData), e);
+            }
+            else
+            {
+
+                foreach (var item in ConnectedPCs)
+                {
+                    if (item.IP.ToString().Equals(e.Source.ToString()))
+                    {
+                        item.LoadClientInfoData(e);
+                        break;
+                    }
+                }
+            }
+        }
+        private void MyNetwork_ClientInfoReceived(object? sender, ClientInfoEventArgs e)
+        {
+            LoadClientInfoData(e);
         }
 
         private void MyNetwork_AlertReceived(object? sender, AlertEventArgs e)
@@ -459,22 +483,29 @@ namespace ArtemisManagerUI
         {
             if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
             {
-                this.Dispatcher.Invoke(new Action<PCItem>(AddPC), address);
+                this.Dispatcher.Invoke(new Action<IPAddress>(RemovePC), address);
             }
             else
             {
-                PCItem? remover = null;
-                foreach (var pc in ConnectedPCs)
+                try
                 {
-                    if (pc.IP == address)
+                    PCItem? remover = null;
+                    foreach (var pc in ConnectedPCs)
                     {
-                        remover = pc;
-                        break;
+                        if (pc.IP == address)
+                        {
+                            remover = pc;
+                            break;
+                        }
+                    }
+                    if (remover != null)
+                    {
+                        ConnectedPCs.Remove(remover);
                     }
                 }
-                if (remover != null)
+                catch (Exception ex)
                 {
-                    ConnectedPCs.Remove(remover);
+
                 }
             }
         }

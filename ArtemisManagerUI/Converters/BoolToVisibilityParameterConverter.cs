@@ -26,6 +26,7 @@ namespace ArtemisManagerUI.Converters
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+        
             Visibility TrueVisibility = Visibility.Visible;
             Visibility FalseVisibility = Visibility.Collapsed;
             if (parameter != null)

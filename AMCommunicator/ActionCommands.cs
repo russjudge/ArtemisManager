@@ -12,5 +12,6 @@ namespace AMCommunicator
         ShutdownPC,
         CloseApp,
         UpdateCheck,
+        ClientInformationRequested,
     }
 }
