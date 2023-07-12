@@ -11,9 +11,26 @@ namespace ArtemisManagerAction
 {
     public class ModItem : INotifyPropertyChanged
     {
-
+        public static readonly string ModInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMods");
+        public readonly static string ActivatedFolder = Path.Combine(ModManager.DataFolder, "Activated");
         public ModItem()
         {
+            SaveFile = string.Empty;
+        }
+        /// <summary>
+        /// Creates a copy ModItem that is activated.
+        /// </summary>
+        public ModItem Activate()
+        {
+            ModItem item = new();
+            this.IsActive = true;
+            this.Save();
+            item.Key = Key;
+            item.ModIdentifier = ModIdentifier;
+
+
+            
+            return item;
         }
         private string key = string.Empty;
         public string Key
@@ -67,8 +84,8 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        private string version = string.Empty;
-        public string Version
+        private string? version = string.Empty;
+        public string? Version
         {
             get { return version; }
             set
@@ -87,8 +104,8 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        private string requiredAretmisVersion ="2.8";
-        public string RequiredArtemisVersion
+        private string? requiredAretmisVersion ="2.8";
+        public string? RequiredArtemisVersion
         {
             get { return requiredAretmisVersion; }
             set
@@ -152,6 +169,20 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
+        private string packageFile = string.Empty;
+        public string PackageFile
+        {
+            get
+            {
+                return packageFile;
+            }
+            set
+            {
+                packageFile = value;
+                DoChanged();
+            }
+        }
+        public string SaveFile { get; private set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         void DoChanged([CallerMemberName] string property = "")
@@ -169,7 +200,49 @@ namespace ArtemisManagerAction
         }
         public static ModItem? GetModItem(string jsonData)
         {
-            return JsonSerializer.Deserialize<ModItem>(jsonData);
+            try
+            {
+                return JsonSerializer.Deserialize<ModItem>(jsonData);
+            }
+            catch (Exception ex)
+            { 
+                return null;
+            }
+        }
+        public static ModItem? LoadModItem(string file)
+        {
+            using StreamReader sr = new(file);
+            string data = sr.ReadToEnd();
+            ModItem? modItem = GetModItem(data);
+            return modItem;
+        }
+        public string GetSaveFile()
+        {
+            string file;
+            if (ModIdentifier == Guid.Empty)
+            {
+                file = localIdentifier.ToString() + ArtemisManager.SaveFileExtension;
+            }
+            else
+            {
+                file = ModIdentifier.ToString() + ArtemisManager.SaveFileExtension;
+            }
+
+            file = Path.Combine(ModInstallFolder, file);
+
+            return file;
+        }
+        public void Save(string file = "")
+        {
+            string data = GetJSON();
+            if (string.IsNullOrEmpty(file)) 
+            {
+                file = GetSaveFile();
+            }
+            SaveFile = file;
+            using StreamWriter sw = new(file);
+            sw.WriteLine(data);
+            
         }
     }
 }

@@ -97,7 +97,7 @@ namespace ArtemisManagerUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\Artemis")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string ArtemisInstallFolder {
             get {
                 return ((string)(this["ArtemisInstallFolder"]));

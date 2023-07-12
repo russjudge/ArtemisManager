@@ -5,6 +5,14 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <Title>Artemis Manager</Title>
+    <Authors>Russ Judge</Authors>
+    <Company>Confederate In Blue Gaming</Company>
+    <Copyright>Copyright (c) 2023 Confederate In Blue Gaming</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/russjudge/ArtemisManager</RepositoryUrl>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,13 +24,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AMCommunicator\AMCommunicator.csproj" />
     <ProjectReference Include="..\ArtemisManagerAction\ArtemisManagerAction.csproj" />
     <ProjectReference Include="..\ArtemisManagerUI\ArtemisManagerUI.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY $(OutDir)\*.* \\ATLANTIS\WorkArea\ /F /R /Y" />
+    <Exec Command="&quot;$(SolutionDir)VersionBump\bin\Debug\net7.0\VersionBump.exe&quot; &quot;$(ProjectPath)&quot;&#xD;&#xA;XCOPY &quot;$(OutDir)\*.*&quot; \\ATLANTIS\WorkArea\ /F /R /Y&#xD;&#xA;" />
   </Target>
 
 </Project>

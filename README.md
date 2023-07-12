@@ -21,11 +21,7 @@ Phase 1
 - Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
 
 Current TODO:
--- Add command to add app to start folder.
 -- Add basic Update check and download and update apply.
--- Add local snapshotting of vanilla Artemis folder.  Include this process automatically at startup so long as there is no Artemis snapshot.  Include check for version change and creating a snapshot
-	for each different version.  Make sure to warn that the vanilla Artemis MUST NOT have any mods applied, or there will be no way to return to vanilla artemis without full re-install of artemis.
--- Add process to restore to any available snapshot version of Artemis.
 -- Add process to command peers to start Artemis automatically.
 -- Add process to command peers to load a specific version snapshot of Artemis
 -- Add process to manually install mods (i.e., not automatic download, but have a zip/compressed file).

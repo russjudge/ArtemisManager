@@ -1,7 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,40 +13,85 @@ namespace ArtemisManagerAction
 {
     public class ArtemisManager
     {
+        public static readonly Dictionary<string, Guid> ArtemisVersionIdentifiers = new();
         public const string RegistryArtemisInstallLocation = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\windows\\CurrentVersion\\App Paths\\Artemis.exe";
-        public readonly static string ActivatedFolder = Path.Combine(ModManager.DataFolder, "Activated");
+        
         public readonly static string ActivatedModsTrackingFile = Path.Combine(ModManager.DataFolder, "ActivatedModsTracking.dat");
         public const string ArtemisEXE = "Artemis.exe";
-        private static void CreateFolder(string path)
+        public const string SaveFileExtension = ".json";
+        static ArtemisManager()
         {
-            if (!Directory.Exists(path))
+            //Fixing Artemis versions to specific Guids.  Same thing will be done to mods eventually.
+            ArtemisVersionIdentifiers.Add("2.8", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
+        }
+        
+        public static bool CheckIfArtemisSnapshotNeeded(string installFolder)
+        {
+            bool matchFound = false;
+            string? installedVersion = GetArtemisVersion(installFolder);
+            if (!string.IsNullOrEmpty(installedVersion) )
             {
-                Directory.CreateDirectory(path);
+                foreach (var mod in GetInstalledMods())
+                {
+                    if (mod.IsArtemisBase)
+                    {
+                        if (mod.Version == installedVersion)
+                        {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                matchFound = true;
+            }
+            return !matchFound;
+        }
+        public static void ClearActiveFolder()
+        {
+            DeleteAll(ModItem.ActivatedFolder);
+            foreach (var mod in GetInstalledMods())
+            {
+                mod.IsActive = false;
+                mod.Save();
             }
         }
+        public static void DeleteAll(string target)
+        {
+            foreach(var dir in new DirectoryInfo(target).GetDirectories())
+            {
+                DeleteAll(dir.FullName);
+                dir.Delete();
+            }
+            foreach (var fle in new DirectoryInfo(target).GetFiles())
+            {
+                fle.Delete();
+            }
+        }
+        
         public static ModItem[] GetInstalledMods()
         {
-            var retVal = GetModList(ModManager.ModInstallFolder);
+            var retVal = GetModList(ModItem.ModInstallFolder);
             foreach (var item in retVal)
             {
-                item.IsActive = (File.Exists(Path.Combine(ActivatedFolder, item.LocalIdentifier.ToString() + ".json")));
+                item.IsActive = (File.Exists(Path.Combine(ModItem.ActivatedFolder, item.LocalIdentifier.ToString() + SaveFileExtension)));
             }
             
             return retVal;
         }
         public static ModItem[] GetActivatedMods()
         {
-            return GetModList(ActivatedFolder);
+            return GetModList(ModItem.ActivatedFolder);
         }
         private static ModItem[] GetModList(string path)
         {
-            CreateFolder(path);
+            ModManager.CreateFolder(path);
             List<ModItem> installedMods = new();
-            foreach (FileInfo file in new DirectoryInfo(path).GetFiles("*.json"))
+            foreach (FileInfo file in new DirectoryInfo(path).GetFiles("*" + SaveFileExtension))
             {
-                using StreamReader sr = new(file.FullName);
-                string data = sr.ReadToEnd();
-                ModItem? modItem = ModItem.GetModItem(data);
+                ModItem? modItem = ModItem.LoadModItem(file.FullName);
                 if (modItem != null)
                 {
                     installedMods.Add(modItem);
@@ -51,9 +99,37 @@ namespace ArtemisManagerAction
             }
             return installedMods.ToArray();
         }
-        public static void SnapshotInstalledArtemisVersion()
+        public static ModItem SnapshotInstalledArtemisVersion(string installFolder)
         {
-
+            ModItem retVal = new();
+            string? version = GetArtemisVersion(installFolder);
+            retVal.RequiredArtemisVersion = version;
+            retVal.Author = "Thom Robertson";
+            retVal.Version = version;
+            retVal.Description = "Base Artemis";
+            retVal.IsArtemisBase = true;
+            //TODO: build hardcoded Guid list based on Artemis version.  Get comprehensive list of versions from the changes.txt file.
+            if (version != null)
+            {
+                if (ArtemisVersionIdentifiers.TryGetValue(version, out Guid ModId))
+                {
+                    retVal.ModIdentifier = ModId;
+                }
+            }
+            string target;
+            if (retVal.ModIdentifier == Guid.Empty)
+            {
+                target = "ArtemisV" + version;
+            }
+            else
+            {
+                target = retVal.ModIdentifier.ToString();
+            }
+            target = Path.Combine(ModItem.ModInstallFolder, target);
+            ModManager.CopyFolder(installFolder, target);
+            retVal.Save(target + SaveFileExtension);
+            
+            return retVal;
         }
 
         public static string? AutoDetectArtemisInstallPath()
@@ -64,8 +140,33 @@ namespace ArtemisManagerAction
             }
             else
             {
-                return null;
+                return DetectArtemisInstallPath();
             }
+        }
+
+        private static string? DetectArtemisInstallPath()
+        {
+            string? retVal = null;
+            foreach (var driv in DriveInfo.GetDrives())
+            {
+                FileInfo f = new(Path.Combine(driv.RootDirectory.FullName, "Program Files", "Artemis", ArtemisEXE));
+                if (f.Exists)
+                {
+                    retVal = f.DirectoryName;
+                    break;
+                }
+                else
+                {
+                    f = new FileInfo(Path.Combine(driv.RootDirectory.FullName, "Program Files (x86)", "Artemis", ArtemisEXE));
+                    if (f.Exists)
+                    {
+                        retVal = f.DirectoryName;
+                        break;
+                    }
+                }
+            }
+            retVal ??= SteamInfo.GetArtemisGameFolder();
+            return retVal;
         }
         /// <summary>
         /// Gets the path to where Artemis is installed, or null if it can't be found.
@@ -74,7 +175,7 @@ namespace ArtemisManagerAction
         [SupportedOSPlatform("windows")]
         private static string? WindowsAutoDetectArtemisInstallPath()
         {
-            string? retVal = null;
+            string? retVal;
             try
             {
                 string[] RegistryPath = RegistryArtemisInstallLocation.Split('\\');
@@ -101,25 +202,13 @@ namespace ArtemisManagerAction
                         }
                         else
                         {
-                            f = new FileInfo(@"C:\Program Files\Artemis\Artemis.exe");
-                            if (f.Exists)
-                            {
-                                retVal = f.DirectoryName;
-                            }
-                            else
-                            {
-                                f = new FileInfo(@"C:\Program Files (x86)\Aretmis\Artemis.exe");
-                                if (f.Exists)
-                                {
-                                    retVal = f.DirectoryName;
-                                }
-                                else
-                                {
-                                    retVal = null;
-                                }
-                            }
+                            retVal = DetectArtemisInstallPath();
                         }
                     }
+                }
+                else
+                {
+                    retVal = DetectArtemisInstallPath();
                 }
             }
             catch
@@ -176,17 +265,33 @@ namespace ArtemisManagerAction
             var processes = System.Diagnostics.Process.GetProcessesByName(ArtemisEXE);
             foreach (var pro in processes)
             {
-                if (pro.StartInfo.FileName.StartsWith(ActivatedFolder))
+                if (pro.StartInfo.FileName.StartsWith(ModItem.ActivatedFolder))
                 {
-
+                    return true;
+                    
                 }
-                else
+               
+            }
+            return false;
+        }
+        public static void StartArtemis()
+        {
+            if (!IsArtemisRunning())
+            {
+                string target = Path.Combine(ModItem.ActivatedFolder, ArtemisEXE);
+                if (File.Exists(target))
                 {
-                    return false;
+                    Process.Start(target);
                 }
             }
-            return true;
         }
-
+        public static void StopArtemis()
+        {
+            var processes = System.Diagnostics.Process.GetProcessesByName(ArtemisEXE);
+            foreach (var pro in processes)
+            {
+                pro.Kill(true);
+            }
+        }
     }
 }

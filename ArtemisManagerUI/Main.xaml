@@ -12,10 +12,6 @@
         <converter:DateFormatter x:Key="DateFormatter" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
         <converter:NullToVisibility x:Key="NullToVisibility" />
-        <Style TargetType="Button">
-            <Setter Property="Padding" Value="5,5,5,5" />
-            <Setter Property="Margin" Value="2,2,2,2" />
-        </Style>
     </Window.Resources>
     <DockPanel>
         <DockPanel DockPanel.Dock="Top">
@@ -42,10 +38,12 @@
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button
+                Click="OnSnapshotAretmis"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
                 Content="Snapshot Current Artemis Install" ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager."></Button>
             
             <Button
+                Click="OnInstallMod"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
                 Content="Install A Mod" />
             <TextBlock
@@ -53,22 +51,31 @@
                 Margin="5,0,5,0" VerticalAlignment="Center"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
                 Text="Artemis Install Not Found." />
+            <AdornerDecorator
+                Visibility="{Binding ElementName=uc, Path=IsWindows, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
             <Button
+                Click="OnBrowseForArtemis"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
                 Content="Browse to Artemis Install Folder" />
-
+            </AdornerDecorator>
             <AdornerDecorator
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
                 <Button
+                    Click="OnStartArtemisSBS"
                     Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                     Content="Start Artemis SBS"
                     ToolTip="Note: this does not tell the peers to start Artemis SBS" />
             </AdornerDecorator>
             <AdornerDecorator Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
                 <Button
+                    Click="OnStopArtemisSBS"
                     Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                     Content="Stop Artemis SBS" />
             </AdornerDecorator>
+            <Button
+                Click="OnDeactivateMods"
+                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
+                Content="Deactivate All Mods" ToolTip="Resets activated Artemis folder to base Artemis" />
             <Button
                 Click="OnPutInStartup"
                 Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
@@ -95,6 +102,13 @@
                 <GroupBox.Header>
                     <Label Content="Installed Mods" />
                 </GroupBox.Header>
+                <ListBox>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <local:ModItemControl Mod="{Binding}" ></local:ModItemControl>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </GroupBox>
             <GroupBox DockPanel.Dock="Bottom" >
                 <GroupBox.Header>

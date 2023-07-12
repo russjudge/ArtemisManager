@@ -15,11 +15,7 @@
                 <Button Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
                     Activate
                 </Button>
-                <Button Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-                    Deactivate
-                </Button>
-                
-                <Button>Uninstall</Button>
+                <Button Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">Uninstall</Button>
                 <Label Content="{Binding Mod.Name, ElementName=uc, Mode=OneWay}" />
             </StackPanel>
                 

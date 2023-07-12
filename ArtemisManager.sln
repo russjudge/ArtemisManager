@@ -17,7 +17,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AMCommunicatorTests", "AMCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerUI", "ArtemisManagerUI\ArtemisManagerUI.csproj", "{35E9D8C3-399F-48A9-BE8A-A69A8B00CD09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtemisManagerAction", "ArtemisManagerAction\ArtemisManagerAction.csproj", "{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerAction", "ArtemisManagerAction\ArtemisManagerAction.csproj", "{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{F2A4302C-5D71-4987-8F72-F3B8C9E2E51C}"
+	ProjectSection(SolutionItems) = preProject
+		Resources\VersionBump.dll = Resources\VersionBump.dll
+		Resources\VersionBump.exe = Resources\VersionBump.exe
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VersionBump", "VersionBump\VersionBump.csproj", "{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +53,10 @@ Global
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

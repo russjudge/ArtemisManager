@@ -6,6 +6,9 @@
              StartupUri="pack://application:,,,/ArtemisManagerUI;component/Main.xaml"
               Startup="OnStartup" DispatcherUnhandledException="OnError" >
     <Application.Resources>
-         
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="5,5,5,5" />
+            <Setter Property="Margin" Value="2,2,2,2" />
+        </Style>
     </Application.Resources>
 </Application>

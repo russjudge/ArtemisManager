@@ -31,20 +31,21 @@ namespace ArtemisManagerUI
         public Main()
         {
             Chat = new();
-            MyNetwork = Network.GetNetwork("");
+            
             Status = new ObservableCollection<string>();
             ConnectedPCs = new()
             {
                 new PCItem("All Connections", IPAddress.Any)
             };
             this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
-            ArtemisInstallFolder = ArtemisManager.AutoDetectArtemisInstallPath();
+            
             IsArtemisRunning = ArtemisManager.IsArtemisRunning();
+            InstalledMods = new(ArtemisManager.GetInstalledMods());
             InitializeComponent();
 
         }
         bool isLoading = true;
-        Network MyNetwork;
+        readonly Network MyNetwork = Network.GetNetwork("");
         /*
          * 
          *
@@ -66,13 +67,31 @@ namespace ArtemisManagerUI
                 Properties.Settings.Default.UpgradeRequired = false;
                 Properties.Settings.Default.Save();
             }
-            
+            ArtemisInstallFolder = Properties.Settings.Default.ArtemisInstallFolder;
+            if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManager.ArtemisEXE)))
+            {
+                ArtemisInstallFolder = ArtemisManager.AutoDetectArtemisInstallPath();
+                Properties.Settings.Default.ArtemisInstallFolder = ArtemisInstallFolder;
+                Properties.Settings.Default.Save();
+            }
+                        
+
             Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
             Network.Password = Properties.Settings.Default.NetworkPassword;
             Password = Network.Password;
             AutoStartServer = Properties.Settings.Default.ConnectOnStart;
             Port = Properties.Settings.Default.ListeningPort;
-
+            if (!string.IsNullOrEmpty(ArtemisInstallFolder))
+            {
+                if (ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder))
+                {
+                    string? version = ArtemisManager.GetArtemisVersion(ArtemisInstallFolder);
+                    if (version != null && MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        SnapshotArtemis();
+                    }
+                }
+            }
             isLoading = false;
             if (AutoStartServer)
             {
@@ -112,7 +131,24 @@ namespace ArtemisManagerUI
 
             }
         }
+        public static readonly DependencyProperty IsWindowsProperty =
+         DependencyProperty.Register(nameof(IsWindows), typeof(bool),
+             typeof(Main), new PropertyMetadata(OperatingSystem.IsWindows()));
 
+        public bool IsWindows
+        {
+            get
+            {
+                return (bool)this.GetValue(IsWindowsProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsWindowsProperty, value);
+
+            }
+        }
+        
         public static readonly DependencyProperty AutoStartServerProperty =
          DependencyProperty.Register(nameof(AutoStartServer), typeof(bool),
              typeof(Main), new PropertyMetadata(OnAutoStartChanged));
@@ -304,6 +340,24 @@ namespace ArtemisManagerUI
             }
         }
 
+
+        public static readonly DependencyProperty InstalledModsProperty =
+           DependencyProperty.Register(nameof(InstalledMods), typeof(ObservableCollection<ModItem>),
+               typeof(Main));
+
+        public ObservableCollection<ModItem> InstalledMods
+        {
+            get
+            {
+                return (ObservableCollection<ModItem>)this.GetValue(InstalledModsProperty);
+
+            }
+            set
+            {
+                this.SetValue(InstalledModsProperty, value);
+
+            }
+        }
 
 
         public static readonly DependencyProperty ConnectedPCsProperty =
@@ -752,6 +806,84 @@ namespace ArtemisManagerUI
         {
             TakeAction.RemoveShortcutFromStartup();
             this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
+        }
+
+        private void OnBrowseForArtemis(object sender, RoutedEventArgs e)
+        {
+            BrowseForArtemis();
+        }
+        void BrowseForArtemis()
+        {
+            WPFFolderBrowser.WPFFolderBrowserDialog dialog = new("Browse for Artemis executable");
+            if (dialog.ShowDialog() == true)
+            {
+                ArtemisInstallFolder = dialog.FileName;
+                Properties.Settings.Default.ArtemisInstallFolder = ArtemisInstallFolder;
+                Properties.Settings.Default.Save();
+            }
+        }
+        private void OnSnapshotAretmis(object sender, RoutedEventArgs e)
+        {
+            //Mod Install.  Install folder naming convention:
+            //ArtemisV#.##
+            SnapshotArtemis();
+            
+        }
+        void SnapshotArtemis()
+        {
+            if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
+            {
+                BrowseForArtemis();
+                if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
+                {
+                    return;
+                }
+                else
+                {
+                    ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder);
+                    InstalledMods.Add(item);
+                    ArtemisManager.ClearActiveFolder();
+                    item.Activate();
+                }
+            }
+        }
+        private void OnStartArtemisSBS(object sender, RoutedEventArgs e)
+        {
+            ArtemisManager.StartArtemis();
+        }
+
+        private void OnStopArtemisSBS(object sender, RoutedEventArgs e)
+        {
+            ArtemisManager.StopArtemis();
+        }
+
+        private void OnDeactivateMods(object sender, RoutedEventArgs e)
+        {
+            ModItem? baseItem = null;
+            foreach (var mod in ArtemisManager.GetActivatedMods())
+            {
+                if (mod.IsArtemisBase)
+                {
+                    baseItem = mod;
+                    break;
+                }
+            }
+            ArtemisManager.ClearActiveFolder();
+            foreach (var mod in InstalledMods)
+            {
+                mod.IsActive = false;
+            }
+            baseItem?.Activate();
+            
+        }
+
+        private void OnInstallMod(object sender, RoutedEventArgs e)
+        {
+            ModInstallWindow win = new ModInstallWindow();
+            if (win.ShowDialog() == true)
+            {
+                InstalledMods.Add(win.Mod);
+            }
         }
     }
 }

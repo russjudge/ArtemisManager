@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Runtime.Versioning;
 using System.Windows;
 using System.Windows.Documents;
 
@@ -13,8 +14,9 @@ namespace ArtemisManagerUI
 {
     public static class TakeAction
     {
-        public static readonly string StartupFolder = 
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", "Startup");
+
+        public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
+            
         public static void ChangeSetting(string settingName,string value)
         {
             switch(settingName)
@@ -32,10 +34,14 @@ namespace ArtemisManagerUI
         {
             if (!force)
             {
-                //if (MessageBox.Show("The follow action is being requested: " + action.ToString() + ".\r\nDo you wish to allow this?", "Action requested", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                //{
-                //    return false;
-                //}
+                if (MessageBox.Show(
+                    "The follow action is being requested: " 
+                    + action.ToString()
+                    + ".\r\nDo you wish to allow this?",
+                    "Action requested", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                {
+                    return false;
+                }
             }
 
             bool WasProcessed;
@@ -52,7 +58,7 @@ namespace ArtemisManagerUI
                     break;
                 case ActionCommands.UpdateCheck:
                     //TODO: Add process to check for update.
-                    if (UpdateCheck(true, source))
+                    if (UpdateCheck(true))
                     {
                         //TODO: do the update.  No prompt.
                     }
@@ -97,9 +103,11 @@ namespace ArtemisManagerUI
         /// </summary>
         /// <param name="AlertIfCannotCheck">send "true" to send an alert to the source that it could not access the website of the update to check.  Possible: have update transmitted from source.</param>
         /// <returns></returns>
-        public static bool UpdateCheck(bool AlertIfCannotCheck, IPAddress? source = null)
+        public static bool UpdateCheck(bool AlertIfCannotCheck)
         {
-            
+            //russjudge.com/software/artemismanager.version
+            //russjudge.com/software/artemismanager.msi
+
             return false;
         }
 
@@ -124,7 +132,8 @@ namespace ArtemisManagerUI
             }
             return retVal;
         }
-        public static void RemoveShortcutFromStartup()
+        [SupportedOSPlatform("windows")]
+        public static void RemoveWindowsShortcutFromStartup()
         {
             var assm = System.Reflection.Assembly.GetEntryAssembly();
             if (assm != null)
@@ -141,8 +150,65 @@ namespace ArtemisManagerUI
                 }
             }
         }
+        [SupportedOSPlatform("linux")]
+        public static void RemoveLinuxShortcutFromStartup()
+        {
+            var assm = System.Reflection.Assembly.GetEntryAssembly();
+            if (assm != null)
+            {
+                string target = Path.Combine(StartupFolder, "ArtemisManager");
+                if (File.Exists(target))
+                {
+                    File.Delete(target);
+                }
+            }
+        }
+        public static void RemoveShortcutFromStartup()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                RemoveWindowsShortcutFromStartup();
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+
+            }
+        }
+        [SupportedOSPlatform("linux")]
+        public static void CreateLinuxShortcutInStartup()
+        {
+            var asm = System.Reflection.Assembly.GetEntryAssembly();
+            if (asm != null)
+            {
+                string target = Path.Combine(StartupFolder, "ArtemisManager");
+                using (StreamWriter sw = new (target))
+                {
+                    sw.WriteLine("#!/usr/bin");
+                    sw.WriteLine(asm.Location.Replace(".dll", ".exe"));
+                }
+                Process.Start("chmod 777 " + target);
+            }
+        }
         public static void CreateShortcutInStartup()
         {
+            if (OperatingSystem.IsWindows())
+            {
+                CreateWindowsShortcutInStartup();
+            }
+            else if (OperatingSystem.IsLinux())
+            {
+                CreateLinuxShortcutInStartup();
+            }
+        }
+        [SupportedOSPlatform("windows")]
+        public static void CreateWindowsShortcutInStartup()
+        {
+            var asm = System.Reflection.Assembly.GetEntryAssembly();
+            if (asm != null)
+            {
+                string appLocation = asm.Location.Replace(".dll", ".exe");
+                Abraham.Windows.Shell.AutostartFolder.AddShortcut(appLocation, null, "Artemis Manager", string.Empty);
+                /*
             var temp = Path.GetTempFileName() + ".vbs";
             var asm = System.Reflection.Assembly.GetEntryAssembly();
             if (asm != null)
@@ -173,7 +239,7 @@ namespace ArtemisManagerUI
 
                 process.WaitForExit();
                 File.Delete(temp);
-                    
+                    */
                                 /*
                  * Set oWS = WScript.CreateObject("WScript.Shell")
 sLinkFile = "C:\MyShortcut.LNK"
