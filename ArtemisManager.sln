@@ -9,6 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AMCommunicator", "AMCommuni
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FE2BC33A-3EBA-4E02-B992-3B0556A834CA}"
 	ProjectSection(SolutionItems) = preProject
+		am.ico = am.ico
+		am.pdn = am.pdn
+		amBanner.jpg = amBanner.jpg
+		amBanner.pdn = amBanner.pdn
+		C:\Users\rjudge\Downloads\artemis1.pdn = C:\Users\rjudge\Downloads\artemis1.pdn
+		changes.txt = changes.txt
 		Deploy.cmd = Deploy.cmd
 		LICENSE = LICENSE
 		README.md = README.md
@@ -28,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerActionTests",
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ArtemisManagerSetup", "ArtemisManagerSetup\ArtemisManagerSetup.vdproj", "{4954523D-03CD-4C5C-B9A0-D907207E8DE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deploy", "Deploy\Deploy.csproj", "{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deploy", "Deploy\Deploy.csproj", "{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,7 +63,6 @@ Global
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D9B06F4F-5871-40AF-B8A8-867D03B14495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -67,7 +72,6 @@ Global
 		{4954523D-03CD-4C5C-B9A0-D907207E8DE2}.Debug|Any CPU.ActiveCfg = Debug
 		{4954523D-03CD-4C5C-B9A0-D907207E8DE2}.Release|Any CPU.ActiveCfg = Release
 		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection

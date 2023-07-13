@@ -9,7 +9,7 @@ namespace Deploy
 {
     internal static class VersionDataFileBuilder
     {
-        public static void BuildDataFile(string version, string appTitle, string setupFileNameFullPath, string targetPath)
+        public static void BuildDataFile(string version, string appTitle, string setupFileNameFullPath, string sourceOutDir, string targetPath)
         {
             FileInfo setupFile = new FileInfo(setupFileNameFullPath);
             if (setupFile.Exists)
@@ -21,10 +21,15 @@ namespace Deploy
                 }
                 setupFile.CopyTo(targetPath);
             }
+            CopyFolder(sourceOutDir, Path.Combine(targetPath, appTitle.Replace(" ", string.Empty)));
         }
-        /*
+        
         public static void CopyFolder(string sourceFolder, string targetFolder)
         {
+            if (!Directory.Exists(targetFolder))
+            {
+                Directory.CreateDirectory(targetFolder);
+            }
             if (!string.IsNullOrEmpty(sourceFolder) && Directory.Exists(sourceFolder) && !string.IsNullOrEmpty(targetFolder) && Directory.Exists(targetFolder))
             {
                 foreach (var dir in new DirectoryInfo(sourceFolder).GetDirectories())
@@ -37,7 +42,7 @@ namespace Deploy
                 }
             }
         }
-        */
+        
         public static Tuple<string,string> GetVersion(string projectFile)
         {
             string version;

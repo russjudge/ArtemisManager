@@ -36,16 +36,27 @@ namespace ArtemisManagerUI
 
                 Status = new ObservableCollection<string>();
                 ConnectedPCs = new()
-            {
-                new PCItem("All Connections", IPAddress.Any)
-            };
+                {
+                    new PCItem("All Connections", IPAddress.Any)
+                };
+                
                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
 
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
                 InstalledMods = new(ArtemisManager.GetInstalledMods());
+
+                var assm = System.Reflection.Assembly.GetEntryAssembly();
+                if (assm != null)
+                {
+                    var nm = assm.GetName();
+                    if (nm != null && nm.Version != null)
+                    {
+                        AppVersion = nm.Version.ToString();
+                    }
+                }
             }
             catch (Exception ex)
-            { 
+            {
             }
             InitializeComponent();
 
@@ -118,6 +129,23 @@ namespace ArtemisManagerUI
                 {
                     this.WindowState = WindowState.Minimized;
                 }
+            }
+        }
+        public static readonly DependencyProperty AppVersionProperty =
+          DependencyProperty.Register(nameof(AppVersion), typeof(string),
+              typeof(Main));
+
+        public string AppVersion
+        {
+            get
+            {
+                return (string)this.GetValue(AppVersionProperty);
+
+            }
+            set
+            {
+                this.SetValue(AppVersionProperty, value);
+
             }
         }
         public static readonly DependencyProperty IsStartedProperty =
@@ -894,6 +922,27 @@ namespace ArtemisManagerUI
             {
                 InstalledMods.Add(win.Mod);
             }
+        }
+
+        private void OnAbout(object sender, RoutedEventArgs e)
+        {
+            AboutWindow win = new AboutWindow();
+            win.Show();
+        }
+
+        private void OnRestart(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnShutdown(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnUpdateCheck(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

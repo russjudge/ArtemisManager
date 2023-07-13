@@ -41,5 +41,10 @@ namespace ArtemisManagerUI
                 this.SetValue(ItemDataProperty, value);
             }
         }
+
+        private void OnDeactivateMods(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

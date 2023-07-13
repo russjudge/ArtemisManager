@@ -21,6 +21,11 @@ Phase 1
 - Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
 
 Current TODO:
+-- Offer multiple versions of Artemis SBS updates.
+	-- Store on russjudge.com.
+	-- set unique Guid to each.
+	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
+	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
 -- Add basic Update check and download and update apply.
 -- Add process to command peers to start Artemis automatically.
 -- Add process to command peers to load a specific version snapshot of Artemis
@@ -50,7 +55,6 @@ Current TODO:
 	-- delete uncompressed folder and update database.
 	-- retain original zip file in archive.
 -- In Setup, Develop process to optionally remove all staging and archived mods and vanilla artemis versions.
--- Create icon for main window and setup.
 -- Create mechanism to generate a mod based on the currently active artemis.
 -- Add button to open Windows Explorer to the active artemis folder that Artemis Manager uses to start Artemis (this will be different that the default install folder of Artemis).
 -- Document possible issues with the Windows Firewall, and ways to fix Windows Firewall, including setting to being on Private network, adding rules, 

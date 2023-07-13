@@ -15,37 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_350C5B7777594978AE368D8072EB47D1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5C27F8BC3A34444396FC34ED720D78E9"
+        "MsmKey" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_DAEA1EC848CD417BBAC9D3FA64B32D16"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_DCBACD6F7A974D6D951BE77B0C3C56A3"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E46AB9ECD4374EEFBFC1DDC7490CB21A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FD950BF3A7BD429AB99B263F7A51EE9F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -67,6 +43,32 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:https://russjudge.com/software/ArtemisManagerSetup.msi"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.7.0.Arm64"
+                    {
+                    "Name" = "8:.NET Runtime 7.0.0 (Arm64)"
+                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.7.0.Arm64"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.7.0.x64"
+                    {
+                    "Name" = "8:.NET Runtime 7.0.0 (x64)"
+                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.7.0.x64"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.NetCore.CoreRuntime.7.0.x86"
+                    {
+                    "Name" = "8:.NET Runtime 7.0.0 (x86)"
+                    "ProductCode" = "8:Microsoft.NetCore.CoreRuntime.7.0.x86"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -114,6 +116,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
+            {
+            "SourcePath" = "8:..\\amBanner.jpg"
+            "TargetName" = "8:amBanner.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -171,7 +193,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:ArtemisManager"
         "ProductCode" = "8:{688883F8-B7C3-4CF1-9C52-2F8AA4D5C408}"
-        "PackageCode" = "8:{15A35071-495C-484C-913E-7E29514C5446}"
+        "PackageCode" = "8:{9EA5F8D6-7892-4B82-8925-34D8B40B4646}"
         "UpgradeCode" = "8:{7D422A04-0CE4-45C7-AAAF-011B84631CB2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -181,7 +203,7 @@
         "ProductVersion" = "8:1.0.0"
         "Manufacturer" = "8:Confederate In Blue Gaming"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:"
+        "ARPHELPLINK" = "8:https://russjudge.com"
         "Title" = "8:ArtemisManager"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Russ Judge"
@@ -318,7 +340,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "UpdateText"
@@ -362,7 +385,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -412,7 +436,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -443,7 +468,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -487,7 +513,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "InstallAllUsersVisible"
@@ -522,7 +549,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -544,7 +572,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -601,7 +630,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -623,7 +653,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -645,7 +676,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_0CEE85E5F5FF4BA1AF4166CBA2E8310E"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -740,34 +772,6 @@
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Symbols"
-            "OutputProjectGuid" = "8:{1A272527-3A00-4981-9A96-269B7E28E3B3}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_350C5B7777594978AE368D8072EB47D1"
-            {
-            "SourcePath" = "8:..\\ArtemisManager\\obj\\Debug\\net7.0-windows\\ArtemisManager.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:BuiltProjectOutputGroup"
             "OutputProjectGuid" = "8:{1A272527-3A00-4981-9A96-269B7E28E3B3}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
@@ -881,34 +885,6 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:PublishItems"
             "OutputProjectGuid" = "8:{111D3BCB-D7A8-4BD4-A4F1-6DEFCAE0E7BF}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5C27F8BC3A34444396FC34ED720D78E9"
-            {
-            "SourcePath" = "8:..\\ArtemisManagerUI\\obj\\Debug\\net7.0-windows\\ArtemisManagerUI.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{35E9D8C3-399F-48A9-BE8A-A69A8B00CD09}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
@@ -1054,34 +1030,6 @@
                 {
                 }
             }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_AA33D124AE6B404F84E34772C10963DA"
-            {
-            "SourcePath" = "8:"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:PublishItemsOutputGroup"
-            "OutputProjectGuid" = "8:{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_AFB64F7D95024CE9AB57E347427D39F8"
             {
             "SourcePath" = "8:"
@@ -1196,7 +1144,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DAEA1EC848CD417BBAC9D3FA64B32D16"
             {
-            "SourcePath" = "8:..\\ArtemisManager\\obj\\Debug\\net7.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\ArtemisManager\\obj\\Debug\\net7.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
@@ -1216,62 +1164,6 @@
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:PublishItems"
-            "OutputProjectGuid" = "8:{1A272527-3A00-4981-9A96-269B7E28E3B3}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DCBACD6F7A974D6D951BE77B0C3C56A3"
-            {
-            "SourcePath" = "8:..\\ArtemisManagerAction\\obj\\Debug\\net7.0\\ArtemisManagerAction.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_E46AB9ECD4374EEFBFC1DDC7490CB21A"
-            {
-            "SourcePath" = "8:..\\ArtemisManager\\obj\\Debug\\net7.0-windows\\ArtemisManager.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{1A272527-3A00-4981-9A96-269B7E28E3B3}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
@@ -1300,34 +1192,6 @@
             "ProjectOutputGroupRegister" = "3:1"
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Documentation"
-            "OutputProjectGuid" = "8:{111D3BCB-D7A8-4BD4-A4F1-6DEFCAE0E7BF}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_FD950BF3A7BD429AB99B263F7A51EE9F"
-            {
-            "SourcePath" = "8:..\\AMCommunicator\\obj\\Debug\\net7.0\\AMCommunicator.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_AC5A3452B0964873BFFB2DBDEB8A4F91"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:"
-            "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{111D3BCB-D7A8-4BD4-A4F1-6DEFCAE0E7BF}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"

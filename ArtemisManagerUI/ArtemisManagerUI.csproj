@@ -1,16 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <FileVersion>0.0.0.35</FileVersion>
-    <AssemblyVersion>0.0.0.35</AssemblyVersion>
+    <FileVersion>0.1.0.56</FileVersion>
+    <AssemblyVersion>0.1.0.56</AssemblyVersion>
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>
     <Copyright>Copyright (c) 2023</Copyright>
   </PropertyGroup>
+ 
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -21,7 +22,37 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\about.png" />
+    <None Remove="Resources\activate.png" />
+    <None Remove="Resources\add1.png" />
+    <None Remove="Resources\amBanner.jpg" />
+    <None Remove="Resources\artemis1.png" />
+    <None Remove="Resources\artemissbs.png" />
+    <None Remove="Resources\broadcast.png" />
+    <None Remove="Resources\deactivate.png" />
+    <None Remove="Resources\disconnect.png" />
+    <None Remove="Resources\download %281%29.png" />
+    <None Remove="Resources\download %282%29.png" />
     <None Remove="Resources\fileexplore.png" />
+    <None Remove="Resources\generate.png" />
+    <None Remove="Resources\install.png" />
+    <None Remove="Resources\no.png" />
+    <None Remove="Resources\ok.png" />
+    <None Remove="Resources\peer-to-peer.png" />
+    <None Remove="Resources\ping.png" />
+    <None Remove="Resources\restart.png" />
+    <None Remove="Resources\search.png" />
+    <None Remove="Resources\send.png" />
+    <None Remove="Resources\Settings-icon.png" />
+    <None Remove="Resources\shutdown.png" />
+    <None Remove="Resources\snapshot.png" />
+    <None Remove="Resources\start.png" />
+    <None Remove="Resources\startup.png" />
+    <None Remove="Resources\stop.png" />
+    <None Remove="Resources\tool-and-utensils.png" />
+    <None Remove="Resources\uninstall.png" />
+    <None Remove="Resources\update.png" />
+    <None Remove="Resources\viewhistory.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +67,97 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\about.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\activate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\add1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\amBanner.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\artemis1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\artemissbs.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\broadcast.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\deactivate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\disconnect.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\download (1).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\download (2).png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\fileexplore.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\generate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\install.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\no.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\ok.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\peer-to-peer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\ping.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\restart.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\search.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\send.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Settings-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\shutdown.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\snapshot.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\start.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\startup.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\stop.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\tool-and-utensils.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\uninstall.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\update.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\viewhistory.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
@@ -67,7 +188,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="..\changes.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="&quot;$(SolutionDir)VersionBump\bin\Debug\net7.0\VersionBump.exe&quot; &quot;$(ProjectPath)&quot;&#xD;&#xA;" />
   </Target>

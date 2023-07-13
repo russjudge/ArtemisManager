@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ArtemisManagerUI" FontSize="14"
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
-        Title="Artemis Manager" SizeToContent="Height" Width="1250">
+        Title="Artemis Manager" SizeToContent="Height" Width="1000" >
     
     <DockPanel>
         <DockPanel.Resources>
@@ -16,38 +16,62 @@
             <converter:NullToVisibility x:Key="NullToVisibility" />
 
         </DockPanel.Resources>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Image Height="35" HorizontalAlignment="Left" Source="/ArtemisManagerUI;component/Resources/amBanner.jpg" />
+            <Label Margin="-110,0,0,0" VerticalAlignment="Center" Content="Version: " FontWeight="Bold" />
+            <TextBlock Margin="-30,0,0,0" VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=AppVersion}" />
+        </StackPanel>
         <DockPanel DockPanel.Dock="Top">
-            <TextBlock Text="This Hostname:" FontWeight="Bold" Padding="0,0,5,0"/>
-            <TextBlock Text="{Binding Hostname, ElementName=uc}" />
-            <TextBlock Text="This IP:" FontWeight="Bold" Padding="20,0,5,0"/>
-            <TextBlock Text="{Binding IP, ElementName=uc}" />
-            <TextBlock Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" ToolTip="Used to restrict access to the peer-to-peer network"/>
-            <TextBox  ToolTip="Used to restrict access to the peer-to-peer network" Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
-
+            <TextBlock VerticalAlignment="Center" Text="This Hostname:" FontWeight="Bold" Padding="0,0,5,0"/>
+            <TextBlock VerticalAlignment="Center" Text="{Binding Hostname, ElementName=uc}" />
+            <TextBlock VerticalAlignment="Center" Text="This IP:" FontWeight="Bold" Padding="20,0,5,0"/>
+            <TextBlock VerticalAlignment="Center" Text="{Binding IP, ElementName=uc}" />
+            <TextBlock VerticalAlignment="Center" Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" ToolTip="Used to restrict access to the peer-to-peer network"/>
+            <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
+            </Button>
+            <TextBox VerticalAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Used to restrict access to the peer-to-peer network" Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
+            
         </DockPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button
                 Click="OnStartServer"
-                ToolTip="Initiates the peer-to-peer network and announces itself to any other active peers."
-                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >Start Network Communication</Button>
+                ToolTip="Initiates the peer-to-peer network and broadcasts itself to any other active peers."
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/peer-to-peer.png" />
+            </Button>
             <Button
                 Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 Click="OnRebroadcast"
-                ToolTip="Broadcasts on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
-                Re-announce this client
+                ToolTip="Re-Broadcasts on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/broadcast.png" />
             </Button>
             <CheckBox Margin="5,0,0,0" Padding="2,0,0,0" IsChecked="{Binding Path=AutoStartServer, ElementName=uc, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="Start Network Communication as soon as this application starts."/>
+            <Button Margin="50,5,5,5" ToolTip="Check for update to Artemis Manager" >
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (2).png" />
+            </Button>
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button
                 Click="OnSnapshotAretmis"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                Content="Snapshot Current Artemis Install" ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager."></Button>
-            
+                ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager.">
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/snapshot.png" />
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                    
+                </StackPanel>
+            </Button>
+
             <Button
-                Click="OnInstallMod"
+                Click="OnInstallMod" ToolTip="Install a Mod"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                Content="Install A Mod" />
+                 >
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
+                </StackPanel>
+            </Button>
             <TextBlock
                 Foreground="Red" FontWeight="Bold"
                 Margin="5,0,5,0" VerticalAlignment="Center"
@@ -55,38 +79,77 @@
                 Text="Artemis Install Not Found." />
             <AdornerDecorator
                 Visibility="{Binding ElementName=uc, Path=IsWindows, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-            <Button
+                <Button
                 Click="OnBrowseForArtemis"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
-                Content="Browse to Artemis Install Folder" />
+                ToolTip="Browse to Artemis Install Folder" >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/search.png" />
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                    </StackPanel>
+                </Button>
             </AdornerDecorator>
             <AdornerDecorator
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
                 <Button
                     Click="OnStartArtemisSBS"
                     Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                    Content="Start Artemis SBS"
-                    ToolTip="Note: this does not tell the peers to start Artemis SBS" />
+                    ToolTip="Start Artemis SBS. Note: this does not tell the peers to start Artemis SBS" >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/start.png" />
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                    </StackPanel>
+                </Button>
             </AdornerDecorator>
             <AdornerDecorator Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
                 <Button
                     Click="OnStopArtemisSBS"
                     Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                    Content="Stop Artemis SBS" />
+                    ToolTip="Stop Artemis SBS. Note: this does not tell the peers to start Artemis SBS" >
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/stop.png" />
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                    </StackPanel>
+                </Button>
             </AdornerDecorator>
             <Button
                 Click="OnDeactivateMods"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                Content="Deactivate All Mods" ToolTip="Resets activated Artemis folder to base Artemis" />
+                ToolTip="Deactivate All Mods by reseting activated Artemis folder to base Artemis" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
+                </StackPanel>
+            </Button>
             <Button
                 Click="OnPutInStartup"
                 Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                Content="Add Manager to Windows Startup" />
+                ToolTip="Add Manager to Windows Startup" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/add1.png" />
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
+                </StackPanel>
+            </Button>
             <Button
                 Click="OnRemoveFromStartup"
                 Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                Content="Remove Manger from Windows Startup" />
+                ToolTip="Remove Manger from Windows Startup" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/no.png" />
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
+                </StackPanel>
+            </Button>
+            <Button Margin="20,5,5,5" ToolTip="Generate Mod from current activated Artemis folder">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/generate.png" />
+            </Button>
+            <Button Margin="5,5,5,5" ToolTip="Open activated Artemis folder in Windows Explorer">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/search.png" />
+            </Button>
+            <Button Margin="40,5,5,5" ToolTip="Download specific update version of Artemis SBS">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (1).png" />
+            </Button>
         </WrapPanel>
+        
         <Grid DockPanel.Dock="Top" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -160,24 +223,53 @@
                     <DockPanel>
                             <GroupBox DockPanel.Dock="Top" Header="Peer Actions">
                                 <WrapPanel>
-                                    <Button Content="Disconnect" Click="OnDisconnect" CommandParameter="{Binding}" ToolTip="Orders the peer to disconnect.  Useful for kicking someone out.  Change the password after disconnecting to prevent them from reconnecting."></Button>
-                                    <Button Content="Ping" Click="OnPing" ToolTip="Pings peer to confirm connection." CommandParameter="{Binding}"></Button>
-                                    <Button Content="Restart PC" Click="OnPing" CommandParameter="{Binding}"></Button>
-                                    <Button Content="Shutdown PC" Click="OnPing" CommandParameter="{Binding}"></Button>
-                                    <Button Content="Check for Software Update" Click="OnPing" CommandParameter="{Binding}" ToolTip="Orders the peer to check for an update to this application."></Button>
+                                    <Button
+                                        Click="OnDisconnect" CommandParameter="{Binding}"
+                                        ToolTip="Disconnect. Orders the peer to disconnect.  Useful for kicking someone out.  Change the password after disconnecting to prevent them from reconnecting.">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/disconnect.png" />
+                                            </StackPanel>
+                                        </Button>
+                                    <Button Click="OnPing" ToolTip="Ping peer to confirm connection." CommandParameter="{Binding}">
+                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/ping.png" />
+                                        </Button>
+                                    <Button ToolTip="Restart Peer PC" Click="OnRestart" CommandParameter="{Binding}">
+                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restart.png" />
+                                        </Button>
+                                    <Button ToolTip="Shutdown Peer PC" Click="OnShutdown" CommandParameter="{Binding}">
+                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/shutdown.png" />
+                                        </Button>
+                                    <Button
+                                        Click="OnUpdateCheck" CommandParameter="{Binding}"
+                                        ToolTip="Have Peer check for Software Update. Orders the peer to check for an update to this application and attempt to apply it if available.">
+                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/update.png" />
+                                        </Button>
                                 </WrapPanel>
                             </GroupBox>
                             <GroupBox DockPanel.Dock="Top" Header="Artemis SBS Actions">
                                 <WrapPanel>
-                                    <Button Content="Install Mod"></Button>
-                                    <Button Content="Activate Mod"></Button><!-- This: Remove and add this button on each mod in list in Info. -->
+                                    <Button ToolTip="Remotely install a mod on Peer."><!-- Use list of currently installed mods on this PC to install remotely.  Also, enable drag-drop from "Installed Mods" -->
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
+                                            </StackPanel>
+                                        </Button>
                                         <Button
-                                            Content="Start Artemis SBS"
-                                            ToolTip="Starts Artemis SBS on peer."
-                                            Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" />
+                                            ToolTip="Start Artemis SBS on Peer."
+                                            Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/start.png" />
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                                            </StackPanel>
+                                        </Button>
                                         <Button
                                             Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                                            Content="Stop Artemis SBS" />
+                                            ToolTip="Stop Artemis SBS on Peer.">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/stop.png" />
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                                            </StackPanel>
+                                        </Button>
                                     </WrapPanel>
                             </GroupBox>
                                 <!--<GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
@@ -185,13 +277,25 @@
                                     
                                 </local:PeerInfoControl>
                             </GroupBox>-->
-                        
-                        <DockPanel DockPanel.Dock="Bottom">
-                            
-                            <Button IsDefault="true" DockPanel.Dock="Right" Tag="{Binding ElementName=MessageLine, Path=Text, Mode=TwoWay}" Content=">>" Click="OnSendMessage" CommandParameter="{Binding}"/>
-                            <TextBox Name="MessageLine" VerticalAlignment="Center"  />
-                        </DockPanel>
-                        <TextBlock />
+                                <GroupBox  DockPanel.Dock="Bottom">
+                                    <GroupBox.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Chat to: " />
+                                            <TextBlock Text="{Binding Hostname}" />
+                                        </StackPanel>
+                                    </GroupBox.Header>
+                                    <DockPanel>
+                                    
+                                    <Button
+                                IsDefault="true" DockPanel.Dock="Right"
+                                Tag="{Binding ElementName=MessageLine, Path=Text, Mode=TwoWay}" ToolTip="Send to chat" Click="OnSendMessage" CommandParameter="{Binding}">
+                                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/send.png" />
+                                    </Button>
+                                    <TextBox Name="MessageLine" VerticalAlignment="Center"  />
+                                    
+                                </DockPanel>
+                                </GroupBox>
+                                <TextBlock />
                     </DockPanel>
                     </GroupBox>
                 </DataTemplate>

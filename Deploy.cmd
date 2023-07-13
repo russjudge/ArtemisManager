@@ -1,1 +1,1 @@
-Deploy\bin\Debug\net7.0\Deploy.exe "ArtemisManager\ArtemisManager.csproj" "ArtemisManagerSetup\Debug\ArtemisManagerSetup.msi" "//Endeaver/russjudge.com/Software"
+Deploy\bin\Debug\net7.0\Deploy.exe "ArtemisManager\ArtemisManager.csproj" "ArtemisManagerSetup\Debug\ArtemisManagerSetup.msi" "ArtemisManager\bin\Debug\net7.0-windows" "//Endeaver/russjudge.com/Software"

@@ -1,0 +1,96 @@
+﻿<Window x:Class="ArtemisManagerUI.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ArtemisManagerUI"
+        mc:Ignorable="d" Name="uc"
+        Title="About" SizeToContent="WidthAndHeight" Padding="5,5,5,5" Icon="/ArtemisManagerUI;component/Resources/about.png">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="0" Grid.Column="0"
+            Text="Application:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="0" Grid.Column="1"
+            Text="{Binding ApplicationName, Mode=OneWay,ElementName=uc}" />
+
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="1" Grid.Column="0"
+            Text="Path:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="1" Grid.Column="1"
+            Text="{Binding ApplicationPath, Mode=OneWay,ElementName=uc}" />
+
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="3" Grid.Column="0"
+            Text="Author:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="3" Grid.Column="1"
+            Text="Russ Judge" />
+        
+
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="4" Grid.Column="0"
+            Text="Company:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="4" Grid.Column="1"
+            Text="{Binding Company, Mode=OneWay,ElementName=uc}" />
+
+
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="5" Grid.Column="0"
+            Text="Version:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="5" Grid.Column="1"
+            Text="{Binding Version, Mode=OneWay,ElementName=uc}" />
+
+
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="6" Grid.Column="0"
+            Text="Copyright:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="6" Grid.Column="1"
+            Text="{Binding Copyright, Mode=OneWay,ElementName=uc}" />
+
+<!--
+
+        <TextBlock Padding="0,0,5,0"
+            Grid.Row="7" Grid.Column="0"
+            Text="Description:"
+            FontWeight="Bold" />
+        <TextBlock
+            Grid.Row="7" Grid.Column="1"
+            Text="{Binding Description, Mode=OneWay,ElementName=uc}" />
+        -->
+        <Button ToolTip="View History" Click="OnViewHistory" Grid.Row="9" Grid.Column="0" >
+            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/viewhistory.png" />
+        </Button>
+
+        <Button ToolTip="OK" Click="OnOK" Grid.Row="9" Grid.Column="1" Width="48">
+            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/ok.png" />
+        </Button>
+        <TextBlock Text="https://russjudge.com" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" />
+    </Grid>
+</Window>
