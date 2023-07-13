@@ -15,7 +15,7 @@ namespace VersionBump
             string retVal;
             theNewVersion = string.Empty;
             int i = projectData.IndexOf(match) + match.Length;
-            if (i >= match.Length)
+            if (i >= 0)
             {
                 int j = projectData.IndexOf('<', i);
                 string version = projectData.Substring(i, j - i);
@@ -26,13 +26,13 @@ namespace VersionBump
                     k++;
                     string newVersion = parts[0] + "." + parts[1] + "." + parts[2] + "." + k.ToString();
                     theNewVersion = newVersion;
-                    retVal = projectData.Substring(0, i) + newVersion + projectData.Substring(j);
+                    retVal = projectData.Substring(0, i) + newVersion  + projectData.Substring(j);
                 }
                 else if (parts.Length <= 3)
                 {
                     string newVersion = parts[0] + "." + parts[1] + "." + parts[2] + ".1";
                     theNewVersion = newVersion;
-                    retVal = projectData.Substring(0, i) + newVersion + projectData.Substring(j);
+                    retVal = projectData.Substring(0, i) + newVersion  + projectData.Substring(j);
                 }
                 else
                 {
@@ -61,7 +61,7 @@ namespace VersionBump
                 {
                     projectData = sr.ReadToEnd();
                 }
-
+               
                 projectData = UpdateMatch(projectData, versionMatch1, out NewFileVersion);
                 projectData = UpdateMatch(projectData, versionMatch2, out NewAssemblyVersion);
 

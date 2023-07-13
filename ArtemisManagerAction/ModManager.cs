@@ -16,8 +16,6 @@ namespace ArtemisManagerAction
 
         
         public static readonly string ModArchiveFolder = Path.Combine(DataFolder, "Archive");
-
-
         
         public static void InstallMod(string packagedFile, ModItem mod)
         {
@@ -48,9 +46,9 @@ namespace ArtemisManagerAction
                 }
             }
         }
-        public static void CreateFolder(string path)
+        public static void CreateFolder(string? path)
         {
-            if (!Directory.Exists(path))
+            if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }

@@ -124,28 +124,28 @@ namespace ArtemisManagerUI
 
         private void OnBrowse(object sender, RoutedEventArgs e)
         {
-            string value = BrowseForOneFile(Title, IsFolderPicker, null);
+            string? value = BrowseForOneFile(Title, IsFolderPicker, null);
             if (!string.IsNullOrEmpty(value))
             {
                 SelectedItem = value;
             }
         }
-        public static string BrowseForOneFile(
+        public static string? BrowseForOneFile(
           string title,
           bool isFolderPicker,
-          string initialDirectory)
+          string? initialDirectory)
         {
             return BrowseForOneFile(title, isFolderPicker, initialDirectory, null);
         }
 
-        public static string BrowseForOneFile(
+        public static string? BrowseForOneFile(
             string title,
             bool isFolderPicker,
-            string initialDirectory,
-            IEnumerable<Tuple<string, string>> filters
+            string? initialDirectory,
+            IEnumerable<Tuple<string, string>>? filters
         )
         {
-            string retVal;
+            string? retVal;
             var dlg = new CommonOpenFileDialog();
             dlg.Title = title;
             dlg.IsFolderPicker = isFolderPicker;

@@ -11,8 +11,8 @@
     <Copyright>Copyright (c) 2023 Confederate In Blue Gaming</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/russjudge/ArtemisManager</RepositoryUrl>
-    <FileVersion>1.0.0.30</FileVersion>
-    <AssemblyVersion>1.0.0.30</AssemblyVersion>
+    <FileVersion>0.0.0.33</FileVersion>
+    <AssemblyVersion>0.0.0.33</AssemblyVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -37,7 +37,11 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="&quot;$(SolutionDir)VersionBump\bin\Debug\net7.0\VersionBump.exe&quot; &quot;$(ProjectPath)&quot;&#xD;&#xA;XCOPY &quot;$(OutDir)\*.*&quot; \\ATLANTIS\WorkArea\ /F /R /Y&#xD;&#xA;" />
+    <Exec Command="XCOPY &quot;$(OutDir)\*.*&quot; \\ATLANTIS\WorkArea\ /F /R /Y&#xD;&#xA;" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;$(SolutionDir)VersionBump\bin\Debug\net7.0\VersionBump.exe&quot; &quot;$(ProjectPath)&quot;&#xD;&#xA;" />
   </Target>
 
 </Project>
