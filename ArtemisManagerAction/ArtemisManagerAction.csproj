@@ -4,13 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.31</FileVersion>
+    <AssemblyVersion>1.0.0.31</AssemblyVersion>
 
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Abraham.Windows.Shell" Version="1.0.1" />
     <PackageReference Include="SharpCompress" Version="0.33.0" />
   </ItemGroup>
 

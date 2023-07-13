@@ -7,13 +7,15 @@
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
         Title="Artemis Manager" SizeToContent="Height" Width="1250">
-    <Window.Resources>
-        <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
-        <converter:DateFormatter x:Key="DateFormatter" />
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <converter:NullToVisibility x:Key="NullToVisibility" />
-    </Window.Resources>
+    
     <DockPanel>
+        <DockPanel.Resources>
+            <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
+            <converter:DateFormatter x:Key="DateFormatter" />
+            <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+            <converter:NullToVisibility x:Key="NullToVisibility" />
+
+        </DockPanel.Resources>
         <DockPanel DockPanel.Dock="Top">
             <TextBlock Text="This Hostname:" FontWeight="Bold" Padding="0,0,5,0"/>
             <TextBlock Text="{Binding Hostname, ElementName=uc}" />
@@ -114,7 +116,7 @@
                 <GroupBox.Header>
                     <Label Content="Activity" />
                 </GroupBox.Header>
-                <ListBox Name="StatusList" ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" Height="500" Width="300"  VerticalAlignment="Top" />
+                <ListBox ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" Height="500" Width="300"  VerticalAlignment="Top" />
             </GroupBox>
             <GroupBox DockPanel.Dock="Top" MinHeight="200">
             <GroupBox.Header>
@@ -178,11 +180,11 @@
                                             Content="Stop Artemis SBS" />
                                     </WrapPanel>
                             </GroupBox>
-                                <GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
+                                <!--<GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
                                 <local:PeerInfoControl ItemData="{Binding}" >
                                     
                                 </local:PeerInfoControl>
-                            </GroupBox>
+                            </GroupBox>-->
                         
                         <DockPanel DockPanel.Dock="Bottom">
                             

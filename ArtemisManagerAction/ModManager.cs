@@ -24,7 +24,7 @@ namespace ArtemisManagerAction
             FileInfo package = new(packagedFile);
             if (package.Exists)
             {
-                string targetPath = mod.GetSaveFile();
+                string targetPath = Path.Combine(ModItem.ModInstallFolder, mod.GetSaveFile());
                 if (Directory.Exists(targetPath))
                 {
                     Unpackage(packagedFile, targetPath);

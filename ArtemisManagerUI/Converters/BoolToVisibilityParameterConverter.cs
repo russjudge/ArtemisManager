@@ -26,34 +26,40 @@ namespace ArtemisManagerUI.Converters
         /// </returns>
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-        
-            Visibility TrueVisibility = Visibility.Visible;
-            Visibility FalseVisibility = Visibility.Collapsed;
-            if (parameter != null)
+            try
             {
-                //throw new ArgumentException(GeneralUtility.CallingMethod + ": Parameter is required! Format: (VisibilityIfTrue|VisibilityIfFalse)");
-
-
-                string[] parmSettings = ((string)parameter).Split('|');
-
-                TrueVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[0]);
-                FalseVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[1]);
-            }
-            if (value == null)
-            {
-                return FalseVisibility;
-            }
-            else
-            {
-                try
+                Visibility TrueVisibility = Visibility.Visible;
+                Visibility FalseVisibility = Visibility.Collapsed;
+                if (parameter != null)
                 {
-                    bool TestedValue = (bool)value;
-                    return TestedValue ? TrueVisibility : FalseVisibility;
+                    //throw new ArgumentException(GeneralUtility.CallingMethod + ": Parameter is required! Format: (VisibilityIfTrue|VisibilityIfFalse)");
+
+
+                    string[] parmSettings = ((string)parameter).Split('|');
+
+                    TrueVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[0]);
+                    FalseVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[1]);
                 }
-                catch
+                if (value == null)
                 {
                     return FalseVisibility;
                 }
+                else
+                {
+                    try
+                    {
+                        bool TestedValue = (bool)value;
+                        return TestedValue ? TrueVisibility : FalseVisibility;
+                    }
+                    catch
+                    {
+                        return FalseVisibility;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return default(Visibility);
             }
         }
 

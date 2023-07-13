@@ -28,8 +28,20 @@ namespace ArtemisManagerAction
             item.Key = Key;
             item.ModIdentifier = ModIdentifier;
 
-
-            
+            item.Name = Name;
+            item.Description = Description;
+            item.Version= Version;
+            item.RequiredArtemisVersion= RequiredArtemisVersion;
+            item.Author= Author;
+            item.IsArtemisBase= IsArtemisBase;
+            item.localIdentifier= LocalIdentifier;
+            item.ReleaseDate= ReleaseDate;
+            item.isActive = true;
+            item.InstallFolder = InstallFolder;
+            item.PackageFile = PackageFile;
+            FileInfo f = new(SaveFile);
+            item.Save(Path.Combine(ActivatedFolder, f.Name));
+            ModManager.CopyFolder(InstallFolder, Path.Combine(ActivatedFolder, f.Name.Substring(0, f.Name.Length - 4)));
             return item;
         }
         private string key = string.Empty;
@@ -134,6 +146,16 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
+        private string installFolder = string.Empty;
+        public string InstallFolder
+        {
+            get { return installFolder; }
+            set
+            {
+                installFolder = value;
+                DoChanged();
+            }
+        }
         private Guid localIdentifier = Guid.NewGuid();
         public Guid LocalIdentifier
         {
@@ -193,8 +215,8 @@ namespace ArtemisManagerAction
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                WriteIndented = true
+                
             };
             return JsonSerializer.Serialize(this, options);
         }
@@ -219,28 +241,37 @@ namespace ArtemisManagerAction
         public string GetSaveFile()
         {
             string file;
-            if (ModIdentifier == Guid.Empty)
+            if (string.IsNullOrEmpty(InstallFolder))
             {
-                file = localIdentifier.ToString() + ArtemisManager.SaveFileExtension;
+                if (ModIdentifier == Guid.Empty)
+                {
+                    file = localIdentifier.ToString() + ArtemisManager.SaveFileExtension;
+                }
+                else
+                {
+                    file = ModIdentifier.ToString() + ArtemisManager.SaveFileExtension;
+                }
             }
             else
             {
-                file = ModIdentifier.ToString() + ArtemisManager.SaveFileExtension;
+                file = new DirectoryInfo(InstallFolder).Name + ArtemisManager.SaveFileExtension;
             }
-
-            file = Path.Combine(ModInstallFolder, file);
-
             return file;
         }
         public void Save(string file = "")
         {
             string data = GetJSON();
-            if (string.IsNullOrEmpty(file)) 
+            if (string.IsNullOrEmpty(SaveFile))
             {
-                file = GetSaveFile();
+                if (string.IsNullOrEmpty(file))
+                {
+                    file = GetSaveFile();
+                    file = Path.Combine(ModInstallFolder, file);
+                }
+                SaveFile = file;
             }
-            SaveFile = file;
-            using StreamWriter sw = new(file);
+            ModManager.CreateFolder(new FileInfo(SaveFile).DirectoryName);
+            using StreamWriter sw = new(SaveFile);
             sw.WriteLine(data);
             
         }

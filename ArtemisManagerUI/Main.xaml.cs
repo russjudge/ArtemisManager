@@ -30,17 +30,23 @@ namespace ArtemisManagerUI
         public static bool ProbablyUnattended { get; private set; }
         public Main()
         {
-            Chat = new();
-            
-            Status = new ObservableCollection<string>();
-            ConnectedPCs = new()
+            try
+            {
+                Chat = new();
+
+                Status = new ObservableCollection<string>();
+                ConnectedPCs = new()
             {
                 new PCItem("All Connections", IPAddress.Any)
             };
-            this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
-            
-            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
-            InstalledMods = new(ArtemisManager.GetInstalledMods());
+                this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
+
+                IsArtemisRunning = ArtemisManager.IsArtemisRunning();
+                InstalledMods = new(ArtemisManager.GetInstalledMods());
+            }
+            catch (Exception ex)
+            { 
+            }
             InitializeComponent();
 
         }
@@ -61,54 +67,57 @@ namespace ArtemisManagerUI
         */
         private void OnLoaded(object sender, RoutedEventArgs? e)
         {
-            if (Properties.Settings.Default.UpgradeRequired)
+            if (isLoading)
             {
-                Properties.Settings.Default.Upgrade();
-                Properties.Settings.Default.UpgradeRequired = false;
-                Properties.Settings.Default.Save();
-            }
-            ArtemisInstallFolder = Properties.Settings.Default.ArtemisInstallFolder;
-            if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManager.ArtemisEXE)))
-            {
-                ArtemisInstallFolder = ArtemisManager.AutoDetectArtemisInstallPath();
-                Properties.Settings.Default.ArtemisInstallFolder = ArtemisInstallFolder;
-                Properties.Settings.Default.Save();
-            }
-                        
-
-            Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
-            Network.Password = Properties.Settings.Default.NetworkPassword;
-            Password = Network.Password;
-            AutoStartServer = Properties.Settings.Default.ConnectOnStart;
-            Port = Properties.Settings.Default.ListeningPort;
-            if (!string.IsNullOrEmpty(ArtemisInstallFolder))
-            {
-                if (ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder))
+                if (Properties.Settings.Default.UpgradeRequired)
                 {
-                    string? version = ArtemisManager.GetArtemisVersion(ArtemisInstallFolder);
-                    if (version != null && MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    Properties.Settings.Default.Upgrade();
+                    Properties.Settings.Default.UpgradeRequired = false;
+                    Properties.Settings.Default.Save();
+                }
+                ArtemisInstallFolder = Properties.Settings.Default.ArtemisInstallFolder;
+                if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManager.ArtemisEXE)))
+                {
+                    ArtemisInstallFolder = ArtemisManager.AutoDetectArtemisInstallPath();
+                    Properties.Settings.Default.ArtemisInstallFolder = ArtemisInstallFolder;
+                    Properties.Settings.Default.Save();
+                }
+
+
+                Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
+                Network.Password = Properties.Settings.Default.NetworkPassword;
+                Password = Network.Password;
+                AutoStartServer = Properties.Settings.Default.ConnectOnStart;
+                Port = Properties.Settings.Default.ListeningPort;
+                if (!string.IsNullOrEmpty(ArtemisInstallFolder))
+                {
+                    if (ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder))
                     {
-                        SnapshotArtemis();
+                        string? version = ArtemisManager.GetArtemisVersion(ArtemisInstallFolder);
+                        if (version != null && MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            SnapshotArtemis();
+                        }
                     }
                 }
-            }
-            isLoading = false;
-            if (AutoStartServer)
-            {
-                DoStartServer();
-            }
-
-            foreach (var arg in Environment.GetCommandLineArgs())
-            {
-                if (arg.Equals("FROMSTARTUPFOLDER", StringComparison.InvariantCultureIgnoreCase))
+                isLoading = false;
+                if (AutoStartServer)
                 {
-                    ProbablyUnattended = true;
-                    break;
+                    DoStartServer();
                 }
-            }
-            if (ProbablyUnattended)
-            {
-                this.WindowState = WindowState.Minimized;
+
+                foreach (var arg in Environment.GetCommandLineArgs())
+                {
+                    if (arg.Equals("FROMSTARTUPFOLDER", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        ProbablyUnattended = true;
+                        break;
+                    }
+                }
+                if (ProbablyUnattended)
+                {
+                    this.WindowState = WindowState.Minimized;
+                }
             }
         }
         public static readonly DependencyProperty IsStartedProperty =
@@ -452,7 +461,7 @@ namespace ArtemisManagerUI
                 else
                 {
                     Status.Add(DateTime.Now.ToString("HH:mm:ss") + ": "  + message);
-                    StatusList.ScrollIntoView(Status.Count - 1);
+                    //StatusList.ScrollIntoView(Status.Count - 1);
                 }
             }
             catch (ThreadInterruptedException)
@@ -834,18 +843,19 @@ namespace ArtemisManagerUI
             if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
             {
                 BrowseForArtemis();
-                if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
-                {
-                    return;
-                }
-                else
-                {
-                    ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder);
-                    InstalledMods.Add(item);
-                    ArtemisManager.ClearActiveFolder();
-                    item.Activate();
-                }
             }
+            if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
+            {
+                return;
+            }
+            else
+            {
+                ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder);
+                InstalledMods.Add(item);
+                ArtemisManager.ClearActiveFolder();
+                item.Activate();
+            }
+
         }
         private void OnStartArtemisSBS(object sender, RoutedEventArgs e)
         {

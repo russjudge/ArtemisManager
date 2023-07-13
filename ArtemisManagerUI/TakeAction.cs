@@ -203,12 +203,12 @@ namespace ArtemisManagerUI
         [SupportedOSPlatform("windows")]
         public static void CreateWindowsShortcutInStartup()
         {
-            var asm = System.Reflection.Assembly.GetEntryAssembly();
-            if (asm != null)
-            {
-                string appLocation = asm.Location.Replace(".dll", ".exe");
-                Abraham.Windows.Shell.AutostartFolder.AddShortcut(appLocation, null, "Artemis Manager", string.Empty);
-                /*
+            //var asm = System.Reflection.Assembly.GetEntryAssembly();
+            //if (asm != null)
+            //{
+                //string appLocation = asm.Location.Replace(".dll", ".exe");
+               // Abraham.Windows.Shell.AutostartFolder.AddShortcut(appLocation, null, "Artemis Manager", string.Empty);
+                
             var temp = Path.GetTempFileName() + ".vbs";
             var asm = System.Reflection.Assembly.GetEntryAssembly();
             if (asm != null)
@@ -239,7 +239,7 @@ namespace ArtemisManagerUI
 
                 process.WaitForExit();
                 File.Delete(temp);
-                    */
+                    
                                 /*
                  * Set oWS = WScript.CreateObject("WScript.Shell")
 sLinkFile = "C:\MyShortcut.LNK"

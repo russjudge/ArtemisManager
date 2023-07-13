@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-        <FileVersion>1.0.0.0</FileVersion>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.31</FileVersion>
+    <AssemblyVersion>1.0.0.31</AssemblyVersion>
     
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>

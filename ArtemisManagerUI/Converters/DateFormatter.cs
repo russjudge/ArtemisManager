@@ -14,20 +14,27 @@ namespace ArtemisManagerUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
+            try
             {
-                return default(DateTime);
-            }
-            else
-            {
-                if (parameter is not string parm)
+                if (value == null)
                 {
-                    return value;
+                    return default(DateTime);
                 }
                 else
                 {
-                    return ((DateTime)value).ToString(parm);
+                    if (parameter is not string parm)
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        return ((DateTime)value).ToString(parm);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                return default(DateTime);
             }
         }
 

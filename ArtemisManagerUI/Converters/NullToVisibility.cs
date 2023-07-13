@@ -14,17 +14,24 @@ namespace ArtemisManagerUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-
-            Visibility IsNullVisibility = Visibility.Visible;
-            Visibility IsObjectVisibility = Visibility.Collapsed;
-            if (parameter != null)
+            try
             {
-                string[] parmSettings = ((string)parameter).Split('|');
+                Visibility IsNullVisibility = Visibility.Visible;
+                Visibility IsObjectVisibility = Visibility.Collapsed;
+                if (parameter != null)
+                {
+                    string[] parmSettings = ((string)parameter).Split('|');
 
-                IsNullVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[0]);
-                IsObjectVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[1]);
+                    IsNullVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[0]);
+                    IsObjectVisibility = (Visibility)Enum.Parse(typeof(Visibility), parmSettings[1]);
+                }
+                return (value == null || string.IsNullOrEmpty(value.ToString())) ? IsNullVisibility : IsObjectVisibility;
             }
-            return (value == null || string.IsNullOrEmpty(value.ToString())) ? IsNullVisibility : IsObjectVisibility;
+            catch (Exception ex) 
+            { 
+                return default(Visibility);
+            }
+
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {

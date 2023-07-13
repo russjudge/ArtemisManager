@@ -54,20 +54,26 @@ namespace ArtemisManagerAction
             DeleteAll(ModItem.ActivatedFolder);
             foreach (var mod in GetInstalledMods())
             {
-                mod.IsActive = false;
-                mod.Save();
+                if (mod.IsActive)
+                {
+                    mod.IsActive = false;
+                    mod.Save();
+                }
             }
         }
         public static void DeleteAll(string target)
         {
-            foreach(var dir in new DirectoryInfo(target).GetDirectories())
+            if (Directory.Exists(target))
             {
-                DeleteAll(dir.FullName);
-                dir.Delete();
-            }
-            foreach (var fle in new DirectoryInfo(target).GetFiles())
-            {
-                fle.Delete();
+                foreach (var dir in new DirectoryInfo(target).GetDirectories())
+                {
+                    DeleteAll(dir.FullName);
+                    dir.Delete();
+                }
+                foreach (var fle in new DirectoryInfo(target).GetFiles())
+                {
+                    fle.Delete();
+                }
             }
         }
         
@@ -104,6 +110,7 @@ namespace ArtemisManagerAction
             ModItem retVal = new();
             string? version = GetArtemisVersion(installFolder);
             retVal.RequiredArtemisVersion = version;
+            retVal.Name = "Artemis SBS";
             retVal.Author = "Thom Robertson";
             retVal.Version = version;
             retVal.Description = "Base Artemis";
@@ -126,6 +133,7 @@ namespace ArtemisManagerAction
                 target = retVal.ModIdentifier.ToString();
             }
             target = Path.Combine(ModItem.ModInstallFolder, target);
+            retVal.InstallFolder = target;
             ModManager.CopyFolder(installFolder, target);
             retVal.Save(target + SaveFileExtension);
             
@@ -241,7 +249,7 @@ namespace ArtemisManagerAction
                             int i = line.IndexOf(" V");
                             if (i > -1)
                             {
-                                int j = line.IndexOf(" ");
+                                int j = line.IndexOf(" ", i+1);
                                 if (j < 0)
                                 {
                                     j = line.Length;

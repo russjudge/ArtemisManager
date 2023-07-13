@@ -15,18 +15,25 @@ namespace ArtemisManagerUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IPAddress ip)
+            try
             {
-                if (ip.ToString() == IPAddress.Any.ToString() || ip.ToString() == IPAddress.None.ToString())
+                if (value is IPAddress ip)
                 {
-                    return Visibility.Collapsed;
+                    if (ip.ToString() == IPAddress.Any.ToString() || ip.ToString() == IPAddress.None.ToString())
+                    {
+                        return Visibility.Collapsed;
+                    }
+                    else
+                    {
+                        return Visibility.Visible;
+                    }
                 }
                 else
                 {
-                    return Visibility.Visible;
+                    return default(Visibility);
                 }
             }
-            else
+            catch (Exception ex)
             {
                 return default(Visibility);
             }
