@@ -17,3 +17,8 @@
 /ArtemisManagerAction/obj
 /VersionBump/bin/Debug/net7.0
 /VersionBump/obj
+/ArtemisManagerActionTests/bin
+/ArtemisManagerActionTests/obj
+/Deploy/bin/Debug/net7.0
+/Deploy/obj
+/ArtemisManagerSetup/Debug
