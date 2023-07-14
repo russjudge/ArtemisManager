@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
 
 namespace ArtemisManagerUI
 {
@@ -536,7 +538,7 @@ namespace ArtemisManagerUI
         {
             UpdateStatus("Starting Connection Service");
 
-            MyNetwork.ItemRequested += MyNetwork_ItemRequested;
+            MyNetwork.ModPackageRequested += MyNetwork_ModPackageRequested;
             MyNetwork.ConnectionRequested += MyNetwork_ConnectionRequested;
             MyNetwork.ConnectionReceived += MyNetwork_ConnectionReceived;
             MyNetwork.StatusUpdated += MyNetwork_StatusUpdated;
@@ -548,9 +550,71 @@ namespace ArtemisManagerUI
             MyNetwork.ChangeSetting += MyNetwork_ChangeSetting;
             MyNetwork.AlertReceived += MyNetwork_AlertReceived;
             MyNetwork.ClientInfoReceived += MyNetwork_ClientInfoReceived;
+            MyNetwork.ArtemisActionReceived += MyNetwork_ArtemisActionReceived;
+            MyNetwork.ModPackageReceived += MyNetwork_ModPackageReceived;
             MyNetwork.Connect();
             IsStarted = true;
         }
+
+        private void MyNetwork_ModPackageReceived(object? sender, ModPackageEventArgs e)
+        {
+            ModItem? item = ModItem.GetModItem(e.mod);
+            if (item != null)
+            {
+                //1. confirm not already installed.
+                //2. Write the file to a package in Archive.
+                //3. Unzip the package to the mod Install folder.
+                //4. Save modItem and add to list.
+            }
+        }
+
+        private void MyNetwork_ArtemisActionReceived(object? sender, ArtemisActionEventArgs e)
+        {
+            var wasProcessed = TakeArtemisAction.ProcessArtemisAction(e.Source, e.Action, e.Identifier, e.Mod);
+
+            switch (e.Action)
+            {
+                case AMCommunicator.Messages.ArtemisActions.ResetToVanilla:
+                    this.Dispatcher.Invoke(new Action<Guid?>(DeactivateAllButBase), wasProcessed.Item2?.LocalIdentifier);
+                    break;
+                case AMCommunicator.Messages.ArtemisActions.StopArtemis:
+                    this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = false; }));
+                    break;
+                case AMCommunicator.Messages.ArtemisActions.StartArtemis:
+                    this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = wasProcessed.Item1; }));
+
+                    break;
+                case AMCommunicator.Messages.ArtemisActions.InstallMod:
+
+                    if (wasProcessed.Item1)  //Will only be processed if we already have the package file in the archive folder.
+                    {
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            if (wasProcessed.Item2 != null)
+                            {
+                                InstalledMods.Add(wasProcessed.Item2);
+                            }
+                        }));
+                    }
+
+                    break;
+                case AMCommunicator.Messages.ArtemisActions.ActivateMod:
+
+                    this.Dispatcher.Invoke(new Action(() =>
+                    {
+                        foreach (var mod in InstalledMods)
+                        {
+                            if (mod.LocalIdentifier == e.Identifier)
+                            {
+                                mod.IsActive = true;
+                            }
+                        }
+                    }));
+
+                    break;
+            }
+        }
+
         void LoadClientInfoData(ClientInfoEventArgs e)
         {
             if (Thread.CurrentThread != this.Dispatcher.Thread)
@@ -580,7 +644,11 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_AlertReceived(object? sender, AlertEventArgs e)
         {
-            MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
+            }));
+            
             //TODO:  Offer option of attempting remote update of client, with warning that if not updated, some functionality may not work.
         }
 
@@ -590,10 +658,13 @@ namespace ArtemisManagerUI
             switch (e.SettingName)
             {
                 case "ConnectOnStart":
-                    this.AutoStartServer = bool.Parse(e.SettingValue);
+                    this.Dispatcher.Invoke(new Action(() => { this.AutoStartServer = bool.Parse(e.SettingValue); }));
                     break;
                 case "ListeningPort":
-                    this.Port = int.Parse(e.SettingValue);
+                    this.Dispatcher.Invoke(new Action(() =>
+                    {
+                        this.Port = int.Parse(e.SettingValue);
+                    }));
                     Network.ConnectionPort = int.Parse(e.SettingValue);
                     break;
             }
@@ -648,7 +719,7 @@ namespace ArtemisManagerUI
             {
                 if (!TakeAction.ProcessPCAction(e.Action, e.Force, e.Source))
                 {
-                    TakeArtemisAction.ProcessArtemisAction(e.Action);
+                    //TakeArtemisAction.ProcessArtemisAction(e.Action);
                 }
 
             }
@@ -720,7 +791,6 @@ namespace ArtemisManagerUI
             {
                 ConnectedPCs.Add(pcItem);
             }
-
         }
 
         private void MyNetwork_ConnectionReceived(object? sender, ConnectionRequestEventArgs e)
@@ -735,9 +805,9 @@ namespace ArtemisManagerUI
             UpdateStatus(string.Format("Connection Requested from: {0} - {1}", e.Address.ToString(), e.Hostname));
         }
 
-        private void MyNetwork_ItemRequested(object? sender, ItemRequestEventArgs? e)
+        private void MyNetwork_ModPackageRequested(object? sender, ModPackageRequestEventArgs? e)
         {
-            //throw new NotImplementedException();
+            TakeAction.FulfillModPackageRequest(e.Target, e.ItemRequestedIdentifier, ModItem.GetModItem(e.ModItem));
         }
 
         private void OnRebroadcast(object sender, RoutedEventArgs? e)
@@ -902,6 +972,7 @@ namespace ArtemisManagerUI
         }
         private void OnStartArtemisSBS(object sender, RoutedEventArgs e)
         {
+
             ArtemisManager.StartArtemis();
         }
 
@@ -910,22 +981,25 @@ namespace ArtemisManagerUI
             ArtemisManager.StopArtemis();
         }
 
-        private void OnDeactivateMods(object sender, RoutedEventArgs e)
+        private void DeactivateAllButBase(Guid? activeIdentifier)
         {
-            ModItem? baseItem = null;
-            foreach (var mod in ArtemisManager.GetActivatedMods())
-            {
-                if (mod.IsArtemisBase)
-                {
-                    baseItem = mod;
-                    break;
-                }
-            }
-            ArtemisManager.ClearActiveFolder();
             foreach (var mod in InstalledMods)
             {
-                mod.IsActive = false;
+                if (mod.LocalIdentifier == activeIdentifier)
+                {
+                    mod.IsActive = true;
+                }
+                else
+                {
+                    mod.IsActive = false;
+                }
             }
+        }
+        private void OnDeactivateMods(object sender, RoutedEventArgs e)
+        {
+            var baseItem = ArtemisManager.ClearActiveFolder();
+            DeactivateAllButBase(baseItem?.LocalIdentifier);
+           
             baseItem?.Activate();
             
         }

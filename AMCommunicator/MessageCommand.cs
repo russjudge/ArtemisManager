@@ -10,8 +10,8 @@ namespace AMCommunicator
     {
         Handshake = 0,
         ClientInfo = 1,
-        RequestItem = 2,
-        Item = 3,
+        RequestModPackage = 2,
+        ModPackage = 3,
         ChangePassword = 4,
         PCAction = 5,
         UpdateCheck = 6,
@@ -21,5 +21,4 @@ namespace AMCommunicator
         ChangeAppSetting = 10,
         Alert = 11,
     }
-
 }

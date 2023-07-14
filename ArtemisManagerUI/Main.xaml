@@ -275,11 +275,11 @@
                                         </Button>
                                     </WrapPanel>
                             </GroupBox>
-                                <!--<GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
-                                <local:PeerInfoControl ItemData="{Binding}" >
+                            <GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
                                     
+                                <local:PeerInfoControl ItemData="{Binding}" >
                                 </local:PeerInfoControl>
-                            </GroupBox>-->
+                            </GroupBox>
                                 <GroupBox  DockPanel.Dock="Bottom">
                                     <GroupBox.Header>
                                         <StackPanel Orientation="Horizontal">

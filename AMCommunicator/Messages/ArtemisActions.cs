@@ -11,7 +11,9 @@ namespace AMCommunicator.Messages
         StartArtemis,
         StopArtemis,
         ActivateMod,
-        DeactivateMod,
-        ResetToVanilla
+        InstallMod,
+        ResetToVanilla,
+        InstallMission,
+        ActivateMission
     }
 }

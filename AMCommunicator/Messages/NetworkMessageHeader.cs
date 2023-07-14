@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    public class NetworkMessageHeader
+    internal class NetworkMessageHeader
     {
         public const int HeaderLength = 8;
         public const int JSONDefinitionLength = 4;
@@ -43,9 +43,9 @@ namespace AMCommunicator.Messages
             {
                 Command = MessageCommand.Handshake;
             }
-            else if (message.GetType() == typeof(ItemMessage))
+            else if (message.GetType() == typeof(ModPackageMessage))
             {
-                Command = MessageCommand.Item;
+                Command = MessageCommand.ModPackage;
             }
             else if (message.GetType() == typeof(PCActionMessage))
             {
@@ -55,9 +55,9 @@ namespace AMCommunicator.Messages
             {
                 Command= MessageCommand.Ping;
             }
-            else if (message.GetType() == typeof(RequestItemMessage))
+            else if (message.GetType() == typeof(RequestModPackageMessage))
             {
-                Command= MessageCommand.RequestItem;
+                Command= MessageCommand.RequestModPackage;
             }
             Version = message.MessageVersion;
             JSON = message.GetJSON();
@@ -91,10 +91,7 @@ namespace AMCommunicator.Messages
         }
         public T? GetItem<T>()
         {
-            JsonSerializerOptions options = new JsonSerializerOptions();
-            options.PropertyNameCaseInsensitive = true;
-            var retVal = JsonSerializer.Deserialize<T>(JSON, options);
-            return retVal;
+            return JsonSerializer.Deserialize<T>(JSON);
         }
     }
 }

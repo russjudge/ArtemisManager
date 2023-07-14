@@ -19,6 +19,9 @@ namespace ArtemisManagerAction
         public readonly static string ActivatedModsTrackingFile = Path.Combine(ModManager.DataFolder, "ActivatedModsTracking.dat");
         public const string ArtemisEXE = "Artemis.exe";
         public const string SaveFileExtension = ".json";
+
+        static System.Diagnostics.Process? runningArtemisProcess = null;
+
         static ArtemisManager()
         {
             //Fixing Artemis versions to specific Guids.  Same thing will be done to mods eventually.
@@ -49,9 +52,9 @@ namespace ArtemisManagerAction
             }
             return !matchFound;
         }
-        public static void ClearActiveFolder()
+        public static ModItem? ClearActiveFolder()
         {
-            DeleteAll(ModItem.ActivatedFolder);
+            var baseArtemis = DeleteAll(ModItem.ActivatedFolder);
             foreach (var mod in GetInstalledMods())
             {
                 if (mod.IsActive)
@@ -60,9 +63,11 @@ namespace ArtemisManagerAction
                     mod.Save();
                 }
             }
+            return baseArtemis;
         }
-        public static void DeleteAll(string target)
+        public static ModItem? DeleteAll(string target)
         {
+            ModItem? mod = null;
             if (Directory.Exists(target))
             {
                 foreach (var dir in new DirectoryInfo(target).GetDirectories())
@@ -72,9 +77,22 @@ namespace ArtemisManagerAction
                 }
                 foreach (var fle in new DirectoryInfo(target).GetFiles())
                 {
+                    if (target == ModItem.ActivatedFolder)
+                    {
+                        if (fle.Extension == ".json")
+                        {
+                            var activatedMod = ModItem.LoadModItem(fle.FullName);
+
+                            if (activatedMod != null && activatedMod.IsArtemisBase)
+                            {
+                                mod = activatedMod;
+                            }
+                        }
+                    }
                     fle.Delete();
                 }
             }
+            return mod;
         }
         
         public static ModItem[] GetInstalledMods()
@@ -289,12 +307,25 @@ namespace ArtemisManagerAction
                 string target = Path.Combine(ModItem.ActivatedFolder, ArtemisEXE);
                 if (File.Exists(target))
                 {
-                    Process.Start(target);
+                    runningArtemisProcess = System.Diagnostics.Process.Start(target);
+                    runningArtemisProcess.Disposed += RunningArtemisProcess_Disposed;
+                    runningArtemisProcess.Exited += RunningArtemisProcess_Exited;
+
                 }
             }
         }
+        private static void RunningArtemisProcess_Exited(object? sender, EventArgs e)
+        {
+            runningArtemisProcess?.Dispose();
+        }
+
+        private static void RunningArtemisProcess_Disposed(object? sender, EventArgs e)
+        {
+            runningArtemisProcess = null;
+        }
         public static void StopArtemis()
         {
+            runningArtemisProcess?.Kill(true);
             var processes = System.Diagnostics.Process.GetProcessesByName(ArtemisEXE);
             foreach (var pro in processes)
             {

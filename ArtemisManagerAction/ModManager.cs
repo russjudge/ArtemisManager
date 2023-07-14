@@ -16,18 +16,36 @@ namespace ArtemisManagerAction
 
         
         public static readonly string ModArchiveFolder = Path.Combine(DataFolder, "Archive");
+        public static bool IsModInstalled(ModItem mod)
+        {
+            bool found = false;
+            foreach (var modItem in ArtemisManager.GetInstalledMods() )
+            {
+                if (modItem.LocalIdentifier.Equals(mod.LocalIdentifier)
+                    || modItem.LocalIdentifier.Equals(mod.ModIdentifier)
+                    || modItem.ModIdentifier.Equals(mod.LocalIdentifier)
+                    || modItem.ModIdentifier.Equals(mod.ModIdentifier))
+                {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
+        }
         
         public static void InstallMod(string packagedFile, ModItem mod)
         {
             FileInfo package = new(packagedFile);
-            if (package.Exists)
+            if (package.Exists && !IsModInstalled(mod))
             {
                 string targetPath = Path.Combine(ModItem.ModInstallFolder, mod.GetSaveFile());
                 if (Directory.Exists(targetPath))
                 {
                     Unpackage(packagedFile, targetPath);
                 }
+                mod.PackageFile = package.Name;
                 mod.Save();
+                File.Copy(packagedFile, Path.Combine(ModArchiveFolder, package.Name));
             }
         }
         private static void Unpackage(string file, string targetPath)

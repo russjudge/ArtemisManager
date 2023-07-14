@@ -1,4 +1,5 @@
 ﻿using AMCommunicator;
+using ArtemisManagerAction;
 using Lnk;
 using SharpCompress.Common;
 using System;
@@ -16,7 +17,28 @@ namespace ArtemisManagerUI
     {
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
-            
+        public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
+        {
+            if (requestSource != null)
+            {
+                if (File.Exists(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier)))
+                {
+                    List<byte> data = new List<byte>();
+                    byte[] buffer = new byte[32768];
+                    int bytesRead;
+                    using (FileStream fs = new FileStream(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier), FileMode.Open))
+                    {
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            byte[] buffer2 = new byte[bytesRead];
+                            Array.Copy(buffer, 0, buffer2, 0, bytesRead);
+                            data.AddRange(buffer2);
+                        }
+                    }
+                    Network.Current?.SendItem(requestSource, data.ToArray(), mod?.GetJSON());
+                }
+            }
+        }
         public static void ChangeSetting(string settingName,string value)
         {
             switch(settingName)

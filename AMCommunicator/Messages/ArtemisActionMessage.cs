@@ -14,17 +14,24 @@ namespace AMCommunicator.Messages
         public ArtemisActionMessage() : base()
         {
             ItemIdentifier = string.Empty;
+            Mod = string.Empty;
+            MissionScript = string.Empty;
         }
-        public ArtemisActionMessage(ArtemisActions action, string itemIdentifier)
+        public ArtemisActionMessage(ArtemisActions action, Guid itemIdentifier, string mod)
         {
             Action = action;
-            ItemIdentifier = itemIdentifier;
-
+            ItemIdentifier = itemIdentifier.ToString();
+            Mod = mod;
+            MissionScript = string.Empty;
         }
         
         
         public ArtemisActions Action { get; set; }
         public string ItemIdentifier { get; set; }
+
+        
+        public string Mod { get; set; }
+        public string MissionScript { get; set; }
 
         protected override void SetMessageVersion()
         {

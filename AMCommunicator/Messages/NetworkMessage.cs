@@ -10,16 +10,18 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    [JsonDerivedType(typeof(HandshakeMessage))]
-    [JsonDerivedType(typeof(AlertMessage))]
-    [JsonDerivedType(typeof(ArtemisActionMessage))]
-    [JsonDerivedType(typeof(ChangeAppSettingMessage))]
-    [JsonDerivedType(typeof(ClientInfoMessage))]
-    [JsonDerivedType(typeof(CommunicationMessage))]
-    [JsonDerivedType(typeof(ItemMessage))]
-    [JsonDerivedType(typeof(PCActionMessage))]
-    [JsonDerivedType(typeof(PingMessage))]
-    [JsonDerivedType(typeof(RequestItemMessage))]
+    
+    [JsonDerivedType(typeof(AlertMessage), nameof(AlertMessage))]
+    [JsonDerivedType(typeof(ArtemisActionMessage), nameof(ArtemisActionMessage))]
+    [JsonDerivedType(typeof(ChangeAppSettingMessage), nameof(ChangeAppSettingMessage))]
+    [JsonDerivedType(typeof(ChangePasswordMessage), nameof(ChangePasswordMessage))]
+    [JsonDerivedType(typeof(ClientInfoMessage), nameof(ClientInfoMessage))]
+    [JsonDerivedType(typeof(CommunicationMessage), nameof(CommunicationMessage))]
+    [JsonDerivedType(typeof(HandshakeMessage), nameof(HandshakeMessage))]
+    [JsonDerivedType(typeof(ModPackageMessage), nameof(ModPackageMessage))]
+    [JsonDerivedType(typeof(PCActionMessage), nameof(PCActionMessage))]
+    [JsonDerivedType(typeof(PingMessage), nameof(PingMessage))]
+    [JsonDerivedType(typeof(RequestModPackageMessage), nameof(RequestModPackageMessage))]
     public abstract class NetworkMessage : INetworkMessage
     {
         protected NetworkMessage()

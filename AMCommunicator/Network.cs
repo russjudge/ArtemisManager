@@ -170,6 +170,27 @@ namespace AMCommunicator
                 Transmit(connection.Stream, msg);
             }
         }
+        public void SendModPackageRequest(IPAddress target, string modItem, string itemRequestedIdentifier)
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                RequestModPackageMessage msg = new(modItem, itemRequestedIdentifier);
+                Transmit(connection.Stream, msg);
+            }
+        }
+        public void SendItem(IPAddress target, byte[] data, string? modItem)
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                string mod = string.Empty;
+                if (modItem != null)
+                {
+                    mod = modItem;
+                }
+                ModPackageMessage msg = new(mod, data);
+                Transmit(connection.Stream, msg);
+            }
+        }
         //For tracking and processing on active connections.
         private readonly Dictionary<IPAddress, ConnectionTracker> activeConnections = new();
 
@@ -361,10 +382,11 @@ namespace AMCommunicator
                 case MessageCommand.ClientInfo:
                     disconnect= ProcessClientInfoMessage(stream, message?.GetItem<ClientInfoMessage>());
                     break;
-                case MessageCommand.RequestItem:
-                    disconnect = ProcessRequestItem(stream, message?.GetItem<RequestItemMessage>());
+                case MessageCommand.RequestModPackage:
+                    disconnect = ProcessRequestModPackageItem(stream, message?.GetItem<RequestModPackageMessage>());
                     break;
-                case MessageCommand.Item:
+                case MessageCommand.ModPackage:
+                    disconnect = ProcessModPackage(stream, message?.GetItem<ModPackageMessage>());
                     break;
                 case MessageCommand.ChangePassword:
                     ProcessPasswordChange(stream, message?.GetItem<ChangePasswordMessage>());
@@ -375,6 +397,7 @@ namespace AMCommunicator
                 case MessageCommand.UpdateCheck:
                     break;
                 case MessageCommand.AretmisAction:
+                    ProcessArtemisAction(stream, message?.GetItem<ArtemisActionMessage>());
                     break;
                 case MessageCommand.Communication:
                     disconnect = ProcessCommunication(stream, message?.GetItem<CommunicationMessage>());
@@ -388,10 +411,8 @@ namespace AMCommunicator
                 case MessageCommand.Alert:
                     disconnect = ProcessAlert(stream, message?.GetItem<AlertMessage>());
                     break;
-               // case MessageCommand.SetClientInfo:
-               //  break;
                 default:
-                    RaiseStatusUpdate("Invalid Message command.  Ignored.");
+                    RaiseStatusUpdate("Invalid Message command.  Ignored.  Check for software update to Artemis Manager.");
                     return false;
             }
            
@@ -399,7 +420,8 @@ namespace AMCommunicator
         }
         public event EventHandler<ChangeSettingEventArgs>? ChangeSetting;
         public event EventHandler<StatusUpdateEventArgs>? StatusUpdated;
-        public event EventHandler<ItemRequestEventArgs>? ItemRequested;
+        public event EventHandler<ModPackageRequestEventArgs>? ModPackageRequested;
+        public event EventHandler<ModPackageEventArgs>? ModPackageReceived;
         public event EventHandler<ConnectionRequestEventArgs>? ConnectionReceived;
         public event EventHandler<ConnectionRequestEventArgs>? ConnectionRequested;
         public event EventHandler<FatalExceptionEncounteredEventArgs>? FatalExceptionEncountered;
@@ -411,6 +433,7 @@ namespace AMCommunicator
         public event EventHandler<VersionMismatchEventArgs>? MessageVersionMismatch;
         public event EventHandler<AlertEventArgs>? AlertReceived;
         public event EventHandler<ClientInfoEventArgs>? ClientInfoReceived;
+        public event EventHandler<ArtemisActionEventArgs>? ArtemisActionReceived;
         void Transmit(NetworkStream? stream, NetworkMessage msg)
         {
             if (stream == null)
@@ -425,6 +448,63 @@ namespace AMCommunicator
                 var bytes = data.GetBytes();
                 stream.Write(bytes, 0, bytes.Length);
             }
+        }
+        private bool ProcessModPackage(NetworkStream? stream, ModPackageMessage? msg)
+        {
+            if (msg != null)
+            {
+                if (msg.MessageVersion != ModPackageMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //We might be unattended here, so we need to alert the sender of an issue.
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
+                            string.Format("ModPackageMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
+                            ModPackageMessage.ThisVersion, msg.MessageVersion));
+                    }
+                }
+                else
+                {
+                    ModPackageReceived?.Invoke(this, new ModPackageEventArgs(msg.Data, msg.ModItem));
+                }
+            }
+            return false;
+        }
+        private bool ProcessArtemisAction(NetworkStream? stream, ArtemisActionMessage? msg)
+        {
+            if (msg != null)
+            {
+                if (msg.MessageVersion != ArtemisActionMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //We might be unattended here, so we need to alert the sender of an issue.
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
+                            string.Format("ArtemisActionMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
+                            ArtemisActionMessage.ThisVersion, msg.MessageVersion));
+                    }
+                }
+                else
+                {
+                    if (msg.Source != null)
+                    {
+                        ArtemisActionReceived?.Invoke(this, new ArtemisActionEventArgs(IPAddress.Parse(msg.Source), msg.Action, msg.ItemIdentifier, msg.Mod));
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         private bool ProcessAlert(NetworkStream? stream, AlertMessage? msg)
         {
@@ -606,17 +686,17 @@ namespace AMCommunicator
             return false;
         }
 
-        private bool ProcessRequestItem(NetworkStream stream, RequestItemMessage? msg)
+        private bool ProcessRequestModPackageItem(NetworkStream stream, RequestModPackageMessage? msg)
         {
             if (msg != null)
             {
-                if (msg.MessageVersion != RequestItemMessage.ThisVersion)
+                if (msg.MessageVersion != RequestModPackageMessage.ThisVersion)
                 {
                     if (msg.Source != null)
                     {
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                           string.Format("RequestItemMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process request until update is performed.",
-                          RequestItemMessage.ThisVersion, msg.MessageVersion));
+                          RequestModPackageMessage.ThisVersion, msg.MessageVersion));
                     }
                     else
                     {
@@ -627,7 +707,7 @@ namespace AMCommunicator
                 {
                     if (msg.Source != null)
                     {
-                        ItemRequested?.Invoke(this, new ItemRequestEventArgs(IPAddress.Parse(msg.Source), msg.ItemIdentifier));
+                        ModPackageRequested?.Invoke(this, new ModPackageRequestEventArgs(IPAddress.Parse(msg.Source), msg.ItemRequestedIdentifier, msg.Mod));
                     }
                 }
             }
