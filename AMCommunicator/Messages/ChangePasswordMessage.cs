@@ -24,7 +24,7 @@ namespace AMCommunicator.Messages
         {
             MessageVersion = ThisVersion;
         }
-        public string NewPassword { get; protected set; }
+        public string NewPassword { get; set; }
       
     }
 }

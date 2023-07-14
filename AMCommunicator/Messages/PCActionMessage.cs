@@ -23,8 +23,8 @@ namespace AMCommunicator.Messages
             Action = action;
         }
 
-        public PCActions Action { get; protected set; }
-        public bool Force { get; protected set; }
+        public PCActions Action { get; set; }
+        public bool Force { get; set; }
 
         protected override void SetMessageVersion()
         {

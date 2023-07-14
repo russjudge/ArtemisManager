@@ -12,7 +12,10 @@ namespace AMCommunicator
     {
         internal ClientInfoEventArgs(ClientInfoMessage message)
         {
-            Source = message.Source;
+            if (message.Source != null)
+            {
+                Source = IPAddress.Parse(message.Source);
+            }
             IsMaster= message.IsMaster;
             AppVersion = message.AppVersion;
             ConnectOnStart = message.ConnectOnstart;

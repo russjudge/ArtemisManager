@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    internal class NetworkMessageHeader
+    public class NetworkMessageHeader
     {
         public const int HeaderLength = 8;
         public const int JSONDefinitionLength = 4;
@@ -91,7 +91,10 @@ namespace AMCommunicator.Messages
         }
         public T? GetItem<T>()
         {
-            return JsonSerializer.Deserialize<T>(JSON);
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.PropertyNameCaseInsensitive = true;
+            var retVal = JsonSerializer.Deserialize<T>(JSON, options);
+            return retVal;
         }
     }
 }

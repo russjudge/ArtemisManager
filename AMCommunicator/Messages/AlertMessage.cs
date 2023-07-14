@@ -26,8 +26,8 @@ namespace AMCommunicator.Messages
         //   for the possibility that the new property will have a default and meaningless value.
         //   EVEN SO, be sure to update the "ThisVersion" constant so that you can do a rudimentary version check to handle new properties
         //   that might not be set properly in an older version.
-        public AlertItems AlertItem { get; protected set; }
-        public string RelatedData { get; protected set; }
+        public AlertItems AlertItem { get; set; }
+        public string RelatedData { get; set; }
 
       
     }

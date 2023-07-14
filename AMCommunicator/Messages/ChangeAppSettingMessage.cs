@@ -22,8 +22,8 @@ namespace AMCommunicator.Messages
             SettingName = settingName;
             SettingValue = settingValue;
         }
-        public string SettingName { get; protected set; }
-        public string SettingValue { get; protected set; }
+        public string SettingName { get; set; }
+        public string SettingValue { get; set; }
 
 
         protected override void SetMessageVersion()

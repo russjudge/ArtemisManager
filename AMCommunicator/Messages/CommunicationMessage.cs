@@ -21,7 +21,7 @@ namespace AMCommunicator.Messages
         {
             Message = message;
         }
-        public string Message { get; protected set; }
+        public string Message { get; set; }
 
         protected override void SetMessageVersion()
         {

@@ -21,6 +21,7 @@ Phase 1
 - Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
 
 Current TODO:
+--Disconnect and reconnect doesn't work.  Needs thorough troubleshooting.  Not sure what's going on.
 -- Offer multiple versions of Artemis SBS updates.
 	-- Store on russjudge.com.
 	-- set unique Guid to each.

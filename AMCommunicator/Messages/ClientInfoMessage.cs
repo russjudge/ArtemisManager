@@ -68,32 +68,32 @@ namespace AMCommunicator.Messages
         {
             MessageVersion = ThisVersion;
         }
-        public bool IsMaster { get; protected set; }
+        public bool IsMaster { get; set; }
 
-        public string AppVersion { get; protected set; }
+        public string AppVersion { get; set; }
 
-        public bool ConnectOnstart { get; protected set; }
+        public bool ConnectOnstart { get; set; }
 
-        public string[] InstalledMods { get; protected set; }
+        public string[] InstalledMods { get; set; }
 
 
         //Reserved for future use: Installed missions will be part of phase 2.
-        public string[] InstalledMissions { get; protected set; }
+        public string[] InstalledMissions { get; set; }
 
-        public bool ArtemisIsRunning { get; protected set; }
+        public bool ArtemisIsRunning { get; set; }
         //Below is to differentiate from Artemis running from original install and Artemis running from folder controlled by this application.
         //  This is useful to warn of potential issues.
-        public bool IsUsingThisAppControlledArtemis { get; protected set; }
+        public bool IsUsingThisAppControlledArtemis { get; set; }
 
-        public bool AppInStartFolder { get; protected set; }
+        public bool AppInStartFolder { get; set; }
 
 
-        public long FreeSpaceOnAppDrive { get; protected set; }
+        public long FreeSpaceOnAppDrive { get; set; }
 
-        public string[] AllDrives { get; protected set; }
+        public string[] AllDrives { get; set; }
 
         //This is a catch-all.
-        public string GeneralSettings { get; protected set; }
+        public string GeneralSettings { get; set; }
     }
 }
 

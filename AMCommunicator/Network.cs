@@ -56,7 +56,7 @@ namespace AMCommunicator
             TcpClient? Liveclient = null;
             try
             {
-                Liveclient = new TcpClient();
+                Liveclient = new TcpClient(AddressFamily.InterNetwork);
                 
                 Liveclient.Connect(target, port);
                 if (Liveclient.Connected)
@@ -239,7 +239,7 @@ namespace AMCommunicator
                                     if (bytesRead > 0)
                                     {
 
-                                        int msgLength = BitConverter.ToInt32(buffer.ToArray(), NetworkMessageHeader.JSONDefinitionLengthPosition + NetworkMessageHeader.JSONDefinitionLength) + NetworkMessageHeader.HeaderLength;
+                                        int msgLength = BitConverter.ToInt32(buffer.ToArray(), NetworkMessageHeader.JSONDefinitionLengthPosition) + NetworkMessageHeader.HeaderLength;
 
                                         RaiseStatusUpdate("Packet Length: {0}", msgLength);
                                         List<byte> newBuffer = new(buffer.ToArray());
@@ -430,7 +430,12 @@ namespace AMCommunicator
         {
             if (msg != null)
             {
-                AlertReceived?.Invoke(this, new AlertEventArgs(msg.Source, msg.AlertItem, msg.RelatedData));
+                IPAddress? IP = null;
+                if (!string.IsNullOrEmpty(msg.Source))
+                {
+                    IP = IPAddress.Parse(msg.Source);
+                }
+                AlertReceived?.Invoke(this, new AlertEventArgs(IP, msg.AlertItem, msg.RelatedData));
             }
             return false;
         }
@@ -447,7 +452,7 @@ namespace AMCommunicator
                     else
                     {
                         //We might be unattended here, so we need to alert the sender of an issue.
-                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                             string.Format("ChangeAppSettingsMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
                             ChangeAppSettingMessage.ThisVersion, msg.MessageVersion));
                     }
@@ -472,14 +477,14 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                           string.Format("ChangePasswordMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Password cannot be changed.\r\nIf this peer is restarted, it will not be able to reconnect to the peer-to-peer network until the password is manually changed.",
                           ChangePasswordMessage.ThisVersion, msg.MessageVersion));
                     }
                 }
                 else
                 {
-                    PasswordChanged?.Invoke(this, new CommunicationMessageEventArgs(msg.Source?.ToString(), msg.NewPassword));
+                    PasswordChanged?.Invoke(this, new CommunicationMessageEventArgs(msg.Source, msg.NewPassword));
                 }
                 return false;
             }
@@ -502,7 +507,7 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                           string.Format("CommunicationMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. .",
                           CommunicationMessage.ThisVersion, msg.MessageVersion));
                     }
@@ -520,7 +525,7 @@ namespace AMCommunicator
                 {
                     if (msg.Source != null)
                     {
-                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                           string.Format("PingMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
                           PingMessage.ThisVersion, msg.MessageVersion));
                     }
@@ -550,7 +555,7 @@ namespace AMCommunicator
                 {
                     if (msg.Source != null)
                     {
-                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                           string.Format("PCActionMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process PC Action until update is performed.",
                           PCActionMessage.ThisVersion, msg.MessageVersion));
                         return false;
@@ -562,6 +567,11 @@ namespace AMCommunicator
                 }
                 else
                 {
+                    IPAddress? ip = null;
+                    if (!string.IsNullOrEmpty(msg.Source))
+                    {
+                        ip = IPAddress.Parse(msg.Source);
+                    }
                     switch ((PCActions)msg.Action)
                     {
                         case PCActions.DisconnectThisConnection:
@@ -569,23 +579,23 @@ namespace AMCommunicator
                             return true;
                         case PCActions.CheckForUpdate:
                             RaiseStatusUpdate("Software Update check requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.UpdateCheck, msg.Force, msg.Source);
+                            RaiseActionCommand(ActionCommands.UpdateCheck, msg.Force, ip);
                             return false;
                         case PCActions.ShutdownPC:
                             RaiseStatusUpdate("PC Shutdown requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.ShutdownPC, msg.Force, msg.Source);
+                            RaiseActionCommand(ActionCommands.ShutdownPC, msg.Force, ip);
                             return true;
                         case PCActions.RestartPC:
                             RaiseStatusUpdate("PC Restart requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.RestartPC, msg.Force, msg.Source);
+                            RaiseActionCommand(ActionCommands.RestartPC, msg.Force, ip);
                             return true;
                         case PCActions.CloseApp:
                             RaiseStatusUpdate("Application Close requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.CloseApp, msg.Force, msg.Source);
+                            RaiseActionCommand(ActionCommands.CloseApp, msg.Force, ip);
                             return true;
                         case PCActions.SendClientInformation:
                             RaiseStatusUpdate("Client Information requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, msg.Source);
+                            RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, ip);
                             return false;
                         default:
                             RaiseStatusUpdate("Invalid PCAction requested from host {0}", hostname);
@@ -604,7 +614,7 @@ namespace AMCommunicator
                 {
                     if (msg.Source != null)
                     {
-                        SendAlert(msg.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
                           string.Format("RequestItemMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process request until update is performed.",
                           RequestItemMessage.ThisVersion, msg.MessageVersion));
                     }
@@ -615,7 +625,10 @@ namespace AMCommunicator
                 }
                 else
                 {
-                    ItemRequested?.Invoke(this, new ItemRequestEventArgs(msg.Source, msg.ItemIdentifier));
+                    if (msg.Source != null)
+                    {
+                        ItemRequested?.Invoke(this, new ItemRequestEventArgs(IPAddress.Parse(msg.Source), msg.ItemIdentifier));
+                    }
                 }
             }
             return false;
@@ -634,7 +647,7 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        SendAlert(message.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(message.Source), AlertItems.MessageVersionMismatch,
                           string.Format("HandshakeMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
                           HandshakeMessage.ThisVersion, message.MessageVersion));
                     }
@@ -648,7 +661,7 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        SendPCAction(message.Source, PCActions.SendClientInformation, true);
+                        SendPCAction(IPAddress.Parse(message.Source), PCActions.SendClientInformation, true);
                     }
                 }
             }
@@ -669,7 +682,7 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        SendAlert(message.Source, AlertItems.MessageVersionMismatch,
+                        SendAlert(IPAddress.Parse(message.Source), AlertItems.MessageVersionMismatch,
                           string.Format("ClientInfoMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process Information until update is performed.",
                           ClientInfoMessage.ThisVersion, message.MessageVersion));
                     }

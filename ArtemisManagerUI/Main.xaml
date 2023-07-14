@@ -16,20 +16,25 @@
             <converter:NullToVisibility x:Key="NullToVisibility" />
 
         </DockPanel.Resources>
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-            <Image Height="35" HorizontalAlignment="Left" Source="/ArtemisManagerUI;component/Resources/amBanner.jpg" />
-            <Label Margin="-110,0,0,0" VerticalAlignment="Center" Content="Version: " FontWeight="Bold" />
+        <DockPanel DockPanel.Dock="Top">
+            <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
+            </Button>
+            <Button DockPanel.Dock="Right" ToolTip="Check for update to Artemis Manager" >
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (2).png" />
+            </Button>
+            <Image DockPanel.Dock="Left" Height="35" HorizontalAlignment="Left" Source="/ArtemisManagerUI;component/Resources/amBanner.jpg" />
+            <Label DockPanel.Dock="Left" Margin="-110,0,0,0" VerticalAlignment="Center" Content="Version: " FontWeight="Bold" />
             <TextBlock Margin="-30,0,0,0" VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=AppVersion}" />
-        </StackPanel>
+           
+        </DockPanel>
         <DockPanel DockPanel.Dock="Top">
             <TextBlock VerticalAlignment="Center" Text="This Hostname:" FontWeight="Bold" Padding="0,0,5,0"/>
             <TextBlock VerticalAlignment="Center" Text="{Binding Hostname, ElementName=uc}" />
             <TextBlock VerticalAlignment="Center" Text="This IP:" FontWeight="Bold" Padding="20,0,5,0"/>
             <TextBlock VerticalAlignment="Center" Text="{Binding IP, ElementName=uc}" />
             <TextBlock VerticalAlignment="Center" Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" ToolTip="Used to restrict access to the peer-to-peer network"/>
-            <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
-            </Button>
+
             <TextBox VerticalAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Used to restrict access to the peer-to-peer network" Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
             
         </DockPanel>
@@ -43,19 +48,17 @@
             <Button
                 Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 Click="OnRebroadcast"
-                ToolTip="Re-Broadcasts on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
+                ToolTip="Re-Broadcast on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/broadcast.png" />
             </Button>
             <CheckBox Margin="5,0,0,0" Padding="2,0,0,0" IsChecked="{Binding Path=AutoStartServer, ElementName=uc, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="Start Network Communication as soon as this application starts."/>
-            <Button Margin="50,5,5,5" ToolTip="Check for update to Artemis Manager" >
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (2).png" />
-            </Button>
+            
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button
                 Click="OnSnapshotAretmis"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                ToolTip="Creates a copy of the currently installed Artemis for use by Artemis Manager.">
+                ToolTip="Create a copy of the currently installed Artemis for use by Artemis Manager.">
                 <StackPanel Orientation="Horizontal">
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/snapshot.png" />
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />

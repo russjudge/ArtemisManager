@@ -23,8 +23,8 @@ namespace AMCommunicator.Messages
         }
         
         
-        public ArtemisActions Action { get; protected set; }
-        public string ItemIdentifier { get; protected set; }
+        public ArtemisActions Action { get; set; }
+        public string ItemIdentifier { get; set; }
 
         protected override void SetMessageVersion()
         {

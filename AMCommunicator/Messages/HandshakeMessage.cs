@@ -16,7 +16,7 @@ namespace AMCommunicator.Messages
         {
             Password = Network.Password;
         }
-        public string Password { get; protected set; }
+        public string Password { get; set; }
 
         protected override void SetMessageVersion()
         {

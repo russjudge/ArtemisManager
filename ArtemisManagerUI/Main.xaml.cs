@@ -622,11 +622,26 @@ namespace ArtemisManagerUI
             }
         }
 
+        void ConsiderClosing(bool force, IPAddress? source)
+        {
+            if (source != null)
+            {
+                if (!force)
+                {
+                    if (MessageBox.Show(string.Format("Peer {0} has request this app to close.  Should it?", source.ToString()), "Close Artemis Manager?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    {
+                        return;
+                    }
+                }
+                this.Close();
+            }
+            
+        }
         private void MyNetwork_ActionCommand(object? sender, ActionCommandEventArgs e)
         {
             if (e.Action == ActionCommands.CloseApp)
             {
-                this.Close();
+                this.Dispatcher.Invoke(new Action<bool, IPAddress?>(ConsiderClosing), e.Force, e.Source);
                 return;
             }
             else

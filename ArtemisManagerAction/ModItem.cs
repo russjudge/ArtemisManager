@@ -216,7 +216,6 @@ namespace ArtemisManagerAction
             var options = new JsonSerializerOptions
             {
                 WriteIndented = true
-                
             };
             return JsonSerializer.Serialize(this, options);
         }

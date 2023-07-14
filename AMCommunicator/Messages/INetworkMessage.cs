@@ -9,7 +9,7 @@ namespace AMCommunicator.Messages
 {
     internal interface INetworkMessage
     {
-        public IPAddress? Source { get; set; }
+        public string? Source { get; set; }
         public short MessageVersion { get; set; }
         public byte[] Unspecified { get; set; }
     }
