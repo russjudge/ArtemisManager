@@ -22,6 +22,13 @@ Phase 1
 
 Current TODO:
 --Disconnect and reconnect doesn't work.  Needs thorough troubleshooting.  Not sure what's going on.
+
+--Steam install notes:
+
+
+--> provide warning to users that since I don't have the Steam version of artemis, I'm not sure how well this will behave---> users may need a different steam account for each pc,
+	and auto detecting the install folder for Artemis SBS under the Steam system might be finicky (especially since I cannot test it).
+
 -- Offer multiple versions of Artemis SBS updates.
 	-- Store on russjudge.com.
 	-- set unique Guid to each.
