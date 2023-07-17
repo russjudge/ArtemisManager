@@ -558,19 +558,33 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_ModPackageReceived(object? sender, ModPackageEventArgs e)
         {
-            ModItem? item = ModItem.GetModItem(e.mod);
+            ModItem? item = ModItem.GetModItem(e.Mod);
             if (item != null)
             {
                 //1. confirm not already installed.
-                //2. Write the file to a package in Archive.
-                //3. Unzip the package to the mod Install folder.
-                //4. Save modItem and add to list.
+                if (!ModManager.IsModInstalled(item))
+                {
+                    //2. Write the file to a package in Archive.
+                    //3. Unzip the package to the mod Install folder.
+                    item.StoreAndUnpack(e.Data);
+
+                    //4. Save modItem and add to list.
+                    item.Save();
+                    InstalledMods.Add(item);
+                }
+
+                //5. check TakeArtemisAction.StagedModItemToActivateOnceInstalled and if matches and not null, activate and set to null.
+                if (TakeArtemisAction.StagedModItemToActivateOnceInstalled != null && TakeArtemisAction.StagedModItemToActivateOnceInstalled.Equals(item))
+                {
+                    item.Activate();
+                    TakeArtemisAction.StagedModItemToActivateOnceInstalled = null;
+                }
             }
         }
 
         private void MyNetwork_ArtemisActionReceived(object? sender, ArtemisActionEventArgs e)
         {
-            var wasProcessed = TakeArtemisAction.ProcessArtemisAction(e.Source, e.Action, e.Identifier, e.Mod);
+            var wasProcessed = TakeArtemisAction.ProcessArtemisAction(e.Source, e.Action, e.Mod);
 
             switch (e.Action)
             {
@@ -807,7 +821,10 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_ModPackageRequested(object? sender, ModPackageRequestEventArgs? e)
         {
-            TakeAction.FulfillModPackageRequest(e.Target, e.ItemRequestedIdentifier, ModItem.GetModItem(e.ModItem));
+            if (e != null)
+            {
+                TakeAction.FulfillModPackageRequest(e.Target, e.ItemRequestedIdentifier, ModItem.GetModItem(e.ModItem));
+            }
         }
 
         private void OnRebroadcast(object sender, RoutedEventArgs? e)
@@ -1006,7 +1023,7 @@ namespace ArtemisManagerUI
 
         private void OnInstallMod(object sender, RoutedEventArgs e)
         {
-            ModInstallWindow win = new ModInstallWindow();
+            ModInstallWindow win = new();
             if (win.ShowDialog() == true)
             {
                 InstalledMods.Add(win.Mod);
@@ -1015,7 +1032,7 @@ namespace ArtemisManagerUI
 
         private void OnAbout(object sender, RoutedEventArgs e)
         {
-            AboutWindow win = new AboutWindow();
+            AboutWindow win = new();
             win.Show();
         }
 

@@ -59,6 +59,7 @@ namespace ArtemisManagerUI
         
         private void OnInstallMod(object sender, RoutedEventArgs e)
         {
+            
             ModManager.InstallMod(PackageFile, Mod);
             this.DialogResult = true;
             this.Close();

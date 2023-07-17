@@ -52,6 +52,10 @@ namespace ArtemisManagerAction
             }
             return !matchFound;
         }
+        public static bool IsModActive(ModItem mod)
+        {
+            return (File.Exists(Path.Combine(ModItem.ActivatedFolder, mod.SaveFile)));
+        }
         public static ModItem? ClearActiveFolder()
         {
             var baseArtemis = DeleteAll(ModItem.ActivatedFolder);
@@ -141,18 +145,10 @@ namespace ArtemisManagerAction
                     retVal.ModIdentifier = ModId;
                 }
             }
-            string target;
-            if (retVal.ModIdentifier == Guid.Empty)
-            {
-                target = "ArtemisV" + version;
-            }
-            else
-            {
-                target = retVal.ModIdentifier.ToString();
-            }
-            target = Path.Combine(ModItem.ModInstallFolder, target);
-            retVal.InstallFolder = target;
+            string target = Path.Combine(ModItem.ModInstallFolder, retVal.GetInstallFolder());
+            
             ModManager.CopyFolder(installFolder, target);
+
             retVal.Save(target + SaveFileExtension);
             
             return retVal;

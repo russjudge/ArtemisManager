@@ -33,37 +33,23 @@ namespace ArtemisManagerAction
             return found;
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="packagedFile">Full path to compressed package file.</param>
+        /// <param name="mod"></param>
         public static void InstallMod(string packagedFile, ModItem mod)
         {
             FileInfo package = new(packagedFile);
             if (package.Exists && !IsModInstalled(mod))
             {
-                string targetPath = Path.Combine(ModItem.ModInstallFolder, mod.GetSaveFile());
-                if (Directory.Exists(targetPath))
-                {
-                    Unpackage(packagedFile, targetPath);
-                }
+                File.Copy(packagedFile, Path.Combine(ModArchiveFolder, package.Name));
                 mod.PackageFile = package.Name;
                 mod.Save();
-                File.Copy(packagedFile, Path.Combine(ModArchiveFolder, package.Name));
+                mod.Unpack();
             }
         }
-        private static void Unpackage(string file, string targetPath)
-        {
-            using Stream stream = File.OpenRead(file);
-            using var reader = ReaderFactory.Open(stream);
-            while (reader.MoveToNextEntry())
-            {
-                if (!reader.Entry.IsDirectory)
-                {
-                    reader.WriteEntryToDirectory(targetPath, new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-                }
-            }
-        }
+      
         public static void CreateFolder(string? path)
         {
             if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))

@@ -23,10 +23,10 @@ namespace ArtemisManagerUI
             {
                 if (File.Exists(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier)))
                 {
-                    List<byte> data = new List<byte>();
+                    List<byte> data = new();
                     byte[] buffer = new byte[32768];
                     int bytesRead;
-                    using (FileStream fs = new FileStream(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier), FileMode.Open))
+                    using (FileStream fs = new(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier), FileMode.Open))
                     {
                         while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
                         {
@@ -140,7 +140,7 @@ namespace ArtemisManagerUI
             if (asm != null)
             {
                 string appLocation = asm.Location;
-                FileInfo fle = new FileInfo(appLocation);
+                FileInfo fle = new(appLocation);
                 string target = Path.Combine(StartupFolder, fle.Name.Replace(".dll", string.Empty) + ".lnk");
 
                 if (File.Exists(target))
@@ -236,7 +236,7 @@ namespace ArtemisManagerUI
             if (asm != null)
             {
                 string appLocation = asm.Location;
-                FileInfo fle = new FileInfo(appLocation);
+                FileInfo fle = new(appLocation);
                 string target = Path.Combine(StartupFolder, fle.Name.Replace(".dll", string.Empty) + ".lnk");
                 string commandLine = "cscript";
                 using (StreamWriter sw = new(temp))
@@ -251,12 +251,15 @@ namespace ArtemisManagerUI
                     sw.WriteLine("oLink.Save");
                     //sw.WriteLine("objFSO.DeleteFile(\"" + temp + "\")");
                 }
-                var startInfo = new System.Diagnostics.ProcessStartInfo(commandLine, temp);
-                startInfo.ErrorDialog = true;
+                var startInfo = new ProcessStartInfo(commandLine, temp)
+                {
+                    ErrorDialog = true
+                };
 
-                var process = new System.Diagnostics.Process();
-                
-                process.StartInfo = startInfo;
+                Process process = new()
+                {
+                    StartInfo = startInfo
+                };
                 process.Start();
 
                 process.WaitForExit();

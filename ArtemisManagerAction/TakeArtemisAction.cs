@@ -5,8 +5,9 @@ namespace ArtemisManagerAction
 {
     public static class TakeArtemisAction
     {
+        public static ModItem? StagedModItemToActivateOnceInstalled { get; set; } = null;
         
-        public static Tuple<bool, ModItem?> ProcessArtemisAction(IPAddress? target, AMCommunicator.Messages.ArtemisActions action, Guid identifier, string? modJSON)
+        public static Tuple<bool, ModItem?> ProcessArtemisAction(IPAddress? target, AMCommunicator.Messages.ArtemisActions action, string? modJSON)
         {
             bool WasProcessed = false;
             ModItem? mod = null;
@@ -22,10 +23,7 @@ namespace ArtemisManagerAction
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ResetToVanilla:
                     var baseArtemis = ArtemisManager.ClearActiveFolder();
-                    if (baseArtemis != null)
-                    {
-                        baseArtemis.Activate();
-                    }
+                    baseArtemis?.Activate();
                     mod = baseArtemis;
                     WasProcessed = true;
                     break;
@@ -37,37 +35,65 @@ namespace ArtemisManagerAction
                         var receivedMod = ModItem.GetModItem(modJSON);
                         if (receivedMod != null)
                         {
-                            bool found = ModManager.IsModInstalled(receivedMod);
-
-                            if (!found)
+                            WasProcessed = RequestInstallMod(receivedMod, target);
+                        }
+                    }
+                    break;
+                case AMCommunicator.Messages.ArtemisActions.ActivateMod:
+                    //Is Mod already activitated?  skip if it is.
+                    WasProcessed = false;
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        var receivedMod = ModItem.GetModItem(modJSON);
+                        if (receivedMod != null)
+                        {
+                            if (!ArtemisManager.IsModActive(receivedMod))
                             {
-                                ModItem? newMod = ModItem.GetModItem(modJSON);
-                                if (newMod != null && !string.IsNullOrEmpty(newMod.PackageFile))
+                                if (!RequestInstallMod(receivedMod, target))
                                 {
-                                    if (File.Exists(Path.Combine(ModManager.ModArchiveFolder, newMod.PackageFile)))
-                                    {
-                                        ModManager.InstallMod(Path.Combine(ModManager.ModArchiveFolder, newMod.PackageFile), newMod);
-                                        mod = newMod;
-                                        WasProcessed = true;
-                                    }
-                                    else
-                                    {
-                                        if (target != null)
-                                        {
-                                            Network.Current?.SendModPackageRequest(target, modJSON, newMod.PackageFile);
-                                        }
-                                    }
+                                    //Means that Mod is not installed and was not installed, but the install package was requested.
+                                    //Therefore we need to set a flag to activate the mod as soon as we get it installed.
+                                    StagedModItemToActivateOnceInstalled = receivedMod;
+                                }
+                                else
+                                {
+                                    receivedMod.Activate();
                                 }
                             }
                         }
                     }
                     break;
-                case AMCommunicator.Messages.ArtemisActions.ActivateMod:
-                    break;
             }
             return new Tuple<bool, ModItem?> (WasProcessed, mod);
         }
 
-       
+        private static bool RequestInstallMod(ModItem receivedMod, IPAddress? target)
+        {
+            bool ActionCompleted = false;
+            if (!ModManager.IsModInstalled(receivedMod))
+            {
+                if (!string.IsNullOrEmpty(receivedMod.PackageFile))
+                {
+                    if (File.Exists(Path.Combine(ModManager.ModArchiveFolder, receivedMod.PackageFile)))
+                    {
+                        receivedMod.Unpack();
+                        ModManager.InstallMod(Path.Combine(ModManager.ModArchiveFolder, receivedMod.PackageFile), receivedMod);
+                        ActionCompleted = true;
+                    }
+                    else
+                    {
+                        if (target != null)
+                        {
+                            Network.Current?.SendModPackageRequest(target, receivedMod.GetJSON(), receivedMod.PackageFile);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                ActionCompleted = true;
+            }
+            return ActionCompleted;
+        }
     }
 }

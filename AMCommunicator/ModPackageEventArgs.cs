@@ -11,10 +11,10 @@ namespace AMCommunicator
         public ModPackageEventArgs(byte[] data, string mod)
         {
             Data = data;
-            this.mod = mod;
+            this.Mod = mod;
         }
 
         public byte[] Data { get; private set; } = Array.Empty<byte>();
-        public string mod { get; private set; } = string.Empty;
+        public string Mod { get; private set; } = string.Empty;
     }
 }

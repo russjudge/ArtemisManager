@@ -161,7 +161,7 @@ namespace ArtemisManagerUI
         /// <summary>
         /// Property changed event.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Gets or sets Application name.
@@ -311,7 +311,7 @@ namespace ArtemisManagerUI
             var assm = System.Reflection.Assembly.GetEntryAssembly();
             if (assm != null)
             {
-                FileInfo f = new FileInfo(assm.Location);
+                FileInfo f = new(assm.Location);
                 if (!string.IsNullOrEmpty(f.DirectoryName))
                 {
                     System.Diagnostics.Process.Start(System.IO.Path.Combine(f.DirectoryName, "changes.txt"));

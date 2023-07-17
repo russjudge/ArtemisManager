@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SharpCompress.Common;
+using SharpCompress.Readers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -147,6 +149,9 @@ namespace ArtemisManagerAction
             }
         }
         private string installFolder = string.Empty;
+        /// <summary>
+        /// Just the subfolder name under "InstalledMods"
+        /// </summary>
         public string InstallFolder
         {
             get { return installFolder; }
@@ -237,23 +242,49 @@ namespace ArtemisManagerAction
             ModItem? modItem = GetModItem(data);
             return modItem;
         }
+        /// <summary>
+        /// Make sure "IsArtemisBase" and Version are set before calling this method.
+        /// </summary>
+        /// <returns></returns>
+        public string GetInstallFolder()
+        {
+            
+            if (string.IsNullOrEmpty(InstallFolder))
+            {
+                if (ModIdentifier == Guid.Empty)
+                {
+                    if (IsArtemisBase)
+                    {
+                        InstallFolder = "ArtemisV" + Version;
+                    }
+                    else
+                    {
+                        InstallFolder = localIdentifier.ToString();
+                    }
+                }
+                else
+                {
+                    InstallFolder = ModIdentifier.ToString();
+                }
+            }
+            
+            return InstallFolder;
+        }
+        /// <summary>
+        /// Recommend calling GetInstallFolder first.
+        /// Is only the name--does not include full path.
+        /// </summary>
+        /// <returns></returns>
         public string GetSaveFile()
         {
             string file;
             if (string.IsNullOrEmpty(InstallFolder))
             {
-                if (ModIdentifier == Guid.Empty)
-                {
-                    file = localIdentifier.ToString() + ArtemisManager.SaveFileExtension;
-                }
-                else
-                {
-                    file = ModIdentifier.ToString() + ArtemisManager.SaveFileExtension;
-                }
+                file = GetInstallFolder() + ArtemisManager.SaveFileExtension;
             }
             else
             {
-                file = new DirectoryInfo(InstallFolder).Name + ArtemisManager.SaveFileExtension;
+                file = InstallFolder + ArtemisManager.SaveFileExtension;
             }
             return file;
         }
@@ -265,14 +296,81 @@ namespace ArtemisManagerAction
                 if (string.IsNullOrEmpty(file))
                 {
                     file = GetSaveFile();
-                    file = Path.Combine(ModInstallFolder, file);
                 }
                 SaveFile = file;
             }
-            ModManager.CreateFolder(new FileInfo(SaveFile).DirectoryName);
+            ModManager.CreateFolder(InstallFolder);
             using StreamWriter sw = new(SaveFile);
             sw.WriteLine(data);
-            
+        }
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            else
+            {
+                return Equals(obj as ModItem);
+            }
+        }
+        public bool Equals(ModItem? other)
+        {
+            if (other != null)
+            {
+                this.SaveFile = this.GetSaveFile();
+                return this.SaveFile.Equals(other.SaveFile);
+            }
+            else
+            {
+                return false;
+            }
+                
+        }
+        public void Unpack()
+        {
+            ModManager.CreateFolder(installFolder);
+            using Stream stream = File.OpenRead(Path.Combine(ModManager.ModArchiveFolder, PackageFile));
+            Unpack(stream);
+        }
+        public void Unpack(Stream stream)
+        {
+            using var reader = ReaderFactory.Open(stream);
+            while (reader.MoveToNextEntry())
+            {
+                if (!reader.Entry.IsDirectory)
+                {
+                    using EntryStream entryStream = reader.OpenEntryStream();
+                    reader.WriteEntryToDirectory(installFolder, new ExtractionOptions()
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
+                }
+            }
+        }
+        public void StoreAndUnpack(byte[] package)
+        {
+            ModManager.CreateFolder(ModManager.ModArchiveFolder);
+            string packageTarget = Path.Combine(ModManager.ModArchiveFolder, packageFile);
+            if (File.Exists(packageTarget))
+            {
+                File.Delete(packageTarget);
+            }
+            using (var fs = new FileStream(packageTarget, FileMode.CreateNew))
+            {
+                fs.Write(package,0, package.Length);
+            }
+            string installFolder = Path.Combine(ModInstallFolder, GetInstallFolder());
+            ModManager.CreateFolder(installFolder);
+
+            using MemoryStream stream = new(package);
+            Unpack(stream);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.GetSaveFile());
         }
     }
 }
