@@ -1,4 +1,5 @@
-﻿using ArtemisManagerAction;
+﻿using AMCommunicator;
+using ArtemisManagerAction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,6 +46,38 @@ namespace ArtemisManagerUI
         private void OnDeactivateMods(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void OnRemoteRemoveManagerFromStartup(object sender, RoutedEventArgs e)
+        {
+            if (ItemData?.IP != null)
+            {
+                Network.Current?.SendPCAction(ItemData.IP, PCActions.RemoveAppFromStartup, true);
+            }
+        }
+
+        private void OnRemoteAddManagerFromStartup(object sender, RoutedEventArgs e)
+        {
+            if (ItemData?.IP != null)
+            {
+                Network.Current?.SendPCAction(ItemData.IP, PCActions.AddAppToStartup, true);
+            }
+        }
+
+        private void OnConnectOnStart(object sender, RoutedEventArgs e)
+        {
+            if (ItemData?.IP != null)
+            {
+                Network.Current?.SendPCAction(ItemData.IP, PCActions.ConnectOnStartup, true);
+            }
+        }
+
+        private void OnNotConnectOnStart(object sender, RoutedEventArgs e)
+        {
+            if (ItemData?.IP != null)
+            {
+                Network.Current?.SendPCAction(ItemData.IP, PCActions.NotConnectOnStartup, true);
+            }
         }
     }
 }

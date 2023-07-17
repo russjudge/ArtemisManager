@@ -170,7 +170,7 @@ namespace ArtemisManagerUI
             dlg.EnsureValidNames = true;
             dlg.Multiselect = false;
             dlg.ShowPlacesList = true;
-
+            
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 retVal = dlg.FileName;

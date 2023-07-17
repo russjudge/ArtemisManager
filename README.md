@@ -35,37 +35,13 @@ Current TODO:
 	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
 
--- Add process to command peers to start Artemis automatically.
 
--- Add process to command peers to load a specific version snapshot of Artemis
--- Add process to manually install mods (i.e., not automatic download, but have a zip/compressed file).
-	-- verify not already installed.  If already installed attempt to check for any version/date changes.
-		-- if non-standard information required to identify version update, then generate standard data retention--base on newest file date in zip file.
-	-- archive the original unmodified zip file.
-	-- Create staging folder that contains the unpackaged mod and only that mod.
-	-- Create a file that can be modified by user of details of this mod, that it is installed and the folder location.
-	-- Details to retain include version number, date version was generated, name, author, required Artemis version.
--- Add process to command peers to install mod
-	-- Peer must check to verify mod is already installed or not.  If it is already installed, include information to check if it needs updated.
-		-- Check if the original zip is in the archive (since not deleted on uninstall) and that it is the correct version.
-	-- If not installed or needs updated, transmit the zip (somehow) to the peer for processing.
-	-- If required Artemis version is not installed on peer--transmit warning with instructions that the correct version of Artemis must be installed, and how to do it 
-		(needs to make sure not to overlay existing version).
--- Add process to command peers to activate mod (or specific Artemis version)
-	-- if peer does not have mod installed, peer requests the mod zip for install and provides update when install complete
-	-- peer sends notice that mod is activated.
-	-- if for specific version of Artemis and that version is not installed, peer sends alert with instructions to install.
-	-- if the required version of Artemis for the mod is not installed, see previous.
-	-- peer first activates required version of Artemis, then activates mod.
--- Add process to command peers to close Artemis process.
--- Add process to query current peer state: app settings, mods installed, mods activated, whether or not Artemis is running.
 -- Add process to uninstall mods.
 	-- If mod is active, restore to vanilla of matching version.
 	-- delete uncompressed folder and update database.
 	-- retain original zip file in archive.
--- In Setup, Develop process to optionally remove all staging and archived mods and vanilla artemis versions.
 -- Create mechanism to generate a mod based on the currently active artemis.
--- Add button to open Windows Explorer to the active artemis folder that Artemis Manager uses to start Artemis (this will be different that the default install folder of Artemis).
+
 -- Document possible issues with the Windows Firewall, and ways to fix Windows Firewall, including setting to being on Private network, adding rules, 
 	and finally, when all else fails, disabling Windows Firewall.
 -- Upon release, document future plans, and request input for enhancements and for prioritizing, and for bug reports.  This first release version requires

@@ -1036,17 +1036,168 @@ namespace ArtemisManagerUI
             win.Show();
         }
 
+        /// <summary>
+        /// Restart the connected Peer PC
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnRestart(object sender, RoutedEventArgs e)
         {
-
+            PCItem? item = GetItem((ICommandSource)sender);
+            if (item != null && item.IP != null)
+            {
+                if (item.IP.ToString() == IPAddress.Any.ToString())
+                {
+                    foreach (var pcItem in ConnectedPCs)
+                    {
+                        if (pcItem.IP != null)
+                        {
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.SendPCAction(item.IP, PCActions.RestartPC, true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MyNetwork.SendPCAction(item.IP, PCActions.RestartPC, true);
+                }
+            }
         }
 
         private void OnShutdown(object sender, RoutedEventArgs e)
         {
-
+            PCItem? item = GetItem((ICommandSource)sender);
+            if (item != null && item.IP != null)
+            {
+                if (item.IP.ToString() == IPAddress.Any.ToString())
+                {
+                    foreach (var pcItem in ConnectedPCs)
+                    {
+                        if (pcItem.IP != null)
+                        {
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.SendPCAction(item.IP, PCActions.ShutdownPC, true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MyNetwork.SendPCAction(item.IP, PCActions.ShutdownPC, true);
+                }
+            }
         }
 
         private void OnUpdateCheck(object sender, RoutedEventArgs e)
+        {
+            PCItem? item = GetItem((ICommandSource)sender);
+            if (item != null && item.IP != null)
+            {
+                if (item.IP.ToString() == IPAddress.Any.ToString())
+                {
+                    foreach (var pcItem in ConnectedPCs)
+                    {
+                        if (pcItem.IP != null)
+                        {
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.SendPCAction(item.IP, PCActions.CheckForUpdate, true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MyNetwork.SendPCAction(item.IP, PCActions.CheckForUpdate, true);
+                }
+            }
+        }
+
+        private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
+        {
+            //Can't work because mod not available here.  Would need to prompt for mod.
+            PCItem? item = GetItem((ICommandSource)sender);
+            if (item != null && item.IP != null)
+            {
+                if (item.IP.ToString() == IPAddress.Any.ToString())
+                {
+                    foreach (var pcItem in ConnectedPCs)
+                    {
+                        if (pcItem.IP != null)
+                        {
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                               //MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.InstallMod, )
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    
+                }
+            }
+        }
+
+        private void OnStartArtemisRemote(object sender, RoutedEventArgs e)
+        {
+            PCItem? item = GetItem((ICommandSource)sender);
+            if (item != null && item.IP != null)
+            {
+                if (item.IP.ToString() == IPAddress.Any.ToString())
+                {
+                    foreach (var pcItem in ConnectedPCs)
+                    {
+                        if (pcItem.IP != null)
+                        {
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.StartArtemis, Guid.Empty, string.Empty);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MyNetwork.SendArtemisAction(item.IP, AMCommunicator.Messages.ArtemisActions.StartArtemis, Guid.Empty, string.Empty);
+                }
+            }
+        }
+
+        private void OnStopArtemisRemote(object sender, RoutedEventArgs e)
+        {
+            PCItem? item = GetItem((ICommandSource)sender);
+            if (item != null && item.IP != null)
+            {
+                if (item.IP.ToString() == IPAddress.Any.ToString())
+                {
+                    foreach (var pcItem in ConnectedPCs)
+                    {
+                        if (pcItem.IP != null)
+                        {
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            {
+                                MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.StopArtemis, Guid.Empty, string.Empty);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MyNetwork.SendArtemisAction(item.IP, AMCommunicator.Messages.ArtemisActions.StopArtemis, Guid.Empty, string.Empty);
+                }
+            }
+        }
+
+        private void OnOpenArtemisRunFolder(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(ArtemisManagerAction.ModItem.ActivatedFolder);
+        }
+
+        private void OnGenerateMod(object sender, RoutedEventArgs e)
         {
 
         }

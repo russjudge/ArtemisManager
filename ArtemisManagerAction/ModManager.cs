@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
+using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Readers;
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Versioning;
 using System.Text;
@@ -13,8 +15,6 @@ namespace ArtemisManagerAction
     public class ModManager
     {
         public static readonly string DataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Confederate In Blue Gaming", "Artemis Manager");
-
-        
         public static readonly string ModArchiveFolder = Path.Combine(DataFolder, "Archive");
         public static bool IsModInstalled(ModItem mod)
         {
@@ -31,6 +31,135 @@ namespace ArtemisManagerAction
                 }
             }
             return found;
+        }
+        public static void GeneratePackage(ModItem mod)
+        {
+            var activeArtemisVersion = ArtemisManagerAction.ArtemisManager.GetArtemisVersion(ModItem.ActivatedFolder);
+            ModItem? baseArtemisMod = null;
+            foreach (var modItem in ArtemisManager.GetInstalledMods())
+            {
+                if (modItem.IsArtemisBase && modItem.Version == activeArtemisVersion)
+                {
+                    baseArtemisMod = modItem;
+                    break;
+                }
+            }
+            if (baseArtemisMod != null)
+            {
+                var baseArtemisFiles = GetFiles(baseArtemisMod.InstallFolder);
+                var newModFiles = GetFiles(ModItem.ActivatedFolder);
+                List<string> workFiles = new List<string>();
+                foreach (var file in newModFiles)
+                {
+                    workFiles.Add(file.Replace(ModItem.ActivatedFolder, string.Empty));
+                }
+                foreach (var file in baseArtemisFiles)
+                {
+                    string matchFile = file.Replace(baseArtemisMod.InstallFolder, string.Empty);
+                    if (workFiles.Contains(matchFile))
+                    {
+                        if (!file.EndsWith(".exe") && !file.EndsWith(".dll"))
+                        {
+                            if (file.EndsWith(".ini") || file.EndsWith(".xml"))
+                            {
+                                string baseData;
+                                string modData;
+                                using (StreamReader sr = new StreamReader(file))
+                                {
+                                    baseData = sr.ReadToEnd();
+                                }
+                                using (StreamReader sr = new StreamReader(Path.Combine(ModItem.ActivatedFolder, matchFile)))
+                                {
+                                    modData = sr.ReadToEnd();
+                                }
+                                if (baseData.Equals(modData))
+                                {
+                                    workFiles.Remove(matchFile);
+                                }
+                            }
+                            else
+                            {
+                                bool fullMatch = true;
+                                byte[] baseData = new byte[32768];
+                                byte[] modData = new byte[32768];
+                                int bytesReadBase = 0;
+                                int bytesReadMod = 0;
+                                using (FileStream fsBase = new FileStream(file, FileMode.Open))
+                                {
+                                    using (FileStream fsMod = new FileStream(Path.Combine(ModItem.ActivatedFolder, matchFile), FileMode.Open))
+                                    {
+                                        while ((bytesReadBase = fsBase.Read(baseData, 0, baseData.Length)) > 0)
+                                        {
+                                            int totalModBytes = 0;
+                                            bytesReadMod = fsMod.Read(modData, 0, bytesReadBase);
+                                            totalModBytes += bytesReadMod;
+                                            while (totalModBytes < bytesReadBase)
+                                            {
+                                                bytesReadMod = fsMod.Read(modData, totalModBytes, bytesReadBase - totalModBytes);
+                                            }
+                                            for (int i = 0; i < bytesReadBase; i++)
+                                            {
+                                                if (modData[i] != baseData[i])
+                                                {
+                                                    fullMatch = false;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (fullMatch)
+                                {
+                                    workFiles.Remove(matchFile);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            workFiles.Remove(matchFile);
+                        }
+                    }
+                }
+                for (int i = 0; i < workFiles.Count; i++)
+                {
+                    if (workFiles[i].StartsWith("\\") || workFiles[i].StartsWith("/"))
+                    {
+                        workFiles[i] = workFiles[i].Substring(1);
+                    }
+                }
+                if (File.Exists(mod.PackageFile))
+                {
+                    File.Delete(mod.PackageFile);
+                }
+                using (var archive = SharpCompress.Archives.Zip.ZipArchive.Create())
+                {
+
+                    foreach (var file in workFiles)
+                    {
+                        archive?.AddEntry(file, Path.Combine(ModItem.ActivatedFolder, file));
+                    }
+                    using (MemoryStream ms = new MemoryStream(System.Text.ASCIIEncoding.ASCII.GetBytes(mod.GetJSON())))
+                    {
+                        ms.Position = 0;
+                        archive.AddEntry(mod.SaveFile, ms);
+                    }
+                    var options = new SharpCompress.Writers.WriterOptions(CompressionType.Deflate);
+                    archive?.SaveTo(mod.PackageFile, options);
+                }
+            }
+        }
+        private static string[] GetFiles(string rootPath)
+        {
+            List<string> retVal = new();
+            foreach (var dir in new DirectoryInfo(rootPath).GetDirectories())
+            {
+                retVal.AddRange(GetFiles(dir.FullName));
+            }
+            foreach (var file in new DirectoryInfo(rootPath).GetFiles())
+            {
+                retVal.Add(file.FullName);
+            }
+            return retVal.ToArray();
         }
         
         /// <summary>

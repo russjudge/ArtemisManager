@@ -181,6 +181,16 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
+        private bool isInstalled = false;
+        public bool IsInstalled
+        {
+            get { return isInstalled; }
+            set
+            {
+                isInstalled = value;
+                DoChanged();
+            }
+        }
 
         private int stackOrder = 0;
         /// <summary>
@@ -345,9 +355,12 @@ namespace ArtemisManagerAction
                     {
                         ExtractFullPath = true,
                         Overwrite = true
+
                     });
                 }
             }
+            this.IsInstalled = true;
+            this.Save();
         }
         public void StoreAndUnpack(byte[] package)
         {

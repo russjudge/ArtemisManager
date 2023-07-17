@@ -120,7 +120,14 @@ namespace AMCommunicator
             if (activeConnections.TryGetValue(target, out var connection))
             {
                 PCActionMessage msg = new(action, force);
-                
+                Transmit(connection.Stream, msg);
+            }
+        }
+        public void SendArtemisAction(IPAddress target, ArtemisActions action, Guid identifier, string modJSON)
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                ArtemisActionMessage msg = new(action, identifier, modJSON);
                 Transmit(connection.Stream, msg);
             }
         }

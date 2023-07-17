@@ -14,5 +14,9 @@ namespace AMCommunicator
         CheckForUpdate,
         DisconnectThisConnection,
         SendClientInformation,
+        AddAppToStartup,
+        RemoveAppFromStartup,
+        ConnectOnStartup,
+        NotConnectOnStartup
     }
 }

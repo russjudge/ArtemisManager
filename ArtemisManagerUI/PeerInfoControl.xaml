@@ -30,7 +30,10 @@
             </Grid.RowDefinitions>
         <Label Grid.Row="0"  Content="Version of Artemis Manager:" />
             <TextBlock Text="{Binding ElementName=uc, Path=ItemData.AppVersion}" Grid.Row="0" Grid.Column="1" />
-            <CheckBox Grid.Row="1" Content="Connect to Peer to Peer network on start" IsChecked="{Binding ElementName=uc, Path=ItemData.ConnectOnstart, Mode=TwoWay}" />
+            <CheckBox
+                Checked="OnConnectOnStart"
+                Unchecked="OnNotConnectOnStart"
+                Grid.Row="1" Content="Connect to Peer to Peer network on start" IsChecked="{Binding ElementName=uc, Path=ItemData.ConnectOnstart, Mode=TwoWay}" />
         
         
             <CheckBox Grid.Row="1" Grid.Column="1"  Content="Is a Master" IsChecked="{Binding ElementName=uc, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="False" />
@@ -41,6 +44,7 @@
         
             <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center"  Grid.Row="2" Content="Manager in Startup Folder" />
             <Button
+                Click="OnRemoteAddManagerFromStartup"
                 Visibility="{Binding ElementName=uc, Path=ItemData.AppInStartFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                 Grid.Row="2" Grid.Column="1" ToolTip="Add Artemis Manager to Startup Folder">
                 <StackPanel Orientation="Horizontal">
@@ -50,7 +54,7 @@
             </Button>
             <Button
                 Grid.Row="2" Grid.Column="1"
-                
+                Click="OnRemoteRemoveManagerFromStartup"
                 Visibility="{Binding ElementName=uc, Path=ItemData.AppInStartFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 ToolTip="Remove Manger from Windows Startup" >
                 <StackPanel Orientation="Horizontal">

@@ -36,6 +36,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ArtemisManagerSetup", "Arte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deploy", "Deploy\Deploy.csproj", "{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AretmisManager_UninstallCleanup", "AretmisManager_UninstallCleanup\AretmisManager_UninstallCleanup.csproj", "{1FA1B525-A021-41DE-B452-0CA82EE29B15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -142,10 +142,10 @@
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
                 </StackPanel>
             </Button>
-            <Button Margin="20,5,5,5" ToolTip="Generate Mod from current activated Artemis folder">
+            <Button Click="OnGenerateMod" Margin="20,5,5,5" ToolTip="Generate Mod from current activated Artemis folder">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/generate.png" />
             </Button>
-            <Button Margin="5,5,5,5" ToolTip="Open activated Artemis folder in Windows Explorer">
+            <Button Click="OnOpenArtemisRunFolder" Margin="5,5,5,5" ToolTip="Open activated Artemis folder in Windows Explorer">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/search.png" />
             </Button>
             <Button Margin="40,5,5,5" ToolTip="Download specific update version of Artemis SBS">
@@ -251,13 +251,14 @@
                             </GroupBox>
                             <GroupBox DockPanel.Dock="Top" Header="Artemis SBS Actions">
                                 <WrapPanel>
-                                    <Button ToolTip="Remotely install a mod on Peer."><!-- Use list of currently installed mods on this PC to install remotely.  Also, enable drag-drop from "Installed Mods" -->
+                                    <Button Click="OnRemoteInstallMod" ToolTip="Remotely install a mod on Peer."><!-- Use list of currently installed mods on this PC to install remotely.  Also, enable drag-drop from "Installed Mods" -->
                                             <StackPanel Orientation="Horizontal">
                                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
                                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
                                             </StackPanel>
                                         </Button>
                                         <Button
+                                            Click="OnStartArtemisRemote"
                                             ToolTip="Start Artemis SBS on Peer."
                                             Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
                                             <StackPanel Orientation="Horizontal">
@@ -266,6 +267,7 @@
                                             </StackPanel>
                                         </Button>
                                         <Button
+                                            Click="OnStopArtemisRemote"
                                             Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                                             ToolTip="Stop Artemis SBS on Peer.">
                                             <StackPanel Orientation="Horizontal">
@@ -276,7 +278,6 @@
                                     </WrapPanel>
                             </GroupBox>
                             <GroupBox DockPanel.Dock="Top" Header="Info" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
-                                    
                                 <local:PeerInfoControl ItemData="{Binding}" >
                                 </local:PeerInfoControl>
                             </GroupBox>

@@ -44,5 +44,6 @@
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion, Mode=TwoWay}" />
         <Button Grid.Row="7" Grid.Column="0" Content="Cancel" Click="OnCancel" IsCancel="True" />
         <Button Grid.Row="7" Grid.Column="1" Content="Install" Click="OnInstallMod" IsDefault="True" />
+        <Button Grid.Row="7" Grid.Column="1" Content="Generate Mod" Click="OnGenerateMod" IsDefault="True" />
     </Grid>
 </Window>

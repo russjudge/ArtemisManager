@@ -59,10 +59,17 @@ namespace ArtemisManagerUI
         
         private void OnInstallMod(object sender, RoutedEventArgs e)
         {
-            
-            ModManager.InstallMod(PackageFile, Mod);
+            if (!string.IsNullOrEmpty(PackageFile) && System.IO.File.Exists(PackageFile))
+            {
+
+                ModManager.InstallMod(PackageFile, Mod);
             this.DialogResult = true;
             this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Please select a package file.");
+            }
         }
 
         private void OnCancel(object sender, RoutedEventArgs e)
@@ -70,6 +77,22 @@ namespace ArtemisManagerUI
             
             this.DialogResult = false;
             this.Close();
+        }
+
+        private void OnGenerateMod(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(PackageFile) && System.IO.File.Exists(PackageFile))
+            {
+                Mod.PackageFile = PackageFile;
+                ModManager.GeneratePackage(Mod);
+                ModManager.InstallMod(Mod.PackageFile, Mod);
+                this.DialogResult = true;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Please select a package file.");
+            }
         }
     }
 }
