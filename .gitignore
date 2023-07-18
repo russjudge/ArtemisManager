@@ -21,3 +21,6 @@
 /Deploy/obj
 /ArtemisManagerSetup/Debug
 /Deploy/bin
+/AretmisManager_UninstallCleanup/obj
+bin
+obj

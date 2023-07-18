@@ -47,28 +47,13 @@
             </CheckBox>
         
         
-            <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center"  Grid.Row="2" >
+            <CheckBox
+                VerticalAlignment="Center" VerticalContentAlignment="Center"  Grid.Row="2"
+                Checked="OnRemoteAddManagerFromStartup"
+                Unchecked="OnRemoteRemoveManagerFromStartup">
                 <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
             </CheckBox>
-            <Button
-                Click="OnRemoteAddManagerFromStartup"
-                Visibility="{Binding ElementName=uc, Path=ItemData.AppInStartFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                Grid.Row="2" Grid.Column="1" ToolTip="Add Artemis Manager to Startup Folder">
-                <StackPanel Orientation="Horizontal">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/add1.png" />
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
-                </StackPanel>
-            </Button>
-            <Button
-                Grid.Row="2" Grid.Column="1"
-                Click="OnRemoteRemoveManagerFromStartup"
-                Visibility="{Binding ElementName=uc, Path=ItemData.AppInStartFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                ToolTip="Remove Manger from Windows Startup" >
-                <StackPanel Orientation="Horizontal">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/no.png" />
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
-                </StackPanel>
-            </Button>
+
             <Label Grid.Row="4" Content="Drive Freespace:" />
     <TextBlock VerticalAlignment="Center"  Text="{Binding ElementName=uc, Path=ItemData.FreeSpaceOnAppDrive}" Grid.Row="4" Grid.Column="1" />
            
@@ -95,7 +80,7 @@
             <ListBox  ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <local:ModItemControl Mod="{Binding}" />
+                        <local:ModItemControl IsRemote="True" Mod="{Binding}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

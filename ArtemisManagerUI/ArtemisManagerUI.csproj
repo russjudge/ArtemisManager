@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <FileVersion>0.1.0.109</FileVersion>
-    <AssemblyVersion>0.1.0.109</AssemblyVersion>
+    <FileVersion>0.1.0.137</FileVersion>
+    <AssemblyVersion>0.1.0.137</AssemblyVersion>
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>
@@ -38,10 +38,12 @@
     <None Remove="Resources\install.png" />
     <None Remove="Resources\no.png" />
     <None Remove="Resources\ok.png" />
+    <None Remove="Resources\Patreon-logo.png" />
     <None Remove="Resources\peer-to-peer.png" />
     <None Remove="Resources\ping.png" />
     <None Remove="Resources\remote.png" />
     <None Remove="Resources\restart.png" />
+    <None Remove="Resources\rj.png" />
     <None Remove="Resources\search.png" />
     <None Remove="Resources\send.png" />
     <None Remove="Resources\Settings-icon.png" />
@@ -116,6 +118,9 @@
     <Resource Include="Resources\ok.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Patreon-logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\peer-to-peer.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
@@ -126,6 +131,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\restart.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\rj.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\search.png">
@@ -193,10 +201,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\changes.txt">
+    <Content Include="..\changes.txt">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
-    </None>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="&quot;$(SolutionDir)VersionBump\bin\Debug\net7.0\VersionBump.exe&quot; &quot;$(ProjectPath)&quot;&#xD;&#xA;" />

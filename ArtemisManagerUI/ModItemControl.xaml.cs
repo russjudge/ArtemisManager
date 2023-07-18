@@ -122,5 +122,20 @@ namespace ArtemisManagerUI
             }
            
         }
+
+        private void OnUninstallMod(object sender, RoutedEventArgs e)
+        {
+            if (IsRemote)
+            {
+                if (Source != null)
+                {
+                    Network.Current?.SendArtemisAction(Source, AMCommunicator.Messages.ArtemisActions.UninstallMod, Mod.ModIdentifier, Mod.GetJSON());
+                }
+            }
+            else
+            {
+                Mod.Uninstall();
+            }
+        }
     }
 }

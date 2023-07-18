@@ -223,6 +223,16 @@ namespace ArtemisManagerUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Patreon_logo {
+            get {
+                object obj = ResourceManager.GetObject("Patreon_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap peer_to_peer {
             get {
                 object obj = ResourceManager.GetObject("peer-to-peer", resourceCulture);
@@ -256,6 +266,16 @@ namespace ArtemisManagerUI.Properties {
         internal static System.Drawing.Bitmap restart {
             get {
                 object obj = ResourceManager.GetObject("restart", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap rj {
+            get {
+                object obj = ResourceManager.GetObject("rj", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -14,6 +14,7 @@ namespace AMCommunicator.Messages
         InstallMod,
         ResetToVanilla,
         InstallMission,
-        ActivateMission
+        ActivateMission,
+        UninstallMod
     }
 }

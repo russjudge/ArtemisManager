@@ -45,7 +45,10 @@ namespace ArtemisManagerUI
 
         private void OnDeactivateMods(object sender, RoutedEventArgs e)
         {
-
+            if (ItemData?.IP != null)
+            {
+                Network.Current?.SendArtemisAction(ItemData.IP, AMCommunicator.Messages.ArtemisActions.ResetToVanilla, Guid.Empty, string.Empty);
+            }
         }
 
         private void OnRemoteRemoveManagerFromStartup(object sender, RoutedEventArgs e)

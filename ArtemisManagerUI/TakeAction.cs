@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 
@@ -15,7 +17,14 @@ namespace ArtemisManagerUI
 {
     public static class TakeAction
     {
+        public static Main? MainWindow { get; set; } = null;
+        public static bool MustExit { get; set; }
 
+        public static event EventHandler<StatusUpdateEventArgs>? StatusUpdate;
+        private static void RaiseStatusUpdate(string message, params object[] parameters)
+        {
+            StatusUpdate?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
+        }
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
         public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
         {
@@ -69,6 +78,7 @@ namespace ArtemisManagerUI
             bool WasProcessed;
             switch (action)
             {
+                
                 case ActionCommands.CloseApp:
                     //Handled elsewhere.
                     WasProcessed = true;
@@ -81,11 +91,24 @@ namespace ArtemisManagerUI
                     WasProcessed = true;
                     break;
                 case ActionCommands.UpdateCheck:
-                    //TODO: Add process to check for update.
-                    if (UpdateCheck(true))
+                    Task.Run(async () =>
                     {
-                        //TODO: do the update.  No prompt.
-                    }
+                        var result = await UpdateCheck(false, source);
+
+                        if (result.Item1)
+                        {
+                            var result2 = await DoUpdate(false, result.Item2);
+                            if (result2)
+                            {
+                                if (source != null)
+                                {
+                                    Network.Current?.SendAlert(source, AMCommunicator.Messages.AlertItems.UpdateCheckSuccess, "Starting update");
+                                }
+                                Environment.Exit(0);
+                            }
+                        }
+                    });
+                    
                     WasProcessed = true;
                     break;
                 case ActionCommands.ShutdownPC:
@@ -119,6 +142,14 @@ namespace ArtemisManagerUI
 #pragma warning restore CS8604 // Possible null reference argument.
                     WasProcessed = true;
                     break;
+                case ActionCommands.AddAppToStartup:
+                    CreateShortcutInStartup();
+                    WasProcessed = true;
+                    break;
+                case ActionCommands.RemoveAppFromStartup:
+                    RemoveShortcutFromStartup();
+                    WasProcessed = true;
+                    break;
                 default:
                     WasProcessed = false;
                     break;
@@ -126,17 +157,111 @@ namespace ArtemisManagerUI
             }
             return WasProcessed;
         }
+        public static string GetAppVersion()
+        {
+            string retVal = string.Empty;
+            var assm = System.Reflection.Assembly.GetEntryAssembly();
+            if (assm != null)
+            {
+                var nm = assm.GetName();
+                if (nm != null && nm.Version != null)
+                {
+                    retVal = nm.Version.ToString();
+                }
+            }
+            return retVal;
+        }
+        const string UpdateSoftwareSourceURL = "https://russjudge.com/software";
+        const string UpdateVersionDataURL = UpdateSoftwareSourceURL + "/artemismanager.version";
+        const string UpdateSetupFileURL = UpdateSoftwareSourceURL + "/artemismanager.msi";
         /// <summary>
         /// Determines whether or not an update is available.
         /// </summary>
         /// <param name="AlertIfCannotCheck">send "true" to send an alert to the source that it could not access the website of the update to check.  Possible: have update transmitted from source.</param>
         /// <returns></returns>
-        public static bool UpdateCheck(bool AlertIfCannotCheck)
+        public async static Task<Tuple<bool, string>> UpdateCheck(bool AlertIfCannotCheck, IPAddress? source = null)
         {
+            bool UpdateNeeded = false;
+            string setupFile = UpdateSetupFileURL;
+            string[] info;
+            try
+            {
+                using (HttpClient client = new())
+                {
+                    var data = await client.GetStringAsync(UpdateVersionDataURL);
+                    //line 1 = version
+                    //line 2 = setup file to download.
+                    info = data.Replace("\r", string.Empty).Split('\n');
+                    if (info.Length > 1)
+                    {
+                        UpdateNeeded = (info[0] != GetAppVersion());
+                    }
+                    setupFile = UpdateSoftwareSourceURL + "/" + info[1];
+                }
+                RaiseStatusUpdate("Update check complete. {0}", UpdateNeeded ? "Updated needed." : "No Update needed.");
+            }
+            catch (Exception ex)
+            {
+                RaiseStatusUpdate("Unable to check for update: {0}", ex.Message);
+                if (AlertIfCannotCheck)
+                {
+                    MessageBox.Show("Unable to check for update: \r\n" + ex.Message, "Update Check Failed");
+                    
+                }
+                else
+                {
+                    if (source != null)
+                    {
+                        Network.Current?.SendAlert(source, AMCommunicator.Messages.AlertItems.UpdateCheckFail, "Unable to check for update: " + ex.Message);
+                    }
+                }
+                RaiseStatusUpdate("Update check failed: {0}", ex.Message);
+            }
             //russjudge.com/software/artemismanager.version
             //russjudge.com/software/artemismanager.msi
 
-            return false;
+            return new Tuple<bool, string>(UpdateNeeded, setupFile);
+        }
+        public static async Task<bool> DoUpdate(bool doPrompt, string setupURL)
+        {
+            //1. Download the msi file.
+            //2. Start the setup and exit.
+            if (doPrompt)
+            {
+                if (MessageBox.Show("An update to Artemis Manager was found.\r\nDo you wish to download the update?", "Update Found", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                {
+                    return false;
+                }
+            }
+            try
+            {
+                string installFile = Path.GetTempFileName() + ".msi";
+                using (HttpClient client = new())
+                {
+                    using (Stream strm = await client.GetStreamAsync(setupURL))
+                    {
+                        int bytesRead = 0;
+                        byte[] buffer = new byte[32768];
+                        
+                        using (FileStream fs = new FileStream(installFile, FileMode.Create))
+                        {
+                            while ((bytesRead = strm.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                fs.Write(buffer, 0, bytesRead);
+                            }
+                        }
+                    }
+                }
+                RaiseStatusUpdate("Starting update.");
+                System.Diagnostics.ProcessStartInfo startInfo = new ProcessStartInfo(installFile);
+                System.Diagnostics.Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+
+                RaiseStatusUpdate("Unable to perform update: " + ex.Message);
+            }
+            return true;
         }
 
         public static bool IsThisAppInStartup()
@@ -212,7 +337,7 @@ namespace ArtemisManagerUI
                 using (StreamWriter sw = new (target))
                 {
                     sw.WriteLine("#!/usr/bin");
-                    sw.WriteLine(asm.Location.Replace(".dll", ".exe"));
+                    sw.WriteLine(asm.Location.Replace(".dll", ".exe") + " FROMSTARTUPFOLDER");
                 }
                 Process.Start("chmod 777 " + target);
             }
@@ -251,7 +376,7 @@ namespace ArtemisManagerUI
                     
                     sw.WriteLine("sLinkFile = \"" + target + "\"");
                     sw.WriteLine("Set oLink = oWS.CreateShortcut(sLinkFile)");
-                    sw.WriteLine("oLink.TargetPath = \"" + appLocation.Replace(".dll", ".exe") + "\"");
+                    sw.WriteLine("oLink.TargetPath = \"" + appLocation.Replace(".dll", ".exe") + " FROMSTARTUPFOLDER\"");
                     sw.WriteLine("oLink.IconLocation = \"" + appLocation + ", 2\"");
                     sw.WriteLine("oLink.Description = \"Artemis Manager\"");
                     sw.WriteLine("oLink.Save");

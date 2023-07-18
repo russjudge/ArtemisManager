@@ -702,6 +702,14 @@ namespace AMCommunicator
                             RaiseStatusUpdate("Client Information requested from {0}", hostname);
                             RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, ip);
                             return false;
+                        case PCActions.RemoveAppFromStartup:
+                            RaiseStatusUpdate("Remove App from startup requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.RemoveAppFromStartup, msg.Force, ip);
+                            return false; ;
+                        case PCActions.AddAppToStartup:
+                            RaiseStatusUpdate("Add App to startup requested from {0}", hostname);
+                            RaiseActionCommand(ActionCommands.AddAppToStartup, msg.Force, ip);
+                            return false; ;
                         default:
                             RaiseStatusUpdate("Invalid PCAction requested from host {0}", hostname);
                             return false;
@@ -1012,6 +1020,7 @@ namespace AMCommunicator
                 if (MyIP.AddressFamily == AddressFamily.InterNetwork)
                 {
                     retVal = MyIP;
+                    break;
                 }
             }
             return retVal;

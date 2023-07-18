@@ -46,6 +46,15 @@ namespace ArtemisManagerAction
             ModManager.CopyFolder(InstallFolder, Path.Combine(ActivatedFolder, f.Name.Substring(0, f.Name.Length - 4)));
             return item;
         }
+        public void Uninstall()
+        {
+            ArtemisManager.DeleteAll(this.InstallFolder);
+            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(SaveFile))
+            {
+                File.Delete(SaveFile);
+            }
+            
+        }
         private string key = string.Empty;
         public string Key
         {

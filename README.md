@@ -22,9 +22,7 @@ Phase 1
 
 Current TODO:
 --> go through each item on main screen and confirm correct functionality encoded:
-	- "Manager in Startup folder" checkbox--remove matching button and control by change in checkbox only, instead.
-	- verify "Connect to Peer to Peer" coded and ready. (Change in checkbox not currently functioning correctly).
-	- "Activate Mod" on peer tries to activate locally instead.
+		
 	- add Mutex to ensure only one copy of app can run.
 	- Do a "Toast" for Ping action.
 	- Test changing password

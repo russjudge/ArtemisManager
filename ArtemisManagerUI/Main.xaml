@@ -6,10 +6,11 @@
         xmlns:local="clr-namespace:ArtemisManagerUI" FontSize="14"
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
-        Title="Artemis Manager" Height="750" Width="1050" >
+        Title="Artemis Manager" Height="750" Width="900" >
     
     <DockPanel>
         <DockPanel.Resources>
+            
             <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
             <converter:DateFormatter x:Key="DateFormatter" />
             <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
@@ -20,7 +21,7 @@
             <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
             </Button>
-            <Button DockPanel.Dock="Right" ToolTip="Check for update to Artemis Manager" >
+            <Button DockPanel.Dock="Right" ToolTip="Check for update to Artemis Manager" Click="OnLocalUpdateCheck">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (2).png" />
             </Button>
             <Image DockPanel.Dock="Left" Height="35" HorizontalAlignment="Left" Source="/ArtemisManagerUI;component/Resources/amBanner.jpg" />
@@ -164,46 +165,53 @@
             </Grid.ColumnDefinitions>
 
         </Grid>
-        
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding ElementName=uc, Path=LastStatus, Mode=OneWay}" />
+        </StatusBar>
         <DockPanel DockPanel.Dock="Right" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-            <GroupBox DockPanel.Dock="Left" Width="310" >
-                <GroupBox.Header>
-                    <Label Content="Installed Mods" />
-                </GroupBox.Header>
-                <ListBox ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <local:ModItemControl Mod="{Binding}" ></local:ModItemControl>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </GroupBox>
-            <GroupBox DockPanel.Dock="Bottom" >
-                <GroupBox.Header>
-                    <Label Content="Activity" />
-                </GroupBox.Header>
-                <ListBox ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" Height="300" Width="300"  VerticalAlignment="Top" />
-            </GroupBox>
-            <GroupBox DockPanel.Dock="Top" MinHeight="200">
-            <GroupBox.Header>
-                <Label Content="Chat" />
-            </GroupBox.Header>
-            <ListBox ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}" >
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
-                            <TextBlock Text="> " />
-                            <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
-                            <TextBlock Text="{Binding Message}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-        </GroupBox>
-            
-            
+
+            <TabControl Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
+
+                <TabItem Tag="InstalledMods" >
+                    <TabItem.Header>
+                        <Label Content="Installed Mods" />
+                    </TabItem.Header>
+                    <ListBox ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:ModItemControl IsRemote="False" Mod="{Binding}" ></local:ModItemControl>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </TabItem>
+
+                <TabItem Tag="Chat" >
+                    <TabItem.Header>
+                        <Label Content="Chat" />
+                    </TabItem.Header>
+                    <ListBox  ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}" local:ListBoxBehavior.AutoScroll="True">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
+                                    <TextBlock Text="> " />
+                                    <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
+                                    <TextBlock Text="{Binding Message}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </TabItem>
+                <TabItem Tag="Activity">
+                    <TabItem.Header>
+                        <Label Content="Activity" />
+                    </TabItem.Header>
+                    <ListBox ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}" VerticalAlignment="Top"  local:ListBoxBehavior.AutoScroll="True" />
+                </TabItem>
+            </TabControl>
+
         </DockPanel>
+        
         <GroupBox Header="Connected Peers" BorderThickness="2,2,2,2" BorderBrush="CadetBlue" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
         <TabControl  
             ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">

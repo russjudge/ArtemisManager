@@ -39,6 +39,18 @@ namespace ArtemisManagerAction
                         }
                     }
                     break;
+                case AMCommunicator.Messages.ArtemisActions.UninstallMod:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        var receivedMod = ModItem.GetModItem(modJSON);
+                        if (receivedMod != null)
+                        {
+                            receivedMod.Uninstall();
+                        }
+                    }
+                    WasProcessed = true;
+
+                    break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateMod:
                     //Is Mod already activitated?  skip if it is.
                     WasProcessed = false;

@@ -35,7 +35,7 @@ namespace AMCommunicator.Messages
                 {
                     if (nm.Version != null)
                     {
-                        AppVersion = nm.Version.ToString();
+                        AppVersion =  nm.Version.ToString();
                     }
                 }
             }

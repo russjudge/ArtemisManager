@@ -102,28 +102,20 @@ namespace ArtemisManagerUI
         /// </summary>
         public AboutWindow()
         {
-            
             var keyAssm = System.Reflection.Assembly.GetEntryAssembly();
             if (keyAssm != null)
             {
                 this.ApplicationPath = keyAssm.Location.Replace(".dll", ".exe");
                 var appName = keyAssm.GetName();
-                this.ApplicationName = appName.FullName;
-                if (appName != null && appName.Version != null)
-                {
-                    this.Version = appName.Version.ToString();
-                }
-
+                this.ApplicationName = appName.Name;
+                
+                this.Version = TakeAction.GetAppVersion();
                 var comp = keyAssm.GetCustomAttribute<AssemblyCompanyAttribute>();
                 if (comp != null)
                 {
                     this.Company = comp.Company;
                 }
-
-
                 this.Author = "Russ Judge";
-                
-
                 var copyright = keyAssm.GetCustomAttribute<AssemblyCopyrightAttribute>();
                 if (copyright != null)
                 {
@@ -314,7 +306,10 @@ namespace ArtemisManagerUI
                 FileInfo f = new(assm.Location);
                 if (!string.IsNullOrEmpty(f.DirectoryName))
                 {
-                    System.Diagnostics.Process.Start(System.IO.Path.Combine(f.DirectoryName, "changes.txt"));
+                    var startInfo = new System.Diagnostics.ProcessStartInfo(System.IO.Path.Combine(f.DirectoryName, "changes.txt"));
+                    startInfo.UseShellExecute = true;
+                    startInfo.CreateNoWindow = true;
+                    System.Diagnostics.Process.Start(startInfo);
                 }
             }
         }

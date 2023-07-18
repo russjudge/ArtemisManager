@@ -9,19 +9,28 @@ namespace Deploy
 {
     internal static class VersionDataFileBuilder
     {
+        /// <summary>
+        /// Creates .version file, copies setup file to target  NOT->, and copies all outdir files to target path/apptitle.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="appTitle"></param>
+        /// <param name="setupFileNameFullPath"></param>
+        /// <param name="sourceOutDir"></param>
+        /// <param name="targetPath"></param>
         public static void BuildDataFile(string version, string appTitle, string setupFileNameFullPath, string sourceOutDir, string targetPath)
         {
             FileInfo setupFile = new FileInfo(setupFileNameFullPath);
             if (setupFile.Exists)
             {
-                using (StreamWriter sw = new StreamWriter(Path.Combine(targetPath, appTitle.Replace(" ", string.Empty) + ".dat")))
+                using (StreamWriter sw = new StreamWriter(Path.Combine(targetPath, appTitle.Replace(" ", string.Empty) + ".version")))
                 {
                     sw.WriteLine(version);
                     sw.WriteLine(setupFile.Name);
+                    
                 }
                 setupFile.CopyTo(targetPath);
             }
-            CopyFolder(sourceOutDir, Path.Combine(targetPath, appTitle.Replace(" ", string.Empty)));
+            //CopyFolder(sourceOutDir, Path.Combine(targetPath, appTitle.Replace(" ", string.Empty)));
         }
         
         public static void CopyFolder(string sourceFolder, string targetFolder)

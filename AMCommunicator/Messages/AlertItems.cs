@@ -9,5 +9,7 @@ namespace AMCommunicator.Messages
     public enum AlertItems : short
     {
         MessageVersionMismatch,
+        UpdateCheckFail,
+        UpdateCheckSuccess
     }
 }
