@@ -193,7 +193,37 @@
 
                 <TabItem Tag="Chat" >
                     <TabItem.Header>
-                        <Label Content="Chat" />
+                        <Label>
+                            <TextBlock Text="Chat" />
+                            <Label.Style>
+                                <Style>
+                                <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=uc, Path=ChatAlert}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation To="Red" 
+                                    Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)" 
+                                    FillBehavior="Stop"  AutoReverse="True" 
+                                    Duration="0:0:1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <ColorAnimation To="Transparent" 
+                                    Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)" 
+                                    FillBehavior="Stop" 
+                                    Duration="0:0:1"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                            </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
                     </TabItem.Header>
                     <ListBox  ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}" local:ListBoxBehavior.AutoScroll="True">
                         <ListBox.ItemTemplate>

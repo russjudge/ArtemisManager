@@ -135,6 +135,25 @@ namespace ArtemisManagerUI
                 }
             }
         }
+        public static readonly DependencyProperty ChatAlertProperty =
+        DependencyProperty.Register(nameof(ChatAlert), typeof(bool),
+            typeof(Main));
+
+        public bool ChatAlert
+        {
+            get
+            {
+                return (bool)this.GetValue(ChatAlertProperty);
+
+            }
+            set
+            {
+                this.SetValue(ChatAlertProperty, value);
+
+            }
+        }
+
+
         public static readonly DependencyProperty ShowPopupProperty =
          DependencyProperty.Register(nameof(ShowPopup), typeof(bool),
              typeof(Main));
@@ -507,7 +526,16 @@ namespace ArtemisManagerUI
 
         private static void OnSelectedTabChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            
+            if (d is Main me)
+            {
+                if (me.SelectedTabItem != null)
+                {
+                    if (me.SelectedTabItem.Tag?.ToString() == "Chat")
+                    {
+                        me.ChatAlert = false;
+                    }
+                }
+            }
         }
 
         public TabItem SelectedTabItem
@@ -550,6 +578,7 @@ namespace ArtemisManagerUI
             else
             {
                 Chat.Add(new ChatMessage(source.ToString(), message));
+                ChatAlert = true;
             }
         }
         private void UpdateStatus(string message)
