@@ -28,21 +28,28 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-        <Label Grid.Row="0"  Content="Version of Artemis Manager:" />
-            <TextBlock Text="{Binding ElementName=uc, Path=ItemData.AppVersion}" Grid.Row="0" Grid.Column="1" />
+        <Label Grid.Row="0"  Content="Artemis Manager Version:" />
+            <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=ItemData.AppVersion}" Grid.Row="0" Grid.Column="1" />
             <CheckBox
+                VerticalAlignment="Center" VerticalContentAlignment="Center"
                 Checked="OnConnectOnStart"
                 Unchecked="OnNotConnectOnStart"
-                Grid.Row="1" Content="Connect to Peer to Peer network on start" IsChecked="{Binding ElementName=uc, Path=ItemData.ConnectOnstart, Mode=TwoWay}" />
+                Grid.Row="1" IsChecked="{Binding ElementName=uc, Path=ItemData.ConnectOnstart, Mode=TwoWay}" >
+                <TextBlock Text="Connect to Peer to Peer network on start" TextWrapping="Wrap"/>
+            </CheckBox>
         
         
             <CheckBox Grid.Row="1" Grid.Column="1"  Content="Is a Master" IsChecked="{Binding ElementName=uc, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="False" />
 
             <CheckBox Grid.Row="3"  Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=ItemData.ArtemisIsRunning}" IsEnabled="False"/>
-            <CheckBox Grid.Row="3" Grid.Column="1" Content="Artemis is under Manager control"  IsEnabled="False" />
+            <CheckBox VerticalContentAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" IsEnabled="False" >
+                <TextBlock Text="Artemis is under Manager control" TextWrapping="Wrap"/>
+            </CheckBox>
         
         
-            <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center"  Grid.Row="2" Content="Manager in Startup Folder" />
+            <CheckBox VerticalAlignment="Center" VerticalContentAlignment="Center"  Grid.Row="2" >
+                <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
+            </CheckBox>
             <Button
                 Click="OnRemoteAddManagerFromStartup"
                 Visibility="{Binding ElementName=uc, Path=ItemData.AppInStartFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
@@ -63,45 +70,46 @@
                 </StackPanel>
             </Button>
             <Label Grid.Row="4" Content="Drive Freespace:" />
-    <TextBlock Text="{Binding ElementName=uc, Path=ItemData.FreeSpaceOnAppDrive}" Grid.Row="4" Grid.Column="1" />
-            <GroupBox
-                Grid.Row="5" Grid.ColumnSpan="2"
+    <TextBlock VerticalAlignment="Center"  Text="{Binding ElementName=uc, Path=ItemData.FreeSpaceOnAppDrive}" Grid.Row="4" Grid.Column="1" />
+           
+           
+
+        </Grid>
+        <GroupBox VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
+                DockPanel.Dock="Top" 
                 >
-                <GroupBox.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock VerticalAlignment="Center" Text="Installed Mods" />
-                        <Button
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Installed Mods" />
+                    <Button
                             Margin="10,2,2,2"
                             Click="OnDeactivateMods"
                             ToolTip="Deactivate All Mods on Peer by reseting activated Artemis folder to base Artemis" >
-                            <StackPanel Orientation="Horizontal">
-                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
-                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </GroupBox.Header>
-                <ListBox  ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" >
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <local:ModItemControl Mod="{Binding}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </GroupBox>
-            <GroupBox Grid.Row="6" Visibility="Collapsed" Header="Installed Missions">
-                <ListBox ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" >
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <local:ModItemControl Mod="{Binding}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                   
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </GroupBox.Header>
+            <ListBox  ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:ModItemControl Mod="{Binding}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+        <!--<GroupBox VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" DockPanel.Dock="Top" Visibility="Collapsed" Header="Installed Missions">
+            <ListBox ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"  >
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:ModItemControl  Mod="{Binding}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
 
-                </ListBox>
-            </GroupBox>
 
-        </Grid>
-        
+            </ListBox>
+        </GroupBox>-->
     </DockPanel>
 </UserControl>

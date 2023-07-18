@@ -71,30 +71,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\rjudge\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
-    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\russj\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Development\\Other\\ArtemisManager\\AretmisManager_UninstallCleanup\\AretmisManager_UninstallCleanup.csproj",
+      "projectUniqueName": "F:\\Development\\ArtemisManager\\AretmisManager_UninstallCleanup\\AretmisManager_UninstallCleanup.csproj",
       "projectName": "AretmisManager_UninstallCleanup",
-      "projectPath": "D:\\Development\\Other\\ArtemisManager\\AretmisManager_UninstallCleanup\\AretmisManager_UninstallCleanup.csproj",
-      "packagesPath": "C:\\Users\\rjudge\\.nuget\\packages\\",
-      "outputPath": "D:\\Development\\Other\\ArtemisManager\\AretmisManager_UninstallCleanup\\obj\\",
+      "projectPath": "F:\\Development\\ArtemisManager\\AretmisManager_UninstallCleanup\\AretmisManager_UninstallCleanup.csproj",
+      "packagesPath": "C:\\Users\\russj\\.nuget\\packages\\",
+      "outputPath": "F:\\Development\\ArtemisManager\\AretmisManager_UninstallCleanup\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\rjudge\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\russj\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
@@ -108,8 +103,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "D:\\Development\\Other\\ArtemisManager\\ArtemisManagerAction\\ArtemisManagerAction.csproj": {
-              "projectPath": "D:\\Development\\Other\\ArtemisManager\\ArtemisManagerAction\\ArtemisManagerAction.csproj"
+            "F:\\Development\\ArtemisManager\\ArtemisManagerAction\\ArtemisManagerAction.csproj": {
+              "projectPath": "F:\\Development\\ArtemisManager\\ArtemisManagerAction\\ArtemisManagerAction.csproj"
             }
           }
         }
@@ -139,7 +134,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.109\\RuntimeIdentifierGraph.json"
       }
     }
   }

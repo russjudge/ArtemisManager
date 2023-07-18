@@ -21,7 +21,17 @@ Phase 1
 - Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
 
 Current TODO:
---Disconnect and reconnect doesn't work.  Needs thorough troubleshooting.  Not sure what's going on.
+--> go through each item on main screen and confirm correct functionality encoded:
+	- "Manager in Startup folder" checkbox--remove matching button and control by change in checkbox only, instead.
+	- verify "Connect to Peer to Peer" coded and ready. (Change in checkbox not currently functioning correctly).
+	- "Activate Mod" on peer tries to activate locally instead.
+	- add Mutex to ensure only one copy of app can run.
+	- Do a "Toast" for Ping action.
+	- Test changing password
+	- add code to change port and test changing port.
+	- add code to close remote artemis manager.
+	- test with more than 2 pcs.
+	- finish coding remote install mod.
 
 --Steam install notes:
 

@@ -1052,7 +1052,7 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null)
                         {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
                                 MyNetwork.SendPCAction(item.IP, PCActions.RestartPC, true);
                             }
@@ -1077,7 +1077,7 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null)
                         {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
                                 MyNetwork.SendPCAction(item.IP, PCActions.ShutdownPC, true);
                             }
@@ -1102,7 +1102,7 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null)
                         {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
                                 MyNetwork.SendPCAction(item.IP, PCActions.CheckForUpdate, true);
                             }
@@ -1128,7 +1128,7 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null)
                         {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
                                //MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.InstallMod, )
                             }
@@ -1194,7 +1194,7 @@ namespace ArtemisManagerUI
 
         private void OnOpenArtemisRunFolder(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start(ArtemisManagerAction.ModItem.ActivatedFolder);
+            System.Diagnostics.Process.Start("explorer " + ArtemisManagerAction.ModItem.ActivatedFolder);
         }
 
         private void OnGenerateMod(object sender, RoutedEventArgs e)

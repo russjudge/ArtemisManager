@@ -5,11 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
-             mc:Ignorable="d" Name="uc">
+             mc:Ignorable="d" Name="uc"  >
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
-    <GroupBox>
+    <GroupBox VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" >
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Button
@@ -57,40 +57,45 @@
                     </StackPanel>
                 </Button>
                 </AdornerDecorator>
-                <Label Content="{Binding Mod.Name, ElementName=uc, Mode=OneWay}" />
+                
             </StackPanel>
                 
         </GroupBox.Header>
     
-    <DockPanel>
+    <DockPanel VerticalAlignment="Stretch" >
+            
+            <StackPanel
+                Orientation="Horizontal" DockPanel.Dock="Top"
+                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" >
+                <Label FontWeight="Bold" Content="{Binding Mod.Name, ElementName=uc, Mode=OneWay}" DockPanel.Dock="Top" />
+                <Label Content="Version:" FontWeight="Bold" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Mod.Version}" />
+                <Label Content="{Binding Mod.Description, ElementName=uc}" DockPanel.Dock="Top" />
+            </StackPanel>
             <StackPanel
                 Orientation="Horizontal" 
-                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 DockPanel.Dock="Top">
+                
                 <Label
                     FontWeight="Bold" Content="Is Active" Foreground="Green" />
                 <Label
                     Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                     Content="Stacked Active Sequence:" />
-                <TextBlock
+                <TextBlock VerticalAlignment="Center"
                     Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                     Text="{Binding ElementName=uc, Path=Mod.StackOrder}" />
             </StackPanel>
-            <Label Content="{Binding Mod.Description, ElementName=uc}" DockPanel.Dock="Top" />
+            
             <StackPanel
                 Orientation="Horizontal" DockPanel.Dock="Top"
                 Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
                 <Label Content="Author:" FontWeight="Bold"  />
-                <TextBlock Text="{Binding ElementName=uc, Path=Mod.Author}" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Mod.Author}" />
                 <Label Content="Requires Artemis Version:" FontWeight="Bold" />
-                <TextBlock Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion}" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion}" />
             </StackPanel>
-            <StackPanel
-                Orientation="Horizontal" DockPanel.Dock="Top"
-                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" >
-                <Label Content="Version:" FontWeight="Bold" />
-                <TextBlock Text="{Binding ElementName=uc, Path=Mod.Version}" />
-            </StackPanel>
+         
 
         </DockPanel>
     </GroupBox>

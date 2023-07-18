@@ -52,7 +52,7 @@ namespace AMCommunicator
 
         private void Connect(IPAddress target, int port)
         {
-            RaiseStatusUpdate("Starting TCP connection to: {0} on port: {1}", target, port);
+            RaiseStatusUpdate("(UDP broadcast received) Starting TCP connection to: {0} on port: {1}", target, port);
             TcpClient? Liveclient = null;
             try
             {
@@ -74,6 +74,7 @@ namespace AMCommunicator
             {
                 Liveclient?.Dispose();
             }
+            RaiseStatusUpdate("(from UDP broadcast receipt) Ending Connect to {0}", target);
         }
         public void Halt(IPAddress address)
         {
@@ -90,14 +91,28 @@ namespace AMCommunicator
         {
             RaiseStatusUpdate("Halting all connections and processes");
             abort = true;
-            server?.Stop();
-
-            foreach (var address in activeConnections.Keys)
+            try
             {
-                RaiseStatusUpdate("Shutting down connection to host {0} - {1}", address, activeConnections[address].Hostname);
-                activeConnections[address].Socket.Shutdown(SocketShutdown.Both);
-                activeConnections[address].Socket.Close();
-                activeConnections[address].Thread?.Interrupt();
+                server?.Stop();
+
+                foreach (var address in activeConnections.Keys)
+                {
+                    RaiseStatusUpdate("Shutting down connection to host {0} - {1}", address, activeConnections[address].Hostname);
+                    try
+                    {
+                        activeConnections[address].Socket.Shutdown(SocketShutdown.Both);
+                        activeConnections[address].Socket.Close();
+                        activeConnections[address].Thread?.Interrupt();
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+            catch
+            {
+
             }
             activeConnections.Clear();
             RaiseStatusUpdate("All connections halted");
@@ -236,9 +251,9 @@ namespace AMCommunicator
                                 byte[] buff;
                                 List<byte> buffer;
                                 int bytesRead = 0;
-                                if (!queuedItem.FromListener)
+                                if (!queuedItem.FromListener) // (from UDP broadcast receipt)
                                 {
-                                    RaiseStatusUpdate("Sending Handshake to {0}:{1}", remoteAddress.ToString(), hostname);
+                                    RaiseStatusUpdate("(from UDP broadcast receipt) Sending Handshake to {0}:{1}", remoteAddress.ToString(), hostname);
                                     //MUST SEND handshake item first here.
                                     HandshakeMessage msg = new();
                                     Transmit(trackItem.Stream, msg);
@@ -301,7 +316,7 @@ namespace AMCommunicator
                                     }
                                     else
                                     {
-                                        abort = true;
+                                        disconnect = true;
 
                                         mreSender.Set();
                                     }
@@ -353,8 +368,10 @@ namespace AMCommunicator
             }
             finally
             {
-                if (queuedItem.Client != null && remoteAddress != null)
+                RaiseStatusUpdate("Doing final cleanup of TCP connection to {0}", hostname);
+                if (remoteAddress != null)
                 {
+                    RaiseStatusUpdate("Removing {0} from dictionary", remoteAddress);
                     activeConnections.Remove(remoteAddress);
                 }
                 if (queuedItem.Client != null && queuedItem.Client.Connected)
@@ -364,6 +381,7 @@ namespace AMCommunicator
                 }
             }
             ConnectionClosed?.Invoke(this, new ConnectionRequestEventArgs(remoteAddress, hostname));
+
         }
         void RaiseFatal(Exception e)
         {
@@ -923,6 +941,7 @@ namespace AMCommunicator
                     }
                     RaiseStatusUpdate("Restarting UDP Listener Service Loop...");
                 }
+                RaiseStatusUpdate("Abort = true--quitting UDP Listener.");
                 
             }
             catch (SocketException e)
@@ -931,6 +950,7 @@ namespace AMCommunicator
             }
             catch (ThreadInterruptedException) 
             {
+                RaiseStatusUpdate("ThreadInterruptedException received on UDP Listener");
             }
             RaiseStatusUpdate("UDP Listener server HALTED");
         }

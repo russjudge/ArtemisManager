@@ -104,7 +104,11 @@ namespace ArtemisManagerAction
             var retVal = GetModList(ModItem.ModInstallFolder);
             foreach (var item in retVal)
             {
-                item.IsActive = (File.Exists(Path.Combine(ModItem.ActivatedFolder, item.LocalIdentifier.ToString() + SaveFileExtension)));
+                if (string.IsNullOrEmpty(item.SaveFile))
+                {
+                    item.Save();
+                }
+                item.IsActive = (File.Exists(Path.Combine(ModItem.ActivatedFolder, item.SaveFile)));
             }
             
             return retVal;

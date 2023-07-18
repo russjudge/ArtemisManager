@@ -74,8 +74,10 @@ namespace ArtemisManagerUI
                     WasProcessed = true;
                     break;
                 case ActionCommands.RestartPC:
-
-                    System.Diagnostics.Process.Start("shutdown /r /t 0");
+                    ProcessStartInfo startInfo = new("shutdown", "/g /t 0 /f");
+                    startInfo.UseShellExecute = false;
+                    startInfo.CreateNoWindow = true;
+                    System.Diagnostics.Process.Start(startInfo);
                     WasProcessed = true;
                     break;
                 case ActionCommands.UpdateCheck:
@@ -87,7 +89,11 @@ namespace ArtemisManagerUI
                     WasProcessed = true;
                     break;
                 case ActionCommands.ShutdownPC:
-                    System.Diagnostics.Process.Start("shutdown /s /t 0");
+                    ProcessStartInfo startInfo2 = new("shutdown", "/sg /t 0 /f");
+                    startInfo2.UseShellExecute = false;
+                    startInfo2.CreateNoWindow = true;
+                    System.Diagnostics.Process.Start(startInfo2);
+                    
                     WasProcessed = true;
                     break;
                 case ActionCommands.ClientInformationRequested:

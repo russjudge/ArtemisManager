@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "LOociI2Miy5it83c5nA0kh6YufVukFLHYkw4mrHR1Dw4BFWzqp1ELwptIcSeFJ79lhlXv8n0GeSx5mAzrOMTZg==",
+  "dgSpecHash": "USn62WTUX/LcM5WSbxvHSoEAWogn/6MfrTLiZAaIZ1szKsv2kzIo2CBRlw4NTcQ7iak9jqGASTxtj8f4ksg9/Q==",
   "success": true,
-  "projectFilePath": "D:\\Development\\Other\\ArtemisManager\\AretmisManager_UninstallCleanup\\AretmisManager_UninstallCleanup.csproj",
+  "projectFilePath": "F:\\Development\\ArtemisManager\\AretmisManager_UninstallCleanup\\AretmisManager_UninstallCleanup.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\rjudge\\.nuget\\packages\\sharpcompress\\0.33.0\\sharpcompress.0.33.0.nupkg.sha512"
+    "C:\\Users\\russj\\.nuget\\packages\\sharpcompress\\0.33.0\\sharpcompress.0.33.0.nupkg.sha512"
   ],
   "logs": []
 }
