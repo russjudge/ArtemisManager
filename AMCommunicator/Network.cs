@@ -428,7 +428,7 @@ namespace AMCommunicator
                     disconnect = ProcessCommunication(stream, message?.GetItem<CommunicationMessage>());
                     break;
                 case MessageCommand.Ping:
-                    disconnect = ProcessPing(stream, message?.GetItem<PingMessage>());
+                    disconnect = ProcessPing(stream, message?.GetItem<PingMessage>(), hostname);
                     break;
                 case MessageCommand.ChangeAppSetting:
                     disconnect = ProcessChangeSetting(stream, message?.GetItem<ChangeAppSettingMessage>());
@@ -445,6 +445,7 @@ namespace AMCommunicator
         }
         public event EventHandler<ChangeSettingEventArgs>? ChangeSetting;
         public event EventHandler<StatusUpdateEventArgs>? StatusUpdated;
+        public event EventHandler<StatusUpdateEventArgs>? PopupMessageEvent;
         public event EventHandler<ModPackageRequestEventArgs>? ModPackageRequested;
         public event EventHandler<ModPackageEventArgs>? ModPackageReceived;
         public event EventHandler<ConnectionRequestEventArgs>? ConnectionReceived;
@@ -622,7 +623,7 @@ namespace AMCommunicator
             return disconnect;
         }
         
-        private bool ProcessPing(NetworkStream stream, PingMessage? msg)
+        private bool ProcessPing(NetworkStream stream, PingMessage? msg, string hostname)
         {
             if (msg != null)
             {
@@ -639,7 +640,7 @@ namespace AMCommunicator
                         return true;
                     }
                 }
-
+                PopupMessageEvent?.Invoke(this, new StatusUpdateEventArgs("Ping from {0} received.", hostname));
                 if (msg.Acknowledge)
                 {
                     msg.Acknowledge = false;
@@ -780,8 +781,6 @@ namespace AMCommunicator
             }
             return retVal;
         }
-
-
         private bool ProcessClientInfoMessage(NetworkStream stream, ClientInfoMessage? message)
         {
             if (message != null)
@@ -843,8 +842,6 @@ namespace AMCommunicator
                 else
                 {
                     RaiseStatusUpdate("Setting listener for IPAddress: {0}, on port: {1}", MyIP, ConnectionPort);
-
-
                     server = new TcpListener(MyIP, ConnectionPort);
 
                     // Start listening for client requests.

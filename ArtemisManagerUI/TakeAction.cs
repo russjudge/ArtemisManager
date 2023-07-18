@@ -17,6 +17,7 @@ namespace ArtemisManagerUI
 {
     public static class TakeAction
     {
+
         public static Main? MainWindow { get; set; } = null;
         public static bool MustExit { get; set; }
 
@@ -25,6 +26,12 @@ namespace ArtemisManagerUI
         {
             StatusUpdate?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
+        public static event EventHandler<StatusUpdateEventArgs>? PopupEvent;
+        private static void RaisePopupEvent(string message, params object[] parameters)
+        {
+            PopupEvent?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
+        }
+
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
         public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
         {

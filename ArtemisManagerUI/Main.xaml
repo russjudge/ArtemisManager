@@ -9,6 +9,7 @@
         Title="Artemis Manager" Height="750" Width="900" >
     
     <DockPanel>
+        
         <DockPanel.Resources>
             
             <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
@@ -17,6 +18,11 @@
             <converter:NullToVisibility x:Key="NullToVisibility" />
 
         </DockPanel.Resources>
+        <Popup IsOpen="{Binding ElementName=uc, Path=ShowPopup, Mode=TwoWay}">
+            <Border BorderThickness="1">
+                <TextBlock TextWrapping="Wrap" Text="{Binding ElementName=uc, Path=PopupMessage, Mode=OneWay}" />
+            </Border>
+        </Popup>
         <DockPanel DockPanel.Dock="Top">
             <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />

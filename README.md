@@ -23,7 +23,6 @@ Phase 1
 Current TODO:
 --> go through each item on main screen and confirm correct functionality encoded:
 		
-	- add Mutex to ensure only one copy of app can run.
 	- Do a "Toast" for Ping action.
 	- Test changing password
 	- add code to change port and test changing port.

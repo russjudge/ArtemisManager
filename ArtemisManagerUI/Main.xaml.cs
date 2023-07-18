@@ -135,6 +135,41 @@ namespace ArtemisManagerUI
                 }
             }
         }
+        public static readonly DependencyProperty ShowPopupProperty =
+         DependencyProperty.Register(nameof(ShowPopup), typeof(bool),
+             typeof(Main));
+
+        public bool ShowPopup
+        {
+            get
+            {
+                return (bool)this.GetValue(ShowPopupProperty);
+
+            }
+            set
+            {
+                this.SetValue(ShowPopupProperty, value);
+
+            }
+        }
+        public static readonly DependencyProperty PopupMessageProperty =
+         DependencyProperty.Register(nameof(PopupMessage), typeof(string),
+             typeof(Main));
+
+        public string PopupMessage
+        {
+            get
+            {
+                return (string)this.GetValue(PopupMessageProperty);
+
+            }
+            set
+            {
+                this.SetValue(PopupMessageProperty, value);
+
+            }
+        }
+
         public static readonly DependencyProperty AppVersionProperty =
           DependencyProperty.Register(nameof(AppVersion), typeof(string),
               typeof(Main));
@@ -296,7 +331,6 @@ namespace ArtemisManagerUI
                             case MessageBoxResult.Cancel:
                                 me.Password = Network.Password;
                                 break;
-
                         }
                     }
                 }
@@ -357,7 +391,6 @@ namespace ArtemisManagerUI
                                 me.MyNetwork.SendChangeSetting(pc.IP, "ListeningPort", Properties.Settings.Default.ListeningPort.ToString());
                             }
                         }
-
                     }
                     else
                     {
@@ -366,7 +399,6 @@ namespace ArtemisManagerUI
                 }
             }
         }
-
         public int Port
         {
             get
@@ -399,8 +431,6 @@ namespace ArtemisManagerUI
 
             }
         }
-
-
         public static readonly DependencyProperty ConnectedPCsProperty =
            DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
                typeof(Main));
@@ -575,8 +605,6 @@ namespace ArtemisManagerUI
                 this.SetValue(IsArtemisRunningProperty, value);
             }
         }
-        
-
         void DoStartServer()
         {
             UpdateStatus("Starting Connection Service");
@@ -597,11 +625,17 @@ namespace ArtemisManagerUI
             MyNetwork.ClientInfoReceived += MyNetwork_ClientInfoReceived;
             MyNetwork.ArtemisActionReceived += MyNetwork_ArtemisActionReceived;
             MyNetwork.ModPackageReceived += MyNetwork_ModPackageReceived;
+            MyNetwork.PopupMessageEvent += MyNetwork_PopupMessageEvent;
             MyNetwork.Connect();
             IsStarted = true;
         }
 
-      
+        private void MyNetwork_PopupMessageEvent(object? sender, StatusUpdateEventArgs e)
+        {
+            this.PopupMessage = e.Message;
+            this.ShowPopup = true;
+        }
+
         private void MyNetwork_ModPackageReceived(object? sender, ModPackageEventArgs e)
         {
             ModItem? item = ModItem.GetModItem(e.Mod);
