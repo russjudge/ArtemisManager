@@ -52,17 +52,17 @@ namespace ArtemisManagerUI
             var collection = oldValue as INotifyCollectionChanged;
             if (collection != null)
             {
-                collection.CollectionChanged -= this.CollectionChangedEventHandler;
+                collection.CollectionChanged -= CollectionChangedEventHandler;
             }
 
             collection = newValue as INotifyCollectionChanged;
             if (collection != null)
             {
-                collection.CollectionChanged += this.CollectionChangedEventHandler;
+                collection.CollectionChanged += CollectionChangedEventHandler;
             }
         }
 
-        private void CollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e)
+        private void CollectionChangedEventHandler(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems == null || e.NewItems.Count < 1)
             {

@@ -174,7 +174,7 @@
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding ElementName=uc, Path=LastStatus, Mode=OneWay}" />
         </StatusBar>
-        <DockPanel DockPanel.Dock="Right" Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+        <DockPanel DockPanel.Dock="Right" >
 
             <TabControl Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
 
@@ -204,7 +204,7 @@
                                                 <Storyboard>
                                                     <ColorAnimation To="Red" 
                                     Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)" 
-                                    FillBehavior="Stop"  AutoReverse="True" 
+                                    FillBehavior="Stop"  AutoReverse="True" RepeatBehavior="Forever"
                                     Duration="0:0:1"/>
                                                 </Storyboard>
                                             </BeginStoryboard>

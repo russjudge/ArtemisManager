@@ -23,10 +23,26 @@ Phase 1
 Current TODO:
 --> go through each item on main screen and confirm correct functionality encoded:
 		
-	- Do a "Toast" for Ping action.
-	- Test changing password
+	- Popup for Ping activity non-functional.  
+	-- activity listbox not scrolling to bottom (presuming chat listbox won't either).
+	--IsUsingThisAppControlledArtemis not reflected locally--needs added.
+
+	- fix Freespace listing to show by GB (currently shows by bytes, with no label).
+
 	- add code to change port and test changing port.
 	- add code to close remote artemis manager.
+
+	-- Create mechanism to generate a mod based on the currently active artemis.
+		- Need to validate at least one changed file was detected.  If no files, then
+			 Mod cannot be generated.
+
+
+	-- Add process to uninstall mods:
+		-- If mod is active, restore to vanilla of matching version.
+		-- delete uncompressed folder
+		-- retain original zip file in archive.
+
+	- Test changing password
 	- test with more than 2 pcs.
 	- finish coding remote install mod.
 
@@ -43,18 +59,15 @@ Current TODO:
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
 
 
--- Add process to uninstall mods.
-	-- If mod is active, restore to vanilla of matching version.
-	-- delete uncompressed folder and update database.
-	-- retain original zip file in archive.
--- Create mechanism to generate a mod based on the currently active artemis.
+
+
 
 -- Document possible issues with the Windows Firewall, and ways to fix Windows Firewall, including setting to being on Private network, adding rules, 
 	and finally, when all else fails, disabling Windows Firewall.
 -- Upon release, document future plans, and request input for enhancements and for prioritizing, and for bug reports.  This first release version requires
 	all of the above TODO items done first and will be noted as version 0.x and as a beta version.  Version 1.0 will be release upon completion of Phase 2, which will also
 	note that an automated way of submitted mods is under development, and to submit mods to me via URL link in the forum post.
--- Add basic Update check and download and update apply.
+
 
 
 Phase 2

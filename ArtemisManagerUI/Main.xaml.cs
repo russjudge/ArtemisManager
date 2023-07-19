@@ -1,5 +1,6 @@
 ﻿using AMCommunicator;
 using ArtemisManagerAction;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -247,7 +248,12 @@ namespace ArtemisManagerUI
         public static readonly DependencyProperty AutoStartServerProperty =
          DependencyProperty.Register(nameof(AutoStartServer), typeof(bool),
              typeof(Main), new PropertyMetadata(OnAutoStartChanged));
+        void UpdateAutoStart(bool value)
+        {
+            Properties.Settings.Default.ConnectOnStart = value;
+            Properties.Settings.Default.Save();
 
+        }
         private static void OnAutoStartChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Main me = (Main)d;
@@ -261,8 +267,7 @@ namespace ArtemisManagerUI
                             me.AutoStartServer = Properties.Settings.Default.ConnectOnStart;
                             break;
                         case MessageBoxResult.Yes:
-                            Properties.Settings.Default.ConnectOnStart = me.AutoStartServer;
-                            Properties.Settings.Default.Save();
+                            me.UpdateAutoStart(me.AutoStartServer);
                             foreach (var pc in me.ConnectedPCs)
                             {
                                 if (pc.IP != null)
@@ -391,6 +396,12 @@ namespace ArtemisManagerUI
           DependencyProperty.Register(nameof(Port), typeof(int),
               typeof(Main), new PropertyMetadata(OnPortChanged));
 
+        void UpdatePort(int port)
+        {
+            Properties.Settings.Default.ListeningPort = port;
+            Properties.Settings.Default.Save();
+            Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
+        }
         private static void OnPortChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             Main me = (Main)d;
@@ -400,9 +411,7 @@ namespace ArtemisManagerUI
                 {
                     if (!me.IsStarted || MessageBox.Show("Are you sure you wish to change the listening port for this application?\r\nThis will change the port on all connected computers and only on the connected computers.\r\n\r\nYou will need to restart the application for the new port to take effect.", "Change Listening Port", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
-                        Properties.Settings.Default.ListeningPort = (int)e.NewValue;
-                        Properties.Settings.Default.Save();
-                        Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
+                        me.UpdatePort((int)e.NewValue);
                         foreach (var pc in me.ConnectedPCs)
                         {
                             if (pc.IP != null)
@@ -578,7 +587,10 @@ namespace ArtemisManagerUI
             else
             {
                 Chat.Add(new ChatMessage(source.ToString(), message));
-                ChatAlert = true;
+                if (SelectedTabItem == null || SelectedTabItem.Tag?.ToString() != "Chat")
+                {
+                    ChatAlert = true;
+                }
             }
         }
         private void UpdateStatus(string message)
@@ -661,8 +673,11 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_PopupMessageEvent(object? sender, StatusUpdateEventArgs e)
         {
-            this.PopupMessage = e.Message;
-            this.ShowPopup = true;
+            //this.Dispatcher.Invoke(() =>
+            //{
+            //    this.PopupMessage = e.Message;
+            //    this.ShowPopup = true;
+            //});
         }
 
         private void MyNetwork_ModPackageReceived(object? sender, ModPackageEventArgs e)
@@ -806,12 +821,20 @@ namespace ArtemisManagerUI
             switch (e.SettingName)
             {
                 case "ConnectOnStart":
-                    this.Dispatcher.Invoke(new Action(() => { this.AutoStartServer = bool.Parse(e.SettingValue); }));
+                    this.Dispatcher.Invoke(new Action(() => {
+                        this.isLoading = true;
+                        this.AutoStartServer = bool.Parse(e.SettingValue);
+                        UpdateAutoStart(this.AutoStartServer);
+                        this.isLoading = false;
+                    }));
                     break;
                 case "ListeningPort":
                     this.Dispatcher.Invoke(new Action(() =>
                     {
+                        this.isLoading = true;
                         this.Port = int.Parse(e.SettingValue);
+                        UpdatePort(Port);
+                        this.isLoading = false;
                     }));
                     Network.ConnectionPort = int.Parse(e.SettingValue);
                     break;
@@ -1125,7 +1148,7 @@ namespace ArtemisManagerUI
             {
                 ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder);
                 InstalledMods.Add(item);
-                ArtemisManager.ClearActiveFolder();
+                //ArtemisManager.ClearActiveFolder();
                 item.Activate();
             }
 
@@ -1134,11 +1157,15 @@ namespace ArtemisManagerUI
         {
 
             ArtemisManager.StartArtemis();
+            System.Threading.Thread.Sleep(2000);
+            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
         }
 
         private void OnStopArtemisSBS(object sender, RoutedEventArgs e)
         {
             ArtemisManager.StopArtemis();
+            System.Threading.Thread.Sleep(2000);
+            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
         }
 
         private void DeactivateAllButBase(Guid? activeIdentifier)

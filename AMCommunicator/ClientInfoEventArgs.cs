@@ -22,7 +22,7 @@ namespace AMCommunicator
             InstalledMods = message.InstalledMods;
             InstalledMissions = message.InstalledMissions;
             ArtemisIsRunning= message.ArtemisIsRunning;
-            IsUsingThisAppContorlledArtemis = message.IsUsingThisAppControlledArtemis;
+            IsUsingThisAppControlledArtemis = message.IsUsingThisAppControlledArtemis;
             AppInStartFolder = message.AppInStartFolder;
             FreeSpaceOnAppSrive = message.FreeSpaceOnAppDrive;
 
@@ -36,7 +36,7 @@ namespace AMCommunicator
         public string[] InstalledMods { get; private set; }
         public string[] InstalledMissions { get; private set; }
         public bool ArtemisIsRunning { get; private set; }
-        public bool IsUsingThisAppContorlledArtemis { get; private set; }
+        public bool IsUsingThisAppControlledArtemis { get; private set; }
         public bool AppInStartFolder { get; private set; }
         public long FreeSpaceOnAppSrive { get; private set; }
         public string[] AllDrives { get; private set; }

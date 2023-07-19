@@ -24,34 +24,44 @@ namespace ArtemisManagerAction
         /// </summary>
         public ModItem Activate()
         {
-            ModItem item = new();
+            if (IsArtemisBase)
+            {
+                ArtemisManager.ClearActiveFolder();
+            }
             this.IsActive = true;
             this.Save();
-            item.Key = Key;
-            item.ModIdentifier = ModIdentifier;
 
-            item.Name = Name;
-            item.Description = Description;
-            item.Version= Version;
-            item.RequiredArtemisVersion= RequiredArtemisVersion;
-            item.Author= Author;
-            item.IsArtemisBase= IsArtemisBase;
-            item.localIdentifier= LocalIdentifier;
-            item.ReleaseDate= ReleaseDate;
-            item.isActive = true;
-            item.InstallFolder = InstallFolder;
-            item.PackageFile = PackageFile;
-            FileInfo f = new(SaveFile);
-            item.Save(Path.Combine(ActivatedFolder, f.Name));
-            ModManager.CopyFolder(InstallFolder, Path.Combine(ActivatedFolder, f.Name.Substring(0, f.Name.Length - 4)));
+            ModItem item = new()
+            {
+                Key = Key,
+                ModIdentifier = ModIdentifier,
+
+                Name = Name,
+                Description = Description,
+                Version = Version,
+                RequiredArtemisVersion = RequiredArtemisVersion,
+                Author = Author,
+                IsArtemisBase = IsArtemisBase,
+                localIdentifier = LocalIdentifier,
+                ReleaseDate = ReleaseDate,
+                isActive = true,
+                InstallFolder = InstallFolder,
+                PackageFile = PackageFile,
+                SaveFile = SaveFile
+            };
+
+            item.Save(Path.Combine(ModManager.DataFolder, SaveFile));
+            
+            ModManager.CopyFolder(Path.Combine(ModItem.ModInstallFolder, InstallFolder), ActivatedFolder);
             return item;
         }
+        
         public void Uninstall()
         {
-            ArtemisManager.DeleteAll(this.InstallFolder);
-            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(SaveFile))
+            ArtemisManager.DeleteAll(Path.Combine(ModItem.ModInstallFolder, this.InstallFolder));
+            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(ModItem.ModInstallFolder, SaveFile)))
             {
-                File.Delete(SaveFile);
+                File.Delete(Path.Combine(ModItem.ModInstallFolder, SaveFile));
             }
             
         }
@@ -307,19 +317,23 @@ namespace ArtemisManagerAction
             }
             return file;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file">Must be full path, otherwise InstallFolder+SaveFile used.</param>
         public void Save(string file = "")
         {
-            string data = GetJSON();
             if (string.IsNullOrEmpty(SaveFile))
             {
-                if (string.IsNullOrEmpty(file))
-                {
-                    file = GetSaveFile();
-                }
-                SaveFile = file;
+                SaveFile = GetSaveFile();
             }
-            ModManager.CreateFolder(InstallFolder);
-            using StreamWriter sw = new(SaveFile);
+            if (string.IsNullOrEmpty(file))
+            {
+                file = Path.Combine(ModInstallFolder, SaveFile);
+            }
+            string data = GetJSON();
+            ModManager.CreateFolder(Path.Combine(ModItem.ModInstallFolder, InstallFolder));
+            using StreamWriter sw = new(file);
             sw.WriteLine(data);
         }
         public override bool Equals(object? obj)

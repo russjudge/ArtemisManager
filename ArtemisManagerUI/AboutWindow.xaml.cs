@@ -107,8 +107,10 @@ namespace ArtemisManagerUI
             {
                 this.ApplicationPath = keyAssm.Location.Replace(".dll", ".exe");
                 var appName = keyAssm.GetName();
-                this.ApplicationName = appName.Name;
-                
+                if (appName != null && !string.IsNullOrEmpty(appName.Name))
+                {
+                    this.ApplicationName = appName.Name;
+                }
                 this.Version = TakeAction.GetAppVersion();
                 var comp = keyAssm.GetCustomAttribute<AssemblyCompanyAttribute>();
                 if (comp != null)

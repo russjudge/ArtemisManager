@@ -43,7 +43,7 @@ namespace ArtemisManagerUI
             }
             InstalledMissions = new object();
             ArtemisIsRunning = info.ArtemisIsRunning;
-            IsUsingThisAppControlledArtemis = info.IsUsingThisAppContorlledArtemis;
+            IsUsingThisAppControlledArtemis = info.IsUsingThisAppControlledArtemis;
             AppInStartFolder= info.AppInStartFolder;
             FreeSpaceOnAppDrive = info.FreeSpaceOnAppSrive;
             foreach(var item in info.AllDrives)

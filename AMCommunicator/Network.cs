@@ -257,8 +257,9 @@ namespace AMCommunicator
                                     //MUST SEND handshake item first here.
                                     HandshakeMessage msg = new();
                                     Transmit(trackItem.Stream, msg);
-                                    SendPCAction(remoteAddress, PCActions.SendClientInformation, true);
+                                    
                                 }
+                                SendPCAction(remoteAddress, PCActions.SendClientInformation, true);
                                 do
                                 {
                                     RaiseStatusUpdate("Beginning read of stream loop for {0}", hostname);
@@ -680,6 +681,7 @@ namespace AMCommunicator
                     }
                     switch ((PCActions)msg.Action)
                     {
+                       
                         case PCActions.DisconnectThisConnection:
                             RaiseStatusUpdate("Disconnect requested from host {0}.", hostname);
                             return true;

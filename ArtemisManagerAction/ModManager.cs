@@ -46,7 +46,7 @@ namespace ArtemisManagerAction
             }
             if (baseArtemisMod != null)
             {
-                var baseArtemisFiles = GetFiles(baseArtemisMod.InstallFolder);
+                var baseArtemisFiles = GetFiles(Path.Combine(ModItem.ModInstallFolder, baseArtemisMod.InstallFolder));
                 var newModFiles = GetFiles(ModItem.ActivatedFolder);
                 List<string> workFiles = new List<string>();
                 foreach (var file in newModFiles)
@@ -55,7 +55,7 @@ namespace ArtemisManagerAction
                 }
                 foreach (var file in baseArtemisFiles)
                 {
-                    string matchFile = file.Replace(baseArtemisMod.InstallFolder, string.Empty);
+                    string matchFile = file.Replace(Path.Combine(ModItem.ModInstallFolder, baseArtemisMod.InstallFolder), string.Empty);
                     if (workFiles.Contains(matchFile))
                     {
                         if (!file.EndsWith(".exe") && !file.EndsWith(".dll"))

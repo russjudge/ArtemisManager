@@ -67,19 +67,14 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnConnectOnStart(object sender, RoutedEventArgs e)
-        {
-            if (ItemData?.IP != null)
-            {
-                Network.Current?.SendPCAction(ItemData.IP, PCActions.ConnectOnStartup, true);
-            }
-        }
+       
 
-        private void OnNotConnectOnStart(object sender, RoutedEventArgs e)
+        private void OnSetConnectOnStart(object sender, RoutedEventArgs e)
         {
             if (ItemData?.IP != null)
             {
-                Network.Current?.SendPCAction(ItemData.IP, PCActions.NotConnectOnStartup, true);
+                Network.Current?.SendChangeSetting(ItemData.IP, "ConnectOnStart", this.ItemData.ConnectOnstart.ToString());
+                
             }
         }
     }

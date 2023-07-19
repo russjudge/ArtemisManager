@@ -37,7 +37,7 @@ namespace ArtemisManagerUI
         {
             if (requestSource != null)
             {
-                if (File.Exists(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier)))
+                if (System.IO.File.Exists(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier)))
                 {
                     List<byte> data = new();
                     byte[] buffer = new byte[32768];
@@ -135,15 +135,16 @@ namespace ArtemisManagerUI
                     {
                         jsonMods.Add(mod.GetJSON());
                     }
-
+                    bool AretmisIsRunning = ArtemisManagerAction.ArtemisManager.IsArtemisRunning();
+                    bool IsRunningUnderMyControl = ArtemisManagerAction.ArtemisManager.IsRunningArtemisUnderMyControl();
 #pragma warning disable CS8604 // Possible null reference argument.
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
                     Network.Current.SendClientInfo(
                         source, Properties.Settings.Default.IsAMaster,
                         Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
                         System.Array.Empty<string>(),
-                        ArtemisManagerAction.ArtemisManager.IsArtemisRunning(),
-                        ArtemisManagerAction.ArtemisManager.IsRunningArtemisUnderMyControl(),
+                        AretmisIsRunning,
+                        IsRunningUnderMyControl,
                         IsThisAppInStartup());
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -157,6 +158,7 @@ namespace ArtemisManagerUI
                     RemoveShortcutFromStartup();
                     WasProcessed = true;
                     break;
+                
                 default:
                     WasProcessed = false;
                     break;
@@ -286,7 +288,14 @@ namespace ArtemisManagerUI
                     var data = Lnk.Lnk.LoadFile(target);
                     if (data != null)
                     {
-                        retVal = data.LocalPath.StartsWith(appLocation.Replace(".dll", ".exe"), StringComparison.InvariantCultureIgnoreCase);
+                        try
+                        {
+                            retVal = data.TargetIDs[data.TargetIDs.Count - 1].Value.Contains(fle.Name.Replace(".dll", ".exe"), StringComparison.InvariantCultureIgnoreCase);
+                        }
+                        catch (NullReferenceException)
+                        {
+                            retVal = false;
+                        }
                     }
                 }
             }
@@ -302,7 +311,7 @@ namespace ArtemisManagerUI
                 foreach (var l in new DirectoryInfo(StartupFolder).GetFiles("*.lnk"))
                 {
                     var lnkFile = Lnk.Lnk.LoadFile(l.FullName);
-                    if (lnkFile.LocalPath == loc)
+                    if (lnkFile.TargetIDs[lnkFile.TargetIDs.Count - 1].Value.Contains(new FileInfo(loc).Name, StringComparison.InvariantCultureIgnoreCase))
                     {
                         l.Delete();
                         break;
@@ -384,7 +393,7 @@ namespace ArtemisManagerUI
                     sw.WriteLine("sLinkFile = \"" + target + "\"");
                     sw.WriteLine("Set oLink = oWS.CreateShortcut(sLinkFile)");
                     sw.WriteLine("oLink.TargetPath = \"" + appLocation.Replace(".dll", ".exe") + " FROMSTARTUPFOLDER\"");
-                    sw.WriteLine("oLink.IconLocation = \"" + appLocation + ", 2\"");
+                    sw.WriteLine("oLink.IconLocation = \"" + appLocation.Replace(".dll", ".exe") + ", \"");
                     sw.WriteLine("oLink.Description = \"Artemis Manager\"");
                     sw.WriteLine("oLink.Save");
                     //sw.WriteLine("objFSO.DeleteFile(\"" + temp + "\")");

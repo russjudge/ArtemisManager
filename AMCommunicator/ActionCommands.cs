@@ -14,6 +14,7 @@ namespace AMCommunicator
         UpdateCheck,
         ClientInformationRequested,
         AddAppToStartup,
-        RemoveAppFromStartup
+        RemoveAppFromStartup,
+       
     }
 }

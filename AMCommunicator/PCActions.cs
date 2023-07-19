@@ -16,7 +16,6 @@ namespace AMCommunicator
         SendClientInformation,
         AddAppToStartup,
         RemoveAppFromStartup,
-        ConnectOnStartup,
-        NotConnectOnStartup
+       
     }
 }

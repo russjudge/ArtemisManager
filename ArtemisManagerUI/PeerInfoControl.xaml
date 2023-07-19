@@ -32,8 +32,8 @@
             <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=ItemData.AppVersion}" Grid.Row="0" Grid.Column="1" />
             <CheckBox
                 VerticalAlignment="Center" VerticalContentAlignment="Center"
-                Checked="OnConnectOnStart"
-                Unchecked="OnNotConnectOnStart"
+                Checked="OnSetConnectOnStart"
+                Unchecked="OnSetConnectOnStart"
                 Grid.Row="1" IsChecked="{Binding ElementName=uc, Path=ItemData.ConnectOnstart, Mode=TwoWay}" >
                 <TextBlock Text="Connect to Peer to Peer network on start" TextWrapping="Wrap"/>
             </CheckBox>
@@ -42,7 +42,7 @@
             <CheckBox Grid.Row="1" Grid.Column="1"  Content="Is a Master" IsChecked="{Binding ElementName=uc, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="False" />
 
             <CheckBox Grid.Row="3"  Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=ItemData.ArtemisIsRunning}" IsEnabled="False"/>
-            <CheckBox VerticalContentAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" IsEnabled="False" >
+            <CheckBox IsChecked="{Binding ElementName=uc, Path=ItemData.IsUsingThisAppControlledArtemis}" VerticalContentAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" IsEnabled="False" >
                 <TextBlock Text="Artemis is under Manager control" TextWrapping="Wrap"/>
             </CheckBox>
         
