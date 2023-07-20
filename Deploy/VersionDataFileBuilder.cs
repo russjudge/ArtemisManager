@@ -26,7 +26,6 @@ namespace Deploy
                 {
                     sw.WriteLine(version);
                     sw.WriteLine(setupFile.Name);
-                    
                 }
                 setupFile.CopyTo(targetPath);
             }

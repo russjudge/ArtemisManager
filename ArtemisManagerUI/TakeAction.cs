@@ -68,7 +68,7 @@ namespace ArtemisManagerUI
             }
             Properties.Settings.Default.Save();
         }
-        public static bool ProcessPCAction(ActionCommands action, bool force, IPAddress? source)
+        public static bool ProcessPCAction(PCActions action, bool force, IPAddress? source)
         {
             if (!force)
             {
@@ -86,18 +86,18 @@ namespace ArtemisManagerUI
             switch (action)
             {
                 
-                case ActionCommands.CloseApp:
+                case PCActions.CloseApp:
                     //Handled elsewhere.
                     WasProcessed = true;
                     break;
-                case ActionCommands.RestartPC:
+                case PCActions.RestartPC:
                     ProcessStartInfo startInfo = new("shutdown", "/g /t 0 /f");
                     startInfo.UseShellExecute = false;
                     startInfo.CreateNoWindow = true;
                     System.Diagnostics.Process.Start(startInfo);
                     WasProcessed = true;
                     break;
-                case ActionCommands.UpdateCheck:
+                case PCActions.CheckForUpdate:
                     Task.Run(async () =>
                     {
                         var result = await UpdateCheck(false, source);
@@ -118,7 +118,7 @@ namespace ArtemisManagerUI
                     
                     WasProcessed = true;
                     break;
-                case ActionCommands.ShutdownPC:
+                case PCActions.ShutdownPC:
                     ProcessStartInfo startInfo2 = new("shutdown", "/sg /t 0 /f");
                     startInfo2.UseShellExecute = false;
                     startInfo2.CreateNoWindow = true;
@@ -126,7 +126,7 @@ namespace ArtemisManagerUI
                     
                     WasProcessed = true;
                     break;
-                case ActionCommands.ClientInformationRequested:
+                case PCActions.SendClientInformation:
                     var mods = ArtemisManagerAction.ArtemisManager.GetInstalledMods();
 
                     var jsonMods = new List<string>();
@@ -150,11 +150,11 @@ namespace ArtemisManagerUI
 #pragma warning restore CS8604 // Possible null reference argument.
                     WasProcessed = true;
                     break;
-                case ActionCommands.AddAppToStartup:
+                case PCActions.AddAppToStartup:
                     CreateShortcutInStartup();
                     WasProcessed = true;
                     break;
-                case ActionCommands.RemoveAppFromStartup:
+                case PCActions.RemoveAppFromStartup:
                     RemoveShortcutFromStartup();
                     WasProcessed = true;
                     break;

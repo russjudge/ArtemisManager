@@ -8,11 +8,31 @@ no relationship to the client/server system.  Masters can submit commands that a
 So, basically, from a single master, all connected instances of the application can be instructed to install mods and missions, apply those mods and missions to the Artemis folder, start Artemis SBS,
 unload those mods and missions to restore the Artemis Folder to vanilla state, and uninstall mods and missions, and finally process serveral tertiary commands.
 
+# Notes involving Steam:
+Since I don't have the Steam version of Artemis, I'm not sure how well this will behave---> users will need a different Steam account for each pc.  Even though detecting
+the Artemis install under Steam is encoded, detecting that install folder for Artemis SBS might be finicky (especially since I cannot test it), so you might have to manually browse to it.
+Also, because Artemis Manager works by creating a copy of the Artemis SBS install folder under its own data location (generally
+C:\Users\<username>\AppData\Roaming\Confederate In Blue Gaming\ArtemisManager\Activated), I'm not sure if Steam will like this--it's possible that the Steam DRM might prevent this
+from running.
+
+# Windows Firewall issues
+If you have the Windows Firewall running, you WILL be prompted to allow Artemis Manager access on the network.  You must allow it for Artemis Manager to work on its peer-to-peer networking.
+However, I've encountered issues with the Windows Firewall that may prevent proper function.  It seems that Microsoft isn't very good at creating a Firewall, at least in my opinion.
+Artemis Manager's peer-to-peer network works by broadcasting a UDP message to all clients on the network subnet, on port 2012.  Any clients running Artemis Manager will receive this broadcast
+and try to connect to the first client by TCP on port 2011 (which is configurable).  I THINK the issue the firewall is having is with the UDP broadcast.  
+If you can't get the peer-to-peer network working, here are some troubleshooting tips you can try.  These are what I tried:
+
+- Make sure your network is marked as "Private":
+	- Windows 11:
+	- Windows 10:
+- Add an exception in Windows Firewall to allow ArtemisManager.exe through
+- If all else fails, turn off Windows Firewall.
+
 # Roadmap
 There will be three phases of development for this application, and once complete, only bug-fixes will be performed, unless some enhancement within the scope of the application is determined.
 
-To avoid scope creep and creating a monster, Artemis Manager will be limited to ONLY managing mods and missions for Artemis SBS.  It will NOT have anything to do with facilitating the creation
-of mods and/or missions.
+To avoid scope creep and creating a monster, Artemis Manager will be limited to ONLY managing mods and missions for Artemis SBS. There will be no functionality added for generating Missions,
+since the Mission Editor already.  DMX editing will not be implemented since there is already a tool for this.
 
 Roadmap is subject to change.
 
@@ -21,45 +41,37 @@ Phase 1
 - Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
 
 Current TODO:
---> go through each item on main screen and confirm correct functionality encoded:
-		
-	- Popup for Ping activity non-functional.  
-	-- activity listbox not scrolling to bottom (presuming chat listbox won't either).
-	--IsUsingThisAppControlledArtemis not reflected locally--needs added.
+- Try using port 2011 for both the UDP and TCP connections, so that when configuring, it will affect both.
+--> Test:
+	- change password
+	- change port
+	- Multiple clients
+	- Install Mod
+	- Install mod remotely
+	- Activate mod
+	- activate mod remotely
+	- uninstall mod
+	- uninstall mod remotely
+	- close app remotely
+	- close and restart app remotely.
+	- auto detection of change in Artemis Version with correct snapshotting.
+	- Start Artemis remotely
+	- stop Artemis remotely
+	- Mod Generation.
+	- Application install
+	- Application uninstall
+	- Update check when update available
+	- update check when no update, but data exists.
+	- applying update.
 
-	- fix Freespace listing to show by GB (currently shows by bytes, with no label).
-
-	- add code to change port and test changing port.
-	- add code to close remote artemis manager.
-
-	-- Create mechanism to generate a mod based on the currently active artemis.
-		- Need to validate at least one changed file was detected.  If no files, then
-			 Mod cannot be generated.
-
-
-	-- Add process to uninstall mods:
-		-- If mod is active, restore to vanilla of matching version.
-		-- delete uncompressed folder
-		-- retain original zip file in archive.
-
-	- Test changing password
-	- test with more than 2 pcs.
-	- finish coding remote install mod.
-
---Steam install notes:
-
-
---> provide warning to users that since I don't have the Steam version of artemis, I'm not sure how well this will behave---> users may need a different steam account for each pc,
-	and auto detecting the install folder for Artemis SBS under the Steam system might be finicky (especially since I cannot test it).
+--> Still to develop:
+	- Prompt on local install if mod should also be remotely installed on all peers.
 
 -- Offer multiple versions of Artemis SBS updates.
 	-- Store on russjudge.com.
 	-- set unique Guid to each.
 	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
-
-
-
 
 
 -- Document possible issues with the Windows Firewall, and ways to fix Windows Firewall, including setting to being on Private network, adding rules, 
@@ -69,9 +81,8 @@ Current TODO:
 	note that an automated way of submitted mods is under development, and to submit mods to me via URL link in the forum post.
 
 
-
 Phase 2
--- Add mechanism for adding missions.  Include way to ensure mission is for correct version of Artemis (i.e., if the mission won't work for specific versions, this will need worked out).
+-- (possibly will move to Phase 1) Add mechanism for adding missions.  Include way to ensure mission is for correct version of Artemis (i.e., if the mission won't work for specific versions, this will need worked out).
 	-- Keep missions independent of any version of artemis or from any mod, unless it was included with the mod.  Whenever a version of Artemis is activated, then ensure to apply all missions
 		that work with that version of artemis automatically as part of the activation.
 -- Add Master/Slave functionality for security control.  In other words, create a way that only one peer can be set to control all peers.  This would prevent any random peer from doing nasty stuff 
@@ -89,6 +100,8 @@ Phase 2
 	-- Since some mods include this file, the console restriction will need to be stored in the peer's settings, and applied to artemis.ini whenever a new mod is activated.
 	-- The staging folder for mods and the vanilla artemis version will need to leave the artemis.ini file untouched.
 -- Add mechanism for updating various settings in artemis.ini that might be useful (Touchscreen=1 or 0???).  Settings that might be useful for this will need tested.
+-- Add mechanism to prevent the replacement of the DMXControl.xml file, since modification of this will be unique to each setting.
+-- Add links to all useful tools for Artemis SBS (ship editor, Mission editor, DMX editor, etc.).  Include links to download and install these tools.
 -- Establish a repository of mods and missons on a central internet website that the application can access and provide a means of automatic install of these mods and missions.  This
 	repository will be maintained by the developer only.  The required information on Mods include: name, author, URL of the source (copy will be kept on website, however), version, date,
 	required artemis version and any required mods.  missions require same data.

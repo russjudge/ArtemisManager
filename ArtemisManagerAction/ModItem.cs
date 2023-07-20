@@ -58,12 +58,13 @@ namespace ArtemisManagerAction
         
         public void Uninstall()
         {
+            var baseArtemis = ArtemisManager.ClearActiveFolder();
+            baseArtemis?.Activate();
             ArtemisManager.DeleteAll(Path.Combine(ModItem.ModInstallFolder, this.InstallFolder));
             if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(ModItem.ModInstallFolder, SaveFile)))
             {
                 File.Delete(Path.Combine(ModItem.ModInstallFolder, SaveFile));
             }
-            
         }
         private string key = string.Empty;
         public string Key

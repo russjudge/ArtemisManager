@@ -308,9 +308,11 @@ namespace ArtemisManagerUI
                 FileInfo f = new(assm.Location);
                 if (!string.IsNullOrEmpty(f.DirectoryName))
                 {
-                    var startInfo = new System.Diagnostics.ProcessStartInfo(System.IO.Path.Combine(f.DirectoryName, "changes.txt"));
-                    startInfo.UseShellExecute = true;
-                    startInfo.CreateNoWindow = true;
+                    System.Diagnostics.ProcessStartInfo startInfo = new(System.IO.Path.Combine(f.DirectoryName, "changes.txt"))
+                    {
+                        UseShellExecute = true,
+                        CreateNoWindow = true
+                    };
                     System.Diagnostics.Process.Start(startInfo);
                 }
             }

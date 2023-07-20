@@ -9,14 +9,14 @@ namespace AMCommunicator
 {
     public class ActionCommandEventArgs : EventArgs
     {
-        public ActionCommandEventArgs(ActionCommands action, bool force, IPAddress? source) 
+        public ActionCommandEventArgs(PCActions action, bool force, IPAddress? source) 
         {
             this.Action = action;
             this.Force = force;
             this.Source = source;
         }
         public IPAddress? Source { get; private set; }
-        public ActionCommands Action { get; private set; }
+        public PCActions Action { get; private set; }
         public bool Force { get;private set; }
     }
 }

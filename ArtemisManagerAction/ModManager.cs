@@ -32,8 +32,9 @@ namespace ArtemisManagerAction
             }
             return found;
         }
-        public static void GeneratePackage(ModItem mod)
+        public static bool GeneratePackage(ModItem mod)
         {
+            bool retval = false;
             var activeArtemisVersion = ArtemisManagerAction.ArtemisManager.GetArtemisVersion(ModItem.ActivatedFolder);
             ModItem? baseArtemisMod = null;
             foreach (var modItem in ArtemisManager.GetInstalledMods())
@@ -48,7 +49,7 @@ namespace ArtemisManagerAction
             {
                 var baseArtemisFiles = GetFiles(Path.Combine(ModItem.ModInstallFolder, baseArtemisMod.InstallFolder));
                 var newModFiles = GetFiles(ModItem.ActivatedFolder);
-                List<string> workFiles = new List<string>();
+                List<string> workFiles = new();
                 foreach (var file in newModFiles)
                 {
                     workFiles.Add(file.Replace(ModItem.ActivatedFolder, string.Empty));
@@ -64,11 +65,11 @@ namespace ArtemisManagerAction
                             {
                                 string baseData;
                                 string modData;
-                                using (StreamReader sr = new StreamReader(file))
+                                using (StreamReader sr = new(file))
                                 {
                                     baseData = sr.ReadToEnd();
                                 }
-                                using (StreamReader sr = new StreamReader(Path.Combine(ModItem.ActivatedFolder, matchFile)))
+                                using (StreamReader sr = new(Path.Combine(ModItem.ActivatedFolder, matchFile)))
                                 {
                                     modData = sr.ReadToEnd();
                                 }
@@ -84,26 +85,24 @@ namespace ArtemisManagerAction
                                 byte[] modData = new byte[32768];
                                 int bytesReadBase = 0;
                                 int bytesReadMod = 0;
-                                using (FileStream fsBase = new FileStream(file, FileMode.Open))
+                                using (FileStream fsBase = new(file, FileMode.Open))
                                 {
-                                    using (FileStream fsMod = new FileStream(Path.Combine(ModItem.ActivatedFolder, matchFile), FileMode.Open))
+                                    using FileStream fsMod = new(Path.Combine(ModItem.ActivatedFolder, matchFile), FileMode.Open);
+                                    while ((bytesReadBase = fsBase.Read(baseData, 0, baseData.Length)) > 0)
                                     {
-                                        while ((bytesReadBase = fsBase.Read(baseData, 0, baseData.Length)) > 0)
+                                        int totalModBytes = 0;
+                                        bytesReadMod = fsMod.Read(modData, 0, bytesReadBase);
+                                        totalModBytes += bytesReadMod;
+                                        while (totalModBytes < bytesReadBase)
                                         {
-                                            int totalModBytes = 0;
-                                            bytesReadMod = fsMod.Read(modData, 0, bytesReadBase);
-                                            totalModBytes += bytesReadMod;
-                                            while (totalModBytes < bytesReadBase)
+                                            bytesReadMod = fsMod.Read(modData, totalModBytes, bytesReadBase - totalModBytes);
+                                        }
+                                        for (int i = 0; i < bytesReadBase; i++)
+                                        {
+                                            if (modData[i] != baseData[i])
                                             {
-                                                bytesReadMod = fsMod.Read(modData, totalModBytes, bytesReadBase - totalModBytes);
-                                            }
-                                            for (int i = 0; i < bytesReadBase; i++)
-                                            {
-                                                if (modData[i] != baseData[i])
-                                                {
-                                                    fullMatch = false;
-                                                    break;
-                                                }
+                                                fullMatch = false;
+                                                break;
                                             }
                                         }
                                     }
@@ -127,18 +126,21 @@ namespace ArtemisManagerAction
                         workFiles[i] = workFiles[i].Substring(1);
                     }
                 }
-                if (File.Exists(mod.PackageFile))
+                if (workFiles.Count > 0)
                 {
-                    File.Delete(mod.PackageFile);
-                }
-                using (var archive = SharpCompress.Archives.Zip.ZipArchive.Create())
-                {
+                    retval = true;
+                    if (File.Exists(mod.PackageFile))
+                    {
+                        File.Delete(mod.PackageFile);
+                    }
+
+                    using SharpCompress.Archives.Zip.ZipArchive? archive = SharpCompress.Archives.Zip.ZipArchive.Create();
 
                     foreach (var file in workFiles)
                     {
                         archive?.AddEntry(file, Path.Combine(ModItem.ActivatedFolder, file));
                     }
-                    using (MemoryStream ms = new MemoryStream(System.Text.ASCIIEncoding.ASCII.GetBytes(mod.GetJSON())))
+                    using (MemoryStream ms = new(Encoding.ASCII.GetBytes(mod.GetJSON())))
                     {
                         ms.Position = 0;
                         archive.AddEntry(mod.SaveFile, ms);
@@ -147,6 +149,7 @@ namespace ArtemisManagerAction
                     archive?.SaveTo(mod.PackageFile, options);
                 }
             }
+            return retval;
         }
         private static string[] GetFiles(string rootPath)
         {

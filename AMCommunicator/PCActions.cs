@@ -9,6 +9,7 @@ namespace AMCommunicator
     public enum PCActions : short
     {
         CloseApp,
+        RestartApp,
         ShutdownPC,
         RestartPC,
         CheckForUpdate,
@@ -16,6 +17,5 @@ namespace AMCommunicator
         SendClientInformation,
         AddAppToStartup,
         RemoveAppFromStartup,
-       
     }
 }

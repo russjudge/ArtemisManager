@@ -4,12 +4,15 @@ using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -46,9 +49,25 @@ namespace ArtemisManagerUI
                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
 
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
+                IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
                 InstalledMods = new(ArtemisManager.GetInstalledMods());
 
                 AppVersion = TakeAction.GetAppVersion();
+
+                var drives = DriveInfo.GetDrives();
+                //List<string> dd = new();
+                foreach (var drive in drives)
+                {
+                    if (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)[..1]))
+                    {
+                        FreeSpaceOnAppDrive = drive.AvailableFreeSpace;
+                    }
+                    //if (drive.DriveType == DriveType.Fixed)
+                    //{
+                    //    dd.Add(drive.Name + "," + drive.DriveType.ToString() + "," + drive.TotalSize.ToString() + "," + drive.AvailableFreeSpace);
+                    //}
+                }
+                
             }
             catch (Exception ex)
             {
@@ -136,6 +155,45 @@ namespace ArtemisManagerUI
                 }
             }
         }
+        
+
+
+        public static readonly DependencyProperty IsUsingThisAppControlledArtemisProperty =
+            DependencyProperty.Register(nameof(IsUsingThisAppControlledArtemis), typeof(bool),
+           typeof(Main));
+
+        public bool IsUsingThisAppControlledArtemis
+        {
+            get
+            {
+                return (bool)this.GetValue(IsUsingThisAppControlledArtemisProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsUsingThisAppControlledArtemisProperty, value);
+
+            }
+        }
+
+        public static readonly DependencyProperty FreeSpaceOnAppDriveProperty =
+            DependencyProperty.Register(nameof(FreeSpaceOnAppDrive), typeof(long),
+           typeof(Main));
+
+        public long FreeSpaceOnAppDrive
+        {
+            get
+            {
+                return (long)this.GetValue(FreeSpaceOnAppDriveProperty);
+
+            }
+            set
+            {
+                this.SetValue(FreeSpaceOnAppDriveProperty, value);
+
+            }
+        }
+
         public static readonly DependencyProperty ChatAlertProperty =
         DependencyProperty.Register(nameof(ChatAlert), typeof(bool),
             typeof(Main));
@@ -157,7 +215,30 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty ShowPopupProperty =
          DependencyProperty.Register(nameof(ShowPopup), typeof(bool),
-             typeof(Main));
+             typeof(Main), new PropertyMetadata(OnShowPopup));
+
+        private static void OnShowPopup(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Main me)
+            {
+                if (me.ShowPopup)
+                {
+                    System.Timers.Timer timer = new()
+                    {
+                        Interval = 5000
+                    };
+                    timer.Elapsed += me.Timer_Elapsed;
+                    timer.Start();
+                }
+            }
+        }
+
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            Dispatcher.Invoke(new Action(() => {
+                ShowPopup = false;
+            }));
+        }
 
         public bool ShowPopup
         {
@@ -409,20 +490,30 @@ namespace ArtemisManagerUI
             {
                 if (!me.isLoading)
                 {
-                    if (!me.IsStarted || MessageBox.Show("Are you sure you wish to change the listening port for this application?\r\nThis will change the port on all connected computers and only on the connected computers.\r\n\r\nYou will need to restart the application for the new port to take effect.", "Change Listening Port", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (int.TryParse(e.NewValue?.ToString(), out int val))
                     {
-                        me.UpdatePort((int)e.NewValue);
-                        foreach (var pc in me.ConnectedPCs)
+                        if (!me.IsStarted || MessageBox.Show("Are you sure you wish to change the listening port for this application?\r\nThis will change the port on all connected computers and only on the connected computers.\r\n\r\nYou will need to restart the application for the new port to take effect.", "Change Listening Port", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
-                            if (pc.IP != null)
+                            me.UpdatePort((int)e.NewValue);
+                            foreach (var pc in me.ConnectedPCs)
                             {
-                                me.MyNetwork.SendChangeSetting(pc.IP, "ListeningPort", Properties.Settings.Default.ListeningPort.ToString());
+                                if (pc.IP != null)
+                                {
+                                    me.MyNetwork.SendChangeSetting(pc.IP, "ListeningPort", Properties.Settings.Default.ListeningPort.ToString());
+                                }
                             }
+                        }
+                        else
+                        {
+                            me.Port = Properties.Settings.Default.ListeningPort;
                         }
                     }
                     else
                     {
-                        me.Port = Properties.Settings.Default.ListeningPort;
+                        if (int.TryParse(e.OldValue?.ToString(), out int result))
+                        {
+                            me.Port = result;
+                        }
                     }
                 }
             }
@@ -719,7 +810,10 @@ namespace ArtemisManagerUI
                     this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = false; }));
                     break;
                 case AMCommunicator.Messages.ArtemisActions.StartArtemis:
-                    this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = wasProcessed.Item1; }));
+                    this.Dispatcher.Invoke(new Action(() => {
+                        this.IsArtemisRunning = wasProcessed.Item1;
+                        IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
+                    }));
 
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallMod:
@@ -881,7 +975,28 @@ namespace ArtemisManagerUI
         }
         private void MyNetwork_ActionCommand(object? sender, ActionCommandEventArgs e)
         {
-            if (e.Action == ActionCommands.CloseApp)
+            if (e.Action == PCActions.RestartApp)
+            {
+                this.Dispatcher.Invoke(new Action<bool, IPAddress?>(ConsiderClosing), e.Force, e.Source);
+                string file = string.Empty;
+                List<string> args = new();
+                foreach (var arg in Environment.GetCommandLineArgs())
+                {
+                    if (string.IsNullOrEmpty(file))
+                    {
+                        file = arg;
+                    }
+                    else
+                    {
+                        args.Add(arg);
+                    }
+                }
+
+                ProcessStartInfo startInfo = new(file, string.Join(" ", args.ToArray()));
+                Process.Start(startInfo);
+                return;
+            }
+            else if (e.Action == PCActions.CloseApp)
             {
                 this.Dispatcher.Invoke(new Action<bool, IPAddress?>(ConsiderClosing), e.Force, e.Source);
                 return;
@@ -893,8 +1008,8 @@ namespace ArtemisManagerUI
                 {
                     switch (e.Action)
                     {
-                        case ActionCommands.AddAppToStartup:
-                        case ActionCommands.RemoveAppFromStartup:
+                        case PCActions.AddAppToStartup:
+                        case PCActions.RemoveAppFromStartup:
                             this.Dispatcher.Invoke(new Action(() =>
                             {
                                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
@@ -1003,99 +1118,54 @@ namespace ArtemisManagerUI
             MyNetwork.HaltAll();
         }
 
-        private void OnDisconnect(object sender, RoutedEventArgs? e)
+       
+        public static readonly DependencyProperty ChatMessageProperty =
+           DependencyProperty.Register(nameof(ChatMessage), typeof(string),
+          typeof(Main));
+
+        public string ChatMessage
         {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
+            get
             {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
+                return (string)this.GetValue(ChatMessageProperty);
+
+            }
+            set
+            {
+                this.SetValue(ChatMessageProperty, value);
+            }
+        }
+        private void OnSendMessage(object sender, RoutedEventArgs e)
+        {
+            if (sender is PeerInfoControl me)
+            {
+                PCItem? item = me.ItemData;
+                if (item != null)
                 {
-                    foreach (var pcItem in ConnectedPCs)
+                    string? msg = me.ChatMessage;
+                    me.ChatMessage = string.Empty;
+
+                    if (item.IP?.ToString() == IPAddress.Any.ToString())
                     {
-                        if (pcItem.IP != null)
+                        foreach (var pcItem in ConnectedPCs)
                         {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                            if (pcItem.IP?.ToString() != IPAddress.Any.ToString() && msg != null)
                             {
-                                MyNetwork.Halt(pcItem.IP);
+                                if (pcItem.IP != null)
+                                {
+                                    AddChatLine("LOCALHOST -> " + pcItem.Hostname, msg);
+                                    MyNetwork.SendMessage(pcItem.IP, msg);
+                                }
                             }
                         }
                     }
-                }
-                else
-                {
-
-                    MyNetwork.Halt(item.IP);
-                }
-            }
-
-        }
-        private static PCItem? GetItem(ICommandSource? commandSource)
-        {
-            if (commandSource != null)
-            {
-                return (PCItem)commandSource.CommandParameter;
-            }
-            else
-            {
-                return null;
-            }
-
-        }
-        private void OnPing(object sender, RoutedEventArgs? e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
+                    else
                     {
-                        if (pcItem.IP != null)
+                        if (msg != null && item.IP != null)
                         {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
-                            {
-                                MyNetwork.SendPing(pcItem.IP);
-                            }
+                            AddChatLine("LOCALHOST -> " + item.Hostname, msg);
+                            MyNetwork.SendMessage(item.IP, msg);
                         }
-                    }
-                }
-                else
-                {
-                    MyNetwork.SendPing(item.IP);
-                }
-            }
-
-        }
-
-        private void OnSendMessage(object sender, RoutedEventArgs? e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            Button btn = (Button)sender;
-            if (item != null)
-            {
-                string? msg = btn.Tag?.ToString();
-                btn.Tag = "";
-
-                if (item.IP?.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP?.ToString() != IPAddress.Any.ToString() && msg != null)
-                        {
-                            if (pcItem.IP != null)
-                            {
-                                AddChatLine("LOCALHOST -> " + pcItem.Hostname, msg);
-                                MyNetwork.SendMessage(pcItem.IP, msg);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (msg != null && item.IP != null)
-                    {
-                        AddChatLine("LOCALHOST -> " + item.Hostname, msg);
-                        MyNetwork.SendMessage(item.IP, msg);
                     }
                 }
             }
@@ -1159,6 +1229,7 @@ namespace ArtemisManagerUI
             ArtemisManager.StartArtemis();
             System.Threading.Thread.Sleep(2000);
             IsArtemisRunning = ArtemisManager.IsArtemisRunning();
+            IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
         }
 
         private void OnStopArtemisSBS(object sender, RoutedEventArgs e)
@@ -1166,6 +1237,7 @@ namespace ArtemisManagerUI
             ArtemisManager.StopArtemis();
             System.Threading.Thread.Sleep(2000);
             IsArtemisRunning = ArtemisManager.IsArtemisRunning();
+            IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
         }
 
         private void DeactivateAllButBase(Guid? activeIdentifier)
@@ -1207,161 +1279,7 @@ namespace ArtemisManagerUI
             win.Show();
         }
 
-        /// <summary>
-        /// Restart the connected Peer PC
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnRestart(object sender, RoutedEventArgs e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null)
-                        {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
-                            {
-                                MyNetwork.SendPCAction(item.IP, PCActions.RestartPC, true);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    MyNetwork.SendPCAction(item.IP, PCActions.RestartPC, true);
-                }
-            }
-        }
 
-        private void OnShutdown(object sender, RoutedEventArgs e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null)
-                        {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
-                            {
-                                MyNetwork.SendPCAction(item.IP, PCActions.ShutdownPC, true);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    MyNetwork.SendPCAction(item.IP, PCActions.ShutdownPC, true);
-                }
-            }
-        }
-
-        private void OnUpdateCheck(object sender, RoutedEventArgs e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null)
-                        {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
-                            {
-                                MyNetwork.SendPCAction(item.IP, PCActions.CheckForUpdate, true);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    MyNetwork.SendPCAction(item.IP, PCActions.CheckForUpdate, true);
-                }
-            }
-        }
-
-        private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
-        {
-            //Can't work because mod not available here.  Would need to prompt for mod.
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null)
-                        {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
-                            {
-                               //MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.InstallMod, )
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    
-                }
-            }
-        }
-
-        private void OnStartArtemisRemote(object sender, RoutedEventArgs e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null)
-                        {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
-                            {
-                                MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.StartArtemis, Guid.Empty, string.Empty);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    MyNetwork.SendArtemisAction(item.IP, AMCommunicator.Messages.ArtemisActions.StartArtemis, Guid.Empty, string.Empty);
-                }
-            }
-        }
-
-        private void OnStopArtemisRemote(object sender, RoutedEventArgs e)
-        {
-            PCItem? item = GetItem((ICommandSource)sender);
-            if (item != null && item.IP != null)
-            {
-                if (item.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null)
-                        {
-                            if (pcItem.IP.ToString() != IPAddress.Any.ToString())
-                            {
-                                MyNetwork.SendArtemisAction(pcItem.IP, AMCommunicator.Messages.ArtemisActions.StopArtemis, Guid.Empty, string.Empty);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    MyNetwork.SendArtemisAction(item.IP, AMCommunicator.Messages.ArtemisActions.StopArtemis, Guid.Empty, string.Empty);
-                }
-            }
-        }
 
         private void OnOpenArtemisRunFolder(object sender, RoutedEventArgs e)
         {
@@ -1370,8 +1288,10 @@ namespace ArtemisManagerUI
 
         private void OnGenerateMod(object sender, RoutedEventArgs e)
         {
-            ModInstallWindow win = new();
-            win.ForInstall = false;
+            ModInstallWindow win = new()
+            {
+                ForInstall = false
+            };
             if (win.ShowDialog() == true)
             {
                 InstalledMods.Add(win.Mod);
@@ -1394,6 +1314,102 @@ namespace ArtemisManagerUI
                 }
                 UpdateStatus("Update check complete.");
             });
+        }
+        private int testCounter = 0;
+        private void OnTest(object sender, RoutedEventArgs e)
+        {
+            /*  Popup Test */
+            /*
+            PopupMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+            ShowPopup = true;
+            */
+
+            /*  Scroll to bottom of listbox on adding entry test */
+            /*
+            Chat.Add(new ChatMessage("local", (++testCounter).ToString() + ") Lorem ipsum dolor sit amet."));
+            Status.Add((testCounter).ToString() + ") Lorem ipsum dolor sit amet.");
+            */
+
+
+            PopupMessage = "This is a test.  It works on my machine, so all is good.";
+            ShowPopup = true;
+        }
+
+        private void OnPopupMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            ShowPopup = false;
+        }
+
+        private void OnPreviewPortInput(object sender, TextCompositionEventArgs e)
+        {
+            var regex = new Regex("[^0-9.-]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+        bool isDragging = false;
+        private void OnModDragEnter(object sender, DragEventArgs e)
+        {
+            if (sender is ListBox me)
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    isDragging = true;
+                }
+                else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+                {
+                    isDragging = true;
+                }
+            }
+        }
+
+        private void OnModDragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.None;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+        }
+
+        private void OnModDragLeave(object sender, DragEventArgs e)
+        {
+            isDragging = false;
+        }
+
+        private void OnModDrop(object sender, DragEventArgs e)
+        {
+            if (sender is ListBox me)
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var file = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    foreach (var f in file)
+                    {
+                        ModInstallWindow win = new();
+
+                        win.PackageFile = f;
+                        if (win.ShowDialog() == true)
+                        {
+                            InstalledMods.Add(win.Mod);
+                        }
+                    }
+                    isDragging = false;
+                }
+                else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+                {
+                    
+                    var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
+                    isDragging = false;
+                    if (ctl.IsRemote && ctl.Source != null)
+                    {
+                        MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
+                    }
+                }
+            }
         }
     }
 }

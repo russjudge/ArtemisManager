@@ -169,9 +169,15 @@ namespace ArtemisManagerUI
             if (!string.IsNullOrEmpty(PackageFile) && System.IO.File.Exists(PackageFile))
             {
                 Mod.PackageFile = PackageFile;
-                ModManager.GeneratePackage(Mod);
-                ModManager.InstallMod(Mod.PackageFile, Mod);
-                this.DialogResult = true;
+                if (ModManager.GeneratePackage(Mod))
+                {
+                    ModManager.InstallMod(Mod.PackageFile, Mod);
+                    this.DialogResult = true;
+                }
+                else
+                {
+                    this.DialogResult = false;
+                }
                 this.Close();
             }
             else

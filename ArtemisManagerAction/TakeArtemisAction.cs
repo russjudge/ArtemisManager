@@ -43,10 +43,7 @@ namespace ArtemisManagerAction
                     if (!string.IsNullOrEmpty(modJSON))
                     {
                         var receivedMod = ModItem.GetModItem(modJSON);
-                        if (receivedMod != null)
-                        {
-                            receivedMod.Uninstall();
-                        }
+                        receivedMod?.Uninstall();
                     }
                     WasProcessed = true;
 

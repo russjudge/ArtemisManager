@@ -16,7 +16,7 @@ namespace AMCommunicator
 {
     public class Network
     {
-        const int udpPort = 2012;
+        //const int udpPort = 2012;
         const int tcpPort = 2011;
 
         //TODO: Master/slave relationship?  --later.
@@ -44,10 +44,7 @@ namespace AMCommunicator
         }
         private static bool abort = false;
         
-        public void SendCommand(IPAddress target )
-        {
-
-        }
+       
         public static int ConnectionPort { get; set; }
 
         private void Connect(IPAddress target, int port)
@@ -388,10 +385,10 @@ namespace AMCommunicator
         {
             FatalExceptionEncountered?.Invoke(this, new FatalExceptionEncounteredEventArgs(e));
         }
-        void RaiseMessageVersionMismatch(short expected, short actual, IPAddress source)
-        {
-            MessageVersionMismatch?.Invoke(this, new VersionMismatchEventArgs(expected, actual, source));
-        }
+        //void RaiseMessageVersionMismatch(short expected, short actual, IPAddress source)
+        //{
+        //    MessageVersionMismatch?.Invoke(this, new VersionMismatchEventArgs(expected, actual, source));
+        //}
         bool ProcessMessage(NetworkStream stream, NetworkMessageHeader? message, string hostname)
         {
             bool disconnect = false;
@@ -650,12 +647,13 @@ namespace AMCommunicator
             }
             return false;
         }
-        private void RaiseActionCommand(ActionCommands action, bool force, IPAddress? source)
+        private void RaiseActionCommand(PCActions action, bool force, IPAddress? source)
         {
             ActionCommand?.Invoke(this, new ActionCommandEventArgs(action, force, source));
         }
         private bool ProcessPCAction(NetworkStream stream, PCActionMessage? msg, string hostname)
         {
+            bool doDisconnect = false;
             if (msg != null)
             {
                 if ((PCActions)msg.Action != PCActions.CheckForUpdate && msg.MessageVersion != PCActionMessage.ThisVersion)
@@ -679,47 +677,32 @@ namespace AMCommunicator
                     {
                         ip = IPAddress.Parse(msg.Source);
                     }
-                    switch ((PCActions)msg.Action)
+                    switch (msg.Action)
                     {
-                       
                         case PCActions.DisconnectThisConnection:
-                            RaiseStatusUpdate("Disconnect requested from host {0}.", hostname);
-                            return true;
-                        case PCActions.CheckForUpdate:
-                            RaiseStatusUpdate("Software Update check requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.UpdateCheck, msg.Force, ip);
-                            return false;
                         case PCActions.ShutdownPC:
-                            RaiseStatusUpdate("PC Shutdown requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.ShutdownPC, msg.Force, ip);
-                            return true;
                         case PCActions.RestartPC:
-                            RaiseStatusUpdate("PC Restart requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.RestartPC, msg.Force, ip);
-                            return true;
                         case PCActions.CloseApp:
-                            RaiseStatusUpdate("Application Close requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.CloseApp, msg.Force, ip);
-                            return true;
-                        case PCActions.SendClientInformation:
-                            RaiseStatusUpdate("Client Information requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.ClientInformationRequested, msg.Force, ip);
-                            return false;
-                        case PCActions.RemoveAppFromStartup:
-                            RaiseStatusUpdate("Remove App from startup requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.RemoveAppFromStartup, msg.Force, ip);
-                            return false; ;
-                        case PCActions.AddAppToStartup:
-                            RaiseStatusUpdate("Add App to startup requested from {0}", hostname);
-                            RaiseActionCommand(ActionCommands.AddAppToStartup, msg.Force, ip);
-                            return false; ;
+                        case PCActions.RestartApp:
+                            RaiseStatusUpdate("PCAction {1} requested from {0}, disconnecting", hostname, msg.Action.ToString());
+                            doDisconnect = true;
+                            break;
                         default:
-                            RaiseStatusUpdate("Invalid PCAction requested from host {0}", hostname);
-                            return false;
+                            RaiseStatusUpdate("PCAction {1} requested from {0}, keeping connection", hostname, msg.Action.ToString());
+                            doDisconnect = false;
+                            break;
+                    }
+                    if (msg.Action == PCActions.DisconnectThisConnection)
+                    {
+                        RaiseStatusUpdate("Disconnect requested from host {0}.", hostname);
+                    }
+                    else
+                    {
+                        RaiseActionCommand(msg.Action, msg.Force, ip);
                     }
                 }
             }
-            return false;
+            return doDisconnect;
         }
 
         private bool ProcessRequestModPackageItem(NetworkStream stream, RequestModPackageMessage? msg)
@@ -879,7 +862,7 @@ namespace AMCommunicator
         private void ListenUDP()
         {
             using UdpClient client = new();
-            IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, udpPort);
+            IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, ConnectionPort);
             activeConnections.Add(IPAddress.Any, new ConnectionTracker("UDP Listener Service", IPAddress.Any, null, client.Client, null));
             
             client.Client.Bind(RemoteIpEndPoint);
@@ -1000,8 +983,7 @@ namespace AMCommunicator
                 client.ExclusiveAddressUse = false;
                 client.MulticastLoopback = false;
                 var bytes = System.Text.ASCIIEncoding.ASCII.GetBytes(msg);
-                client.Send(bytes, bytes.Length, "255.255.255.255", udpPort);
-                
+                client.Send(bytes, bytes.Length, "255.255.255.255", ConnectionPort);
             }
             else
             {

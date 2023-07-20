@@ -4,9 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArtemisManagerUI"
+        xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc"
         Title="Install Mod" SizeToContent="Height" Width="600">
     <Window.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
         <Style TargetType="Label">
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -43,7 +45,11 @@
         <Label Grid.Row="6" Content="Required Artemis Version:" />
         <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion, Mode=TwoWay}" />
         <Button Grid.Row="7" Grid.Column="0" Content="Cancel" Click="OnCancel" IsCancel="True" />
-        <Button Grid.Row="7" Grid.Column="1" Content="Install" Click="OnInstallMod" IsDefault="True" />
-        <Button Grid.Row="7" Grid.Column="1" Content="Generate Mod" Click="OnGenerateMod" IsDefault="True" />
+        <Button
+            Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+            Grid.Row="7" Grid.Column="1" Content="Install" Click="OnInstallMod" IsDefault="True" />
+        <Button
+            Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+            Grid.Row="7" Grid.Column="1" Content="Generate Mod" Click="OnGenerateMod" IsDefault="True" />
     </Grid>
 </Window>
