@@ -41,9 +41,10 @@ namespace ArtemisManagerUI
                 Chat = new();
 
                 Status = new ObservableCollection<string>();
-                ConnectedPCs = new()
+                ConnectedPCs = new();
+                if (Properties.Settings.Default.IsAMaster)
                 {
-                    new PCItem("All Connections", IPAddress.Any)
+                    ConnectedPCs.Add(new PCItem("All Connections", IPAddress.Any));
                 };
                 
                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
@@ -51,9 +52,9 @@ namespace ArtemisManagerUI
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
                 IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
                 InstalledMods = new(ArtemisManager.GetInstalledMods());
-
+                InstalledMissions = new(ArtemisManager.GetInstalledMissions());
                 AppVersion = TakeAction.GetAppVersion();
-
+                IsMaster = Properties.Settings.Default.IsAMaster;
                 var drives = DriveInfo.GetDrives();
                 //List<string> dd = new();
                 foreach (var drive in drives)
@@ -533,6 +534,24 @@ namespace ArtemisManagerUI
         }
 
 
+        public static readonly DependencyProperty InstalledMissionsProperty =
+           DependencyProperty.Register(nameof(InstalledMissions), typeof(ObservableCollection<ModItem>),
+               typeof(Main));
+
+        public ObservableCollection<ModItem> InstalledMissions
+        {
+            get
+            {
+                return (ObservableCollection<ModItem>)this.GetValue(InstalledMissionsProperty);
+
+            }
+            set
+            {
+                this.SetValue(InstalledMissionsProperty, value);
+
+            }
+        }
+
         public static readonly DependencyProperty InstalledModsProperty =
            DependencyProperty.Register(nameof(InstalledMods), typeof(ObservableCollection<ModItem>),
                typeof(Main));
@@ -880,15 +899,40 @@ namespace ArtemisManagerUI
             }
             else
             {
-
+                bool isMasterFound = false;
                 foreach (var item in ConnectedPCs)
                 {
+                    
                     if (item.IP != null && e.Source != null)
                     {
+                        if (item.IsMaster)
+                        {
+                            isMasterFound = true;
+                        }
                         if (item.IP.ToString().Equals(e.Source.ToString()))
                         {
                             item.LoadClientInfoData(e);
-                            break;
+                        }
+                    }
+                }
+                if (!Properties.Settings.Default.IsAMaster)
+                {
+                    if (isMasterFound)
+                    {
+                        if (IsMaster)
+                        {
+                            isLoading = true;
+                            IsMaster = false;
+                            isLoading = false;
+                        }
+                    }
+                    else
+                    {
+                        if (!IsMaster)
+                        {
+                            isLoading = true;
+                            IsMaster = true;
+                            isLoading = false;
                         }
                     }
                 }
@@ -931,6 +975,12 @@ namespace ArtemisManagerUI
                         this.isLoading = false;
                     }));
                     Network.ConnectionPort = int.Parse(e.SettingValue);
+                    break;
+                case "IsMaster":
+                    this.Dispatcher.Invoke(new Action(() =>
+                    {
+                        this.IsMaster = bool.Parse(e.SettingValue);
+                    }));
                     break;
             }
         }
@@ -1133,6 +1183,34 @@ namespace ArtemisManagerUI
             set
             {
                 this.SetValue(ChatMessageProperty, value);
+            }
+        }
+        public static readonly DependencyProperty IsMasterProperty =
+           DependencyProperty.Register(nameof(IsMaster), typeof(bool),
+          typeof(Main), new PropertyMetadata(OnIsMasterChanged));
+
+        private static void OnIsMasterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Main me) 
+            {
+                if (!me.isLoading)
+                {
+                    Properties.Settings.Default.IsAMaster = me.IsMaster;
+                    Properties.Settings.Default.Save();
+                }
+            }
+        }
+
+        public bool IsMaster
+        {
+            get
+            {
+                return (bool)this.GetValue(IsMasterProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsMasterProperty, value);
             }
         }
         private void OnSendMessage(object sender, RoutedEventArgs e)
@@ -1404,6 +1482,71 @@ namespace ArtemisManagerUI
                     
                     var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
                     isDragging = false;
+                    if (ctl.IsRemote && ctl.Source != null)
+                    {
+                        MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
+                    }
+                }
+            }
+        }
+
+        private void OnMissionDragEnter(object sender, DragEventArgs e)
+        {
+            if (sender is ListBox me)
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    isDragging = true;
+                }
+                else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+                {
+                    isDragging = true;
+                }
+            }
+        }
+
+        private void OnMissionDragLeave(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void OnMissionDragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.None;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            {
+                e.Effects = DragDropEffects.Copy;
+            }
+        }
+
+        private void OnMissionDrop(object sender, DragEventArgs e)
+        {
+            if (sender is ListBox me)
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    var file = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    foreach (var f in file)
+                    {
+                        ModInstallWindow win = new();
+                        win.PackageFile = f;
+                        win.Mod.IsMission = true;
+                        if (win.ShowDialog() == true)
+                        {
+                            InstalledMissions.Add(win.Mod);
+                        }
+                    }
+                    
+                }
+                else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+                {
+
+                    var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
+                    
                     if (ctl.IsRemote && ctl.Source != null)
                     {
                         MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);

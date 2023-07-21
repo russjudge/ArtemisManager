@@ -65,7 +65,22 @@ namespace ArtemisManagerUI
                 this.SetValue(IsRemoteProperty, value);
             }
         }
+        public static readonly DependencyProperty IsMasterProperty =
+           DependencyProperty.Register(nameof(IsMaster), typeof(bool),
+          typeof(ModItemControl));
 
+        public bool IsMaster
+        {
+            get
+            {
+                return (bool)this.GetValue(IsMasterProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsMasterProperty, value);
+            }
+        }
         public static readonly DependencyProperty ModProperty =
          DependencyProperty.Register(nameof(Mod), typeof(ModItem),
              typeof(ModItemControl));

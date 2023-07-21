@@ -149,6 +149,10 @@ namespace ArtemisManagerAction
                     archive?.SaveTo(mod.PackageFile, options);
                 }
             }
+            if (retval)
+            {
+                mod.ModIdentifier = Guid.NewGuid();
+            }
             return retval;
         }
         private static string[] GetFiles(string rootPath)

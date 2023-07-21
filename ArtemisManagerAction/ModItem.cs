@@ -14,7 +14,10 @@ namespace ArtemisManagerAction
     public class ModItem : INotifyPropertyChanged
     {
         public static readonly string ModInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMods");
+        public static readonly string MissionInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMissions");
+        
         public readonly static string ActivatedFolder = Path.Combine(ModManager.DataFolder, "Activated");
+        public static readonly string MissionFolderPath = Path.Combine(ActivatedFolder, "dat", "Missions");
         public ModItem()
         {
             SaveFile = string.Empty;
@@ -28,31 +31,43 @@ namespace ArtemisManagerAction
             {
                 ArtemisManager.ClearActiveFolder();
             }
+            ModItem item;
+            string targetPath = ActivatedFolder;
+            if (!IsMission)
+            {
+                StackOrder = new DirectoryInfo(ModManager.DataFolder).GetFiles("*" + ArtemisManager.SaveFileExtension).Length;
+
+                item = new()
+                {
+                    Key = Key,
+                    ModIdentifier = ModIdentifier,
+
+                    Name = Name,
+                    Description = Description,
+                    Version = Version,
+                    RequiredArtemisVersion = RequiredArtemisVersion,
+                    Author = Author,
+                    IsArtemisBase = IsArtemisBase,
+                    localIdentifier = LocalIdentifier,
+                    ReleaseDate = ReleaseDate,
+                    isActive = true,
+                    InstallFolder = InstallFolder,
+                    PackageFile = PackageFile,
+                    SaveFile = SaveFile
+                };
+
+                item.Save(Path.Combine(ModManager.DataFolder, SaveFile));
+            }
+            else
+            {
+                item = this;
+                targetPath = Path.Combine(MissionFolderPath, InstallFolder);
+            }
+            
+            ModManager.CopyFolder(Path.Combine(GetFullSavePath(), InstallFolder), targetPath);
             this.IsActive = true;
             this.Save();
 
-            ModItem item = new()
-            {
-                Key = Key,
-                ModIdentifier = ModIdentifier,
-
-                Name = Name,
-                Description = Description,
-                Version = Version,
-                RequiredArtemisVersion = RequiredArtemisVersion,
-                Author = Author,
-                IsArtemisBase = IsArtemisBase,
-                localIdentifier = LocalIdentifier,
-                ReleaseDate = ReleaseDate,
-                isActive = true,
-                InstallFolder = InstallFolder,
-                PackageFile = PackageFile,
-                SaveFile = SaveFile
-            };
-
-            item.Save(Path.Combine(ModManager.DataFolder, SaveFile));
-            
-            ModManager.CopyFolder(Path.Combine(ModItem.ModInstallFolder, InstallFolder), ActivatedFolder);
             return item;
         }
         
@@ -60,10 +75,13 @@ namespace ArtemisManagerAction
         {
             var baseArtemis = ArtemisManager.ClearActiveFolder();
             baseArtemis?.Activate();
-            ArtemisManager.DeleteAll(Path.Combine(ModItem.ModInstallFolder, this.InstallFolder));
-            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(ModItem.ModInstallFolder, SaveFile)))
+            if (!IsMission)
             {
-                File.Delete(Path.Combine(ModItem.ModInstallFolder, SaveFile));
+                ArtemisManager.DeleteAll(Path.Combine(GetFullSavePath(), this.InstallFolder));
+            }
+            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(GetFullSavePath(), SaveFile)))
+            {
+                File.Delete(Path.Combine(GetFullSavePath(), SaveFile));
             }
         }
         private string key = string.Empty;
@@ -138,7 +156,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        private string? requiredAretmisVersion ="2.8";
+        private string? requiredAretmisVersion ="2.8.0";
         public string? RequiredArtemisVersion
         {
             get { return requiredAretmisVersion; }
@@ -212,6 +230,16 @@ namespace ArtemisManagerAction
             }
         }
 
+        private bool isMission = false;
+        public bool IsMission
+        {
+            get { return isMission; }
+            set
+            {
+                isMission = value;
+                DoChanged();
+            }
+        }
         private int stackOrder = 0;
         /// <summary>
         /// Identifies what position this mod is in the list of activated mods.  Only useful for listing activated mods.  Base Artemis SBS should ALWAYS be 0, and NEVER should multiple different
@@ -318,6 +346,17 @@ namespace ArtemisManagerAction
             }
             return file;
         }
+        private string GetFullSavePath()
+        {
+            if (IsMission)
+            {
+                return MissionInstallFolder;
+            }
+            else
+            {
+                return ModInstallFolder;
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -328,12 +367,13 @@ namespace ArtemisManagerAction
             {
                 SaveFile = GetSaveFile();
             }
+
             if (string.IsNullOrEmpty(file))
             {
-                file = Path.Combine(ModInstallFolder, SaveFile);
+                file = Path.Combine(GetFullSavePath(), SaveFile);
             }
             string data = GetJSON();
-            ModManager.CreateFolder(Path.Combine(ModItem.ModInstallFolder, InstallFolder));
+            ModManager.CreateFolder(Path.Combine(GetFullSavePath(), InstallFolder));
             using StreamWriter sw = new(file);
             sw.WriteLine(data);
         }

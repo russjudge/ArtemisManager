@@ -8,6 +8,8 @@ no relationship to the client/server system.  Masters can submit commands that a
 So, basically, from a single master, all connected instances of the application can be instructed to install mods and missions, apply those mods and missions to the Artemis folder, start Artemis SBS,
 unload those mods and missions to restore the Artemis Folder to vanilla state, and uninstall mods and missions, and finally process serveral tertiary commands.
 
+Required disk space is around 3MB for the Artemis Manager application, plus the size of each installed mod and mission plus the size of the Artemis SBS application.
+
 # Notes involving Steam:
 Since I don't have the Steam version of Artemis, I'm not sure how well this will behave---> users will need a different Steam account for each pc.  Even though detecting
 the Artemis install under Steam is encoded, detecting that install folder for Artemis SBS might be finicky (especially since I cannot test it), so you might have to manually browse to it.
@@ -63,12 +65,17 @@ Current TODO:
 	- Update check when update available
 	- update check when no update, but data exists.
 	- applying update.
+	- Mission install.
+	- Mission activation.
+	- Mission uninstall.
+	- Remote mission install.
+	- Remote mission activation.
+	- remote mission uninstall.
+	- Setting/clearing "IsMaster" both local and remote.
 
---> Still to develop:
-	- Prompt on local install if mod should also be remotely installed on all peers.
 
 -- Offer multiple versions of Artemis SBS updates.
-	-- Store on russjudge.com.
+	-- Store on artemis.russjudge.com.
 	-- set unique Guid to each.
 	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
@@ -82,19 +89,6 @@ Current TODO:
 
 
 Phase 2
--- (possibly will move to Phase 1) Add mechanism for adding missions.  Include way to ensure mission is for correct version of Artemis (i.e., if the mission won't work for specific versions, this will need worked out).
-	-- Keep missions independent of any version of artemis or from any mod, unless it was included with the mod.  Whenever a version of Artemis is activated, then ensure to apply all missions
-		that work with that version of artemis automatically as part of the activation.
--- Add Master/Slave functionality for security control.  In other words, create a way that only one peer can be set to control all peers.  This would prevent any random peer from doing nasty stuff 
-	to the other peers (particularly useful in a conference setup, or anywhere you might have random people using your setup).
-	-- Thoughts on managing this:
-		1. Controlled in Settings.  By default all are Master at install.  One Master can remotely set peers to be slave or secondary master.  A slave can become a master in the following situation:
-			- All peers are slaves.  In this situation, all peers will auto switch to master, until a master connects to the network.  This will be a benefit for when the original master
-			disappears permanently for any number of reasons.  Under this case, the setting won't change unless one peer makes another peer a slave--then the master peer will change it's setting to
-			permanently store as master, while the slave peer will retain it's slave setting.  No password (see below) will be required under this condition because the password might not be known.
-			- by entering a set password, which will be blank by default, but can be changed by the master.  This will allow the user to change which peer is the master if he is physically moving
-			around.  This way he won't have to jump back to the original master peer to set a slave to a peer.
--- Document required disk space and how disk space will increase--so that users will be prepared on undersized disk spaced PCs.
 -- Add Engineering presets local edit and propagating to peers.
 -- Add mechanism for editing artemis.ini file to restrict peers to specific consoles and ships and port (default 2010) (need to confirm this works).
 	-- Since some mods include this file, the console restriction will need to be stored in the peer's settings, and applied to artemis.ini whenever a new mod is activated.

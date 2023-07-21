@@ -15,6 +15,7 @@
             <converter:DateFormatter x:Key="DateFormatter" />
             <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
             <converter:NullToVisibility x:Key="NullToVisibility" />
+            <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
         </DockPanel.Resources>
         <Popup  PopupAnimation="Scroll" Placement="RelativePoint" AllowsTransparency="True" DockPanel.Dock="Top" IsOpen="{Binding ElementName=uc, Path=ShowPopup, Mode=TwoWay}" MouseUp="OnPopupMouseUp" >
             <Border Padding="20,20,20,20" BorderThickness="2" BorderBrush="Chartreuse" Background="Yellow">
@@ -28,13 +29,44 @@
             <Button DockPanel.Dock="Right" ToolTip="Check for update to Artemis Manager" Click="OnLocalUpdateCheck">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (2).png" />
             </Button>
+
             <Button
-                Visibility="Visible"
+                DockPanel.Dock="Right"
+                Click="OnStartServer"
+                ToolTip="Initiates the peer-to-peer network and broadcasts itself to any other active peers."
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/peer-to-peer.png" />
+            </Button>
+            <Button
+                DockPanel.Dock="Right"
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Click="OnRebroadcast"
+                ToolTip="Re-Broadcast on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/broadcast.png" />
+            </Button>
+            
+            
+            <Button
+                Visibility="Collapsed"
                 DockPanel.Dock="Right" Click="OnTest" ToolTip="This is just a button for the developer to run strange tests.  If you see it, he forgot to hide it." >
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/worksonmymachine.png" />
             </Button>
+            
             <Image DockPanel.Dock="Left" Height="35" HorizontalAlignment="Left" Source="/ArtemisManagerUI;component/Resources/amBanner.jpg" />
             <Label DockPanel.Dock="Left" Margin="-110,0,0,0" VerticalAlignment="Center" Content="Version: " FontWeight="Bold" />
+            <StackPanel DockPanel.Dock="Right" Margin="20,0,0,0" Orientation="Horizontal">
+                <Label Content="Drive Freespace:" VerticalAlignment="Center" />
+                <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
+            </StackPanel>
+            <Button DockPanel.Dock="Right"  Click="OnGenerateMod" Margin="20,5,5,5" ToolTip="Generate Mod from current activated Artemis folder">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/generate.png" />
+            </Button>
+            <Button
+                DockPanel.Dock="Right"
+                Visibility="Collapsed"
+                Margin="40,5,5,5" ToolTip="Download specific update version of Artemis SBS">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (1).png" />
+            </Button>
             <TextBlock Margin="-30,0,0,0" VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=AppVersion}" />
         </DockPanel>
         <DockPanel DockPanel.Dock="Top">
@@ -43,34 +75,26 @@
             <TextBlock VerticalAlignment="Center" Text="This IP:" FontWeight="Bold" Padding="20,0,5,0"/>
             <TextBlock VerticalAlignment="Center" Text="{Binding IP, ElementName=uc}" />
             <TextBlock VerticalAlignment="Center" Text="Connection Password:" FontWeight="Bold" Padding="20,0,5,0" ToolTip="Used to restrict access to the peer-to-peer network"/>
-            <TextBox VerticalAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Used to restrict access to the peer-to-peer network" Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
+            <TextBox
+                IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                VerticalAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Used to restrict access to the peer-to-peer network" Text="{Binding Path=Password, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
         </DockPanel>
         <WrapPanel DockPanel.Dock="Top">
-            <Button
-                Click="OnStartServer"
-                ToolTip="Initiates the peer-to-peer network and broadcasts itself to any other active peers."
-                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/peer-to-peer.png" />
-            </Button>
-            <Button
-                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                Click="OnRebroadcast"
-                ToolTip="Re-Broadcast on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/broadcast.png" />
-            </Button>
+            
             <CheckBox Margin="5,0,0,0" Padding="2,0,0,0" IsChecked="{Binding Path=AutoStartServer, ElementName=uc, Mode=TwoWay}" VerticalAlignment="Center" VerticalContentAlignment="Center" Content="Start Network Communication as soon as this application starts."/>
-            <StackPanel Margin="20,0,0,0" Orientation="Horizontal">
-                <Label Content="Drive Freespace:" VerticalAlignment="Center" />
-                <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
-            </StackPanel>
+           
             <StackPanel Margin="20,0,0,0" Orientation="Horizontal">
                 <Label Content="Listening Port:" VerticalAlignment="Center" />
-                <TextBox PreviewTextInput="OnPreviewPortInput" VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Port}" Width="80"/>
+                <TextBox IsEnabled="{Binding ElementName=uc, Path=IsMaster}" PreviewTextInput="OnPreviewPortInput" VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Port}" Width="80"/>
             </StackPanel>
+            <CheckBox
+                ToolTip="Sets whether or not this client can control all other clients."
+                IsEnabled="false"
+                IsChecked="{Binding ElementName=uc, Path=IsMaster}" Margin="10,0,0,0" Content="Is Master" VerticalContentAlignment="Center"  VerticalAlignment="Center"  />
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
             <Button
-                Click="OnInstallMod" ToolTip="Install a Mod"
+                Click="OnInstallMod" ToolTip="Install a Mod or Mission"
                 Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
                  >
                 <StackPanel Orientation="Horizontal">
@@ -150,15 +174,11 @@
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
                 </StackPanel>
             </Button>
-            <Button Click="OnGenerateMod" Margin="20,5,5,5" ToolTip="Generate Mod from current activated Artemis folder">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/generate.png" />
-            </Button>
+            
             <Button Click="OnOpenArtemisRunFolder" Margin="5,5,5,5" ToolTip="Open activated Artemis folder in Windows Explorer">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/search.png" />
             </Button>
-            <Button Margin="40,5,5,5" ToolTip="Download specific update version of Artemis SBS">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (1).png" />
-            </Button>
+           
         </WrapPanel>
 
         <StatusBar DockPanel.Dock="Bottom">
@@ -180,6 +200,29 @@
                         Drop="OnModDrop"
                         
                         ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:ModItemControl
+                                    IsRemote="False"
+                                    Mod="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </TabItem>
+                <TabItem Tag="InstalledMissions" >
+                    <TabItem.Header>
+                        <Label Content="Installed Missions" />
+                    </TabItem.Header>
+                    <!--GiveFeedback="OnModGiveFeedback"
+                        MouseMove="OnModMouseMove"-->
+                    <ListBox
+                        AllowDrop="True"
+                        DragEnter="OnMissionDragEnter"
+                        DragLeave="OnMissionDragLeave"
+                        DragOver="OnMissionDragOver"
+                        Drop="OnMissionDrop"
+                        
+                        ItemsSource="{Binding ElementName=uc, Path=InstalledMissions, Mode=OneWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <local:ModItemControl
@@ -270,6 +313,7 @@
                 <TabControl.ContentTemplate>
                     <DataTemplate>
                         <local:PeerInfoControl
+                            IsMaster="{Binding ElementName=uc, Path=IsMaster}"
                             ItemData="{Binding}"
                             SendMessage="OnSendMessage"
                             ConnectedPCs="{Binding ElementName=uc, Path=ConnectedPCs}" >

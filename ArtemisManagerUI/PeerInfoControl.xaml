@@ -24,7 +24,9 @@
 
         <DockPanel>
             <DockPanel DockPanel.Dock="Top">
-                <GroupBox DockPanel.Dock="Left" Header="Peer Actions">
+                <GroupBox
+                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    DockPanel.Dock="Left" Header="Peer Actions">
                     <WrapPanel>
                         <Button
                             Click="OnDisconnect" CommandParameter="{Binding}"
@@ -58,7 +60,9 @@
 
                     </WrapPanel>
                 </GroupBox>
-                <GroupBox DockPanel.Dock="Left" Header="Artemis SBS Actions">
+                <GroupBox
+                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    DockPanel.Dock="Left" Header="Artemis SBS Actions">
                     <WrapPanel>
                         <Button Click="OnRemoteInstallMod" ToolTip="Remotely install a mod on Peer.">
                             <!-- Use list of currently installed mods on this PC to install remotely.  Also, enable drag-drop from "Installed Mods" -->
@@ -112,6 +116,7 @@
                             <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=ItemData.AppVersion}" />
                         </StackPanel>
                         <CheckBox
+                            IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
                             VerticalAlignment="Center" VerticalContentAlignment="Center"
                             Checked="OnSetConnectOnStart"
                             Unchecked="OnSetConnectOnStart"
@@ -122,9 +127,12 @@
                                 TextWrapping="Wrap"/>
                         </CheckBox>
                         <CheckBox
+                            Checked="OnIsMasterSet"
+                            Unchecked="OnIsMasterSet"
                             ToolTip="Indicates whether or not this client can control all other clients.  If not checked, then this client cannot control any client, except itself."
                             Content="Is a Master"
-                            IsChecked="{Binding ElementName=uc, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="False" />
+                            IsChecked="{Binding ElementName=uc, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                            />
                         <CheckBox Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=ItemData.ArtemisIsRunning}" IsEnabled="False"/>
                         <CheckBox
                             IsChecked="{Binding ElementName=uc, Path=ItemData.IsUsingThisAppControlledArtemis}"
@@ -133,6 +141,7 @@
                                 Text="Artemis is under Manager control" ToolTip="Indicates if the version of Artemis is running is running due the the Artemis Manager" TextWrapping="Wrap"/>
                         </CheckBox>
                         <CheckBox
+                            IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
                             VerticalAlignment="Center" VerticalContentAlignment="Center"
                             Checked="OnRemoteAddManagerFromStartup"
                             Unchecked="OnRemoteRemoveManagerFromStartup">
@@ -150,6 +159,7 @@
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock VerticalAlignment="Center" Text="Installed Mods" />
                                 <Button
+                                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                                     Margin="10,2,2,2"
                                     Click="OnDeactivateMods"
                                     ToolTip="Deactivate All Mods on Peer by reseting activated Artemis folder to base Artemis" >
@@ -169,7 +179,7 @@
                             ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" >
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <local:ModItemControl IsRemote="True" Mod="{Binding}" />
+                                    <local:ModItemControl IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}" IsRemote="True" Mod="{Binding}" />
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

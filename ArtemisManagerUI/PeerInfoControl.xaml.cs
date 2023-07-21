@@ -79,6 +79,22 @@ namespace ArtemisManagerUI
                 this.SetValue(ChatMessageProperty, value);
             }
         }
+        public static readonly DependencyProperty IsMasterProperty =
+           DependencyProperty.Register(nameof(IsMaster), typeof(bool),
+          typeof(PeerInfoControl));
+
+        public bool IsMaster
+        {
+            get
+            {
+                return (bool)this.GetValue(IsMasterProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsMasterProperty, value);
+            }
+        }
 
         private void OnDeactivateMods(object sender, RoutedEventArgs e)
         {
@@ -445,6 +461,15 @@ namespace ArtemisManagerUI
                         }
                     }
                 }
+            }
+        }
+
+        private void OnIsMasterSet(object sender, RoutedEventArgs e)
+        {
+            if (ItemData?.IP != null)
+            {
+                AMCommunicator.Network.Current?.SendChangeSetting(ItemData.IP, "IsMaster", this.ItemData.IsMaster.ToString());
+
             }
         }
     }

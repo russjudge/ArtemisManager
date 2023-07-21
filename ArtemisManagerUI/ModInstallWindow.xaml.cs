@@ -77,7 +77,7 @@ namespace ArtemisManagerUI
                         using var reader = ReaderFactory.Open(stream);
                         while (reader.MoveToNextEntry())
                         {
-                            if (!reader.Entry.IsDirectory && reader.Entry.Key.EndsWith(".json"))
+                            if (!reader.Entry.IsDirectory && reader.Entry.Key.EndsWith(ArtemisManager.SaveFileExtension))
                             {
                                 int bytesRead = 0;
                                 byte[] buffer = new byte[1024];

@@ -65,6 +65,8 @@ namespace ArtemisManagerUI
                 case "ListeningPort":
                     Properties.Settings.Default.ListeningPort = int.Parse(value);
                     break;
+                case "IsMaster":
+                    break;
             }
             Properties.Settings.Default.Save();
         }
@@ -180,7 +182,7 @@ namespace ArtemisManagerUI
             }
             return retVal;
         }
-        const string UpdateSoftwareSourceURL = "https://russjudge.com/software";
+        const string UpdateSoftwareSourceURL = "https://artemis.russjudge.com/software";
         const string UpdateVersionDataURL = UpdateSoftwareSourceURL + "/artemismanager.version";
         const string UpdateSetupFileURL = UpdateSoftwareSourceURL + "/artemismanager.msi";
         /// <summary>

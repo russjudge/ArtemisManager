@@ -17,6 +17,7 @@ namespace ArtemisManagerAction
         const string SteamAppManifestFile = "appmanifest_" + ArtemisAppKey + ".acf";
         const string SteamAppInstallFolderName = "\"installdir\"";  //Example: "installdir"		"Archon" (2 tabs).  Preprocess file by replace tabs with spaces, reducing to 1 space. read lines until installdir found.
         const string ArtemisAppKey = "247350";
+        const string ArtemisCosmosAppKey = "2467840";
         const string SteamRegistryKey = @"SOFTWARE\Valve\Steam";
         const string SteamRegistrySteamPathValue = "SteamPath";
         const string SteamAppsRelativeFolder = "steamApps";

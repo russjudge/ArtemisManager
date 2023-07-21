@@ -9,7 +9,9 @@
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
-    <GroupBox VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" >
+    <GroupBox
+        Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+        VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" >
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <Button

@@ -26,7 +26,11 @@ namespace ArtemisManagerAction
         static ArtemisManager()
         {
             //Fixing Artemis versions to specific Guids.  Same thing will be done to mods eventually.
-            ArtemisVersionIdentifiers.Add("2.8", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
+            ArtemisVersionIdentifiers.Add("2.0.0", new Guid("372902D8-CA57-46AA-9B17-488243C04D55"));
+            ArtemisVersionIdentifiers.Add("2.1.1", new Guid("5814DE3D-B3D2-4D2E-AB71-A8634E0F9368"));
+            ArtemisVersionIdentifiers.Add("2.4.0", new Guid("F46E14B7-A97B-4EAA-A060-A9034F7F55CB"));
+            ArtemisVersionIdentifiers.Add("2.8.0", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
+            ArtemisVersionIdentifiers.Add("2.8.1", new Guid("AF0EC3FE-D26A-4AAD-8E1A-8584DE044688"));  //If from zip file the exe file date should be 1/23/2022.
         }
         
         public static bool CheckIfArtemisSnapshotNeeded(string installFolder)
@@ -74,24 +78,32 @@ namespace ArtemisManagerAction
                 if (mod.IsActive)
                 {
                     mod.IsActive = false;
+                    mod.StackOrder = 0;
                     mod.Save();
                 }
             }
+            foreach (var mission in GetInstalledMissions())
+            {
+                if (mission.IsActive)
+                {
+                    mission.IsActive = false;
+                    mission.StackOrder = 0;
+                    mission.Save();
+                }
+            }
             
-            foreach (var fle in new DirectoryInfo(ModManager.DataFolder).GetFiles("*.json"))
+            foreach (var fle in new DirectoryInfo(ModManager.DataFolder).GetFiles("*" + SaveFileExtension))
             {
                 fle.Delete();
             }
             if (baseArtemis != null)
             {
                 baseArtemis.IsActive = false;
-                //baseArtemis.Activate();
             }
             return baseArtemis;
         }
         public static void DeleteAll(string target)
         {
-            
             if (Directory.Exists(target))
             {
                 foreach (var dir in new DirectoryInfo(target).GetDirectories())
@@ -104,9 +116,22 @@ namespace ArtemisManagerAction
                     fle.Delete();
                 }
             }
-          
         }
-        
+
+        public static ModItem[] GetInstalledMissions()
+        {
+            var retVal = GetModList(ModItem.MissionInstallFolder);
+            foreach (var item in retVal)
+            {
+                if (string.IsNullOrEmpty(item.SaveFile))
+                {
+                    item.Save();
+                }
+                
+            }
+
+            return retVal;
+        }
         public static ModItem[] GetInstalledMods()
         {
             var retVal = GetModList(ModItem.ModInstallFolder);
@@ -283,6 +308,19 @@ namespace ArtemisManagerAction
                                 retVal = line.Substring(i + 2, j - (i + 2));
                             }
                             break;
+                        }
+                    }
+                    int k = retVal.IndexOf(".");
+                    if (retVal.IndexOf(".", k + 1) == -1)
+                    {
+                        retVal += ".0";
+                    }
+                    if (retVal == "2.8.0")
+                    {
+                        FileInfo f = new(Path.Combine(installPath, ArtemisEXE));
+                        if (f.LastWriteTime.Year >= 2022 && f.LastWriteTime.Year <= 2023)
+                        {
+                            retVal = "2.8.1";
                         }
                     }
                 }

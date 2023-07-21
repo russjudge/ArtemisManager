@@ -24,6 +24,7 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="170" />
@@ -33,7 +34,11 @@
         <local:FileSelector Grid.Row="0" Grid.Column="1" Title="" SelectedItem="{Binding ElementName=uc, Path=PackageFile, Mode=TwoWay}" />
         
         <Label Grid.Row="1" Content="Name:" />
-        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.Name, Mode=TwoWay}" />
+        <DockPanel  Grid.Row="1" Grid.Column="1">
+            <CheckBox Margin="10,0,5,0" DockPanel.Dock="Right" VerticalAlignment="Center"  IsChecked="{Binding ElementName=uc, Path=Mod.IsMission, Mode=TwoWay}" Content="Is a Mission" />
+        <TextBox Text="{Binding ElementName=uc, Path=Mod.Name, Mode=TwoWay}" />
+            
+        </DockPanel>
         <Label Grid.Row="2" Content="Description:" />
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.Description, Mode=TwoWay}" />
         <Label Grid.Row="3" Content="Author:" />
