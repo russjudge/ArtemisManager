@@ -119,20 +119,6 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_365D297F50EB4672ABA774A314D70A2C"
-            {
-            "Name" = "8:Publish Items from AretmisManager_UninstallCleanup (Active)"
-            "Condition" = "8:"
-            "Object" = "8:_3350C7F444F4480DB10D8C2A350F86A2"
-            "FileType" = "3:2"
-            "InstallAction" = "3:4"
-            "Arguments" = "8:/Uninstall"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_2DFFD1C7_7EA3_4038_BCC6_A91052673EE5"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_B402437C1EF84F35A9B45A00F6428CCE"
             {
             "Name" = "8:Publish Items from ArtemisManager (Active)"
