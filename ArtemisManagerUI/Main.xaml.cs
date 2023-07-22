@@ -12,6 +12,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -238,7 +239,13 @@ namespace ArtemisManagerUI
         {
             Dispatcher.Invoke(new Action(() => {
                 ShowPopup = false;
+                PopupMessage = string.Empty;
             }));
+            if (sender is System.Timers.Timer tmr)
+            {
+                tmr.Stop();
+                tmr.Dispose();
+            }
         }
 
         public bool ShowPopup
@@ -783,11 +790,11 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_PopupMessageEvent(object? sender, StatusUpdateEventArgs e)
         {
-            //this.Dispatcher.Invoke(() =>
-            //{
-            //    this.PopupMessage = e.Message;
-            //    this.ShowPopup = true;
-            //});
+            this.Dispatcher.Invoke(() =>
+            {
+                this.PopupMessage += "\r\n\r\n" + e.Message;
+                this.ShowPopup = true;
+            });
         }
 
         private void MyNetwork_ModPackageReceived(object? sender, ModPackageEventArgs e)
@@ -888,6 +895,24 @@ namespace ArtemisManagerUI
                     }));
 
                     break;
+            }
+            if (e.Source != null)
+            {
+                var jsonMods = new List<string>();
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    foreach (var mod in InstalledMods)
+                    {
+                        jsonMods.Add(mod.GetJSON());
+                    }
+
+                    MyNetwork.SendClientInfo(e.Source, Properties.Settings.Default.IsAMaster,
+                                Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
+                                System.Array.Empty<string>(),
+                                ArtemisManager.IsArtemisRunning(),
+                                ArtemisManager.IsRunningArtemisUnderMyControl(),
+                                TakeAction.IsThisAppInStartup());
+                }));
             }
         }
 
@@ -993,9 +1018,13 @@ namespace ArtemisManagerUI
         private void MyNetwork_PasswordChanged(object? sender, CommunicationMessageEventArgs e)
         {
             isLoading = true;
-            Password = e.Message;
-            Network.Password = Password;
-            Properties.Settings.Default.NetworkPassword = Password;
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                Password = e.Message;
+            }));
+            
+            Network.Password = e.Message;
+            Properties.Settings.Default.NetworkPassword = e.Message;
             Properties.Settings.Default.Save();
             isLoading = false;
         }
@@ -1027,7 +1056,7 @@ namespace ArtemisManagerUI
         {
             if (e.Action == PCActions.RestartApp)
             {
-                this.Dispatcher.Invoke(new Action<bool, IPAddress?>(ConsiderClosing), e.Force, e.Source);
+                
                 string file = string.Empty;
                 List<string> args = new();
                 foreach (var arg in Environment.GetCommandLineArgs())
@@ -1042,8 +1071,9 @@ namespace ArtemisManagerUI
                     }
                 }
 
-                ProcessStartInfo startInfo = new(file, string.Join(" ", args.ToArray()));
+                ProcessStartInfo startInfo = new(file.Replace(".dll", ".exe"), string.Join(" ", args.ToArray()));
                 Process.Start(startInfo);
+                this.Dispatcher.Invoke(new Action<bool, IPAddress?>(ConsiderClosing), e.Force, e.Source);
                 return;
             }
             else if (e.Action == PCActions.CloseApp)
@@ -1361,7 +1391,10 @@ namespace ArtemisManagerUI
 
         private void OnOpenArtemisRunFolder(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("explorer " + ArtemisManagerAction.ModItem.ActivatedFolder);
+            
+            ProcessStartInfo startInfo = new ProcessStartInfo("explorer", ArtemisManagerAction.ModItem.ActivatedFolder);
+            Process.Start(startInfo);
+
         }
 
         private void OnGenerateMod(object sender, RoutedEventArgs e)

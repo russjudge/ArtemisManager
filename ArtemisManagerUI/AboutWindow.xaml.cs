@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -316,6 +317,15 @@ namespace ArtemisManagerUI
                     System.Diagnostics.Process.Start(startInfo);
                 }
             }
+        }
+
+        private void OnRequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            var url = e.Uri.ToString();
+            Process.Start(new ProcessStartInfo(url)
+            {
+                UseShellExecute = true
+            });
         }
     }
 }

@@ -22,6 +22,7 @@
             <RowDefinition />
             <RowDefinition />
             <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
         <TextBlock Padding="0,0,5,0"
             Grid.Row="0" Grid.Column="0"
@@ -81,18 +82,13 @@
             Text="Source Code:"
             FontWeight="Bold" />
         <TextBlock Grid.Row="7" Grid.Column="1">
-        <Hyperlink            
+        <Hyperlink
+            RequestNavigate="OnRequestNavigate"
             NavigateUri="https://github.com/russjudge/ArtemisManager">
             https://github.com/russjudge/ArtemisManager
         </Hyperlink>
         </TextBlock>
-        <Button ToolTip="View History" Click="OnViewHistory" Grid.Row="10" Grid.Column="0" >
-            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/viewhistory.png" />
-        </Button>
-
-        <Button ToolTip="OK" Click="OnOK" Grid.Row="10" Grid.Column="1" Width="48">
-            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/ok.png" />
-        </Button>
+        
 
         <Label Grid.Row="8" Content="Artemis Manager Home:" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Left"  />
 
@@ -101,7 +97,7 @@
         <StackPanel Orientation="Horizontal" Grid.Row="8" Grid.Column="1">
             <Image Height="32" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
             <TextBlock VerticalAlignment="Center" >
-            <Hyperlink NavigateUri="https://artemis.russjudge.com">
+            <Hyperlink NavigateUri="https://artemis.russjudge.com" RequestNavigate="OnRequestNavigate">
                 https://artemis.russjudge.com
             </Hyperlink>
             </TextBlock>
@@ -114,7 +110,9 @@
         <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.Column="1">
             <Image Height="32" Source="/ArtemisManagerUI;component/Resources/rj.png" />
             <TextBlock VerticalAlignment="Center" >
-            <Hyperlink NavigateUri="https://russjudge.com">
+            <Hyperlink
+                RequestNavigate="OnRequestNavigate"
+                NavigateUri="https://russjudge.com">
                 https://russjudge.com
             </Hyperlink>
             </TextBlock>
@@ -124,9 +122,19 @@
             <Image Height="32" Source="/ArtemisManagerUI;component/Resources/Patreon-logo.png" />
         </Label>
         <TextBlock ToolTip="Buy me coffee. I must have coffee--lots of coffee.  I live on coffee." Grid.Row="10" Grid.Column="1" VerticalAlignment="Center"  >
-            <Hyperlink NavigateUri="https://www.patreon.com/russjudge">
+            <Hyperlink
+                RequestNavigate="OnRequestNavigate"
+                NavigateUri="https://www.patreon.com/russjudge">
                 https://www.patreon.com/russjudge
             </Hyperlink>
         </TextBlock>
+
+        <Button ToolTip="View History" Click="OnViewHistory" Grid.Row="11" Grid.Column="0" >
+            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/viewhistory.png" />
+        </Button>
+
+        <Button ToolTip="OK" Click="OnOK" Grid.Row="11" Grid.Column="1" Width="48">
+            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/ok.png" />
+        </Button>
     </Grid>
 </Window>

@@ -10,10 +10,12 @@
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
     <GroupBox
-        Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+        
         VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" >
         <GroupBox.Header>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel
+                Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Orientation="Horizontal">
                 <Button
                     Click="OnActivateMod"
                     ToolTip="Activate mod on Peer."

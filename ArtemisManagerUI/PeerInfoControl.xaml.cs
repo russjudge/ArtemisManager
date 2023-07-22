@@ -150,6 +150,7 @@ namespace ArtemisManagerUI
 
         private void OnSendMessage(object sender, RoutedEventArgs e)
         {
+            
             RaiseSendMessageEvent();
         }
 
@@ -217,7 +218,7 @@ namespace ArtemisManagerUI
                         {
                             if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
-                                AMCommunicator.Network.Current?.SendPCAction(item.IP, PCActions.RestartPC, true);
+                                AMCommunicator.Network.Current?.SendPCAction(pcItem.IP, PCActions.RestartPC, true);
                             }
                         }
                     }
@@ -242,7 +243,7 @@ namespace ArtemisManagerUI
                         {
                             if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
-                                AMCommunicator.Network.Current?.SendPCAction(item.IP, PCActions.ShutdownPC, true);
+                                AMCommunicator.Network.Current?.SendPCAction(pcItem.IP, PCActions.ShutdownPC, true);
                             }
                         }
                     }
@@ -266,7 +267,7 @@ namespace ArtemisManagerUI
                         {
                             if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
-                                AMCommunicator.Network.Current?.SendPCAction(item.IP, PCActions.CheckForUpdate, true);
+                                AMCommunicator.Network.Current?.SendPCAction(pcItem.IP, PCActions.CheckForUpdate, true);
                             }
                         }
                     }
@@ -290,7 +291,7 @@ namespace ArtemisManagerUI
                         {
                             if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
-                                AMCommunicator.Network.Current?.SendPCAction(item.IP, PCActions.CloseApp, true);
+                                AMCommunicator.Network.Current?.SendPCAction(pcItem.IP, PCActions.CloseApp, true);
                             }
                         }
                     }
@@ -315,7 +316,7 @@ namespace ArtemisManagerUI
                         {
                             if (pcItem.IP.ToString() != IPAddress.Any.ToString() && pcItem.IP.ToString() != IPAddress.None.ToString())
                             {
-                                AMCommunicator.Network.Current?.SendPCAction(item.IP, PCActions.RestartApp, true);
+                                AMCommunicator.Network.Current?.SendPCAction(pcItem.IP, PCActions.RestartApp, true);
                             }
                         }
                     }

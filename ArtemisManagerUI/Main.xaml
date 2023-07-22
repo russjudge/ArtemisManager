@@ -202,9 +202,12 @@
                         ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <local:ModItemControl
+                                
+                                    <local:ModItemControl
+                                        IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
                                     IsRemote="False"
                                     Mod="{Binding}" />
+                                
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
@@ -226,6 +229,7 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <local:ModItemControl
+                                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
                                     IsRemote="False"
                                     Mod="{Binding}" />
                             </DataTemplate>
@@ -304,6 +308,7 @@
             BorderBrush="CadetBlue"
             Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
             <TabControl
+                Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
                 ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
                 <TabControl.ItemTemplate>
                     <DataTemplate>
@@ -313,10 +318,10 @@
                 <TabControl.ContentTemplate>
                     <DataTemplate>
                         <local:PeerInfoControl
-                            IsMaster="{Binding ElementName=uc, Path=IsMaster}"
+                            IsMaster="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
                             ItemData="{Binding}"
                             SendMessage="OnSendMessage"
-                            ConnectedPCs="{Binding ElementName=uc, Path=ConnectedPCs}" >
+                            ConnectedPCs="{Binding Mode=OneWay, Path=(TabControl.ItemsSource), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" >
                         </local:PeerInfoControl>
                     </DataTemplate>
                 </TabControl.ContentTemplate>
