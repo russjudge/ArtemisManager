@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -109,11 +110,18 @@ namespace ArtemisManagerAction
                 foreach (var dir in new DirectoryInfo(target).GetDirectories())
                 {
                     DeleteAll(dir.FullName);
-                    dir.Delete();
+                    //if (dir.Exists)
+                    //{
+                    //    dir.Delete();
+                    //}
                 }
                 foreach (var fle in new DirectoryInfo(target).GetFiles())
                 {
                     fle.Delete();
+                }
+                if (Directory.Exists(target))
+                {
+                    Directory.Delete(target);
                 }
             }
         }

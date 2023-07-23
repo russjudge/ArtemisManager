@@ -411,6 +411,11 @@ namespace ArtemisManagerUI
                 if (e.Data.GetDataPresent(typeof(ModItemControl)))
                 {
                     isDragging = true;
+
+                }
+                else
+                {
+                    e.Effects = DragDropEffects.None;
                 }
             }
         }
@@ -431,7 +436,7 @@ namespace ArtemisManagerUI
 
         private void OnModDrop(object sender, DragEventArgs e)
         {
-            if (sender is ListBox me)
+            if (sender is FrameworkElement me)
             {
                 if (e.Data.GetDataPresent(typeof(ModItemControl)))
                 {
@@ -441,25 +446,8 @@ namespace ArtemisManagerUI
                     if (!ctl.IsRemote && item != null && item.IP != null)
                     {
                         isDragging = false;
-                        
 
-                        if (item.IP.ToString() == IPAddress.Any.ToString())
-                        {
-                            foreach (var pcItem in ConnectedPCs)
-                            {
-                                if (pcItem.IP != null)
-                                {
-                                    if (pcItem.IP.ToString() != IPAddress.Any.ToString())
-                                    {
-                                        TakeAction.FulfillModPackageRequest(pcItem.IP, ctl.Mod.PackageFile, ctl.Mod);
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            TakeAction.FulfillModPackageRequest(item.IP, ctl.Mod.PackageFile, ctl.Mod);
-                        }
+                        TakeAction.FulfillModPackageRequest(item.IP, ctl.Mod.PackageFile, ctl.Mod);
                     }
                 }
             }

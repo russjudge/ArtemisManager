@@ -20,12 +20,13 @@ namespace ArtemisManagerUI
             Hostname = hostname;
             IP = ip;
             InstalledMods = new ObservableCollection<ModItem>();
-            InstalledMissions = new object();
+            InstalledMissions = new ObservableCollection<ModItem>();
             AllDrives = new ObservableCollection<string>();
         }
         public void LoadClientInfoData(ClientInfoEventArgs info)
         {
             InstalledMods.Clear();
+            InstalledMissions.Clear();
             AllDrives.Clear();
             IsMaster = info.IsMaster;
             AppVersion= info.AppVersion;
@@ -41,7 +42,18 @@ namespace ArtemisManagerUI
                     }
                 }
             }
-            InstalledMissions = new object();
+
+            foreach (var item in info.InstalledMissions)
+            {
+                if (!string.IsNullOrEmpty(item))
+                {
+                    var mod = ModItem.GetModItem(item);
+                    if (mod != null)
+                    {
+                        InstalledMissions.Add(mod);
+                    }
+                }
+            }
             ArtemisIsRunning = info.ArtemisIsRunning;
             IsUsingThisAppControlledArtemis = info.IsUsingThisAppControlledArtemis;
             AppInStartFolder= info.AppInStartFolder;
@@ -93,9 +105,8 @@ namespace ArtemisManagerUI
         public ObservableCollection<ModItem> InstalledMods { get; private set; }
         
 
-        //Reserved for future use: Installed missions will be part of phase 2.
-        
-        public object InstalledMissions{get; private set;}
+
+        public ObservableCollection<ModItem> InstalledMissions {get; private set;}
 
         private bool artemisIsRunning = false;
 

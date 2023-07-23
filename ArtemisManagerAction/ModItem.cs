@@ -20,7 +20,7 @@ namespace ArtemisManagerAction
         public static readonly string MissionFolderPath = Path.Combine(ActivatedFolder, "dat", "Missions");
         public ModItem()
         {
-            SaveFile = string.Empty;
+            
         }
         /// <summary>
         /// Creates a copy ModItem that is activated.
@@ -33,8 +33,15 @@ namespace ArtemisManagerAction
             }
             ModItem item;
             string targetPath = ActivatedFolder;
+            
+            if (string.IsNullOrEmpty(SaveFile))
+            {
+                SaveFile = GetSaveFile();
+            }
+            
             if (!IsMission)
             {
+
                 StackOrder = new DirectoryInfo(ModManager.DataFolder).GetFiles("*" + ArtemisManager.SaveFileExtension).Length;
 
                 item = new()
@@ -55,34 +62,36 @@ namespace ArtemisManagerAction
                     PackageFile = PackageFile,
                     SaveFile = SaveFile
                 };
-
+                
                 item.Save(Path.Combine(ModManager.DataFolder, SaveFile));
             }
             else
             {
                 item = this;
-                targetPath = Path.Combine(MissionFolderPath, InstallFolder);
+                targetPath = MissionFolderPath;
+                
             }
-            
-            ModManager.CopyFolder(Path.Combine(GetFullSavePath(), InstallFolder), targetPath);
+            string sourcePath = Path.Combine(GetFullSavePath(), InstallFolder);
+            ModManager.CopyFolder(sourcePath, targetPath);
             this.IsActive = true;
             this.Save();
 
             return item;
         }
         
-        public void Uninstall()
+        public bool Uninstall()
         {
-            var baseArtemis = ArtemisManager.ClearActiveFolder();
-            baseArtemis?.Activate();
-            if (!IsMission)
+            bool retVal = false;
+            if (!IsActive || IsMission)
             {
                 ArtemisManager.DeleteAll(Path.Combine(GetFullSavePath(), this.InstallFolder));
+                if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(GetFullSavePath(), SaveFile)))
+                {
+                    File.Delete(Path.Combine(GetFullSavePath(), SaveFile));
+                }
+                retVal = true;
             }
-            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(GetFullSavePath(), SaveFile)))
-            {
-                File.Delete(Path.Combine(GetFullSavePath(), SaveFile));
-            }
+            return retVal;
         }
         private string key = string.Empty;
         public string Key
@@ -146,7 +155,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        private DateTime releaseDate = DateTime.MinValue;
+        private DateTime releaseDate = DateTime.Today;
         public DateTime ReleaseDate
         {
             get { return releaseDate; }
@@ -267,7 +276,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        public string SaveFile { get; private set; }
+        public string SaveFile { get; private set; } = string.Empty;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         void DoChanged([CallerMemberName] string property = "")
@@ -403,7 +412,7 @@ namespace ArtemisManagerAction
         }
         public void Unpack()
         {
-            ModManager.CreateFolder(installFolder);
+            ModManager.CreateFolder(Path.Combine(ModInstallFolder,installFolder));
             using Stream stream = File.OpenRead(Path.Combine(ModManager.ModArchiveFolder, PackageFile));
             Unpack(stream);
         }
@@ -414,8 +423,16 @@ namespace ArtemisManagerAction
             {
                 if (!reader.Entry.IsDirectory)
                 {
-                    using EntryStream entryStream = reader.OpenEntryStream();
-                    reader.WriteEntryToDirectory(installFolder, new ExtractionOptions()
+                    string targetFolder;
+                    if (IsMission)
+                    {
+                        targetFolder = Path.Combine(MissionInstallFolder, installFolder);
+                    }
+                    else
+                    {
+                        targetFolder = Path.Combine(ModInstallFolder, installFolder);
+                    }
+                    reader.WriteEntryToDirectory(targetFolder, new ExtractionOptions()
                     {
                         ExtractFullPath = true,
                         Overwrite = true

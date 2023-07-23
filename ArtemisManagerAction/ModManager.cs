@@ -16,15 +16,18 @@ namespace ArtemisManagerAction
     {
         public static readonly string DataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Confederate In Blue Gaming", "Artemis Manager");
         public static readonly string ModArchiveFolder = Path.Combine(DataFolder, "Archive");
-        public static bool IsModInstalled(ModItem mod)
+        public static bool IsModInstalled(ModItem? mod)
         {
+            if (mod == null) return false;
             bool found = false;
             foreach (var modItem in ArtemisManager.GetInstalledMods() )
             {
                 if (modItem.LocalIdentifier.Equals(mod.LocalIdentifier)
                     || modItem.LocalIdentifier.Equals(mod.ModIdentifier)
-                    || modItem.ModIdentifier.Equals(mod.LocalIdentifier)
-                    || modItem.ModIdentifier.Equals(mod.ModIdentifier))
+                    || (!modItem.ModIdentifier.Equals(Guid.Empty) 
+                    && (modItem.ModIdentifier.Equals(mod.LocalIdentifier)
+                    || modItem.ModIdentifier.Equals(mod.ModIdentifier)))
+                    || (!string.IsNullOrEmpty(mod.PackageFile) && modItem.PackageFile.Equals(mod.PackageFile)))
                 {
                     found = true;
                     break;
@@ -174,15 +177,20 @@ namespace ArtemisManagerAction
         /// </summary>
         /// <param name="packagedFile">Full path to compressed package file.</param>
         /// <param name="mod"></param>
-        public static void InstallMod(string packagedFile, ModItem mod)
+        public static void InstallMod(string packagedFile, ModItem? mod)
         {
-            FileInfo package = new(packagedFile);
-            if (package.Exists && !IsModInstalled(mod))
+            if (mod != null)
             {
-                File.Copy(packagedFile, Path.Combine(ModArchiveFolder, package.Name));
-                mod.PackageFile = package.Name;
-                mod.Save();
-                mod.Unpack();
+                FileInfo package = new(packagedFile);
+                if (package.Exists && !IsModInstalled(mod))
+                {
+                    ModManager.CreateFolder(ModArchiveFolder);
+                    
+                    File.Copy(packagedFile, Path.Combine(ModArchiveFolder, package.Name), true);
+                    mod.PackageFile = package.Name;
+                    mod.Save();
+                    mod.Unpack();
+                }
             }
         }
       
@@ -202,7 +210,7 @@ namespace ArtemisManagerAction
             }
             foreach (var fle in new DirectoryInfo(sourceFolder).GetFiles())
             {
-                fle.CopyTo(Path.Combine(destinationFolder, fle.Name));
+                fle.CopyTo(Path.Combine(destinationFolder, fle.Name), true);
             }
         }
     }

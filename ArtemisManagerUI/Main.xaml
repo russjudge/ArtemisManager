@@ -147,15 +147,7 @@
                     </StackPanel>
                 </Button>
             </AdornerDecorator>
-            <Button
-                Click="OnDeactivateMods"
-                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                ToolTip="Deactivate All Mods by reseting activated Artemis folder to base Artemis" >
-                <StackPanel Orientation="Horizontal">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
-                </StackPanel>
-            </Button>
+
             <Button
                 Click="OnPutInStartup"
                 Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
@@ -184,52 +176,77 @@
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding ElementName=uc, Path=LastStatus, Mode=OneWay}" />
         </StatusBar>
-        <DockPanel DockPanel.Dock="Right" >
-            <TabControl Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
-                <TabItem Tag="InstalledMods" >
-                    <TabItem.Header>
-                        <Label Content="Installed Mods" />
-                    </TabItem.Header>
-                    <!--GiveFeedback="OnModGiveFeedback"
-                        MouseMove="OnModMouseMove"-->
-                    <ListBox
-                        AllowDrop="True"
+        <DockPanel
+            local:DragHelper.DragScopeId="DragScope1">
+        <DockPanel
+            DockPanel.Dock="Right" >
+            <TabControl
+                Tag="{Binding ElementName=uc, Mode=OneWay, Path=SelectedPeer}"
+                Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
+                <TabItem
+                    AllowDrop="True"
                         DragEnter="OnModDragEnter"
                         DragLeave="OnModDragLeave"
                         DragOver="OnModDragOver"
                         Drop="OnModDrop"
+                    Tag="InstalledMods" >
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Label VerticalAlignment="Center"  Content="Installed Mods" />
+                        </StackPanel>
                         
+                    </TabItem.Header>
+                    <StackPanel>
+                        <Button
+                            HorizontalAlignment="Left"
+                            Click="OnDeactivateMods"
+                            Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
+                            ToolTip="Deactivate All Mods by reseting activated Artemis folder to base Artemis" >
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
+                            </StackPanel>
+                        </Button>
+                    
+                    <ListBox
+                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
                         ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 
                                     <local:ModItemControl
-                                        IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
-                                    IsRemote="False"
-                                    Mod="{Binding}" />
+                                        RemoteInstallMod="OnRemoteInstallMod"
+                                        ModUninstalled="OnModUninstalled"
+                                        IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                        IsRemote="False"
+                                        Mod="{Binding}" />
                                 
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
+                    </StackPanel>
                 </TabItem>
-                <TabItem Tag="InstalledMissions" >
+                <TabItem
+                     AllowDrop="True"
+                        DragEnter="OnMissionDragEnter"
+                        DragLeave="OnMissionDragLeave"
+                        DragOver="OnMissionDragOver"
+                        Drop="OnMissionDrop"
+                    Tag="InstalledMissions" >
                     <TabItem.Header>
                         <Label Content="Installed Missions" />
                     </TabItem.Header>
                     <!--GiveFeedback="OnModGiveFeedback"
                         MouseMove="OnModMouseMove"-->
                     <ListBox
-                        AllowDrop="True"
-                        DragEnter="OnMissionDragEnter"
-                        DragLeave="OnMissionDragLeave"
-                        DragOver="OnMissionDragOver"
-                        Drop="OnMissionDrop"
-                        
+                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
                         ItemsSource="{Binding ElementName=uc, Path=InstalledMissions, Mode=OneWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <local:ModItemControl
-                                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
+                                    RemoteInstallMod="OnRemoteInstallMod"
+                                    ModUninstalled="OnMissionUninstalled"
+                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                     IsRemote="False"
                                     Mod="{Binding}" />
                             </DataTemplate>
@@ -303,11 +320,13 @@
             </TabControl>
         </DockPanel>
         <GroupBox
+             
             Header="Connected Peers"
             BorderThickness="2,2,2,2"
             BorderBrush="CadetBlue"
             Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
             <TabControl
+                SelectedValue="{Binding ElementName=uc, Mode=TwoWay, Path=SelectedPeer}"
                 Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
                 ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
                 <TabControl.ItemTemplate>
@@ -327,5 +346,6 @@
                 </TabControl.ContentTemplate>
             </TabControl>
         </GroupBox>
+        </DockPanel>
     </DockPanel>
 </Window>

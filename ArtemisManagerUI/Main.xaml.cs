@@ -47,7 +47,7 @@ namespace ArtemisManagerUI
                 {
                     ConnectedPCs.Add(new PCItem("All Connections", IPAddress.Any));
                 };
-                
+                TakeAction.ConnectedPCs = ConnectedPCs;
                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
 
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
@@ -76,6 +76,7 @@ namespace ArtemisManagerUI
                 UpdateStatus("Error starting up: " + ex.Message);
             }
             InitializeComponent();
+             
 
         }
         bool isLoading = true;
@@ -155,6 +156,7 @@ namespace ArtemisManagerUI
                         this.WindowState = WindowState.Minimized;
                     }
                 }
+               
             }
         }
         
@@ -811,7 +813,11 @@ namespace ArtemisManagerUI
 
                     //4. Save modItem and add to list.
                     item.Save();
-                    InstalledMods.Add(item);
+                    this.Dispatcher.Invoke(new Action(() =>
+                    {
+                        InstalledMods.Add(item);
+                    }));
+                    
                 }
 
                 //5. check TakeArtemisAction.StagedModItemToActivateOnceInstalled and if matches and not null, activate and set to null.
@@ -826,94 +832,81 @@ namespace ArtemisManagerUI
         private void MyNetwork_ArtemisActionReceived(object? sender, ArtemisActionEventArgs e)
         {
             var wasProcessed = TakeArtemisAction.ProcessArtemisAction(e.Source, e.Action, e.Mod);
-
-            switch (e.Action)
+            if (wasProcessed.Item1)
             {
-                case AMCommunicator.Messages.ArtemisActions.ResetToVanilla:
-                    this.Dispatcher.Invoke(new Action<Guid?>(DeactivateAllButBase), wasProcessed.Item2?.LocalIdentifier);
-                    break;
-                case AMCommunicator.Messages.ArtemisActions.StopArtemis:
-                    this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = false; }));
-                    break;
-                case AMCommunicator.Messages.ArtemisActions.StartArtemis:
-                    this.Dispatcher.Invoke(new Action(() => {
-                        this.IsArtemisRunning = wasProcessed.Item1;
-                        IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
-                    }));
-
-                    break;
-                case AMCommunicator.Messages.ArtemisActions.InstallMod:
-
-                    if (wasProcessed.Item1)  //Will only be processed if we already have the package file in the archive folder.
-                    {
+                switch (e.Action)
+                {
+                    case AMCommunicator.Messages.ArtemisActions.ResetToVanilla:
+                        this.Dispatcher.Invoke(new Action<Guid?>(DeactivateAllButBase), wasProcessed.Item2?.LocalIdentifier);
+                        break;
+                    case AMCommunicator.Messages.ArtemisActions.StopArtemis:
+                        this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = false; }));
+                        break;
+                    case AMCommunicator.Messages.ArtemisActions.StartArtemis:
                         this.Dispatcher.Invoke(new Action(() =>
                         {
-                            if (wasProcessed.Item2 != null)
-                            {
-                                InstalledMods.Add(wasProcessed.Item2);
-                            }
+                            this.IsArtemisRunning = wasProcessed.Item1;
+                            IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
                         }));
-                    }
 
-                    break;
-                case AMCommunicator.Messages.ArtemisActions.UninstallMod:
-                    if (wasProcessed.Item1) 
-                    {
-                        this.Dispatcher.Invoke(new Action(() =>
+                        break;
+                    case AMCommunicator.Messages.ArtemisActions.InstallMod:
+
+                        if (wasProcessed.Item1)  //Will only be processed if we already have the package file in the archive folder.
                         {
-                            if (wasProcessed.Item2 != null)
+                            this.Dispatcher.Invoke(new Action(() =>
                             {
-                                ModItem? modToRemove = null;
-                                foreach (var mod in InstalledMods)
+                                if (wasProcessed.Item2 != null)
                                 {
-                                    if (mod.Equals(wasProcessed.Item2))
+                                    InstalledMods.Add(wasProcessed.Item2);
+                                }
+                            }));
+                        }
+
+                        break;
+                    case AMCommunicator.Messages.ArtemisActions.UninstallMod:
+                        if (wasProcessed.Item1)
+                        {
+                            this.Dispatcher.Invoke(new Action(() =>
+                            {
+                                if (wasProcessed.Item2 != null)
+                                {
+                                    ModItem? modToRemove = null;
+                                    foreach (var mod in InstalledMods)
                                     {
-                                        modToRemove = mod;
-                                        break;
+                                        if (mod.Equals(wasProcessed.Item2))
+                                        {
+                                            modToRemove = mod;
+                                            break;
+                                        }
+                                    }
+                                    if (modToRemove != null)
+                                    {
+                                        InstalledMods.Remove(modToRemove);
                                     }
                                 }
-                                if (modToRemove != null)
+                            }));
+                        }
+
+                        break;
+                    case AMCommunicator.Messages.ArtemisActions.ActivateMod:
+
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            foreach (var mod in InstalledMods)
+                            {
+                                if (mod.LocalIdentifier == e.Identifier)
                                 {
-                                    InstalledMods.Remove(modToRemove);
+                                    mod.IsActive = true;
                                 }
                             }
                         }));
-                    }
 
-                    break;
-                case AMCommunicator.Messages.ArtemisActions.ActivateMod:
-
-                    this.Dispatcher.Invoke(new Action(() =>
-                    {
-                        foreach (var mod in InstalledMods)
-                        {
-                            if (mod.LocalIdentifier == e.Identifier)
-                            {
-                                mod.IsActive = true;
-                            }
-                        }
-                    }));
-
-                    break;
+                        break;
+                }
             }
-            if (e.Source != null)
-            {
-                var jsonMods = new List<string>();
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    foreach (var mod in InstalledMods)
-                    {
-                        jsonMods.Add(mod.GetJSON());
-                    }
-
-                    MyNetwork.SendClientInfo(e.Source, Properties.Settings.Default.IsAMaster,
-                                Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
-                                System.Array.Empty<string>(),
-                                ArtemisManager.IsArtemisRunning(),
-                                ArtemisManager.IsRunningArtemisUnderMyControl(),
-                                TakeAction.IsThisAppInStartup());
-                }));
-            }
+            UpdateStatus(string.Format("Sending Updated Client info to requesting peer {0}", e.Source?.ToString()));
+            TakeAction.SendClientInfo(e.Source);
         }
 
         void LoadClientInfoData(ClientInfoEventArgs e)
@@ -1197,8 +1190,23 @@ namespace ArtemisManagerUI
         {
             MyNetwork.HaltAll();
         }
+        public static readonly DependencyProperty SelectedPeerProperty =
+          DependencyProperty.Register(nameof(SelectedPeer), typeof(PCItem),
+         typeof(Main));
 
-       
+        public PCItem SelectedPeer
+        {
+            get
+            {
+                return (PCItem)this.GetValue(SelectedPeerProperty);
+
+            }
+            set
+            {
+                this.SetValue(SelectedPeerProperty, value);
+            }
+        }
+
         public static readonly DependencyProperty ChatMessageProperty =
            DependencyProperty.Register(nameof(ChatMessage), typeof(string),
           typeof(Main));
@@ -1460,7 +1468,7 @@ namespace ArtemisManagerUI
         bool isDragging = false;
         private void OnModDragEnter(object sender, DragEventArgs e)
         {
-            if (sender is ListBox me)
+            if (sender is FrameworkElement me)
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -1493,7 +1501,7 @@ namespace ArtemisManagerUI
 
         private void OnModDrop(object sender, DragEventArgs e)
         {
-            if (sender is ListBox me)
+            if (sender is FrameworkElement me)
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -1501,7 +1509,7 @@ namespace ArtemisManagerUI
                     foreach (var f in file)
                     {
                         ModInstallWindow win = new();
-
+                        win.ForInstall = true;
                         win.PackageFile = f;
                         if (win.ShowDialog() == true)
                         {
@@ -1525,7 +1533,7 @@ namespace ArtemisManagerUI
 
         private void OnMissionDragEnter(object sender, DragEventArgs e)
         {
-            if (sender is ListBox me)
+            if (sender is FrameworkElement me)
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -1558,7 +1566,7 @@ namespace ArtemisManagerUI
 
         private void OnMissionDrop(object sender, DragEventArgs e)
         {
-            if (sender is ListBox me)
+            if (sender is FrameworkElement me)
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -1566,8 +1574,10 @@ namespace ArtemisManagerUI
                     foreach (var f in file)
                     {
                         ModInstallWindow win = new();
+                        win.ForInstall = true;
                         win.PackageFile = f;
                         win.Mod.IsMission = true;
+                        win.Title = "Install Mission";
                         if (win.ShowDialog() == true)
                         {
                             InstalledMissions.Add(win.Mod);
@@ -1585,6 +1595,42 @@ namespace ArtemisManagerUI
                         MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
                     }
                 }
+            }
+        }
+
+        private void OnModUninstalled(object sender, RoutedEventArgs e)
+        {
+            if (sender is ModItemControl ctl)
+            {
+                ctl.Dispatcher.Invoke(() =>
+                {
+                    if (ctl.DataContext is ModItem mod)
+                    {
+                        InstalledMods.Remove(mod);
+                    }
+                });
+            }
+        }
+
+        private void OnMissionUninstalled(object sender, RoutedEventArgs e)
+        {
+            if (sender is ModItemControl ctl)
+            {
+                ctl.Dispatcher.Invoke(() =>
+                {
+                    if (ctl.DataContext is ModItem mod)
+                    {
+                        InstalledMissions.Remove(mod);
+                    }
+                });
+            }
+        }
+
+        private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
+        {
+            if (SelectedPeer!= null && SelectedPeer.IP != null && e.OriginalSource is ModItem Mod)
+            {
+                TakeAction.FulfillModPackageRequest(SelectedPeer.IP, Mod.PackageFile, Mod);
             }
         }
     }

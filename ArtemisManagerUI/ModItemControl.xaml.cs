@@ -29,6 +29,7 @@ namespace ArtemisManagerUI
         public ModItemControl()
         {
             InitializeComponent();
+           
         }
 
 
@@ -65,6 +66,11 @@ namespace ArtemisManagerUI
                 this.SetValue(IsRemoteProperty, value);
             }
         }
+        
+
+
+
+
         public static readonly DependencyProperty IsMasterProperty =
            DependencyProperty.Register(nameof(IsMaster), typeof(bool),
           typeof(ModItemControl));
@@ -130,14 +136,10 @@ namespace ArtemisManagerUI
 
         private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
         {
-            if (IsRemote)
+            if (!IsRemote)
             {
-                if (Source != null)
-                {
-                    Network.Current?.SendArtemisAction(Source, AMCommunicator.Messages.ArtemisActions.InstallMod, Mod.ModIdentifier, Mod.GetJSON());
-                }
+                RaiseRemoteInstallModEvent();
             }
-           
         }
 
         private void OnUninstallMod(object sender, RoutedEventArgs e)
@@ -152,74 +154,57 @@ namespace ArtemisManagerUI
             else
             {
                 Mod.Uninstall();
+                RaiseModUninstalledEvent();
             }
         }
-        Window? _dragdropWindow = null;
-        protected override void OnMouseMove(MouseEventArgs e)
+
+        
+        
+
+        void RaiseModUninstalledEvent()
         {
-            base.OnMouseMove(e);
-            if (e.LeftButton == MouseButtonState.Pressed)
+            RoutedEventArgs args = new RoutedEventArgs(ModUninstalledEvent);
+            RaiseEvent(args);
+        }
+
+        public static readonly RoutedEvent ModUninstalledEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(ModUninstalled),
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(RoutedEventHandler),
+            ownerType: typeof(ModItemControl));
+        public event RoutedEventHandler ModUninstalled
+        {
+            add { AddHandler(ModUninstalledEvent, value); }
+            remove { RemoveHandler(ModUninstalledEvent, value); }
+        }
+        bool isLoading = true;
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (isLoading)
             {
-                // Package the data.
-                DataObject data = new DataObject();
-                data.SetData(this.GetType());
-                data.SetData("Object", this);
-                /*
-                this.Effect = new DropShadowEffect
-                {
-                    Color = new Color { A = 50, R = 0, G = 0, B = 0 },
-                    Direction = 320,
-                    ShadowDepth = 0,
-                    Opacity = .75,
-                };
-                */
-                _dragdropWindow = new Window();
-                _dragdropWindow.WindowStyle = WindowStyle.None;
-                _dragdropWindow.AllowsTransparency = true;
-                _dragdropWindow.AllowDrop = false;
-                _dragdropWindow.Background = null;
-                _dragdropWindow.IsHitTestVisible = false;
-                _dragdropWindow.SizeToContent = SizeToContent.WidthAndHeight;
-                _dragdropWindow.Topmost = true;
-                _dragdropWindow.ShowInTaskbar = false;
+                this.InitializeDragging("DragScope1");
 
-                Rectangle r = new Rectangle();
-                r.Width = ((FrameworkElement)this).ActualWidth;
-                r.Height = ((FrameworkElement)this).ActualHeight;
-                r.Fill = new VisualBrush(this);
-                this._dragdropWindow.Content = r;
-
-                /*
-                Win32Point w32Mouse = new Win32Point();
-                GetCursorPos(ref w32Mouse);
-                
-
-                this._dragdropWindow.Left = w32Mouse.X;
-                this._dragdropWindow.Top = w32Mouse.Y;
-                */
-                var mousePosition = Mouse.GetPosition(Application.Current.MainWindow);
-                this._dragdropWindow.Left = mousePosition.X;
-                this._dragdropWindow.Top = mousePosition.Y;
-                this._dragdropWindow.Show();
-
-                // Initiate the drag-and-drop operation.
-                DragDrop.DoDragDrop(this, data, DragDropEffects.Copy);
+                this.SetDragTypes(typeof(ModItemControl));
+                isLoading = false;
             }
         }
-        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
+
+
+        void RaiseRemoteInstallModEvent()
         {
-            base.OnGiveFeedback(e);
-            // These Effects values are set in the drop target's
-            // DragOver event handler.
-            if (e.Effects.HasFlag(DragDropEffects.Copy))
-            {
-                Mouse.SetCursor(Cursors.Hand);
-            }
-            else
-            {
-                Mouse.SetCursor(Cursors.No);
-            }
-            e.Handled = true;
+            RoutedEventArgs args = new(RemoteInstallModEvent, this.Mod);
+            RaiseEvent(args);
+        }
+
+        public static readonly RoutedEvent RemoteInstallModEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(RemoteInstallMod),
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(RoutedEventHandler),
+            ownerType: typeof(ModItemControl));
+        public event RoutedEventHandler RemoteInstallMod
+        {
+            add { AddHandler(RemoteInstallModEvent, value); }
+            remove { RemoveHandler(RemoteInstallModEvent, value); }
         }
     }
 }

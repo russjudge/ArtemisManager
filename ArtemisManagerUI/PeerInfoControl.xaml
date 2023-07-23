@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
-             xmlns:local="clr-namespace:ArtemisManagerUI" Name="uc"
+             xmlns:local="clr-namespace:ArtemisManagerUI" Name="ucPeer"
              mc:Ignorable="d" >
     <UserControl.Resources>
         <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
@@ -16,9 +16,9 @@
     <GroupBox>
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding IP}" />
+                <TextBlock Text="{Binding Path=ItemData.IP, ElementName=ucPeer}" />
                 <TextBlock Text=" - " />
-                <TextBlock Text="{Binding Hostname}" />
+                <TextBlock Text="{Binding Path=ItemData.Hostname, ElementName=ucPeer}" />
             </StackPanel>
         </GroupBox.Header>
 
@@ -28,7 +28,7 @@
                 <GroupBox.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Chat to: " />
-                        <TextBlock Text="{Binding Hostname}" />
+                        <TextBlock Text="{Binding Path=ItemData.Hostname, ElementName=ucPeer}" />
                     </StackPanel>
                 </GroupBox.Header>
                 <DockPanel>
@@ -37,7 +37,7 @@
                         ToolTip="Send to chat" Click="OnSendMessage">
                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/send.png" />
                     </Button>
-                    <TextBox Text="{Binding ElementName=uc, Path=ChatMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"  />
+                    <TextBox Text="{Binding ElementName=ucPeer, Path=ChatMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"  />
                 </DockPanel>
             </GroupBox>
             
@@ -46,14 +46,14 @@
                     <StackPanel DockPanel.Dock="Left" MaxWidth="250" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
                         <StackPanel Orientation="Horizontal">
                             <Label Content="Artemis Manager Version:" />
-                            <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=ItemData.AppVersion}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=ucPeer, Path=ItemData.AppVersion}" />
                         </StackPanel>
                         <CheckBox
-                            IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                            IsEnabled="{Binding ElementName=ucPeer, Path=IsMaster}"
                             VerticalAlignment="Center" VerticalContentAlignment="Center"
                             Checked="OnSetConnectOnStart"
                             Unchecked="OnSetConnectOnStart"
-                            IsChecked="{Binding ElementName=uc, Path=ItemData.ConnectOnstart, Mode=TwoWay}" >
+                            IsChecked="{Binding ElementName=ucPeer, Path=ItemData.ConnectOnstart, Mode=TwoWay}" >
                             <TextBlock
                                 Text="Connect to Peer-to-Peer network on start"
                                 ToolTip="If checked, then when this application starts on the client, it will immediately try to connecto to the peer-to-peer network."
@@ -64,17 +64,17 @@
                             Unchecked="OnIsMasterSet"
                             ToolTip="Indicates whether or not this client can control all other clients.  If not checked, then this client cannot control any client, except itself."
                             Content="Is a Master"
-                            IsChecked="{Binding ElementName=uc, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                            IsChecked="{Binding ElementName=ucPeer, Path=ItemData.IsMaster, Mode=TwoWay}" IsEnabled="{Binding ElementName=ucPeer, Path=IsMaster}"
                             />
-                        <CheckBox Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=ItemData.ArtemisIsRunning}" IsEnabled="False"/>
+                        <CheckBox Content="Artemis is Running" IsChecked="{Binding ElementName=ucPeer, Path=ItemData.ArtemisIsRunning}" IsEnabled="False"/>
                         <CheckBox
-                            IsChecked="{Binding ElementName=uc, Path=ItemData.IsUsingThisAppControlledArtemis}"
+                            IsChecked="{Binding ElementName=ucPeer, Path=ItemData.IsUsingThisAppControlledArtemis}"
                             VerticalContentAlignment="Center" VerticalAlignment="Center" IsEnabled="False" >
                             <TextBlock
                                 Text="Artemis is under Manager control" ToolTip="Indicates if the version of Artemis is running is running due the the Artemis Manager" TextWrapping="Wrap"/>
                         </CheckBox>
                         <CheckBox
-                            IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                            IsEnabled="{Binding ElementName=ucPeer, Path=IsMaster}"
                             VerticalAlignment="Center" VerticalContentAlignment="Center"
                             Checked="OnRemoteAddManagerFromStartup"
                             Unchecked="OnRemoteRemoveManagerFromStartup">
@@ -82,12 +82,12 @@
                         </CheckBox>
                         <StackPanel Orientation="Horizontal">
                             <Label Grid.Row="4" Content="Drive Freespace:" />
-                            <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=ItemData.FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=ucPeer, Path=ItemData.FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
                         </StackPanel>
                     </StackPanel>
                     <DockPanel DockPanel.Dock="Right">
                         <GroupBox
-                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=ucPeer, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                     DockPanel.Dock="Top" Header="Artemis SBS Actions">
                             <WrapPanel>
                                 <Button Click="OnRemoteInstallMod" ToolTip="Remotely install a mod on Peer.">
@@ -100,7 +100,7 @@
                                 <Button
                             Click="OnStartArtemisRemote"
                             ToolTip="Start Artemis SBS on Peer."
-                            Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                            Visibility="{Binding ElementName=ucPeer, Path=ItemData.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
                                     <StackPanel Orientation="Horizontal">
                                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/start.png" />
                                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
@@ -108,7 +108,7 @@
                                 </Button>
                                 <Button
                             Click="OnStopArtemisRemote"
-                            Visibility="{Binding ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                            Visibility="{Binding ElementName=ucPeer, Path=ItemData.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                             ToolTip="Stop Artemis SBS on Peer.">
                                     <StackPanel Orientation="Horizontal">
                                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/stop.png" />
@@ -118,7 +118,7 @@
                             </WrapPanel>
                         </GroupBox>
                         <GroupBox
-                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=ucPeer, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                     DockPanel.Dock="Top" Header="Peer Actions">
                             <WrapPanel>
                                 <Button
@@ -164,13 +164,18 @@
             <TabControl
                         DockPanel.Dock="Top">
                 <TabItem
+                     AllowDrop="True"
+                            DragEnter="OnModDragEnter"
+                            DragLeave="OnModDragLeave"
+                            DragOver="OnModDragOver"
+                            Drop="OnModDrop"
                         VerticalAlignment="Stretch" VerticalContentAlignment="Stretch"
                         >
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock VerticalAlignment="Center" Text="Installed Mods" />
                             <Button
-                                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                                    Visibility="{Binding ElementName=ucPeer, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                                     Margin="10,2,2,2"
                                     Click="OnDeactivateMods"
                                     ToolTip="Deactivate All Mods on Peer by reseting activated Artemis folder to base Artemis" >
@@ -182,24 +187,41 @@
                         </StackPanel>
                     </TabItem.Header>
                     <ListBox
-                            AllowDrop="True"
-                            DragEnter="OnModDragEnter"
-                            DragLeave="OnModDragLeave"
-                            DragOver="OnModDragOver"
-                            Drop="OnModDrop"
-                            ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMods}" >
+                        
+                           Tag="{Binding ElementName=ucPeer, Path=IsMaster, Mode=OneWay}"
+                            ItemsSource="{Binding ElementName=ucPeer, Path=ItemData.InstalledMods}" >
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <local:ModItemControl
-                                        IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}" IsRemote="True" Mod="{Binding}" />
+                                    Source="{Binding ElementName=ucPeer, Path=ItemData.IP, Mode=OneWay}"
+                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                    IsRemote="True" Mod="{Binding}" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </TabItem>
-                <TabItem>
+                <TabItem
+                     AllowDrop="True"
+                            DragEnter="OnModDragEnter"
+                            DragLeave="OnModDragLeave"
+                            DragOver="OnModDragOver"
+                            Drop="OnModDrop"
+                    VerticalAlignment="Stretch" VerticalContentAlignment="Stretch">
                     <TabItem.Header>
                         <TextBlock Text="Installed Missions" VerticalAlignment="Center" />
                     </TabItem.Header>
+                    <ListBox
+                           Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
+                            ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMissions}" >
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:ModItemControl
+                                    Source="{Binding ElementName=ucPeer, Path=ItemData.IP, Mode=OneWay}"
+                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                    IsRemote="True" Mod="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </TabItem>
             </TabControl>
         </DockPanel>

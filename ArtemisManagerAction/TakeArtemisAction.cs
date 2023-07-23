@@ -1,5 +1,6 @@
 ﻿using AMCommunicator;
 using System.Net;
+using System.Text.Json.Nodes;
 
 namespace ArtemisManagerAction
 {
@@ -40,13 +41,19 @@ namespace ArtemisManagerAction
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.UninstallMod:
+                    WasProcessed = false;
                     if (!string.IsNullOrEmpty(modJSON))
                     {
                         var receivedMod = ModItem.GetModItem(modJSON);
-                        receivedMod?.Uninstall();
+                        if (receivedMod != null)
+                        {
+                            WasProcessed = receivedMod.Uninstall();
+                        }
                     }
-                    WasProcessed = true;
-
+                    if (!WasProcessed && target != null)
+                    {
+                        Network.Current?.SendMessage(target, "Unable to uninstall requested mod.  Cannot uninstall active mods.");
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateMod:
                     //Is Mod already activitated?  skip if it is.

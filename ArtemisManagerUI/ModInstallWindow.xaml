@@ -27,34 +27,36 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="170" />
+            <ColumnDefinition Width="63.26" />
+            <ColumnDefinition Width="106.74"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Content="Package File:" />
-        <local:FileSelector Grid.Row="0" Grid.Column="1" Title="" SelectedItem="{Binding ElementName=uc, Path=PackageFile, Mode=TwoWay}" />
-        
-        <Label Grid.Row="1" Content="Name:" />
-        <DockPanel  Grid.Row="1" Grid.Column="1">
+        <Label Content="Package File:" Grid.ColumnSpan="2" />
+        <local:FileSelector Grid.Row="0" Grid.Column="2" Title="" SelectedItem="{Binding ElementName=uc, Path=PackageFile, Mode=TwoWay}" />
+
+        <Label Grid.Row="1" Content="Name:" Grid.ColumnSpan="2" />
+        <DockPanel  Grid.Row="1" Grid.Column="2" Margin="0,0,0,26" Grid.RowSpan="2">
             <CheckBox Margin="10,0,5,0" DockPanel.Dock="Right" VerticalAlignment="Center"  IsChecked="{Binding ElementName=uc, Path=Mod.IsMission, Mode=TwoWay}" Content="Is a Mission" />
-        <TextBox Text="{Binding ElementName=uc, Path=Mod.Name, Mode=TwoWay}" />
-            
+            <TextBox Text="{Binding ElementName=uc, Path=Mod.Name, Mode=TwoWay}" />
+
         </DockPanel>
-        <Label Grid.Row="2" Content="Description:" />
-        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.Description, Mode=TwoWay}" />
-        <Label Grid.Row="3" Content="Author:" />
-        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.Author, Mode=TwoWay}" />
-        <Label Grid.Row="4" Content="Mod Version:" />
-        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.Version, Mode=TwoWay}" />
-        <Label Grid.Row="5" Content="Release Date:" />
-        <DatePicker Grid.Row="5" Grid.Column="1" SelectedDate="{Binding ElementName=uc, Path=Mod.ReleaseDate, Mode=TwoWay}" />
-        <Label Grid.Row="6" Content="Required Artemis Version:" />
-        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion, Mode=TwoWay}" />
-        <Button Grid.Row="7" Grid.Column="0" Content="Cancel" Click="OnCancel" IsCancel="True" />
+        <Label Grid.Row="2" Content="Description:" Grid.ColumnSpan="2" />
+        <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding ElementName=uc, Path=Mod.Description, Mode=TwoWay}" Margin="0,0,0,26" Grid.RowSpan="2" />
+        <Label Grid.Row="3" Content="Author:" Grid.ColumnSpan="2" />
+        <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding ElementName=uc, Path=Mod.Author, Mode=TwoWay}" Margin="0,0,0,26" Grid.RowSpan="2" />
+        <Label Grid.Row="4" Content="Mod/Mission Version:" Grid.ColumnSpan="2" />
+        <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding ElementName=uc, Path=Mod.Version, Mode=TwoWay}" Margin="0,0,0,26" Grid.RowSpan="2" />
+
+        <Label Grid.Row="5" Content="Release Date:" Grid.ColumnSpan="2" />
+        <DatePicker Grid.Row="5" Grid.Column="2" SelectedDate="{Binding ElementName=uc, Path=Mod.ReleaseDate, Mode=TwoWay}" Margin="0,0,0,26" Grid.RowSpan="2" />
+        <Label Grid.Row="6" Content="Required Artemis Version:" Grid.ColumnSpan="2" />
+        <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion, Mode=TwoWay}" Margin="0,0,0,32" Grid.RowSpan="2" />
+        <Button Grid.Row="7" Grid.Column="0" Content="Cancel" Click="OnCancel" IsCancel="True" Grid.ColumnSpan="2" Margin="2,2,2,2" />
         <Button
             Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-            Grid.Row="7" Grid.Column="1" Content="Install" Click="OnInstallMod" IsDefault="True" />
+            Grid.Row="7" Grid.Column="2" Content="Install" Click="OnInstallMod" IsDefault="True" Margin="2,2,2,2" />
         <Button
             Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-            Grid.Row="7" Grid.Column="1" Content="Generate Mod" Click="OnGenerateMod" IsDefault="True" />
+            Grid.Row="7" Grid.Column="2" Content="Generate Mod" Click="OnGenerateMod" IsDefault="True" Margin="2,2,2,2" />
     </Grid>
 </Window>

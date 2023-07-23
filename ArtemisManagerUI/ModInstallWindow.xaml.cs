@@ -25,6 +25,7 @@ namespace ArtemisManagerUI
     {
         public ModInstallWindow()
         {
+            Mod = new();
             InitializeComponent();
         }
         public static readonly DependencyProperty ForInstallProperty =
@@ -47,7 +48,7 @@ namespace ArtemisManagerUI
         public static readonly DependencyProperty ModProperty =
            DependencyProperty.Register(nameof(Mod), typeof(ModItem),
            typeof(ModInstallWindow));
-        
+
         public ModItem Mod
         {
             get
@@ -68,6 +69,7 @@ namespace ArtemisManagerUI
         {
             if (d is ModInstallWindow me)
             {
+                
                 if (me.ForInstall)
                 {
                     if (!string.IsNullOrEmpty(me.PackageFile) && System.IO.File.Exists(me.PackageFile))
@@ -109,8 +111,9 @@ namespace ArtemisManagerUI
                                                 //me.Mod.PackageFile = mod.PackageFile;
                                                 me.Mod.ReleaseDate = mod.ReleaseDate;
                                                 me.Mod.RequiredArtemisVersion = mod.RequiredArtemisVersion;
-                                               // me.Mod.SaveFile = mod.SaveFile;
+                                                // me.Mod.SaveFile = mod.SaveFile;
                                                 me.Mod.Version = mod.Version;
+                                                
                                                 break;
                                             }
                                         }
@@ -118,13 +121,45 @@ namespace ArtemisManagerUI
                                         {
 
                                         }
-                                        
+
                                     }
                                 }
-                                
+
                             }
                         }
                     }
+                }
+                if (string.IsNullOrEmpty(me.Mod.Name) && !string.IsNullOrEmpty(me.PackageFile))
+                {
+                    string wrkName = new FileInfo(me.PackageFile).Name;
+                    int i = wrkName.IndexOf('.');
+                    if (i < 0)
+                    {
+                        i = wrkName.Length;
+                    }
+
+                    me.Mod.Name = wrkName.Substring(0, i).Replace("_", " ");
+                    if (me.Mod.Name[0] >= 'A' && me.Mod.Name[0] <= 'Z'
+                        && (me.Mod.Name[1] < 'A' || me.Mod.Name[1] > 'Z'))
+                    {
+                        StringBuilder sb = new();
+                        sb.Append(me.Mod.Name[0]);
+
+                        for (int j = 1; j < me.Mod.Name.Length; j++)
+                        {
+                            if (me.Mod.Name[j] >= 'A' && me.Mod.Name[j] <= 'Z')
+                            {
+                                sb.Append(' ');
+                            }
+                            sb.Append(me.Mod.Name[j]);
+                        }
+                        me.Mod.Name = sb.ToString();
+                    }
+                    if (me.Mod.Name.StartsWith("MISS "))
+                    {
+                        me.Mod.Name = me.Mod.Name.Substring(5);
+                    }
+
                 }
             }
         }
@@ -141,15 +176,14 @@ namespace ArtemisManagerUI
                 this.SetValue(PackageFileProperty, value);
             }
         }
-        
+
         private void OnInstallMod(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(PackageFile) && System.IO.File.Exists(PackageFile))
             {
-
                 ModManager.InstallMod(PackageFile, Mod);
-            this.DialogResult = true;
-            this.Close();
+                this.DialogResult = true;
+                this.Close();
             }
             else
             {
@@ -159,7 +193,7 @@ namespace ArtemisManagerUI
 
         private void OnCancel(object sender, RoutedEventArgs e)
         {
-            
+
             this.DialogResult = false;
             this.Close();
         }

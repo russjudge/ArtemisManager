@@ -17,7 +17,6 @@ namespace ArtemisManagerUI
 {
     public static class TakeAction
     {
-
         public static Main? MainWindow { get; set; } = null;
         public static bool MustExit { get; set; }
 
@@ -31,6 +30,7 @@ namespace ArtemisManagerUI
         {
             PopupEvent?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
+        public static IList<PCItem>? ConnectedPCs { get; set; }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
         public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
@@ -51,7 +51,26 @@ namespace ArtemisManagerUI
                             data.AddRange(buffer2);
                         }
                     }
-                    Network.Current?.SendItem(requestSource, data.ToArray(), mod?.GetJSON());
+                    string json = mod?.GetJSON() ?? string.Empty;
+                    var dataArr = data.ToArray();
+                    if (requestSource.ToString() == IPAddress.Any.ToString() && ConnectedPCs != null)
+                    {
+                        foreach (var pcItem in ConnectedPCs)
+                        {
+                            if (pcItem.IP != null)
+                            {
+                                if (pcItem.IP.ToString() != IPAddress.Any.ToString())
+                                {
+                                    Network.Current?.SendItem(pcItem.IP, dataArr, json);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Network.Current?.SendItem(requestSource, dataArr, json);
+                    }
+                        
                 }
             }
         }
@@ -87,15 +106,16 @@ namespace ArtemisManagerUI
             bool WasProcessed;
             switch (action)
             {
-                
                 case PCActions.CloseApp:
                     //Handled elsewhere.
                     WasProcessed = true;
                     break;
                 case PCActions.RestartPC:
-                    ProcessStartInfo startInfo = new("shutdown", "/g /t 0 /f");
-                    startInfo.UseShellExecute = false;
-                    startInfo.CreateNoWindow = true;
+                    ProcessStartInfo startInfo = new("shutdown", "/g /t 0 /f")
+                    {
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
                     System.Diagnostics.Process.Start(startInfo);
                     WasProcessed = true;
                     break;
@@ -121,35 +141,17 @@ namespace ArtemisManagerUI
                     WasProcessed = true;
                     break;
                 case PCActions.ShutdownPC:
-                    ProcessStartInfo startInfo2 = new("shutdown", "/sg /t 0 /f");
-                    startInfo2.UseShellExecute = false;
-                    startInfo2.CreateNoWindow = true;
+                    ProcessStartInfo startInfo2 = new("shutdown", "/sg /t 0 /f")
+                    {
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
                     System.Diagnostics.Process.Start(startInfo2);
                     
                     WasProcessed = true;
                     break;
                 case PCActions.SendClientInformation:
-                    var mods = ArtemisManagerAction.ArtemisManager.GetInstalledMods();
-
-                    var jsonMods = new List<string>();
-
-                    foreach (var mod in mods)
-                    {
-                        jsonMods.Add(mod.GetJSON());
-                    }
-                    bool AretmisIsRunning = ArtemisManagerAction.ArtemisManager.IsArtemisRunning();
-                    bool IsRunningUnderMyControl = ArtemisManagerAction.ArtemisManager.IsRunningArtemisUnderMyControl();
-#pragma warning disable CS8604 // Possible null reference argument.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-                    Network.Current.SendClientInfo(
-                        source, Properties.Settings.Default.IsAMaster,
-                        Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
-                        System.Array.Empty<string>(),
-                        AretmisIsRunning,
-                        IsRunningUnderMyControl,
-                        IsThisAppInStartup());
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8604 // Possible null reference argument.
+                    SendClientInfo(source);
                     WasProcessed = true;
                     break;
                 case PCActions.AddAppToStartup:
@@ -167,6 +169,33 @@ namespace ArtemisManagerUI
 
             }
             return WasProcessed;
+        }
+        public static void SendClientInfo(IPAddress? source)
+        {
+            if (source != null)
+            {
+                var mods = ArtemisManagerAction.ArtemisManager.GetInstalledMods();
+                var missions = ArtemisManager.GetInstalledMissions();
+                var jsonMods = new List<string>();
+                var jsonMissions = new List<string>();
+                foreach (var mod in mods)
+                {
+                    jsonMods.Add(mod.GetJSON());
+                }
+                foreach (var mission in missions)
+                {
+                    jsonMissions.Add(mission.GetJSON());
+                }
+                bool AretmisIsRunning = ArtemisManagerAction.ArtemisManager.IsArtemisRunning();
+                bool IsRunningUnderMyControl = ArtemisManagerAction.ArtemisManager.IsRunningArtemisUnderMyControl();
+                Network.Current?.SendClientInfo(
+                    source, Properties.Settings.Default.IsAMaster,
+                    Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
+                    jsonMissions.ToArray(),
+                    AretmisIsRunning,
+                    IsRunningUnderMyControl,
+                    IsThisAppInStartup());
+            }
         }
         public static string GetAppVersion()
         {
