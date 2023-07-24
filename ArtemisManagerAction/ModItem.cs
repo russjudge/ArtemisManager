@@ -85,10 +85,16 @@ namespace ArtemisManagerAction
             if (!IsActive || IsMission)
             {
                 ArtemisManager.DeleteAll(Path.Combine(GetFullSavePath(), this.InstallFolder));
+                if (string.IsNullOrEmpty(SaveFile))
+                {
+                    SaveFile = GetSaveFile();
+                }
                 if (!string.IsNullOrEmpty(SaveFile) && File.Exists(Path.Combine(GetFullSavePath(), SaveFile)))
                 {
                     File.Delete(Path.Combine(GetFullSavePath(), SaveFile));
                 }
+               
+
                 retVal = true;
             }
             return retVal;
@@ -276,7 +282,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        public string SaveFile { get; private set; } = string.Empty;
+        public string SaveFile { get; set; } = string.Empty;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         void DoChanged([CallerMemberName] string property = "")
@@ -418,20 +424,21 @@ namespace ArtemisManagerAction
         }
         public void Unpack(Stream stream)
         {
+            string targetFolder;
+            if (IsMission)
+            {
+                targetFolder = Path.Combine(MissionInstallFolder, installFolder);
+            }
+            else
+            {
+                targetFolder = Path.Combine(ModInstallFolder, installFolder);
+            }
+            ModManager.CreateFolder(targetFolder);
             using var reader = ReaderFactory.Open(stream);
             while (reader.MoveToNextEntry())
             {
                 if (!reader.Entry.IsDirectory)
                 {
-                    string targetFolder;
-                    if (IsMission)
-                    {
-                        targetFolder = Path.Combine(MissionInstallFolder, installFolder);
-                    }
-                    else
-                    {
-                        targetFolder = Path.Combine(ModInstallFolder, installFolder);
-                    }
                     reader.WriteEntryToDirectory(targetFolder, new ExtractionOptions()
                     {
                         ExtractFullPath = true,

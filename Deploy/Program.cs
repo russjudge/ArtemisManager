@@ -6,7 +6,9 @@ try
     if (args.Length > 3)
     {
         var projectFile = args[0];
+
         var data = VersionDataFileBuilder.GetVersion(projectFile);
+        Console.WriteLine("Deploying App: {0}, version: {1}", data.Item2, data.Item1);
         VersionDataFileBuilder.BuildDataFile(data.Item1, data.Item2, args[1], args[2], args[3]);
         Console.WriteLine("Deploy:");
         Console.WriteLine("*** File {0} deployed to {1}", args[1], args[2]);

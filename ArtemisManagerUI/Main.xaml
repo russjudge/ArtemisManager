@@ -7,7 +7,7 @@
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
         
-        Title="Artemis Manager" Height="750" Width="900" >
+        Title="Artemis Manager" Height="700" Width="900" >
     <DockPanel>
         <DockPanel.Resources>
             <converter:ByteFormatter x:Key="ByteFormatter" />
@@ -58,8 +58,14 @@
                 <Label Content="Drive Freespace:" VerticalAlignment="Center" />
                 <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
             </StackPanel>
+
             <Button DockPanel.Dock="Right"  Click="OnGenerateMod" Margin="20,5,5,5" ToolTip="Generate Mod from current activated Artemis folder">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/generate.png" />
+            </Button>
+            <Button
+                Visibility="{Binding ElementName=uc, Path=ArtemisChanged, Mode=OneWay,Converter={StaticResource BoolToVisibilityParameterConverter }, ConverterParameter='Visible|Collapsed'}"
+                DockPanel.Dock="Right"  Click="OnSnapshotAretmis" Margin="20,5,5,5" ToolTip="Create snapshot of currently installed Artemis">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/snapshot.png" />
             </Button>
             <Button
                 DockPanel.Dock="Right"
@@ -196,8 +202,8 @@
                         </StackPanel>
                         
                     </TabItem.Header>
-                    <StackPanel>
-                        <Button
+                    <DockPanel>
+                        <Button DockPanel.Dock="Top" 
                             HorizontalAlignment="Left"
                             Click="OnDeactivateMods"
                             Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
@@ -215,6 +221,7 @@
                             <DataTemplate>
                                 
                                     <local:ModItemControl
+                                        ModActivated="OnModActivated"
                                         RemoteInstallMod="OnRemoteInstallMod"
                                         ModUninstalled="OnModUninstalled"
                                         IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
@@ -224,7 +231,7 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    </StackPanel>
+                    </DockPanel>
                 </TabItem>
                 <TabItem
                      AllowDrop="True"
@@ -236,8 +243,7 @@
                     <TabItem.Header>
                         <Label Content="Installed Missions" />
                     </TabItem.Header>
-                    <!--GiveFeedback="OnModGiveFeedback"
-                        MouseMove="OnModMouseMove"-->
+                  
                     <ListBox
                         Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
                         ItemsSource="{Binding ElementName=uc, Path=InstalledMissions, Mode=OneWay}">

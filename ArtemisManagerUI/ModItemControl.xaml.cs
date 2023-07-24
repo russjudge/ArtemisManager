@@ -116,6 +116,8 @@ namespace ArtemisManagerUI
             else
             {
                 Mod.Activate();
+                RaiseModActivatedEvent();
+                TakeAction.SendClientInfo(IPAddress.Any);
             }
         }
 
@@ -154,12 +156,32 @@ namespace ArtemisManagerUI
             else
             {
                 Mod.Uninstall();
+                TakeAction.SendClientInfo(IPAddress.Any);
                 RaiseModUninstalledEvent();
             }
         }
 
-        
-        
+
+
+        void RaiseModActivatedEvent()
+        {
+            RoutedEventArgs args = new RoutedEventArgs(ModActivatedEvent);
+            RaiseEvent(args);
+        }
+
+        public static readonly RoutedEvent ModActivatedEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(ModActivated),
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(RoutedEventHandler),
+            ownerType: typeof(ModItemControl));
+        public event RoutedEventHandler ModActivated
+        {
+            add { AddHandler(ModActivatedEvent, value); }
+            remove { RemoveHandler(ModActivatedEvent, value); }
+        }
+
+
+
 
         void RaiseModUninstalledEvent()
         {

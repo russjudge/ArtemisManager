@@ -17,9 +17,15 @@ namespace AMCommunicator.Messages
         public PingMessage(bool acknowledge) : base()
         {
             Acknowledge = acknowledge;
+            Message = string.Empty;
+        }
+        public PingMessage(string message): base()
+        {
+            Message = message;
+            Acknowledge = false;
         }
         public bool Acknowledge { get; set; }
-
+        public string Message { get; set; }
         protected override void SetMessageVersion()
         {
             MessageVersion = ThisVersion;

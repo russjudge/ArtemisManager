@@ -119,13 +119,17 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                PingMessage msg = new()
-                {
-                    Acknowledge = true
-                };
+                PingMessage msg = new(true);
                 Transmit(connection.Stream, msg);
             }
-
+        }
+        public void SendPing(IPAddress target, string message)
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                PingMessage msg = new(message);
+                Transmit(connection.Stream, msg);
+            }
         }
         public void SendPCAction(IPAddress target, PCActions action, bool force)
         {
@@ -197,17 +201,51 @@ namespace AMCommunicator
                 Transmit(connection.Stream, msg);
             }
         }
+
+        public const int MaxJSONBytes = 100 * 1024 * 1024;
         public void SendItem(IPAddress target, byte[] data, string? modItem)
         {
-            if (activeConnections.TryGetValue(target, out var connection))
+            ThreadPool.QueueUserWorkItem(SendItem, new Tuple<IPAddress, byte[], string?>(target, data, modItem));
+        }
+
+        void SendItem(object? status)
+        {
+            if (status is Tuple<IPAddress, byte[], string?> parms)
             {
-                string mod = string.Empty;
-                if (modItem != null)
+                IPAddress target = parms.Item1;
+                byte[] data = parms.Item2;
+                string? modItem = parms.Item3;
+                if (activeConnections.TryGetValue(target, out var connection))
                 {
-                    mod = modItem;
+                    string mod = string.Empty;
+                    if (modItem != null)
+                    {
+                        mod = modItem;
+                    }
+
+                    List<byte[]> bufferList = new();
+                    byte[] buffer;
+                    int startPos = 0;
+                    int length = MaxJSONBytes;
+                    do
+                    {
+                        if (length > data.Length - startPos)
+                        {
+                            length = data.Length - startPos;
+                        }
+                        buffer = new byte[length];
+                        Array.Copy(data, startPos, buffer, 0, length);
+                        bufferList.Add(buffer);
+                        startPos += length;
+                    } while (startPos < data.Length);
+                    for (int i = 0; i < bufferList.Count; i++)
+                    {
+                        ModPackageMessage msg = new(mod, bufferList[i], (i >= bufferList.Count - 1));
+                        Transmit(connection.Stream, msg);
+                    }
+                    RaiseStatusUpdate("Mod/Mission sent to {0}", target.ToString());
                 }
-                ModPackageMessage msg = new(mod, data);
-                Transmit(connection.Stream, msg);
+
             }
         }
         //For tracking and processing on active connections.
@@ -473,6 +511,7 @@ namespace AMCommunicator
                 stream.Write(bytes, 0, bytes.Length);
             }
         }
+        List<byte> buffer = new List<byte>();
         private bool ProcessModPackage(NetworkStream? stream, ModPackageMessage? msg)
         {
             if (msg != null)
@@ -493,7 +532,17 @@ namespace AMCommunicator
                 }
                 else
                 {
-                    ModPackageReceived?.Invoke(this, new ModPackageEventArgs(msg.Data, msg.ModItem));
+                    if (msg.Source != null)
+                    {
+                        buffer.AddRange(msg.Data);
+                        if (msg.TransmissionCompleted)
+                        {
+                            var IP = IPAddress.Parse(msg.Source);
+                            ModPackageReceived?.Invoke(this, new ModPackageEventArgs(IP, buffer.ToArray(), msg.ModItem));
+                            SendPing(IP, string.Format("Package received for install. Bytes received: {0}", buffer.Count));
+                            buffer = new();
+                        }
+                    }
                 }
             }
             return false;
@@ -638,7 +687,14 @@ namespace AMCommunicator
                         return true;
                     }
                 }
-                PopupMessageEvent?.Invoke(this, new StatusUpdateEventArgs("Ping from {0} received.", hostname));
+                if (string.IsNullOrEmpty(msg.Message))
+                {
+                    PopupMessageEvent?.Invoke(this, new StatusUpdateEventArgs("Ping from {0} received.", hostname));
+                }
+                else
+                {
+                    PopupMessageEvent?.Invoke(this, new StatusUpdateEventArgs("From {0}: {1}", hostname, msg.Message));
+                }
                 if (msg.Acknowledge)
                 {
                     msg.Acknowledge = false;

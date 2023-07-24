@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -72,6 +73,7 @@ namespace ArtemisManagerUI
                 
                 if (me.ForInstall)
                 {
+                    bool IsMission = true;
                     if (!string.IsNullOrEmpty(me.PackageFile) && System.IO.File.Exists(me.PackageFile))
                     {
                         //look for .json file to load data for.
@@ -79,8 +81,13 @@ namespace ArtemisManagerUI
                         using var reader = ReaderFactory.Open(stream);
                         while (reader.MoveToNextEntry())
                         {
+                            if (reader.Entry.Key.StartsWith("dat/"))
+                            {
+                                IsMission = false;
+                            }
                             if (!reader.Entry.IsDirectory && reader.Entry.Key.EndsWith(ArtemisManager.SaveFileExtension))
                             {
+                               
                                 int bytesRead = 0;
                                 byte[] buffer = new byte[1024];
                                 List<byte> bufList = new List<byte>();
@@ -127,6 +134,7 @@ namespace ArtemisManagerUI
 
                             }
                         }
+                        me.Mod.IsMission = IsMission;
                     }
                 }
                 if (string.IsNullOrEmpty(me.Mod.Name) && !string.IsNullOrEmpty(me.PackageFile))
@@ -182,6 +190,7 @@ namespace ArtemisManagerUI
             if (!string.IsNullOrEmpty(PackageFile) && System.IO.File.Exists(PackageFile))
             {
                 ModManager.InstallMod(PackageFile, Mod);
+                TakeAction.SendClientInfo(IPAddress.Any);
                 this.DialogResult = true;
                 this.Close();
             }
@@ -200,16 +209,18 @@ namespace ArtemisManagerUI
 
         private void OnGenerateMod(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(PackageFile) && System.IO.File.Exists(PackageFile))
+            if (!string.IsNullOrEmpty(PackageFile))
             {
                 Mod.PackageFile = PackageFile;
                 if (ModManager.GeneratePackage(Mod))
                 {
                     ModManager.InstallMod(Mod.PackageFile, Mod);
+                    TakeAction.SendClientInfo(IPAddress.Any);
                     this.DialogResult = true;
                 }
                 else
                 {
+                    MessageBox.Show("Cannot create Mod. No modifications found in the current active folder.\r\nCreate your mod at:\r\n" + ModItem.ActivatedFolder);
                     this.DialogResult = false;
                 }
                 this.Close();

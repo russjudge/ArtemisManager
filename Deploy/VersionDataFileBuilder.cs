@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,12 +23,17 @@ namespace Deploy
             FileInfo setupFile = new FileInfo(setupFileNameFullPath);
             if (setupFile.Exists)
             {
-                using (StreamWriter sw = new StreamWriter(Path.Combine(targetPath, appTitle.Replace(" ", string.Empty) + ".version")))
+                string versionFile = Path.Combine(targetPath, appTitle.Replace(" ", string.Empty).ToLowerInvariant() + ".version");
+                if (File.Exists(versionFile))
+                {
+                    File.Delete(versionFile);
+                }
+                using (StreamWriter sw = new StreamWriter(versionFile))
                 {
                     sw.WriteLine(version);
-                    sw.WriteLine(setupFile.Name);
+                    sw.WriteLine(setupFile.Name.ToLowerInvariant());
                 }
-                setupFile.CopyTo(targetPath);
+                setupFile.CopyTo(Path.Combine(targetPath, setupFile.Name.ToLowerInvariant()), true);
             }
             //CopyFolder(sourceOutDir, Path.Combine(targetPath, appTitle.Replace(" ", string.Empty)));
         }
@@ -46,40 +52,58 @@ namespace Deploy
                 }
                 foreach (var fle in new DirectoryInfo(sourceFolder).GetFiles())
                 {
-                    fle.CopyTo(targetFolder);
+                    fle.CopyTo(Path.Combine(targetFolder, fle.Name), true);
                 }
             }
         }
         
         public static Tuple<string,string> GetVersion(string projectFile)
         {
-            string version;
-            string title;
-            const string titleMatch = "<Title>";
-            const string match = "<AssemblyVersion>";
+            
             string projectData;
             using (StreamReader sr = new StreamReader(projectFile))
             {
                 projectData= sr.ReadToEnd();
             }
+
+            return ProcessProjectData(projectData);
+        }
+        public static Tuple<string, string> ProcessProjectData(string projectData)
+        {
+            string version;
+            string title;
+            const string titleMatch = "<Title>";
+            const string match = "<AssemblyVersion>";
             int i = projectData.IndexOf(match) + match.Length;
-            if (i > -1)
+            if (i > match.Length)
             {
                 int j = projectData.IndexOf('<', i);
-                version = projectData.Substring(i, j - i);
+                string ver = projectData.Substring(i, j - i);
+                var parts = ver.Split('.');
+                
+                if (int.TryParse(parts[3], out int piece))
+                {
+                    piece--;
+                    version = parts[0] + "." + parts[1] + "." + parts[2] + "." + piece.ToString();
+                }
+                else
+                {
+                    version = "0.0.0.0";
+                }
             }
             else
             {
                 version = "0.0.0.0";
             }
-            i = projectData.IndexOf(titleMatch);
-            if (i >= titleMatch.Length)
+            i = projectData.IndexOf(titleMatch) + titleMatch.Length;
+            if (i > titleMatch.Length)
             {
-                int j = projectData.IndexOf('<', i);
+                int j = projectData.IndexOf('<', i + 1);
                 title = projectData.Substring(i, j - i);
             }
             else
             {
+                Console.WriteLine("Unable to find project title.");
                 title = string.Empty;
             }
             return new Tuple<string, string>(version, title);

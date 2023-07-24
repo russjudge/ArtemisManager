@@ -37,6 +37,10 @@ namespace ArtemisManagerAction
                         if (receivedMod != null)
                         {
                             WasProcessed = RequestInstallMod(receivedMod, target);
+                            if (WasProcessed)
+                            {
+                                mod = receivedMod;
+                            }
                         }
                     }
                     break;
@@ -48,11 +52,15 @@ namespace ArtemisManagerAction
                         if (receivedMod != null)
                         {
                             WasProcessed = receivedMod.Uninstall();
+                            if (WasProcessed)
+                            {
+                                mod = receivedMod;
+                            }
                         }
                     }
                     if (!WasProcessed && target != null)
                     {
-                        Network.Current?.SendMessage(target, "Unable to uninstall requested mod.  Cannot uninstall active mods.");
+                        Network.Current?.SendAlert(target, AMCommunicator.Messages.AlertItems.Uninstall_Failure, "Unable to uninstall requested mod.  Cannot uninstall active mods.");
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateMod:
@@ -74,6 +82,8 @@ namespace ArtemisManagerAction
                                 else
                                 {
                                     receivedMod.Activate();
+                                    mod = receivedMod;
+                                    WasProcessed = true;
                                 }
                             }
                         }

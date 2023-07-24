@@ -211,8 +211,8 @@
                         <TextBlock Text="Installed Missions" VerticalAlignment="Center" />
                     </TabItem.Header>
                     <ListBox
-                           Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
-                            ItemsSource="{Binding ElementName=uc, Path=ItemData.InstalledMissions}" >
+                           Tag="{Binding ElementName=ucPeer, Path=IsMaster, Mode=OneWay}"
+                            ItemsSource="{Binding ElementName=ucPeer, Path=ItemData.InstalledMissions}" >
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <local:ModItemControl

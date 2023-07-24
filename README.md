@@ -25,8 +25,7 @@ and try to connect to the first client by TCP on port 2011 (which is configurabl
 If you can't get the peer-to-peer network working, here are some troubleshooting tips you can try.  These are what I tried:
 
 - Make sure your network is marked as "Private":
-	- Windows 11:
-	- Windows 10:
+
 - Add an exception in Windows Firewall to allow ArtemisManager.exe through
 - If all else fails, turn off Windows Firewall.
 
@@ -39,40 +38,6 @@ since the Mission Editor already.  DMX editing will not be implemented since the
 Roadmap is subject to change.
 
 Phase 1
-- Develop Network connectivity, including the processing of commands
-- Manage the install and application of mods, both as a manual process and as a reaction to commands submitted over the network connectivity.
-
-Current TODO:
-- Try using port 2011 for both the UDP and TCP connections, so that when configuring, it will affect both.
---> Test:
-	- change password
-	- change port
-	- Multiple clients
-	- Install Mod
-	- Install mod remotely
-	- Activate mod
-	- activate mod remotely
-	- uninstall mod
-	- uninstall mod remotely
-	- close app remotely
-	- close and restart app remotely.
-	- auto detection of change in Artemis Version with correct snapshotting.
-	- Start Artemis remotely
-	- stop Artemis remotely
-	- Mod Generation.
-	- Application install
-	- Application uninstall
-	- Update check when update available
-	- update check when no update, but data exists.
-	- applying update.
-	- Mission install.
-	- Mission activation.
-	- Mission uninstall.
-	- Remote mission install.
-	- Remote mission activation.
-	- remote mission uninstall.
-	- Setting/clearing "IsMaster" both local and remote.
-
 
 -- Offer multiple versions of Artemis SBS updates.
 	-- Store on artemis.russjudge.com.
@@ -80,9 +45,6 @@ Current TODO:
 	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
 
-
--- Document possible issues with the Windows Firewall, and ways to fix Windows Firewall, including setting to being on Private network, adding rules, 
-	and finally, when all else fails, disabling Windows Firewall.
 -- Upon release, document future plans, and request input for enhancements and for prioritizing, and for bug reports.  This first release version requires
 	all of the above TODO items done first and will be noted as version 0.x and as a beta version.  Version 1.0 will be release upon completion of Phase 2, which will also
 	note that an automated way of submitted mods is under development, and to submit mods to me via URL link in the forum post.

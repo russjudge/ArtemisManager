@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		am.ico = am.ico
 		am.pdn = am.pdn
+		am.rtf = am.rtf
 		amBanner.jpg = amBanner.jpg
 		amBanner.pdn = amBanner.pdn
 		C:\Users\rjudge\Downloads\artemis1.pdn = C:\Users\rjudge\Downloads\artemis1.pdn
@@ -36,7 +37,9 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ArtemisManagerSetup", "Arte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deploy", "Deploy\Deploy.csproj", "{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AretmisManager_UninstallCleanup", "AretmisManager_UninstallCleanup\AretmisManager_UninstallCleanup.csproj", "{1FA1B525-A021-41DE-B452-0CA82EE29B15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AretmisManager_UninstallCleanup", "AretmisManager_UninstallCleanup\AretmisManager_UninstallCleanup.csproj", "{1FA1B525-A021-41DE-B452-0CA82EE29B15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtemisManagerUITests", "ArtemisManagerUITests\ArtemisManagerUITests.csproj", "{C655E240-A1E2-4EFC-9114-C50127C1AE49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -80,6 +83,10 @@ Global
 		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

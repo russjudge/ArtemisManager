@@ -174,7 +174,7 @@ namespace ArtemisManagerUI
         {
             if (source != null)
             {
-                var mods = ArtemisManagerAction.ArtemisManager.GetInstalledMods();
+                var mods = ArtemisManager.GetInstalledMods();
                 var missions = ArtemisManager.GetInstalledMissions();
                 var jsonMods = new List<string>();
                 var jsonMissions = new List<string>();
@@ -188,13 +188,35 @@ namespace ArtemisManagerUI
                 }
                 bool AretmisIsRunning = ArtemisManagerAction.ArtemisManager.IsArtemisRunning();
                 bool IsRunningUnderMyControl = ArtemisManagerAction.ArtemisManager.IsRunningArtemisUnderMyControl();
-                Network.Current?.SendClientInfo(
-                    source, Properties.Settings.Default.IsAMaster,
-                    Properties.Settings.Default.ConnectOnStart, jsonMods.ToArray(),
-                    jsonMissions.ToArray(),
-                    AretmisIsRunning,
-                    IsRunningUnderMyControl,
-                    IsThisAppInStartup());
+                var modsArray = jsonMods.ToArray();
+                var missionsArray = jsonMissions.ToArray();
+                bool InStartup = IsThisAppInStartup();
+                if (source.ToString() == IPAddress.Any.ToString() && ConnectedPCs != null)
+                {
+                    foreach (var client in ConnectedPCs)
+                    {
+                        if (client.IP != null)
+                        {
+                            Network.Current?.SendClientInfo(
+                               client.IP, Properties.Settings.Default.IsAMaster,
+                               Properties.Settings.Default.ConnectOnStart, modsArray,
+                               missionsArray,
+                               AretmisIsRunning,
+                               IsRunningUnderMyControl,
+                               InStartup);
+                        }
+                    }
+                }
+                else
+                {
+                    Network.Current?.SendClientInfo(
+                        source, Properties.Settings.Default.IsAMaster,
+                        Properties.Settings.Default.ConnectOnStart, modsArray,
+                        missionsArray,
+                        AretmisIsRunning,
+                        IsRunningUnderMyControl,
+                        InStartup);
+                }
             }
         }
         public static string GetAppVersion()
@@ -294,6 +316,7 @@ namespace ArtemisManagerUI
                 }
                 RaiseStatusUpdate("Starting update.");
                 System.Diagnostics.ProcessStartInfo startInfo = new ProcessStartInfo(installFile);
+                startInfo.UseShellExecute = true;
                 System.Diagnostics.Process.Start(startInfo);
             }
             catch (Exception ex)

@@ -1,1 +1,2 @@
 Deploy\bin\Debug\net7.0\Deploy.exe "ArtemisManager\ArtemisManager.csproj" "ArtemisManagerSetup\Debug\ArtemisManagerSetup.msi" "ArtemisManager\bin\Debug\net7.0-windows7.0" "//Endeaver/artemis.russjudge.com/Software"
+exit

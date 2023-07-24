@@ -18,7 +18,7 @@ namespace ArtemisManager
     public partial class App : Application
     {
         const string mutextName = "D4133AFE-31E8-4351-85B0-7F27FB0AFD20"; //Is a generated GUID so that this will work regardless of where installed, even if installed in multiple locations.
-                                                                    //"ArtemisManager";
+                                                                          //"ArtemisManager";
         static Mutex? Mutex;
         public static bool ProbablyUnattended { get; private set; }
         private void OnStartup(object sender, StartupEventArgs e)
@@ -35,22 +35,25 @@ namespace ArtemisManager
                         break;
                     }
                 }
-                Task.Run(async () =>
+                if (!Debugger.IsAttached)
                 {
-                    var result = TakeAction.UpdateCheck(false);
-                    if (result.Result.Item1)
+                    Task.Run(async () =>
                     {
-                        if (await TakeAction.DoUpdate(true, result.Result.Item2))
+                        var result = TakeAction.UpdateCheck(false);
+                        if (result.Result.Item1)
                         {
-                            TakeAction.MustExit = true;
-                            Environment.Exit(0);
+                            if (await TakeAction.DoUpdate(true, result.Result.Item2))
+                            {
+                                TakeAction.MustExit = true;
+                                Environment.Exit(0);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
             else
             {
-                
+
                 TakeAction.MustExit = true;
                 //MessageBox.Show("Exiting due to Mutex");
                 Environment.Exit(0);
@@ -60,7 +63,7 @@ namespace ArtemisManager
         private void OnError(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             //TODO: Handle error here.
-            
+
             string workFile = Path.GetTempFileName() + ".txt";
 
             using (StreamWriter sw = new StreamWriter(workFile))
@@ -84,7 +87,7 @@ namespace ArtemisManager
                 {
 
                 }
-                MessageBox.Show("FATAL ERROR: " + e.Exception.Message + 
+                MessageBox.Show("FATAL ERROR: " + e.Exception.Message +
                     "\r\n\r\nLoading debugging information.\r\nPlease cut and paste this information into the \"Contact Us\" form at:\r\nhttps://russjudge/contact\r\n\r\n" +
                     "We need to exit now....", "FATAL ERROR", MessageBoxButton.OK, MessageBoxImage.Error
                     );

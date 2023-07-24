@@ -81,6 +81,7 @@ namespace ArtemisManagerUI
         }
         bool isLoading = true;
         readonly Network MyNetwork = Network.GetNetwork("");
+        FileSystemWatcher watcher = null;
         /*
          * 
          *
@@ -130,11 +131,16 @@ namespace ArtemisManagerUI
                     {
                         if (ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder))
                         {
+                            ArtemisChanged= true;
                             string? version = ArtemisManager.GetArtemisVersion(ArtemisInstallFolder);
                             if (version != null && MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
                                 SnapshotArtemis();
                             }
+                        }
+                        else
+                        {
+
                         }
                     }
                     isLoading = false;
@@ -735,7 +741,33 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty ArtemisInstallFolderProperty =
           DependencyProperty.Register(nameof(ArtemisInstallFolder), typeof(string),
-              typeof(Main));
+              typeof(Main), new PropertyMetadata(OnArtemisInstallFolderChanged));
+
+        private static void OnArtemisInstallFolderChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is Main me)
+            {
+                if (!string.IsNullOrEmpty(me.ArtemisInstallFolder))
+                {
+                    me.watcher = new FileSystemWatcher(me.ArtemisInstallFolder);
+                    me.watcher.Created += me.Watcher_Changed;
+                    me.watcher.Changed += me.Watcher_Changed;
+                    me.watcher.EnableRaisingEvents = true;
+                }
+            }
+        }
+
+        private void Watcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            Dispatcher.Invoke(() => {
+                if (!string.IsNullOrEmpty(ArtemisInstallFolder))
+                {
+                    ArtemisChanged = ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder);
+                }
+            });
+            
+        }
+
 
         public string? ArtemisInstallFolder
         {
@@ -815,7 +847,14 @@ namespace ArtemisManagerUI
                     item.Save();
                     this.Dispatcher.Invoke(new Action(() =>
                     {
-                        InstalledMods.Add(item);
+                        if (item.IsMission)
+                        {
+                            InstalledMissions.Add(item);
+                        }
+                        else
+                        {
+                            InstalledMods.Add(item);
+                        }
                     }));
                     
                 }
@@ -826,6 +865,7 @@ namespace ArtemisManagerUI
                     item.Activate();
                     TakeArtemisAction.StagedModItemToActivateOnceInstalled = null;
                 }
+                TakeAction.SendClientInfo(IPAddress.Any);
             }
         }
 
@@ -858,7 +898,14 @@ namespace ArtemisManagerUI
                             {
                                 if (wasProcessed.Item2 != null)
                                 {
-                                    InstalledMods.Add(wasProcessed.Item2);
+                                    if (wasProcessed.Item2.IsMission)
+                                    {
+                                        InstalledMissions.Add(wasProcessed.Item2);
+                                    }
+                                    else
+                                    {
+                                        InstalledMods.Add(wasProcessed.Item2);
+                                    }
                                 }
                             }));
                         }
@@ -871,18 +918,21 @@ namespace ArtemisManagerUI
                             {
                                 if (wasProcessed.Item2 != null)
                                 {
-                                    ModItem? modToRemove = null;
-                                    foreach (var mod in InstalledMods)
+                                    if (wasProcessed.Item2.IsMission)
                                     {
-                                        if (mod.Equals(wasProcessed.Item2))
+                                        this.InstalledMissions.Clear();
+                                        foreach (var mod in ArtemisManager.GetInstalledMissions())
                                         {
-                                            modToRemove = mod;
-                                            break;
+                                            InstalledMissions.Add(mod);
                                         }
                                     }
-                                    if (modToRemove != null)
+                                    else
                                     {
-                                        InstalledMods.Remove(modToRemove);
+                                        this.InstalledMods.Clear();
+                                        foreach (var mod in ArtemisManager.GetInstalledMods())
+                                        {
+                                            InstalledMods.Add(mod);
+                                        }
                                     }
                                 }
                             }));
@@ -893,11 +943,26 @@ namespace ArtemisManagerUI
 
                         this.Dispatcher.Invoke(new Action(() =>
                         {
-                            foreach (var mod in InstalledMods)
+                            if (wasProcessed.Item2 != null)
                             {
-                                if (mod.LocalIdentifier == e.Identifier)
+                                if (wasProcessed.Item2.IsMission)
                                 {
-                                    mod.IsActive = true;
+                                    foreach (var mod in InstalledMissions)
+                                    {
+                                        if (mod.LocalIdentifier == e.Identifier)
+                                        {
+                                            mod.IsActive = true;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    this.InstalledMods.Clear();
+                                    
+                                    foreach (var mod in ArtemisManager.GetInstalledMods())
+                                    {
+                                        InstalledMods.Add(mod);
+                                    }
                                 }
                             }
                         }));
@@ -905,8 +970,8 @@ namespace ArtemisManagerUI
                         break;
                 }
             }
-            UpdateStatus(string.Format("Sending Updated Client info to requesting peer {0}", e.Source?.ToString()));
-            TakeAction.SendClientInfo(e.Source);
+            UpdateStatus("Sending Updated Client info");
+            TakeAction.SendClientInfo(IPAddress.Any);
         }
 
         void LoadClientInfoData(ClientInfoEventArgs e)
@@ -965,6 +1030,8 @@ namespace ArtemisManagerUI
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
+                PopupMessage = e.AlertItem.ToString() + "\r\n" + e.RelatedData;
+                ShowPopup = true;
                 MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
             }));
             
@@ -1313,6 +1380,24 @@ namespace ArtemisManagerUI
                 Properties.Settings.Default.Save();
             }
         }
+        public static readonly DependencyProperty ArtemisChangedProperty =
+          DependencyProperty.Register(nameof(ArtemisChanged), typeof(bool),
+         typeof(Main));
+
+        public bool ArtemisChanged
+        {
+            get
+            {
+                return (bool)this.GetValue(ArtemisChangedProperty);
+
+            }
+            set
+            {
+                this.SetValue(ArtemisChangedProperty, value);
+            }
+        }
+
+
         private void OnSnapshotAretmis(object sender, RoutedEventArgs e)
         {
             //Mod Install.  Install folder naming convention:
@@ -1333,9 +1418,19 @@ namespace ArtemisManagerUI
             else
             {
                 ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder);
-                InstalledMods.Add(item);
+                
                 //ArtemisManager.ClearActiveFolder();
                 item.Activate();
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    InstalledMods.Clear();
+                    foreach(var mod in ArtemisManager.GetInstalledMods())
+                    {
+                        InstalledMods.Add(mod);
+                    }
+                    ArtemisChanged = false;
+                }));
+                TakeAction.SendClientInfo(IPAddress.Any);
             }
 
         }
@@ -1376,7 +1471,7 @@ namespace ArtemisManagerUI
             DeactivateAllButBase(baseItem?.LocalIdentifier);
            
             baseItem?.Activate();
-            
+            TakeAction.SendClientInfo(IPAddress.Any);
         }
 
         private void OnInstallMod(object sender, RoutedEventArgs e)
@@ -1419,20 +1514,22 @@ namespace ArtemisManagerUI
 
         private void OnLocalUpdateCheck(object sender, RoutedEventArgs e)
         {
-            UpdateStatus("Checking for update...");
-            Task.Run( async () =>
-            {
-                var result = TakeAction.UpdateCheck(true);
-                if (result.Result.Item1)
+            
+                UpdateStatus("Checking for update...");
+                Task.Run(async () =>
                 {
-                    var newResult = await TakeAction.DoUpdate(true, result.Result.Item2);
-                    if (newResult)
+                    var result = TakeAction.UpdateCheck(true);
+                    if (result.Result.Item1)
                     {
-                        this.Dispatcher.Invoke(new Action(() => { this.Close(); }));
+                        var newResult = await TakeAction.DoUpdate(true, result.Result.Item2);
+                        if (newResult)
+                        {
+                            this.Dispatcher.Invoke(new Action(() => { this.Close(); }));
+                        }
                     }
-                }
-                UpdateStatus("Update check complete.");
-            });
+                    UpdateStatus("Update check complete.");
+                });
+            
         }
         private int testCounter = 0;
         private void OnTest(object sender, RoutedEventArgs e)
@@ -1632,6 +1729,18 @@ namespace ArtemisManagerUI
             {
                 TakeAction.FulfillModPackageRequest(SelectedPeer.IP, Mod.PackageFile, Mod);
             }
+        }
+
+        private void OnModActivated(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                InstalledMods.Clear();
+                foreach(var mod in ArtemisManager.GetInstalledMods())
+                {
+                    InstalledMods.Add(mod);
+                }
+            });
         }
     }
 }

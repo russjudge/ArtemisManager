@@ -47,6 +47,8 @@
                     <StackPanel
                         Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                         Orientation="Horizontal">
+                        <AdornerDecorator
+                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
                 <Button
                     Click="OnUninstallMod"
                     ToolTip="Uninstall mod."
@@ -55,7 +57,8 @@
                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
                     </StackPanel>
                 </Button>
-                <Button
+                        </AdornerDecorator>
+                        <Button
                     Click="OnUninstallMod"
                     ToolTip="Uninstall mission."
                     Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
@@ -63,8 +66,7 @@
                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
                     </StackPanel>
                 </Button>
-                
-                    <Button
+                        <Button
                     Click="OnInstallMod"
                     Margin="30,2,2,2"
                     ToolTip="Install mod locally from the remote mod on Peer."

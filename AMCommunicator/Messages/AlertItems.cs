@@ -10,6 +10,7 @@ namespace AMCommunicator.Messages
     {
         MessageVersionMismatch,
         UpdateCheckFail,
-        UpdateCheckSuccess
+        UpdateCheckSuccess,
+        Uninstall_Failure
     }
 }
