@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
+    
     <GroupBox
         
         VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" >
@@ -45,11 +46,28 @@
                     </StackPanel>
                 </Button>
                     <StackPanel
-                        Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                        Orientation="Horizontal">
+                        Orientation="Horizontal"
+                        Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                        <AdornerDecorator
+                            Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+
                         <AdornerDecorator
                             Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                <Button
+                            <Button
+                                Click="OnUninstallMod"
+                                ToolTip="Uninstall mod."
+                                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
+                                </StackPanel>
+                            </Button>
+                        </AdornerDecorator>
+                        </AdornerDecorator>
+                        <AdornerDecorator
+                            Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+                        <AdornerDecorator
+                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+                            <Button
                     Click="OnUninstallMod"
                     ToolTip="Uninstall mod."
                     Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
@@ -57,6 +75,7 @@
                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
                     </StackPanel>
                 </Button>
+                        </AdornerDecorator>
                         </AdornerDecorator>
                         <Button
                     Click="OnUninstallMod"

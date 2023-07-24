@@ -18,9 +18,11 @@ namespace ArtemisManagerAction
         public const string ArtemisEXE = "Artemis.exe";
         public const string RegistryArtemisInstallLocation = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\windows\\CurrentVersion\\App Paths\\" + ArtemisEXE;
         
-        public readonly static string ActivatedModsTrackingFile = Path.Combine(ModManager.DataFolder, "ActivatedModsTracking.dat");
-        
         public const string SaveFileExtension = ".json";
+        public const string ArtemisEngineeringFile = "Artemis.dat";
+        public const string OriginalArtemisEngineeringFile = "Original.dat";
+        //public static readonly string EngineeringPresetsOriginal = Path.Combine(ModManager.ModArchiveFolder, ArtemisEngineeringFile);
+        public static readonly string EngineeringPresetsFolder = Path.Combine(ModManager.DataFolder, "EngineeringPresets");
 
         static System.Diagnostics.Process? runningArtemisProcess = null;
 
@@ -33,7 +35,30 @@ namespace ArtemisManagerAction
             ArtemisVersionIdentifiers.Add("2.8.0", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
             ArtemisVersionIdentifiers.Add("2.8.1", new Guid("AF0EC3FE-D26A-4AAD-8E1A-8584DE044688"));  //If from zip file the exe file date should be 1/23/2022.
         }
-        
+
+        public static string[] GetEngineeringPresetFiles()
+        {
+            List<string> retVal = new();
+            foreach (var fle in new DirectoryInfo(EngineeringPresetsFolder).GetFiles())
+            {
+                retVal.Add(fle.Name);
+            }
+            if (retVal.Count == 0 && File.Exists(Path.Combine(ModItem.ActivatedFolder, ArtemisEngineeringFile)))
+            {
+                File.Copy(Path.Combine(ModItem.ActivatedFolder, ArtemisEngineeringFile), Path.Combine(EngineeringPresetsFolder, OriginalArtemisEngineeringFile));
+                retVal.Add(OriginalArtemisEngineeringFile);
+            }
+            return retVal.ToArray();
+        }
+        public static KeyValuePair<string, string>[] GetArtemisUpgradeLinks()
+        {
+            //TODO: download from https://artemis.russjudge.com/software/???/artemisupgrades.txt
+            //  format will be:
+            //  version: url
+            //2.1.1:https://artemis.russjudge.com/software/artemisupgrades/artemis_V2_1_1.exe
+            //be sure to keep the correct casing of the filename.
+            return Array.Empty<KeyValuePair<string, string>>();
+        }
         public static bool CheckIfArtemisSnapshotNeeded(string installFolder)
         {
             bool matchFound = false;
@@ -318,17 +343,20 @@ namespace ArtemisManagerAction
                             break;
                         }
                     }
-                    int k = retVal.IndexOf(".");
-                    if (retVal.IndexOf(".", k + 1) == -1)
+                    if (retVal != null)
                     {
-                        retVal += ".0";
-                    }
-                    if (retVal == "2.8.0")
-                    {
-                        FileInfo f = new(Path.Combine(installPath, ArtemisEXE));
-                        if (f.LastWriteTime.Year >= 2022 && f.LastWriteTime.Year <= 2023)
+                        int k = retVal.IndexOf(".");
+                        if (retVal.IndexOf(".", k + 1) == -1)
                         {
-                            retVal = "2.8.1";
+                            retVal += ".0";
+                        }
+                        if (retVal == "2.8.0")
+                        {
+                            FileInfo f = new(Path.Combine(installPath, ArtemisEXE));
+                            if (f.LastWriteTime.Year >= 2022 && f.LastWriteTime.Year <= 2023)
+                            {
+                                retVal = "2.8.1";
+                            }
                         }
                     }
                 }
@@ -372,9 +400,11 @@ namespace ArtemisManagerAction
                 string target = Path.Combine(ModItem.ActivatedFolder, ArtemisEXE);
                 if (File.Exists(target))
                 {
-                    ProcessStartInfo startInfo = new ProcessStartInfo(target);
-                    startInfo.WorkingDirectory = Path.GetDirectoryName(target);
-                    
+                    ProcessStartInfo startInfo = new(target)
+                    {
+                        WorkingDirectory = Path.GetDirectoryName(target)
+                    };
+
                     runningArtemisProcess = System.Diagnostics.Process.Start(startInfo);
                     if (runningArtemisProcess != null)
                     {

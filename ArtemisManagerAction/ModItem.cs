@@ -82,7 +82,7 @@ namespace ArtemisManagerAction
         public bool Uninstall()
         {
             bool retVal = false;
-            if (!IsActive || IsMission)
+            if (!IsActive || IsMission || IsArtemisBase)
             {
                 ArtemisManager.DeleteAll(Path.Combine(GetFullSavePath(), this.InstallFolder));
                 if (string.IsNullOrEmpty(SaveFile))
@@ -293,7 +293,7 @@ namespace ArtemisManagerAction
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true
+                WriteIndented = false
             };
             return JsonSerializer.Serialize(this, options);
         }

@@ -39,7 +39,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deploy", "Deploy\Deploy.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AretmisManager_UninstallCleanup", "AretmisManager_UninstallCleanup\AretmisManager_UninstallCleanup.csproj", "{1FA1B525-A021-41DE-B452-0CA82EE29B15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtemisManagerUITests", "ArtemisManagerUITests\ArtemisManagerUITests.csproj", "{C655E240-A1E2-4EFC-9114-C50127C1AE49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerUITests", "ArtemisManagerUITests\ArtemisManagerUITests.csproj", "{C655E240-A1E2-4EFC-9114-C50127C1AE49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtemisEngineeringPresets", "ArtemisEngineeringPresets\ArtemisEngineeringPresets.csproj", "{2E79A2C0-7F86-4C3A-A172-A5432546A847}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C655E240-A1E2-4EFC-9114-C50127C1AE49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E79A2C0-7F86-4C3A-A172-A5432546A847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E79A2C0-7F86-4C3A-A172-A5432546A847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E79A2C0-7F86-4C3A-A172-A5432546A847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E79A2C0-7F86-4C3A-A172-A5432546A847}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

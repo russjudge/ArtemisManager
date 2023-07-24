@@ -45,10 +45,6 @@ Phase 1
 	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
 
--- Upon release, document future plans, and request input for enhancements and for prioritizing, and for bug reports.  This first release version requires
-	all of the above TODO items done first and will be noted as version 0.x and as a beta version.  Version 1.0 will be release upon completion of Phase 2, which will also
-	note that an automated way of submitted mods is under development, and to submit mods to me via URL link in the forum post.
-
 
 Phase 2
 -- Add Engineering presets local edit and propagating to peers.

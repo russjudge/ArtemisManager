@@ -263,6 +263,16 @@ namespace ArtemisManagerUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Presets {
+            get {
+                object obj = ResourceManager.GetObject("Presets", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap remote {
             get {
                 object obj = ResourceManager.GetObject("remote", resourceCulture);
@@ -386,6 +396,16 @@ namespace ArtemisManagerUI.Properties {
         internal static System.Drawing.Bitmap tool_and_utensils {
             get {
                 object obj = ResourceManager.GetObject("tool-and-utensils", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap trash {
+            get {
+                object obj = ResourceManager.GetObject("trash", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

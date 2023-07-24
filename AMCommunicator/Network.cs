@@ -248,6 +248,14 @@ namespace AMCommunicator
 
             }
         }
+        public void SendJsonPackageFile(IPAddress target, string JSON, JsonPackageFile fileType, string filename)
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                JsonPackageMessage msg = new(JSON, fileType, filename);
+                Transmit(connection.Stream, msg);
+            }
+        }
         //For tracking and processing on active connections.
         private readonly Dictionary<IPAddress, ConnectionTracker> activeConnections = new();
 
@@ -472,6 +480,9 @@ namespace AMCommunicator
                 case MessageCommand.Alert:
                     disconnect = ProcessAlert(stream, message?.GetItem<AlertMessage>());
                     break;
+                case MessageCommand.JsonPackage:
+                    disconnect = ProcessJsonPackage(stream, message?.GetItem<JsonPackageMessage>());
+                    break;
                 default:
                     RaiseStatusUpdate("Invalid Message command.  Ignored.  Check for software update to Artemis Manager.");
                     return false;
@@ -496,6 +507,7 @@ namespace AMCommunicator
         public event EventHandler<AlertEventArgs>? AlertReceived;
         public event EventHandler<ClientInfoEventArgs>? ClientInfoReceived;
         public event EventHandler<ArtemisActionEventArgs>? ArtemisActionReceived;
+        public event EventHandler<PackageFileEventArgs>? PackageFileReceived;
         void Transmit(NetworkStream? stream, NetworkMessage msg)
         {
             if (stream == null)
@@ -510,6 +522,32 @@ namespace AMCommunicator
                 var bytes = data.GetBytes();
                 stream.Write(bytes, 0, bytes.Length);
             }
+        }
+        private bool ProcessJsonPackage(NetworkStream? stream, JsonPackageMessage? msg)
+        {
+            if (msg != null)
+            {
+                if (msg.MessageVersion != ModPackageMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //We might be unattended here, so we need to alert the sender of an issue.
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
+                            string.Format("JsonPackageMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
+                            JsonPackageMessage.ThisVersion, msg.MessageVersion));
+                    }
+                }
+                else
+                {
+                    PackageFileReceived?.Invoke(this, new PackageFileEventArgs(msg.JsonData, msg.FileType, msg.FileName));
+
+                }
+            }
+            return false;
         }
         List<byte> buffer = new List<byte>();
         private bool ProcessModPackage(NetworkStream? stream, ModPackageMessage? msg)

@@ -20,5 +20,6 @@ namespace AMCommunicator
         Ping = 9,
         ChangeAppSetting = 10,
         Alert = 11,
+        JsonPackage,
     }
 }

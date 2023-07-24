@@ -133,7 +133,7 @@
             <Image Height="24" Source="/ArtemisManagerUI;component/Resources/viewhistory.png" />
         </Button>
 
-        <Button ToolTip="OK" Click="OnOK" Grid.Row="11" Grid.Column="1" Width="48">
+        <Button HorizontalAlignment="Right" ToolTip="OK" Click="OnOK" Grid.Row="11" Grid.Column="1" Width="48">
             <Image Height="24" Source="/ArtemisManagerUI;component/Resources/ok.png" />
         </Button>
     </Grid>

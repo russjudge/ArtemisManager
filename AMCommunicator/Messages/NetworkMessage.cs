@@ -22,6 +22,7 @@ namespace AMCommunicator.Messages
     [JsonDerivedType(typeof(PCActionMessage), nameof(PCActionMessage))]
     [JsonDerivedType(typeof(PingMessage), nameof(PingMessage))]
     [JsonDerivedType(typeof(RequestModPackageMessage), nameof(RequestModPackageMessage))]
+    [JsonDerivedType(typeof(JsonPackageMessage), nameof(JsonPackageMessage))]
     public abstract class NetworkMessage : INetworkMessage
     {
         protected NetworkMessage()
@@ -40,7 +41,7 @@ namespace AMCommunicator.Messages
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = true,
+                WriteIndented = false,
             };
             return JsonSerializer.Serialize<NetworkMessage>(this, options);
         }

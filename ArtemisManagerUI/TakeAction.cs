@@ -1,4 +1,5 @@
 ﻿using AMCommunicator;
+using ArtemisEngineeringPresets;
 using ArtemisManagerAction;
 using Lnk;
 using SharpCompress.Common;
@@ -9,9 +10,11 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Versioning;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using static System.Windows.Forms.Design.AxImporter;
 
 namespace ArtemisManagerUI
 {
@@ -480,6 +483,17 @@ Set oLink = oWS.CreateShortcut(sLinkFile)
 oLink.Save
                  * */
             }
+            
+        }
+        public static void SaveEngineeringPreset(string filename, string JsonData)
+        {
+            PresetsFile? file = JsonSerializer.Deserialize<PresetsFile>(JsonData);
+            if (file != null)
+            {
+                file.SaveFile = Path.Combine(ArtemisManager.EngineeringPresetsFolder, filename);
+                file.Save();
+            }
+
         }
     }
 }
