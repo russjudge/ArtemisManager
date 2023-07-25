@@ -48,8 +48,10 @@ Phase 1
 	-- need to activate a selected engineering preset.
 	-- bug add new adds 2.
 	-- prompt on delete
+
+-->preserve DMXCommands.xml file, controls.ini, and local settings for artemis.ini.
+
 Phase 2
--- Add Engineering presets local edit and propagating to peers.
 -- Add mechanism for editing artemis.ini file to restrict peers to specific consoles and ships and port (default 2010) (need to confirm this works).
 	-- Since some mods include this file, the console restriction will need to be stored in the peer's settings, and applied to artemis.ini whenever a new mod is activated.
 	-- The staging folder for mods and the vanilla artemis version will need to leave the artemis.ini file untouched.
