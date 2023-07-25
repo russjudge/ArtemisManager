@@ -142,7 +142,7 @@ namespace ArtemisEngineeringPresets
             }
             set
             {
-                this.SetValue(ChangedProperty, value);
+                this.SetValue(IndexProperty, value);
             }
         }
 

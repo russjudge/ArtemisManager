@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>0.2.0.11</AssemblyVersion>
-    <FileVersion>0.2.0.11</FileVersion>
+    <AssemblyVersion>0.2.0.40</AssemblyVersion>
+    <FileVersion>0.2.0.40</FileVersion>
     <Copyright>Copyright (c) 2023</Copyright>
     <Company>Confederate In Blue Gaming</Company>
     <Authors>Russ Judge</Authors>

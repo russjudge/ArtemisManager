@@ -17,9 +17,19 @@ namespace ArtemisEngineeringPresets
         public const int MaxPresets = 10;
         public const int MaxStations = 8;
         public const byte HeaderByte = 0xfe;
-        public PresetsFile() 
+        public PresetsFile()
         {
             Presets = new Preset[MaxPresets];
+            for (int i = 0; i < MaxPresets; i++)
+            {
+                for (int j = 0; j < MaxStations; j++)
+                {
+                    Presets[i] = new Preset();
+                    Presets[i].SystemLevels[j] = new();
+                    Presets[i].SystemLevels[j].EnergyLevel = 150;
+                    Presets[i].SystemLevels[j].CoolantLevel = 4;
+                }
+            }
         }
         public PresetsFile(string file) 
         {

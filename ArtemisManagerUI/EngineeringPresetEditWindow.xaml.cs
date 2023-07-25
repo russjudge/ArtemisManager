@@ -4,6 +4,7 @@ using ArtemisManagerAction;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -38,16 +39,22 @@ namespace ArtemisManagerUI
 
         private void Watcher_Created(object sender, FileSystemEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(".dat"))
+            if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(".dat") )
             {
-                PresetFiles.Add(e.Name);
+                Dispatcher.Invoke(() =>
+                {
+                    if (!PresetFiles.Contains(e.Name))
+                    {
+                        PresetFiles.Add(e.Name);
+                    }
+                });
             }
         }
 
         FileSystemWatcher? watcher;
         public static readonly DependencyProperty SelectedTargetPCProperty =
         DependencyProperty.Register(nameof(SelectedTargetPC), typeof(PCItem),
-        typeof(PresetSettingsControl));
+        typeof(EngineeringPresetEditWindow));
 
         public PCItem SelectedTargetPC
         {
@@ -63,7 +70,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty ConnectedPCsProperty =
           DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
-          typeof(PresetSettingsControl));
+          typeof(EngineeringPresetEditWindow));
 
         public ObservableCollection<PCItem> ConnectedPCs
         {
@@ -79,7 +86,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty PresetFilesProperty =
           DependencyProperty.Register(nameof(PresetFiles), typeof(ObservableCollection<string>),
-          typeof(PresetSettingsControl));
+          typeof(EngineeringPresetEditWindow));
 
         public ObservableCollection<string> PresetFiles
         {
@@ -95,21 +102,22 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedPresetFileProperty =
          DependencyProperty.Register(nameof(SelectedPresetFile), typeof(string),
-         typeof(PresetSettingsControl), new PropertyMetadata(OnSelectedPresetFileChanged));
+         typeof(EngineeringPresetEditWindow), new PropertyMetadata(OnSelectedPresetFileChanged));
 
         private static void OnSelectedPresetFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is EngineeringPresetEditWindow window)
+            if (d is EngineeringPresetEditWindow me)
             {
-                if (!string.IsNullOrEmpty(window.SelectedPresetFile) && System.IO.File.Exists(window.SelectedPresetFile))
+                if (!string.IsNullOrEmpty(me.SelectedPresetFile) && System.IO.File.Exists(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile)))
                 {
                     bool IsOkay = true;
-                    if (window.SelectedFile != null && window.SelectedFile.HasChanges())
+
+                    if (me.SelectedFile != null && me.SelectedFile.HasChanges())
                     {
                         switch (System.Windows.MessageBox.Show("Save changes to current Presets File?", "Presets File changed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
                         {
                             case MessageBoxResult.Yes:
-                                window.SelectedFile.Save();
+                                me.SelectedFile.Save();
                                 IsOkay = true;
                                 break;
                             case MessageBoxResult.No:
@@ -122,13 +130,13 @@ namespace ArtemisManagerUI
                     }
                     if (IsOkay)
                     {
-                        window.SelectedFile = new(window.SelectedPresetFile);
+                        me.SelectedFile = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder,me.SelectedPresetFile));
                     }
                     else
                     {
-                        if (window.SelectedFile != null && !string.IsNullOrEmpty(window.SelectedFile.SaveFile))
+                        if (me.SelectedFile != null && !string.IsNullOrEmpty(me.SelectedFile.SaveFile))
                         {
-                            window.SelectedPresetFile = new System.IO.FileInfo(window.SelectedFile.SaveFile).Name;
+                            me.SelectedPresetFile = new System.IO.FileInfo(me.SelectedFile.SaveFile).Name;
                         }
                     }
                 }
@@ -150,7 +158,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedFileProperty =
           DependencyProperty.Register(nameof(SelectedFile), typeof(PresetsFile),
-          typeof(PresetSettingsControl));
+          typeof(EngineeringPresetEditWindow));
 
         public PresetsFile? SelectedFile
         {
@@ -176,9 +184,19 @@ namespace ArtemisManagerUI
                 dialg.Title = "Select new presets filename";
                 if (dialg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    System.IO.File.Copy(
-                        System.IO.Path.Combine(ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder, ArtemisManagerAction.ArtemisManager.OriginalArtemisEngineeringFile),
-                        dialg.FileName);
+                    string source = System.IO.Path.Combine(ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder, ArtemisManagerAction.ArtemisManager.OriginalArtemisEngineeringFile);
+                    if (File.Exists(source))
+                    {
+                        System.IO.File.Copy(
+                            source,
+                            dialg.FileName);
+                    }
+                    else
+                    {
+                        PresetsFile f = new PresetsFile();
+                        f.SaveFile = dialg.FileName;
+                        f.Save();
+                    }
                     PresetFiles.Add(dialg.FileName);
                     SelectedFile = new PresetsFile(dialg.FileName);
                 }
@@ -228,5 +246,7 @@ namespace ArtemisManagerUI
                 }
             }
         }
+
+       
     }
 }

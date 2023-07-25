@@ -14,11 +14,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		am.rtf = am.rtf
 		amBanner.jpg = amBanner.jpg
 		amBanner.pdn = amBanner.pdn
+		artemis.ini = artemis.ini
 		C:\Users\rjudge\Downloads\artemis1.pdn = C:\Users\rjudge\Downloads\artemis1.pdn
 		changes.txt = changes.txt
+		controls.ini = controls.ini
 		Deploy.cmd = Deploy.cmd
 		LICENSE = LICENSE
 		README.md = README.md
+		vesselData.xml = vesselData.xml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AMCommunicatorTests", "AMCommunicatorTests\AMCommunicatorTests.csproj", "{B8C00DC4-485B-42A9-B958-8FB76C50324F}"
@@ -41,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AretmisManager_UninstallCle
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerUITests", "ArtemisManagerUITests\ArtemisManagerUITests.csproj", "{C655E240-A1E2-4EFC-9114-C50127C1AE49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArtemisEngineeringPresets", "ArtemisEngineeringPresets\ArtemisEngineeringPresets.csproj", "{2E79A2C0-7F86-4C3A-A172-A5432546A847}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisEngineeringPresets", "ArtemisEngineeringPresets\ArtemisEngineeringPresets.csproj", "{2E79A2C0-7F86-4C3A-A172-A5432546A847}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

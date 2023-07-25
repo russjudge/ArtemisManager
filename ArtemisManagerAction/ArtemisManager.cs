@@ -19,7 +19,7 @@ namespace ArtemisManagerAction
         public const string RegistryArtemisInstallLocation = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\windows\\CurrentVersion\\App Paths\\" + ArtemisEXE;
         
         public const string SaveFileExtension = ".json";
-        public const string ArtemisEngineeringFile = "Artemis.dat";
+        public const string ArtemisEngineeringFile = "engineeringSettings.dat";
         public const string OriginalArtemisEngineeringFile = "Original.dat";
         //public static readonly string EngineeringPresetsOriginal = Path.Combine(ModManager.ModArchiveFolder, ArtemisEngineeringFile);
         public static readonly string EngineeringPresetsFolder = Path.Combine(ModManager.DataFolder, "EngineeringPresets");
@@ -39,6 +39,7 @@ namespace ArtemisManagerAction
         public static string[] GetEngineeringPresetFiles()
         {
             List<string> retVal = new();
+            ModManager.CreateFolder(EngineeringPresetsFolder);
             foreach (var fle in new DirectoryInfo(EngineeringPresetsFolder).GetFiles())
             {
                 retVal.Add(fle.Name);
