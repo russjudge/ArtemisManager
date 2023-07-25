@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>0.2.0.49</AssemblyVersion>
-    <FileVersion>0.2.0.49</FileVersion>
+    <AssemblyVersion>0.2.0.126</AssemblyVersion>
+    <FileVersion>0.2.0.126</FileVersion>
     <Copyright>Copyright (c) 2023</Copyright>
     <Company>Confederate In Blue Gaming</Company>
     <Authors>Russ Judge</Authors>
@@ -25,11 +25,43 @@
   </Target>
 
   <ItemGroup>
+    <None Remove="Resources\activate.png" />
+    <None Remove="Resources\automatic.png" />
+    <None Remove="Resources\max.png" />
+    <None Remove="Resources\min.png" />
+    <None Remove="Resources\newfile.png" />
+    <None Remove="Resources\normal.png" />
+    <None Remove="Resources\Presets.png" />
     <None Remove="Resources\save.png" />
+    <None Remove="Resources\trash.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\activate.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\automatic.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\max.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\min.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\newfile.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\normal.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Presets.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\save.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\trash.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

@@ -39,5 +39,23 @@ namespace ArtemisEngineeringPresets
                 this.SetValue(LevelsProperty, value);
             }
         }
+
+        private void OnSetMaxEnergy(object sender, RoutedEventArgs e)
+        {
+            Levels.EnergyLevel = 300;
+            Levels.CoolantLevel = Levels.CoolantNeed;
+        }
+
+        private void OnSetNormalEnergy(object sender, RoutedEventArgs e)
+        {
+            Levels.EnergyLevel = 100;
+            Levels.CoolantLevel = Levels.CoolantNeed;
+        }
+
+        private void OnSetMinimumEnergy(object sender, RoutedEventArgs e)
+        {
+            Levels.EnergyLevel = 0;
+            Levels.CoolantLevel = 0;
+        }
     }
 }

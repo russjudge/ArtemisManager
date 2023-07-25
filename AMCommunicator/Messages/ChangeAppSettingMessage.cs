@@ -17,10 +17,17 @@ namespace AMCommunicator.Messages
             SettingName = string.Empty;
             SettingValue = string.Empty;
         }
-        public ChangeAppSettingMessage(string settingName, string settingValue) : base()
+        public ChangeAppSettingMessage(string settingName, string? settingValue) : base()
         {
             SettingName = settingName;
-            SettingValue = settingValue;
+            if (settingValue == null)
+            {
+                SettingValue = string.Empty;
+            }
+            else
+            {
+                SettingValue = settingValue;
+            }
         }
         public string SettingName { get; set; }
         public string SettingValue { get; set; }

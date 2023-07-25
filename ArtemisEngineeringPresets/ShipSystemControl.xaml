@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisEngineeringPresets"
              Name="uc"
-             mc:Ignorable="d" MinHeight="220">
+             mc:Ignorable="d" MinHeight="300">
     <GroupBox
         BorderBrush="Green" BorderThickness="3"
         >
@@ -24,7 +24,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition Height="4*" />
-
+                <RowDefinition />
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Grid.Column="0" Padding="0,3,0,0" HorizontalAlignment="Center" Margin="10,50,0,0" Text="Energy" >
                 <TextBlock.RenderTransform>
@@ -95,6 +95,15 @@
             Orientation="Vertical"
             Foreground="Salmon"
             Grid.Row="2" Grid.Column="2" Maximum="8" Minimum="0" Value="{Binding Levels.CoolantNeed, Mode=OneWay, ElementName=uc}" />
+            <Button Grid.Row="3" Grid.Column="0" ToolTip="Max Energy setting" Click="OnSetMaxEnergy">
+                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/max.png" />
+            </Button>
+            <Button Grid.Row="3" Grid.Column="1" ToolTip="Normal Energy setting" Click="OnSetNormalEnergy">
+                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/normal.png" />
+            </Button>
+            <Button Grid.Row="3" Grid.Column="2" ToolTip="Minimum Energy setting" Click="OnSetMinimumEnergy">
+                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/min.png" />
+            </Button>
         </Grid>
     </GroupBox>
 </UserControl>

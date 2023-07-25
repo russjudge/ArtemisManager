@@ -10,7 +10,7 @@ namespace ArtemisManagerUI.Converters
 {
 
     [ValueConversion(typeof(bool), typeof(Visibility))]
-    internal class BoolToVisibilityParameterConverter : IValueConverter
+    public class BoolToVisibilityParameterConverter : IValueConverter
     {
         #region IValueConverter Members
 

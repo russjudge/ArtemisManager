@@ -26,8 +26,6 @@ namespace ArtemisEngineeringPresets
                 {
                     Presets[i] = new Preset();
                     Presets[i].SystemLevels[j] = new();
-                    Presets[i].SystemLevels[j].EnergyLevel = 150;
-                    Presets[i].SystemLevels[j].CoolantLevel = 3;
                 }
             }
         }
@@ -99,6 +97,13 @@ namespace ArtemisEngineeringPresets
                 Presets[i] = workPresets[i];
             }
             SaveFile = file;
+        }
+        public void Delete()
+        {
+            if (!string.IsNullOrEmpty(SaveFile) && File.Exists(SaveFile))
+            {
+                File.Delete(SaveFile);
+            }
         }
         public void Save()
         {

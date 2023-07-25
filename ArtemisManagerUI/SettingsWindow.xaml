@@ -1,0 +1,79 @@
+﻿<Window x:Class="ArtemisManagerUI.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ArtemisManagerUI"
+        mc:Ignorable="d" Name="uc"
+        Title="Settings" Height="450" Width="800" Icon="/ArtemisManagerUI;component/Resources/Settings-icon.png">
+    
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Top">
+            <StatusBarItem>
+                <Button
+                    Click="OnEngineeringPresets" Margin="0,5,5,5" ToolTip="Engineering Presets">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/Presets.png" />
+                </Button>
+            </StatusBarItem>
+            
+            <StatusBarItem>
+                <CheckBox
+                    Margin="5,0,0,0" Padding="2,0,0,0"
+                    IsChecked="{Binding Path=SettingsData.ConnectOnStart, ElementName=uc, Mode=TwoWay}"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    Content="Start Network Communication as soon as this application starts."/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <Button>
+                    Create backup of controls.ini file
+                </Button>
+            </StatusBarItem>
+            <StatusBarItem>
+                <Button>
+                    Restore backup of controls.ini file
+                </Button>
+            </StatusBarItem>
+        </StatusBar>
+        <GroupBox DockPanel.Dock="Top" Header="Peer-to-Peer Network">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Row="0" Grid.Column="0"
+                    VerticalAlignment="Center" Text="Connection Password:" Padding="20,0,5,0" ToolTip="Used to restrict access to the peer-to-peer network"/>
+                <TextBox
+                    Grid.Row="0" Grid.Column="1"
+                    IsEnabled="{Binding ElementName=uc, Path=SettingsData.IsMaster}"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    ToolTip="Used to restrict access to the peer-to-peer network"
+                    Text="{Binding Path=SettingsData.NetworkPassword, Mode=TwoWay, ElementName=uc, UpdateSourceTrigger=LostFocus}" />
+
+                <TextBlock
+                    Grid.Row="1" Grid.Column="0"
+                    Text="Listening Port:" VerticalAlignment="Center" />
+                <TextBox
+                    Grid.Row="1" Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    IsEnabled="{Binding ElementName=uc, Path=SettingsData.IsMaster}" PreviewTextInput="OnPreviewPortInput"
+                    VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=SettingsData.ListeningPort}" Width="80"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox
+            Header="Localized Custom Artemis.ini"
+            DockPanel.Dock="Top">
+            
+            <!--
+            Notes: DO Not store this in settings, but in it's own file.  Use this window for changing each client independently.
+            Use <tabcontrol> for each connected client for artemis ini (local settings only), with first tab being this pc.
+            -->
+            
+        </GroupBox>
+    </DockPanel>
+</Window>

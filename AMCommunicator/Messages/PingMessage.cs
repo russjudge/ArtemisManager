@@ -25,7 +25,7 @@ namespace AMCommunicator.Messages
             Acknowledge = false;
         }
         public bool Acknowledge { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
         protected override void SetMessageVersion()
         {
             MessageVersion = ThisVersion;

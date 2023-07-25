@@ -35,6 +35,7 @@ namespace ArtemisManager
                         break;
                     }
                 }
+                
                 if (!Debugger.IsAttached)
                 {
                     Task.Run(async () =>

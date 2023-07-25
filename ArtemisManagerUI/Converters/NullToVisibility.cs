@@ -10,7 +10,7 @@ using System.Windows.Data;
 namespace ArtemisManagerUI.Converters
 {
     [ValueConversion(typeof(object), typeof(Visibility))]
-    internal class NullToVisibility : IValueConverter
+    public class NullToVisibility : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

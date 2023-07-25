@@ -9,7 +9,7 @@ using System.Windows.Data;
 namespace ArtemisManagerUI.Converters
 {
     [ValueConversion(typeof(long), typeof(string))]
-    internal class ByteFormatter : IValueConverter
+    public class ByteFormatter : IValueConverter
     {
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

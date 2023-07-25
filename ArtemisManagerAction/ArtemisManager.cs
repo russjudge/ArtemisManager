@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ArtemisManagerAction
 {
@@ -23,6 +25,7 @@ namespace ArtemisManagerAction
         public const string ArtemisEngineeringFile = "engineeringSettings.dat";
         public const string OriginalArtemisEngineeringFile = "Original.dat";
         public const string ArtemisUpgradesURLFolder = "https://artemis.russjudge.com/artemisupgrades/";
+        public const string ExternalToolsURLFolder = "https://artemis.russjudge.com/Tools/";
         //public static readonly string EngineeringPresetsOriginal = Path.Combine(ModManager.ModArchiveFolder, ArtemisEngineeringFile);
         public static readonly string EngineeringPresetsFolder = Path.Combine(ModManager.DataFolder, "EngineeringPresets");
 
@@ -53,9 +56,44 @@ namespace ArtemisManagerAction
             }
             return retVal.ToArray();
         }
+        public async static Task<Tuple<string, string, string>[]> GetExternaToolsLinks()
+        {
+            //\\ENDEAVER\artemis.russjudge.com\Tools\tools.txt line =< name >| file |< ownerwebsite >
+            string[] info;
+            List<Tuple<string, string, string>> links = new();
+            //download from https://artemis.russjudge.com/Tools/tools.txt
+            //  format will be:
+            //  name|file|ownerwebsite
+            //Artemis Mission Editor|missionEditor.msi|https://
+            //be sure to keep the correct casing of the filename.
+            try
+            {
+                using (HttpClient client = new())
+                {
+                    var data = await client.GetStringAsync(ExternalToolsURLFolder + "tools.txt");
+                    //line 1 = version
+                    //line 2 = setup file to download.
+                    info = data.Replace("\r", string.Empty).Split('\n');
+
+                }
+                foreach (var line in info)
+                {
+                    string[] item = line.Split('|');
+                    if (item.Length > 2)
+                    {
+                        links.Add(new(item[0], item[1], item[2]));
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+            }
+            return links.ToArray();
+        }
         public async static Task<KeyValuePair<string, string>[]> GetArtemisUpgradeLinks()
         {
-            //TODO: download from https://artemis.russjudge.com/software/artemisupgrades/artemisupgrades.txt
+            //download from https://artemis.russjudge.com/software/artemisupgrades/artemisupgrades.txt
             //  format will be:
             //  version: url
             //2.1.1:artemis_V2_1_1.exe
@@ -75,7 +113,10 @@ namespace ArtemisManagerAction
                 foreach (var line in info)
                 {
                     string[] item = line.Split(':');
-                    links.Add(new(item[0], item[1]));
+                    if (item.Length > 1)
+                    {
+                        links.Add(new(item[0], item[1]));
+                    }
                 }
                 
             }
@@ -84,6 +125,63 @@ namespace ArtemisManagerAction
             }
 
             return links.ToArray();
+        }
+        [Obsolete("Need to somehow get failure or success back to user.")]
+       public static async void DownloadFile(string url, string target)
+        {
+            using (HttpClient client = new())
+            {
+                try
+                {
+
+                    using (var stream = await client.GetStreamAsync(url))
+                    {
+                        if (stream != null)
+                        {
+                            byte[] buffer = new byte[32768];
+                            int bytesRead = 0;
+                            if (stream != null)
+                            {
+                             
+                                using (FileStream fs = new(target, FileMode.Create))
+                                {
+                                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                    {
+                                        fs.Write(buffer, 0, bytesRead);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                /*
+                                Dispatcher.Invoke(() =>
+                                {
+                                    System.Windows.MessageBox.Show("Error downloading " + file,
+                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                });
+                                */
+                            }
+                        }
+                        else
+                        {
+                            /*
+                            Dispatcher.Invoke(() =>
+                            {
+
+                                System.Windows.MessageBox.Show("Error downloading " + file,
+                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                            });
+                            */
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //System.Windows.MessageBox.Show("Error downloading " + file + ":\r\n\r\n" + ex.Message,
+                    //                   "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
         public static bool CheckIfArtemisSnapshotNeeded(string installFolder)
         {

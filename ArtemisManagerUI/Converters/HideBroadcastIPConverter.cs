@@ -11,7 +11,7 @@ using System.Windows.Data;
 namespace ArtemisManagerUI.Converters
 {
     [ValueConversion(typeof(IPAddress), typeof(Visibility))]
-    internal class HideBroadcastIPConverter : IValueConverter
+    public class HideBroadcastIPConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

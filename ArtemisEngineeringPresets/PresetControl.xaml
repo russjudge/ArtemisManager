@@ -7,6 +7,10 @@
              mc:Ignorable="d" >
     <UserControl.Resources>
         <local:GreaterThanBrushConverter x:Key="GreaterThanBrushConverter" />
+        <Style x:Key="{x:Type ListBoxItem}" TargetType="{x:Type ListBoxItem}">
+            <!-- Possibly other setters -->
+            <Setter Property="Focusable" Value="False" />
+        </Style>
     </UserControl.Resources>
     <DockPanel>
         <StackPanel
@@ -22,23 +26,31 @@
                 VerticalAlignment="Center"
                 Text="{Binding PresetItem.TotalCoolantLevel, ElementName=uc, Mode=OneWay}" />
 
-
-            <Button Margin="30,0,0,0" Content="Auto Adjust" Click="AutoAdjust_Click" />
+            <TextBlock Text="Maximum Available Coolant: 8" VerticalAlignment="Center" Padding="15,0,5,0" />
+            <Button
+                ToolTip="Gives coolant first to the setting requiring the most coolant, and continues until no more coolant is left."
+                Margin="30,0,0,0" Click="AutoAdjust_Click" >
+                <StackPanel Orientation="Horizontal">
+                    <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/automatic.png" />
+                    <TextBlock Text="Automatically adjust coolant levels" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
         </StackPanel>
-        <ListBox VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" 
+        <ListBox
+            VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" 
             Name="ic"
             ItemsSource="{Binding Path=PresetItem.SystemLevels, ElementName=uc, Mode=OneWay}">
-            <ListBox.ItemsPanel>
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-            <ListBox.ItemTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <local:ShipSystemControl
-                            Levels="{Binding}" />
+                        Levels="{Binding}" />
                 </DataTemplate>
-            </ListBox.ItemTemplate>
+            </ItemsControl.ItemTemplate>
 
         </ListBox>
 

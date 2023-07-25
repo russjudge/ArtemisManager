@@ -1,31 +1,20 @@
 ﻿using AMCommunicator;
 using ArtemisManagerAction;
-using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Menu;
+using WPFFolderBrowser;
 
 namespace ArtemisManagerUI
 {
@@ -38,13 +27,16 @@ namespace ArtemisManagerUI
         public Main()
         {
             try
-            {
+           {
+                SettingsAction.Touch();
+                
                 ArtemisUpgradeLinks = new();
+                ExternalToolsLinks = new();
                 Chat = new();
 
                 Status = new ObservableCollection<string>();
                 ConnectedPCs = new();
-                if (Properties.Settings.Default.IsAMaster)
+                if (SettingsAction.Current.IsMaster)
                 {
                     ConnectedPCs.Add(new PCItem("All Connections", IPAddress.Any));
                 };
@@ -56,32 +48,27 @@ namespace ArtemisManagerUI
                 InstalledMods = new(ArtemisManager.GetInstalledMods());
                 InstalledMissions = new(ArtemisManager.GetInstalledMissions());
                 AppVersion = TakeAction.GetAppVersion();
-                IsMaster = Properties.Settings.Default.IsAMaster;
+                IsMaster = SettingsAction.Current.IsMaster;
+
                 var drives = DriveInfo.GetDrives();
-                //List<string> dd = new();
+
                 foreach (var drive in drives)
                 {
                     if (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)[..1]))
                     {
                         FreeSpaceOnAppDrive = drive.AvailableFreeSpace;
                     }
-                    //if (drive.DriveType == DriveType.Fixed)
-                    //{
-                    //    dd.Add(drive.Name + "," + drive.DriveType.ToString() + "," + drive.TotalSize.ToString() + "," + drive.AvailableFreeSpace);
-                    //}
                 }
-                
+                ConnectOnStart = SettingsAction.Current.ConnectOnStart;
             }
             catch (Exception ex)
             {
                 UpdateStatus("Error starting up: " + ex.Message);
             }
-            InitializeComponent();
-            System.Threading.ThreadPool.QueueUserWorkItem(LoadArtemisUpdgradeLinks);
+                
 
-        }
-        void LoadArtemisUpdgradeLinks(object? state)
-        {
+            InitializeComponent();
+
             Task.Run(async () =>
             {
                 var links = await ArtemisManager.GetArtemisUpgradeLinks();
@@ -93,7 +80,146 @@ namespace ArtemisManagerUI
                     }
                 });
             });
+            Task.Run(async () =>
+            {
+                var links = await ArtemisManager.GetExternaToolsLinks();
+                Dispatcher.Invoke(() =>
+                {
+                    foreach (var link in links)
+                    {
+                        MenuItem item = new()
+                        {
+                            Header = link.Item1
+                        };
+                        MenuItem sub = new()
+                        {
+                            Header = "Download",
+                            CommandParameter = link,
+                            
+                            Icon = new System.Windows.Controls.Image
+                            {
+                                Source = new BitmapImage(new Uri("/ArtemisManagerUI;component/Resources/download (1).png", UriKind.Relative))
+                            }
+                    };
+                        sub.Click += OnDownload;
+                        
+                        item.Items.Add(sub);
+                        sub = new()
+                        {
+                            Header = "Visit Owner website",
+                            CommandParameter = link.Item3,
+                            Icon = new System.Windows.Controls.Image
+                            {
+                                Source = new BitmapImage(new Uri("/ArtemisManagerUI;component/Resources/www.png", UriKind.Relative))
+                            }
+                        };
+                        sub.Click += OnGotoOwnerWebsite;
+
+                        item.Items.Add(sub);
+                        ExternalToolsLinks.Add(item);
+                    }
+                });
+            });
+
         }
+        private void OnGotoOwnerWebsite(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem me && me.CommandParameter is string url)
+            {
+                ProcessStartInfo processStartInfo = new(url)
+                {
+                    UseShellExecute = true
+                };
+                Process.Start(processStartInfo);
+            }
+        }
+        private void OnDownload(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem me)
+            {
+                if (me.CommandParameter is Tuple<string, string, string> item)
+                {
+                    WPFFolderBrowserDialog dialog = new();
+
+                    string targetFolder = string.Empty;
+                    dialog.Title = "Select folder to save download to";
+                    if (dialog.ShowDialog() == true)
+                    {
+                        targetFolder = dialog.FileName;
+
+                        Task.Run(async () =>
+                        {
+                            using (HttpClient client = new())
+                            {
+                                try
+                                {
+
+                                    using (var stream = await client.GetStreamAsync(ArtemisManager.ExternalToolsURLFolder + item.Item2))
+                                    {
+                                        if (stream != null)
+                                        {
+                                            byte[] buffer = new byte[32768];
+                                            int bytesRead = 0;
+                                            if (stream != null)
+                                            {
+                                                string target = System.IO.Path.Combine(targetFolder, item.Item2);
+                                                using (FileStream fs = new(target, FileMode.Create))
+                                                {
+                                                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                                    {
+                                                        fs.Write(buffer, 0, bytesRead);
+                                                    }
+                                                }
+                                                Dispatcher.Invoke(() =>
+                                                {
+                                                    if (System.Windows.MessageBox.Show(
+                                                        item.Item1 + " downloaded successfully.\r\n\r\nDo you want to run the install?",
+                                                        item.Item1 + " download", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                    {
+                                                        ProcessStartInfo startInfo = new(target)
+                                                        {
+                                                            UseShellExecute = true
+                                                        };
+                                                        Process.Start(startInfo);
+                                                    }
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Dispatcher.Invoke(() =>
+                                                {
+                                                    System.Windows.MessageBox.Show("Error downloading " + item.Item1,
+                                                    item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                                });
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Dispatcher.Invoke(() =>
+                                            {
+
+                                                System.Windows.MessageBox.Show("Error downloading " + item.Item1,
+                                                    item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                                            });
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Windows.MessageBox.Show("Error downloading " + item.Item1 + ":\r\n\r\n" + ex.Message,
+                                                       item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                            }
+
+                        });
+                    }
+
+                }
+            }
+        }
+
         bool isLoading = true;
         readonly Network MyNetwork = Network.GetNetwork("");
         FileSystemWatcher? watcher = null;
@@ -104,7 +230,7 @@ namespace ArtemisManagerUI
          *ModInstallFolder
          *ServerIPOrName
          *ConnectOnStart
-         *IsAMaster
+         *IsMaster
          *NetworkPassword
          *ArtemisInstallFolder (after finding actual install folder, make copy to here).
          *ArtemisServer
@@ -122,12 +248,7 @@ namespace ArtemisManagerUI
                 else
                 {
                     TakeAction.MainWindow = this;
-                    if (Properties.Settings.Default.UpgradeRequired)
-                    {
-                        Properties.Settings.Default.Upgrade();
-                        Properties.Settings.Default.UpgradeRequired = false;
-                        Properties.Settings.Default.Save();
-                    }
+
                     ArtemisInstallFolder = Properties.Settings.Default.ArtemisInstallFolder;
                     if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManager.ArtemisEXE)))
                     {
@@ -136,30 +257,22 @@ namespace ArtemisManagerUI
                         Properties.Settings.Default.Save();
                     }
 
-
-                    Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
-                    Network.Password = Properties.Settings.Default.NetworkPassword;
-                    Password = Network.Password;
-                    AutoStartServer = Properties.Settings.Default.ConnectOnStart;
-                    Port = Properties.Settings.Default.ListeningPort;
                     if (!string.IsNullOrEmpty(ArtemisInstallFolder))
                     {
                         if (ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder))
                         {
-                            ArtemisChanged= true;
+                            ArtemisChanged = true;
                             string? version = ArtemisManager.GetArtemisVersion(ArtemisInstallFolder);
-                            if (version != null && MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            if (version != null && System.Windows.MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
                                 SnapshotArtemis();
                             }
                         }
-                        else
-                        {
-
-                        }
                     }
+
+                    
                     isLoading = false;
-                    if (AutoStartServer)
+                    if (ConnectOnStart)
                     {
                         DoStartServer();
                     }
@@ -177,10 +290,9 @@ namespace ArtemisManagerUI
                         this.WindowState = WindowState.Minimized;
                     }
                 }
-               
             }
         }
-        
+
 
 
         public static readonly DependencyProperty IsUsingThisAppControlledArtemisProperty =
@@ -260,7 +372,8 @@ namespace ArtemisManagerUI
 
         private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() => {
+            Dispatcher.Invoke(new Action(() =>
+            {
                 ShowPopup = false;
                 PopupMessage = string.Empty;
             }));
@@ -356,14 +469,14 @@ namespace ArtemisManagerUI
 
             }
         }
-        
-        public static readonly DependencyProperty AutoStartServerProperty =
-         DependencyProperty.Register(nameof(AutoStartServer), typeof(bool),
+
+        public static readonly DependencyProperty ConnectOnStartProperty =
+         DependencyProperty.Register(nameof(ConnectOnStart), typeof(bool),
              typeof(Main), new PropertyMetadata(OnAutoStartChanged));
         static void UpdateAutoStart(bool value)
         {
-            Properties.Settings.Default.ConnectOnStart = value;
-            Properties.Settings.Default.Save();
+            SettingsAction.Current.ConnectOnStart = value;
+            SettingsAction.Current.Save();
         }
         private static void OnAutoStartChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -372,41 +485,31 @@ namespace ArtemisManagerUI
             {
                 if (!me.isLoading)
                 {
-                    switch (MessageBox.Show("Do you want to change this setting on all connected peers?", "Change auto start peer-to-peer network", MessageBoxButton.YesNoCancel))
-                    {
-                        case MessageBoxResult.Cancel:
-                            me.AutoStartServer = Properties.Settings.Default.ConnectOnStart;
-                            break;
-                        case MessageBoxResult.Yes:
-                            UpdateAutoStart(me.AutoStartServer);
-                            foreach (var pc in me.ConnectedPCs)
-                            {
-                                if (pc.IP != null)
-                                {
-                                    me.MyNetwork.SendChangeSetting(pc.IP, "ConnectOnStart", me.AutoStartServer.ToString());
-                                }
-                            }
-                            
-                            break;
-                        case MessageBoxResult.No:
-                            Properties.Settings.Default.ConnectOnStart = me.AutoStartServer;
-                            Properties.Settings.Default.Save();
-                            break;
-                    }
+                    string name = nameof(ConnectOnStart);
+                    string value = me.ConnectOnStart.ToString();
+                    //TakeAction.DoChangeSetting(name, value);
+                    //if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString()))
+                    //{
+                    //    me.ConnectOnStart = SettingsAction.Current.ConnectOnStart;
+                    //}
+                    //else
+                    //{
+                    //    UpdateAutoStart(me.ConnectOnStart);
+                    //}
                 }
             }
         }
 
-        public bool AutoStartServer
+        public bool ConnectOnStart
         {
             get
             {
-                return (bool)this.GetValue(AutoStartServerProperty);
+                return (bool)this.GetValue(ConnectOnStartProperty);
 
             }
             set
             {
-                this.SetValue(AutoStartServerProperty, value);
+                this.SetValue(ConnectOnStartProperty, value);
 
             }
         }
@@ -430,61 +533,6 @@ namespace ArtemisManagerUI
         }
 
 
-        public static readonly DependencyProperty PasswordProperty =
-           DependencyProperty.Register(nameof(Password), typeof(string),
-               typeof(Main), new PropertyMetadata(OnPasswordChanged));
-
-        private static void OnPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Main me = (Main)d;
-            if (me != null)
-            {
-                if (!me.isLoading)
-                {
-                    if (me.IsStarted)
-                    {
-                        switch (MessageBox.Show("Update all connected peers with new password?\r\nWarning--if not changing the password on all connected peers will mean these peers will NOT be able to reconnect if they lose connection.\r\nThe current connection will be unaffected.", "Update Managers", MessageBoxButton.YesNoCancel))
-                        {
-                            case MessageBoxResult.Yes:
-                                Network.Password = me.Password;
-                                Properties.Settings.Default.NetworkPassword = me.Password;
-                                Properties.Settings.Default.Save();
-                                //TODO: Send notice of update to all PCs
-                                foreach (var pc in me.ConnectedPCs)
-                                {
-                                    if (pc.IP != null)
-                                    {
-                                        me.MyNetwork.SendChangePassword(pc.IP, me.Password);
-                                    }
-                                }
-                                break;
-                            case MessageBoxResult.No:
-                                Network.Password = me.Password;
-                                Properties.Settings.Default.NetworkPassword = me.Password;
-                                Properties.Settings.Default.Save();
-                                break;
-                            case MessageBoxResult.Cancel:
-                                me.Password = Network.Password;
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
-        public string Password
-        {
-            get
-            {
-                return (string)this.GetValue(PasswordProperty);
-
-            }
-            set
-            {
-                this.SetValue(PasswordProperty, value);
-
-            }
-        }
         public static readonly DependencyProperty IPProperty =
            DependencyProperty.Register(nameof(IP), typeof(string),
                typeof(Main), new PropertyMetadata(Network.GetMyIP()?.ToString()));
@@ -502,68 +550,6 @@ namespace ArtemisManagerUI
 
             }
         }
-
-        public static readonly DependencyProperty PortProperty =
-          DependencyProperty.Register(nameof(Port), typeof(int),
-              typeof(Main), new PropertyMetadata(OnPortChanged));
-
-        static void UpdatePort(int port)
-        {
-            Properties.Settings.Default.ListeningPort = port;
-            Properties.Settings.Default.Save();
-            Network.ConnectionPort = Properties.Settings.Default.ListeningPort;
-        }
-        private static void OnPortChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            Main me = (Main)d;
-            if (me != null)
-            {
-                if (!me.isLoading)
-                {
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
-                    if (int.TryParse(e.NewValue?.ToString(), out int val))
-                    {
-                        if (!me.IsStarted || MessageBox.Show("Are you sure you wish to change the listening port for this application?\r\nThis will change the port on all connected computers and only on the connected computers.\r\n\r\nYou will need to restart the application for the new port to take effect.", "Change Listening Port", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        {
-                            UpdatePort((int)e.NewValue);
-                            foreach (var pc in me.ConnectedPCs)
-                            {
-                                if (pc.IP != null)
-                                {
-                                    me.MyNetwork.SendChangeSetting(pc.IP, "ListeningPort", Properties.Settings.Default.ListeningPort.ToString());
-                                }
-                            }
-                        }
-                        else
-                        {
-                            me.Port = Properties.Settings.Default.ListeningPort;
-                        }
-                    }
-                    else
-                    {
-                        if (int.TryParse(e.OldValue?.ToString(), out int result))
-                        {
-                            me.Port = result;
-                        }
-                    }
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
-                }
-            }
-        }
-        public int Port
-        {
-            get
-            {
-                return (int)this.GetValue(PortProperty);
-
-            }
-            set
-            {
-                this.SetValue(PortProperty, value);
-
-            }
-        }
-
 
         public static readonly DependencyProperty InstalledMissionsProperty =
            DependencyProperty.Register(nameof(InstalledMissions), typeof(ObservableCollection<ModItem>),
@@ -745,8 +731,7 @@ namespace ArtemisManagerUI
                 else
                 {
                     LastStatus = message;
-                    Status.Add(DateTime.Now.ToString("HH:mm:ss") + ": "  + message);
-                    //StatusList.ScrollIntoView(Status.Count - 1);
+                    Status.Add(DateTime.Now.ToString("HH:mm:ss") + ": " + message);
                 }
             }
             catch (ThreadInterruptedException)
@@ -775,13 +760,14 @@ namespace ArtemisManagerUI
 
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Dispatcher.Invoke(() => {
+            Dispatcher.Invoke(() =>
+            {
                 if (!string.IsNullOrEmpty(ArtemisInstallFolder))
                 {
                     ArtemisChanged = ArtemisManager.CheckIfArtemisSnapshotNeeded(ArtemisInstallFolder);
                 }
             });
-            
+
         }
 
 
@@ -798,8 +784,8 @@ namespace ArtemisManagerUI
             }
         }
         public static readonly DependencyProperty IsArtemisRunningProperty =
-       DependencyProperty.Register(nameof(IsArtemisRunning), typeof(bool),
-           typeof(Main));
+            DependencyProperty.Register(nameof(IsArtemisRunning), typeof(bool),
+            typeof(Main));
 
         public bool IsArtemisRunning
         {
@@ -883,7 +869,7 @@ namespace ArtemisManagerUI
                             InstalledMods.Add(item);
                         }
                     }));
-                    
+
                 }
 
                 //5. check TakeArtemisAction.StagedModItemToActivateOnceInstalled and if matches and not null, activate and set to null.
@@ -985,7 +971,7 @@ namespace ArtemisManagerUI
                                 else
                                 {
                                     this.InstalledMods.Clear();
-                                    
+
                                     foreach (var mod in ArtemisManager.GetInstalledMods())
                                     {
                                         InstalledMods.Add(mod);
@@ -1012,7 +998,7 @@ namespace ArtemisManagerUI
                 bool isMasterFound = false;
                 foreach (var item in ConnectedPCs)
                 {
-                    
+
                     if (item.IP != null && e.Source != null)
                     {
                         if (item.IsMaster)
@@ -1025,7 +1011,7 @@ namespace ArtemisManagerUI
                         }
                     }
                 }
-                if (!Properties.Settings.Default.IsAMaster)
+                if (!SettingsAction.Current.IsMaster)
                 {
                     if (isMasterFound)
                     {
@@ -1059,35 +1045,30 @@ namespace ArtemisManagerUI
             {
                 PopupMessage = e.AlertItem.ToString() + "\r\n" + e.RelatedData;
                 ShowPopup = true;
-                MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
+                System.Windows.MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
             }));
-            
-            //TODO:  Offer option of attempting remote update of client, with warning that if not updated, some functionality may not work.
         }
 
         private void MyNetwork_ChangeSetting(object? sender, ChangeSettingEventArgs e)
         {
+            SettingsAction.Current.SynchronizeEnabled = false;
+            SettingsAction.Current.ChangeSetting(e.SettingName, e.SettingValue);
+            SettingsAction.Current.Save();
+
             TakeAction.ChangeSetting(e.SettingName, e.SettingValue);
+
             switch (e.SettingName)
             {
                 case "ConnectOnStart":
-                    this.Dispatcher.Invoke(new Action(() => {
-                        this.isLoading = true;
-                        this.AutoStartServer = bool.Parse(e.SettingValue);
-                        UpdateAutoStart(this.AutoStartServer);
-                        this.isLoading = false;
-                    }));
-                    break;
-                case "ListeningPort":
                     this.Dispatcher.Invoke(new Action(() =>
                     {
                         this.isLoading = true;
-                        this.Port = int.Parse(e.SettingValue);
-                        UpdatePort(Port);
+                        this.ConnectOnStart = bool.Parse(e.SettingValue);
+                        UpdateAutoStart(this.ConnectOnStart);
                         this.isLoading = false;
                     }));
-                    Network.ConnectionPort = int.Parse(e.SettingValue);
                     break;
+                
                 case "IsMaster":
                     this.Dispatcher.Invoke(new Action(() =>
                     {
@@ -1104,16 +1085,9 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_PasswordChanged(object? sender, CommunicationMessageEventArgs e)
         {
-            isLoading = true;
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                Password = e.Message;
-            }));
-            
-            Network.Password = e.Message;
-            Properties.Settings.Default.NetworkPassword = e.Message;
-            Properties.Settings.Default.Save();
-            isLoading = false;
+            SettingsAction.Current.SynchronizeEnabled = false;
+            SettingsAction.Current.ChangeSetting(nameof(SettingsAction.NetworkPassword), e.Message);
+            SettingsAction.Current.Save();
         }
 
         private void MyNetwork_CommunicationMessageReceived(object? sender, CommunicationMessageEventArgs e)
@@ -1130,20 +1104,20 @@ namespace ArtemisManagerUI
             {
                 if (!force)
                 {
-                    if (MessageBox.Show(string.Format("Peer {0} has request this app to close.  Should it?", source.ToString()), "Close Artemis Manager?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                    if (System.Windows.MessageBox.Show(string.Format("Peer {0} has request this app to close.  Should it?", source.ToString()), "Close Artemis Manager?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                     {
                         return;
                     }
                 }
                 this.Close();
             }
-            
+
         }
         private void MyNetwork_ActionCommand(object? sender, ActionCommandEventArgs e)
         {
             if (e.Action == PCActions.RestartApp)
             {
-                
+
                 string file = string.Empty;
                 List<string> args = new();
                 foreach (var arg in Environment.GetCommandLineArgs())
@@ -1224,13 +1198,13 @@ namespace ArtemisManagerUI
         }
         private void ThrowFatal(Exception e)
         {
-            if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher )
+            if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
             {
                 this.Dispatcher.Invoke(new Action<Exception>(ThrowFatal), e);
             }
             else
             {
-                MessageBox.Show("FATAL Exception:\r\n" + e.ToString());
+                System.Windows.MessageBox.Show("FATAL Exception:\r\n" + e.ToString());
                 this.Close();
             }
         }
@@ -1284,16 +1258,34 @@ namespace ArtemisManagerUI
         {
             MyNetwork.HaltAll();
         }
-        
-             public static readonly DependencyProperty ArtemisUpgradeLinksProperty =
-          DependencyProperty.Register(nameof(ArtemisUpgradeLinks), typeof(ObservableCollection<KeyValuePair<string, string>>),
-         typeof(Main));
+
+        public static readonly DependencyProperty ExternalToolsLinksProperty =
+            DependencyProperty.Register(nameof(ExternalToolsLinks), typeof(ObservableCollection<MenuItem>),
+            typeof(Main));
+
+        public ObservableCollection<MenuItem> ExternalToolsLinks
+        {
+            get
+            {
+                return (ObservableCollection<MenuItem>)this.GetValue(ExternalToolsLinksProperty);
+
+            }
+            set
+            {
+                this.SetValue(ExternalToolsLinksProperty, value);
+            }
+        }
+
+
+        public static readonly DependencyProperty ArtemisUpgradeLinksProperty =
+            DependencyProperty.Register(nameof(ArtemisUpgradeLinks), typeof(ObservableCollection<KeyValuePair<string, string>>),
+            typeof(Main));
 
         public ObservableCollection<KeyValuePair<string, string>> ArtemisUpgradeLinks
         {
             get
             {
-                return (ObservableCollection<KeyValuePair<string,string>>)this.GetValue(ArtemisUpgradeLinksProperty);
+                return (ObservableCollection<KeyValuePair<string, string>>)this.GetValue(ArtemisUpgradeLinksProperty);
 
             }
             set
@@ -1337,19 +1329,8 @@ namespace ArtemisManagerUI
         }
         public static readonly DependencyProperty IsMasterProperty =
            DependencyProperty.Register(nameof(IsMaster), typeof(bool),
-          typeof(Main), new PropertyMetadata(OnIsMasterChanged));
+          typeof(Main));
 
-        private static void OnIsMasterChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is Main me) 
-            {
-                if (!me.isLoading)
-                {
-                    Properties.Settings.Default.IsAMaster = me.IsMaster;
-                    Properties.Settings.Default.Save();
-                }
-            }
-        }
 
         public bool IsMaster
         {
@@ -1403,7 +1384,7 @@ namespace ArtemisManagerUI
         {
             TakeAction.CreateShortcutInStartup();
             this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
-            
+
         }
         private void OnRemoveFromStartup(object sender, RoutedEventArgs e)
         {
@@ -1420,7 +1401,7 @@ namespace ArtemisManagerUI
             bool isOkay = false;
             while (!isOkay)
             {
-                WPFFolderBrowser.WPFFolderBrowserDialog dialog = new("Browse for Artemis executable");
+                WPFFolderBrowserDialog dialog = new("Browse for Artemis executable");
 
                 if (dialog.ShowDialog() == true)
                 {
@@ -1444,8 +1425,8 @@ namespace ArtemisManagerUI
             }
         }
         public static readonly DependencyProperty ArtemisChangedProperty =
-          DependencyProperty.Register(nameof(ArtemisChanged), typeof(bool),
-         typeof(Main));
+            DependencyProperty.Register(nameof(ArtemisChanged), typeof(bool),
+            typeof(Main));
 
         public bool ArtemisChanged
         {
@@ -1482,7 +1463,7 @@ namespace ArtemisManagerUI
                 Dispatcher.Invoke(new Action(() =>
                 {
                     InstalledMods.Clear();
-                    foreach(var mod in ArtemisManager.GetInstalledMods())
+                    foreach (var mod in ArtemisManager.GetInstalledMods())
                     {
                         InstalledMods.Add(mod);
                     }
@@ -1525,7 +1506,7 @@ namespace ArtemisManagerUI
         {
             var baseItem = ArtemisManager.ClearActiveFolder();
             DeactivateAllButBase(baseItem?.LocalIdentifier);
-           
+
             baseItem?.Activate();
             TakeAction.SendClientInfo(IPAddress.Any);
         }
@@ -1569,20 +1550,27 @@ namespace ArtemisManagerUI
 
         private void OnLocalUpdateCheck(object sender, RoutedEventArgs e)
         {
-                UpdateStatus("Checking for update...");
-                Task.Run(async () =>
+            UpdateStatus("Checking for update...");
+            Task.Run(async () =>
+            {
+                var result = TakeAction.UpdateCheck(true);
+                if (result.Result.Item1)
                 {
-                    var result = TakeAction.UpdateCheck(true);
-                    if (result.Result.Item1)
+                    var newResult = await TakeAction.DoUpdate(true, result.Result.Item2);
+                    if (newResult)
                     {
-                        var newResult = await TakeAction.DoUpdate(true, result.Result.Item2);
-                        if (newResult)
-                        {
-                            this.Dispatcher.Invoke(new Action(() => { this.Close(); }));
-                        }
+                        this.Dispatcher.Invoke(new Action(() => { this.Close(); }));
                     }
-                    UpdateStatus("Update check complete.");
-                });
+                }
+                else
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.MessageBox.Show("You are running the current version of Artemis Manager.", "Update Check", MessageBoxButton.OK, MessageBoxImage.Information);
+                    });
+                }
+                UpdateStatus("Update check complete.");
+            });
         }
         private void OnTest(object sender, RoutedEventArgs e)
         {
@@ -1608,16 +1596,12 @@ namespace ArtemisManagerUI
             ShowPopup = false;
         }
 
-        private void OnPreviewPortInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = MyRegex();
-            e.Handled = regex.IsMatch(e.Text);
-        }
+       
 
         bool isDragging = false;
-        private void OnModDragEnter(object sender, DragEventArgs e)
+        private void OnModDragEnter(object sender, System.Windows.DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
                 isDragging = true;
             }
@@ -1628,30 +1612,30 @@ namespace ArtemisManagerUI
 
         }
 
-        private void OnModDragOver(object sender, DragEventArgs e)
+        private void OnModDragOver(object sender, System.Windows.DragEventArgs e)
         {
-            e.Effects = DragDropEffects.None;
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            e.Effects = System.Windows.DragDropEffects.None;
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = System.Windows.DragDropEffects.Copy;
             }
             else if (e.Data.GetDataPresent(typeof(ModItemControl)))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = System.Windows.DragDropEffects.Copy;
             }
         }
 
-        private void OnModDragLeave(object sender, DragEventArgs e)
+        private void OnModDragLeave(object sender, System.Windows.DragEventArgs e)
         {
             isDragging = false;
         }
 
-        private void OnModDrop(object sender, DragEventArgs e)
+        private void OnModDrop(object sender, System.Windows.DragEventArgs e)
         {
 
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                var file = (string[])e.Data.GetData(DataFormats.FileDrop);
+                var file = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
                 foreach (var f in file)
                 {
                     ModInstallWindow win = new()
@@ -1679,9 +1663,9 @@ namespace ArtemisManagerUI
 
         }
 
-        private void OnMissionDragEnter(object sender, DragEventArgs e)
+        private void OnMissionDragEnter(object sender, System.Windows.DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
                 isDragging = true;
             }
@@ -1692,29 +1676,29 @@ namespace ArtemisManagerUI
 
         }
 
-        private void OnMissionDragLeave(object sender, DragEventArgs e)
+        private void OnMissionDragLeave(object sender, System.Windows.DragEventArgs e)
         {
 
         }
 
-        private void OnMissionDragOver(object sender, DragEventArgs e)
+        private void OnMissionDragOver(object sender, System.Windows.DragEventArgs e)
         {
-            e.Effects = DragDropEffects.None;
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            e.Effects = System.Windows.DragDropEffects.None;
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = System.Windows.DragDropEffects.Copy;
             }
             else if (e.Data.GetDataPresent(typeof(ModItemControl)))
             {
-                e.Effects = DragDropEffects.Copy;
+                e.Effects = System.Windows.DragDropEffects.Copy;
             }
         }
 
-        private void OnMissionDrop(object sender, DragEventArgs e)
+        private void OnMissionDrop(object sender, System.Windows.DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                var file = (string[])e.Data.GetData(DataFormats.FileDrop);
+                var file = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
                 foreach (var f in file)
                 {
                     ModInstallWindow win = new()
@@ -1729,11 +1713,9 @@ namespace ArtemisManagerUI
                         InstalledMissions.Add(win.Mod);
                     }
                 }
-
             }
             else if (e.Data.GetDataPresent(typeof(ModItemControl)))
             {
-
                 var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
 
                 if (ctl.IsRemote && ctl.Source != null)
@@ -1741,7 +1723,6 @@ namespace ArtemisManagerUI
                     MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
                 }
             }
-
         }
 
         private void OnModUninstalled(object sender, RoutedEventArgs e)
@@ -1774,7 +1755,7 @@ namespace ArtemisManagerUI
 
         private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
         {
-            if (SelectedPeer!= null && SelectedPeer.IP != null && e.OriginalSource is ModItem Mod)
+            if (SelectedPeer != null && SelectedPeer.IP != null && e.OriginalSource is ModItem Mod)
             {
                 TakeAction.FulfillModPackageRequest(SelectedPeer.IP, Mod.PackageFile, Mod);
             }
@@ -1785,7 +1766,7 @@ namespace ArtemisManagerUI
             Dispatcher.Invoke(() =>
             {
                 InstalledMods.Clear();
-                foreach(var mod in ArtemisManager.GetInstalledMods())
+                foreach (var mod in ArtemisManager.GetInstalledMods())
                 {
                     InstalledMods.Add(mod);
                 }
@@ -1796,12 +1777,88 @@ namespace ArtemisManagerUI
         {
             if (sender is MenuItem me)
             {
-                if (me.CommandParameter is KeyValuePair<string,string> data)
+                if (me.CommandParameter is string file)
                 {
+                    WPFFolderBrowserDialog dialog = new();
+
+                    string targetFolder = string.Empty;
+                    dialog.Title = "Select folder to save download to";
+                    if (dialog.ShowDialog() == true)
+                    {
+                        targetFolder = dialog.FileName;
+
+                        Task.Run(async () =>
+                        {
+                            using (HttpClient client = new())
+                            {
+                                try
+                                {
+
+                                    using (var stream = await client.GetStreamAsync(ArtemisManager.ArtemisUpgradesURLFolder + file))
+                                    {
+                                        if (stream != null)
+                                        {
+                                            byte[] buffer = new byte[32768];
+                                            int bytesRead = 0;
+                                            if (stream != null)
+                                            {
+                                                string target = System.IO.Path.Combine(targetFolder, file);
+                                                using (FileStream fs = new(target, FileMode.Create))
+                                                {
+                                                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                                                    {
+                                                        fs.Write(buffer, 0, bytesRead);
+                                                    }
+                                                }
+                                                Dispatcher.Invoke(() =>
+                                                {
+                                                    if (System.Windows.MessageBox.Show("Artemis SBS Upgrade downloaded successfully.\r\n\r\nDo you want to run the install?", "Artemis SBS Upgrade download", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                                                    {
+                                                        ProcessStartInfo startInfo = new(target)
+                                                        {
+                                                            UseShellExecute = true
+                                                        };
+                                                        Process.Start(startInfo);
+
+                                                    }
+                                                });
+                                            }
+                                            else
+                                            {
+                                                Dispatcher.Invoke(() =>
+                                                {
+                                                    System.Windows.MessageBox.Show("Error downloading " + file,
+                                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                                });
+
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Dispatcher.Invoke(() =>
+                                            {
+
+                                                System.Windows.MessageBox.Show("Error downloading " + file,
+                                                        "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                                            });
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Windows.MessageBox.Show("Error downloading " + file + ":\r\n\r\n" + ex.Message,
+                                                       "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                }
+                            }
+
+                        });
+                    }
 
                 }
             }
         }
+
 
         private void OnEngineeringPresets(object sender, RoutedEventArgs e)
         {
@@ -1813,7 +1870,13 @@ namespace ArtemisManagerUI
             win.Show();
         }
 
-        [GeneratedRegex("[^0-9.-]+")]
-        private static partial Regex MyRegex();
+
+        private void OnSettings(object sender, RoutedEventArgs e)
+        {
+            SettingsWindow win = new();
+            
+            win.ShowDialog();
+            ConnectOnStart = SettingsAction.Current.ConnectOnStart;
+        }
     }
 }

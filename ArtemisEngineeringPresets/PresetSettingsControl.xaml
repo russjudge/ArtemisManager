@@ -4,11 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisEngineeringPresets"
-             mc:Ignorable="d" Name="uc"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel>
+             mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <local:NullToBoolConverter x:Key="NullToBoolConverter" />
+    </UserControl.Resources>
+    <DockPanel IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=File}">
         <DockPanel DockPanel.Dock="Top" >
-        <Button HorizontalAlignment="Left"  Click="OnSave">
+            <Button Margin="25,0,25,0" DockPanel.Dock="Left"
+                
+                Click="OnActivate" CommandParameter="{Binding}" ToolTip="Activate this presets file" >
+                <StackPanel>
+                    <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/activate.png" />
+                    <TextBlock Text="Activate" />
+                </StackPanel>
+            </Button>
+            
+            <Button Margin="5,0,10,0" HorizontalAlignment="left" DockPanel.Dock="Left"  Click="OnSave">
             <Button.Content>
                 <StackPanel>
                     <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/save.png" />
@@ -17,16 +28,28 @@
 
             </Button.Content>
         </Button>
+            <Button Margin="25,0,25,0" DockPanel.Dock="Right"
+                HorizontalAlignment="Right"
+                Click="OnDelete" ToolTip="Delete Engineering Presets file" >
+                <StackPanel>
+                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/trash.png" />
+                    <TextBlock Text="Delete" />
+                </StackPanel>
+            </Button>
         </DockPanel>
         <TabControl
-        DockPanel.Dock="Top" 
-        TabStripPlacement="Bottom"
-            SelectedIndex="0"
-        ItemsSource="{Binding Path=File.Presets, ElementName=uc, Mode=OneWay}">
+            
+            DockPanel.Dock="Top" 
+            TabStripPlacement="Bottom"
+            SelectedItem="{Binding ElementName=uc, Path=SelectedIItem, Mode=TwoWay}"
+            ItemsSource="{Binding Path=File.Presets, ElementName=uc, Mode=OneWay}">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <TextBlock Text="{Binding Index}" />
-                <!--<TextBlock FontWeight="Bold" FontFamily="Comic Sans MS" FontSize="20" VerticalAlignment="Center" >
+                    <StackPanel>
+                        <TextBlock Text="Preset" />
+                        <TextBlock Padding="10,2,10,10" FontWeight="Bold" Text="{Binding Index}" />
+                    </StackPanel>
+                    <!--<TextBlock FontWeight="Bold" FontFamily="Comic Sans MS" FontSize="20" VerticalAlignment="Center" >
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource ToIndexConverter}">
                             <Binding></Binding>

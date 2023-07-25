@@ -81,7 +81,7 @@ namespace AMCommunicator.Messages
         public string JSON { get; private set; }
         public byte[] GetBytes()
         {
-            List<byte> bytes = new List<byte>();
+            List<byte> bytes = new();
             bytes.AddRange(BitConverter.GetBytes(Length));
             bytes.AddRange(BitConverter.GetBytes((short)Command));
             bytes.AddRange(BitConverter.GetBytes(Version));

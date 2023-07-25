@@ -12,7 +12,7 @@ namespace ArtemisManagerUI.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -20,30 +20,6 @@ namespace ArtemisManagerUI.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ModInstallFolder {
-            get {
-                return ((string)(this["ModInstallFolder"]));
-            }
-            set {
-                this["ModInstallFolder"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ServerIPOrName {
-            get {
-                return ((string)(this["ServerIPOrName"]));
-            }
-            set {
-                this["ServerIPOrName"] = value;
             }
         }
         
@@ -62,12 +38,12 @@ namespace ArtemisManagerUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool IsAMaster {
+        public bool IsMaster {
             get {
-                return ((bool)(this["IsAMaster"]));
+                return ((bool)(this["IsMaster"]));
             }
             set {
-                this["IsAMaster"] = value;
+                this["IsMaster"] = value;
             }
         }
         
@@ -140,6 +116,18 @@ namespace ArtemisManagerUI.Properties {
             }
             set {
                 this["ListeningPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsAMaster {
+            get {
+                return ((bool)(this["IsAMaster"]));
+            }
+            set {
+                this["IsAMaster"] = value;
             }
         }
     }

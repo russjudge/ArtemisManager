@@ -11,6 +11,8 @@ namespace ArtemisEngineeringPresets
     {
         public SystemLevel()
         {
+            EnergyLevel = 100;
+            CoolantLevel = 0;
         }
         public SystemLevel(int energy, int coolant)
         {
@@ -89,7 +91,12 @@ namespace ArtemisEngineeringPresets
         {
             if (sender is SystemLevel me)
             {
+                var startNeed = me.CoolantNeed;
                 me.CoolantNeed = Preset.CoolantLevelToPreventOverheat(me.EnergyLevel);
+                if (me.CoolantNeed < startNeed && me.CoolantNeed < me.CoolantLevel)
+                {
+                    me.CoolantLevel = me.CoolantNeed;
+                }
                 me.Changed = true;
             }
         }

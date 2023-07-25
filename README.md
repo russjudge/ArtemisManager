@@ -35,19 +35,7 @@ There will be three phases of development for this application, and once complet
 To avoid scope creep and creating a monster, Artemis Manager will be limited to ONLY managing mods and missions for Artemis SBS. There will be no functionality added for generating Missions,
 since the Mission Editor already.  DMX editing will not be implemented since there is already a tool for this.
 
-Roadmap is subject to change.
 
-Phase 1
-
--- Offer multiple versions of Artemis SBS updates.
-	-- Store on artemis.russjudge.com.
-	-- set unique Guid to each.
-	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
-	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
-
-	-- need to activate a selected engineering preset.
-	-- bug add new adds 2.
-	-- prompt on delete
 
 -->preserve DMXCommands.xml file, controls.ini, and local settings for artemis.ini.
 
@@ -69,12 +57,6 @@ Phase 3
 	-- Allow editing of ALL artemis.ini settings (excluding console restriction).  Warn of possible incompatibility of different versions.  
 	-- Add editing of vesselData.xml file.
 	-- add buttons for opening applications such as blender for editing the ship images
-
-
-Tools to link to:
-\\ENDEAVER\artemis.russjudge.com\Tools\tools.txt line=<name>|file|<ownerwebsite>
-Artemis Bridge Tools: https://www.armidalesoftware.com/Artemis/DMXTools.htm (old versions: https://www.armidalesoftware.com/Artemis/ChangeLog.htm)
-Artemis Mission Editor: http://artemiswiki.pbworks.com/w/page/53389687/Mission%20Editor
 
 
 Stuff that will NOT be done:

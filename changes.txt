@@ -1,6 +1,6 @@
 Change History
 ===============================
-Version 0.2 (beta) xx/xx/xxxx:
+Version 0.2 (beta) 07/25/2023:
 Bug Fixes:
 	- Added check for when browsing for Artemis SBS install location to verify that the artemis.exe file exists before setting the Artemis Install folder.
 	- If the Activated Mods folder (<user>/AppData/Roaming/Confederate In Blue Gaming/Artemis Manager/Activated) doesn't exist (Artemis install has never been snapshotted),
@@ -10,8 +10,12 @@ Bug Fixes:
 
 Other changes:
 	- Moved "Install Mod" button to be on the "Installed Mods" and "Installed Missions" tabs.
+	- Some minor layout changes.
 	- Added Menu.
 	- Added ability to edit Engineering presets.
+	- Added links to Artemis SBS Upgrade install files for download and install.  Will add to the available list as other people submit them to me.
+	- Added links to external useful tools for download and install.
+
 ------------------------------
 Version 0.1 (beta) 07/23/2023:
 	- Initial Release
