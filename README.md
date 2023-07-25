@@ -68,7 +68,13 @@ Phase 3
 	-- automatic noting of artemis verison being edited.
 	-- Allow editing of ALL artemis.ini settings (excluding console restriction).  Warn of possible incompatibility of different versions.  
 	-- Add editing of vesselData.xml file.
-	-- add buttons for opening applications such as blender for editing the ship images.
+	-- add buttons for opening applications such as blender for editing the ship images
+
+
+Tools to link to:
+\\ENDEAVER\artemis.russjudge.com\Tools\tools.txt line=<name>|file|<ownerwebsite>
+Artemis Bridge Tools: https://www.armidalesoftware.com/Artemis/DMXTools.htm (old versions: https://www.armidalesoftware.com/Artemis/ChangeLog.htm)
+Artemis Mission Editor: http://artemiswiki.pbworks.com/w/page/53389687/Mission%20Editor
 
 
 Stuff that will NOT be done:
