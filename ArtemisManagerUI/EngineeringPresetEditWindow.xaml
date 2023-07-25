@@ -24,8 +24,9 @@
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding IP}" />
-                                <TextBlock Text="{Binding Hostname}" />
+                                <TextBlock VerticalAlignment="Center"  Text="{Binding IP}" />
+                                <TextBlock VerticalAlignment="Center" Text=" - " />
+                                <TextBlock VerticalAlignment="Center" Text="{Binding Hostname}" />
                             </StackPanel>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
@@ -51,7 +52,7 @@
                                 Click="OnDelete" CommandParameter="{Binding}" ToolTip="Delete file" >
                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/trash.png" />
                             </Button>
-                            <TextBlock Text="{Binding}" />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding}" />
                             
                         </StackPanel>
                     </DataTemplate>

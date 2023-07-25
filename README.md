@@ -45,7 +45,9 @@ Phase 1
 	-- Instructions: If installing a lower version, first uninstall Artemis SBS, then install the lowest base install you have (lower than the desired version to install), then install update.
 	--    Installing 2.x requires first installing the 2.0 install.  Installing 1.x will need a full install version of 1.x that is lower than the desired version.
 
-
+	-- need to activate a selected engineering preset.
+	-- bug add new adds 2.
+	-- prompt on delete
 Phase 2
 -- Add Engineering presets local edit and propagating to peers.
 -- Add mechanism for editing artemis.ini file to restrict peers to specific consoles and ships and port (default 2010) (need to confirm this works).

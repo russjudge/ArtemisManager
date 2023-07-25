@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,7 @@ namespace ArtemisManagerAction
         public const string SaveFileExtension = ".json";
         public const string ArtemisEngineeringFile = "engineeringSettings.dat";
         public const string OriginalArtemisEngineeringFile = "Original.dat";
+        public const string ArtemisUpgradesURLFolder = "https://artemis.russjudge.com/artemisupgrades/";
         //public static readonly string EngineeringPresetsOriginal = Path.Combine(ModManager.ModArchiveFolder, ArtemisEngineeringFile);
         public static readonly string EngineeringPresetsFolder = Path.Combine(ModManager.DataFolder, "EngineeringPresets");
 
@@ -51,14 +53,37 @@ namespace ArtemisManagerAction
             }
             return retVal.ToArray();
         }
-        public static KeyValuePair<string, string>[] GetArtemisUpgradeLinks()
+        public async static Task<KeyValuePair<string, string>[]> GetArtemisUpgradeLinks()
         {
-            //TODO: download from https://artemis.russjudge.com/software/???/artemisupgrades.txt
+            //TODO: download from https://artemis.russjudge.com/software/artemisupgrades/artemisupgrades.txt
             //  format will be:
             //  version: url
-            //2.1.1:https://artemis.russjudge.com/software/artemisupgrades/artemis_V2_1_1.exe
+            //2.1.1:artemis_V2_1_1.exe
             //be sure to keep the correct casing of the filename.
-            return Array.Empty<KeyValuePair<string, string>>();
+            string[] info;
+            List<KeyValuePair<string, string>> links = new();
+            try
+            {
+                using (HttpClient client = new())
+                {
+                    var data = await client.GetStringAsync(ArtemisUpgradesURLFolder + "artemisupgrades.txt");
+                    //line 1 = version
+                    //line 2 = setup file to download.
+                    info = data.Replace("\r", string.Empty).Split('\n');
+                    
+                }
+                foreach (var line in info)
+                {
+                    string[] item = line.Split(':');
+                    links.Add(new(item[0], item[1]));
+                }
+                
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return links.ToArray();
         }
         public static bool CheckIfArtemisSnapshotNeeded(string installFolder)
         {

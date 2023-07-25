@@ -82,13 +82,16 @@ namespace ArtemisManagerUI
         }
         void LoadArtemisUpdgradeLinks(object? state)
         {
-            var links = ArtemisManager.GetArtemisUpgradeLinks();
-            Dispatcher.Invoke(() =>
+            Task.Run(async () =>
             {
-                foreach (var link in links)
+                var links = await ArtemisManager.GetArtemisUpgradeLinks();
+                Dispatcher.Invoke(() =>
                 {
-                    ArtemisUpgradeLinks.Add(link);
-                }
+                    foreach (var link in links)
+                    {
+                        ArtemisUpgradeLinks.Add(link);
+                    }
+                });
             });
         }
         bool isLoading = true;
@@ -1802,8 +1805,11 @@ namespace ArtemisManagerUI
 
         private void OnEngineeringPresets(object sender, RoutedEventArgs e)
         {
-            EngineeringPresetEditWindow win = new EngineeringPresetEditWindow();
-            win.ConnectedPCs = ConnectedPCs;
+            EngineeringPresetEditWindow win = new()
+            {
+                ConnectedPCs = ConnectedPCs
+            };
+            win.SelectedTargetPC = win.ConnectedPCs[0];
             win.Show();
         }
 

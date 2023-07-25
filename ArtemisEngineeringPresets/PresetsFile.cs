@@ -27,7 +27,7 @@ namespace ArtemisEngineeringPresets
                     Presets[i] = new Preset();
                     Presets[i].SystemLevels[j] = new();
                     Presets[i].SystemLevels[j].EnergyLevel = 150;
-                    Presets[i].SystemLevels[j].CoolantLevel = 4;
+                    Presets[i].SystemLevels[j].CoolantLevel = 3;
                 }
             }
         }

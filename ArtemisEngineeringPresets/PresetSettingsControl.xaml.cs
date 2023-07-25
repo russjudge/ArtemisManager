@@ -27,34 +27,6 @@ namespace ArtemisEngineeringPresets
             InitializeComponent();
         }
 
-        //static void OnPresetItemsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-        //{
-        //    PresetSettingsControl me = sender as PresetSettingsControl;
-        //    if (me != null)
-        //    {
-        //        me.tb.SelectedIndex = -1;
-        //        me.Dispatcher.BeginInvoke(new Action(me.SelectFirstItem), System.Windows.Threading.DispatcherPriority.Loaded);
-        //    }
-        //}
-        //void SelectFirstItem()
-        //{
-        //    tb.SelectedIndex = 0;
-        //}
-        //public static readonly DependencyProperty PresetItemsProperty =
-        //   DependencyProperty.Register("PresetItems", typeof(Preset[]),
-        //   typeof(PresetSettingsControl));
-
-        //public Preset[] PresetItems
-        //{
-        //    get
-        //    {
-        //        return (Preset[])this.GetValue(PresetItemsProperty);
-        //    }
-        //    set
-        //    {
-        //        this.SetValue(PresetItemsProperty, value);
-        //    }
-        //}
         public static readonly DependencyProperty FileProperty =
            DependencyProperty.Register(nameof(File), typeof(PresetsFile),
            typeof(PresetSettingsControl));

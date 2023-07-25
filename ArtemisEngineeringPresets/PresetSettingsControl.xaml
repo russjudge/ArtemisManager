@@ -21,6 +21,7 @@
         <TabControl
         DockPanel.Dock="Top" 
         TabStripPlacement="Bottom"
+            SelectedIndex="0"
         ItemsSource="{Binding Path=File.Presets, ElementName=uc, Mode=OneWay}">
         <TabControl.ItemTemplate>
             <DataTemplate>
