@@ -186,7 +186,7 @@
 
 
             <Button
-                Visibility="Collapsed"
+                Visibility="Visible"
                 DockPanel.Dock="Right" Click="OnTest" ToolTip="This is just a button for the developer to run strange tests.  If you see it, he forgot to hide it." >
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/worksonmymachine.png" />
             </Button>

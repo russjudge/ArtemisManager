@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
 {
-    public enum Ship
+    public enum Ship : int
     {
         None = 0,
         Artemis = 1,

@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Management;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Versioning;
@@ -172,6 +174,46 @@ namespace ArtemisManagerUI
 
             }
             return WasProcessed;
+        }
+
+        /// <summary>
+        /// Gets list of all screen resolutions available for the current screen.
+        /// NOTE: this MIGHT only work for the screen that the app is running on--or the primary screen (not sure).  This needs tested.
+        /// </summary>
+        /// <returns></returns>
+        public static Size[] GetAvailableScreenResolutions()
+        {
+            List<Size> retVal = new();
+            //(gwmi - N "root\wmi" - Class WmiMonitorListedSupportedSourceModes)[0].MonitorSourceModes | select { "$($_.HorizontalActivePixels)x$($_.VerticalActivePixels)"}
+            try
+            {
+                using ManagementObjectSearcher searcher = new("root\\WMI", "SELECT * FROM WmiMonitorListedSupportedSourceModes");
+                foreach (ManagementObject queryObj in searcher.Get().Cast<ManagementObject>())
+                {
+                    var monitorSourceModes = queryObj["MonitorSourceModes"] as Array;
+                    if (monitorSourceModes != null && monitorSourceModes.Length > 0)
+                    {
+                        foreach (var mode in monitorSourceModes)
+                        {
+                            if (mode is ManagementBaseObject md)
+                            {
+
+                                //WmiMonitorSupportedVideoModes
+                                //VideoModeDescriptor vmd = 
+                                var horizontalPixels = Convert.ToInt32(md["HorizontalActivePixels"]);
+                                var verticalPixels = Convert.ToInt32(md["VerticalActivePixels"]);
+                                Size sz = new Size(horizontalPixels, verticalPixels);
+                                retVal.Add(sz);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (ManagementException e)
+            {
+                Console.WriteLine("An error occurred while querying for WMI data: " + e.Message);
+            }
+            return retVal.ToArray();
         }
         public static void SendClientInfo(IPAddress? source)
         {

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -17,24 +18,41 @@ namespace ArtemisManagerAction
 {
     public class ArtemisManager
     {
+        public const string Artemis = "Artemis";
         public static readonly Dictionary<string, Guid> ArtemisVersionIdentifiers = new();
-        public const string ArtemisEXE = "Artemis.exe";
         public const string RegistryArtemisInstallLocation = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\windows\\CurrentVersion\\App Paths\\" + ArtemisEXE;
         
         public const string SaveFileExtension = ".json";
-        public const string ArtemisEngineeringFile = "engineeringSettings.dat";
-        public const string OriginalArtemisEngineeringFile = "Original.dat";
+        public const string INIFileExtension = ".ini";
+        public const string XMLFileExtension = ".xml";
+        public const string DATFileExtension = ".dat";
+        public const string EXEFileExtension = ".exe";
+        public const string TXTFileExtension = ".txt";
+
         public const string ArtemisUpgradesURLFolder = "https://artemis.russjudge.com/artemisupgrades/";
         public const string ExternalToolsURLFolder = "https://artemis.russjudge.com/Tools/";
+
         public static readonly string EngineeringPresetsFolder = Path.Combine(ModManager.DataFolder, "EngineeringPresets");
-
         public static readonly string ControlsINIFolder = Path.Combine(ModManager.DataFolder, "controlsINI");
-        public const string controlsINI = "controls.ini";
         public static readonly string DMXCommandsFolder = Path.Combine(ModManager.DataFolder, "DMXCommands");
-        public const string ArtemisDATSubfolder = "dat";
-        public const string DMXCommands = "DMXcommands.xml";
-        public const string ArtemisINI = "artemis.ini";
+        public static readonly string ArtemisINIFolder = Path.Combine(ModManager.DataFolder, "artemisINI");
 
+
+        public const string ArtemisDATSubfolder = "dat";
+        public const string originalIdentifier = "Original";
+
+        public const string ArtemisEngineeringFile = "engineeringSettings" + DATFileExtension;
+        public const string OriginalArtemisEngineeringFile = originalIdentifier + DATFileExtension;
+
+
+        public const string OriginalArtemisINIFile = originalIdentifier + Artemis + INIFileExtension;
+
+        public const string ArtemisEXE = Artemis + EXEFileExtension;
+        public const string controlsINI = "controls" + INIFileExtension;
+        public const string DMXCommands = "DMXcommands" + XMLFileExtension;
+        public const string ArtemisINI = "artemis" + INIFileExtension;
+
+        public const string ChangesTXT = "changes" + TXTFileExtension;
         static System.Diagnostics.Process? runningArtemisProcess = null;
         
 
@@ -47,6 +65,18 @@ namespace ArtemisManagerAction
             ArtemisVersionIdentifiers.Add("2.8.0", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
             ArtemisVersionIdentifiers.Add("2.8.1", new Guid("AF0EC3FE-D26A-4AAD-8E1A-8584DE044688"));  //If from zip file the exe file date should be 1/23/2022.
         }
+
+        public static string[] GetArtemisINIFileList()
+        {
+            ModManager.CreateFolder(ArtemisINIFolder);
+            List<string> list = new();
+            foreach (var fle in new DirectoryInfo(ArtemisINIFolder).GetFiles("*" + INIFileExtension))
+            {
+                list.Add(fle.Name);
+            }
+            return list.ToArray();
+        }
+
         public static void SaveDMXCommandsFile(string sourceFile)
         {
             ModManager.CreateFolder(DMXCommandsFolder);
@@ -60,7 +90,7 @@ namespace ArtemisManagerAction
         {
             ModManager.CreateFolder(DMXCommandsFolder);
             List<string> list = new();
-            foreach (var fle in new DirectoryInfo(DMXCommandsFolder).GetFiles("*.xml"))
+            foreach (var fle in new DirectoryInfo(DMXCommandsFolder).GetFiles("*" + XMLFileExtension))
             {
                 list.Add(fle.Name);
             }
@@ -79,7 +109,7 @@ namespace ArtemisManagerAction
         {
             ModManager.CreateFolder(ControlsINIFolder);
             List<string> list = new();
-            foreach (var fle in new DirectoryInfo(ControlsINIFolder).GetFiles("*.ini"))
+            foreach (var fle in new DirectoryInfo(ControlsINIFolder).GetFiles("*" + INIFileExtension))
             {
                 list.Add(fle.Name);
             }
@@ -89,7 +119,7 @@ namespace ArtemisManagerAction
         {
             List<string> retVal = new();
             ModManager.CreateFolder(EngineeringPresetsFolder);
-            foreach (var fle in new DirectoryInfo(EngineeringPresetsFolder).GetFiles())
+            foreach (var fle in new DirectoryInfo(EngineeringPresetsFolder).GetFiles("*" + DATFileExtension))
             {
                 retVal.Add(fle.Name);
             }
@@ -114,7 +144,7 @@ namespace ArtemisManagerAction
             {
                 using (HttpClient client = new())
                 {
-                    var data = await client.GetStringAsync(ExternalToolsURLFolder + "tools.txt");
+                    var data = await client.GetStringAsync(ExternalToolsURLFolder + "tools" + TXTFileExtension);
                     //line 1 = version
                     //line 2 = setup file to download.
                     info = data.Replace("\r", string.Empty).Split('\n');
@@ -148,7 +178,7 @@ namespace ArtemisManagerAction
             {
                 using (HttpClient client = new())
                 {
-                    var data = await client.GetStringAsync(ArtemisUpgradesURLFolder + "artemisupgrades.txt");
+                    var data = await client.GetStringAsync(ArtemisUpgradesURLFolder + "artemisupgrades" + TXTFileExtension);
                     //line 1 = version
                     //line 2 = setup file to download.
                     info = data.Replace("\r", string.Empty).Split('\n');
@@ -370,10 +400,10 @@ namespace ArtemisManagerAction
             ModItem retVal = new();
             string? version = GetArtemisVersion(installFolder);
             retVal.RequiredArtemisVersion = version;
-            retVal.Name = "Artemis SBS";
+            retVal.Name = Artemis + " SBS";
             retVal.Author = "Thom Robertson";
             retVal.Version = version;
-            retVal.Description = "Base Artemis";
+            retVal.Description = "Base " + Artemis;
             retVal.IsArtemisBase = true;
             //TODO: build hardcoded Guid list based on Artemis version.  Get comprehensive list of versions from the changes.txt file.
             if (version != null)
@@ -409,7 +439,7 @@ namespace ArtemisManagerAction
             string? retVal = null;
             foreach (var driv in DriveInfo.GetDrives())
             {
-                FileInfo f = new(Path.Combine(driv.RootDirectory.FullName, "Program Files", "Artemis", ArtemisEXE));
+                FileInfo f = new(Path.Combine(driv.RootDirectory.FullName, "Program Files", Artemis, ArtemisEXE));
                 if (f.Exists)
                 {
                     retVal = f.DirectoryName;
@@ -417,7 +447,7 @@ namespace ArtemisManagerAction
                 }
                 else
                 {
-                    f = new FileInfo(Path.Combine(driv.RootDirectory.FullName, "Program Files (x86)", "Artemis", ArtemisEXE));
+                    f = new FileInfo(Path.Combine(driv.RootDirectory.FullName, "Program Files (x86)", Artemis, ArtemisEXE));
                     if (f.Exists)
                     {
                         retVal = f.DirectoryName;
@@ -488,7 +518,7 @@ namespace ArtemisManagerAction
             string? retVal = null;
             if (installPath != null)
             {
-                string changesFile = Path.Combine(installPath, "changes.txt");
+                string changesFile = Path.Combine(installPath, ChangesTXT);
                 if (File.Exists(changesFile))
                 {
 
@@ -533,27 +563,17 @@ namespace ArtemisManagerAction
         }
         public static bool IsArtemisRunning()
         {
-            var processes =  System.Diagnostics.Process.GetProcessesByName("Artemis");
-            //bool found = false;
-            //foreach (var process in processes)
-            //{
-            //    if (process.MainModule.FileName.Equals(Path.Combine(ModItem.ActivatedFolder, "Artemis.exe"))
-            //    {
-            //        found = true;
-            //        break;
-            //    }
-                
-            //}
+            var processes =  System.Diagnostics.Process.GetProcessesByName(Artemis);
             return (processes.Length > 0);
         }
         public static bool IsRunningArtemisUnderMyControl()
         {
-            var processes = System.Diagnostics.Process.GetProcessesByName("Artemis");
+            var processes = System.Diagnostics.Process.GetProcessesByName(Artemis);
             foreach (var pro in processes)
             {
                 if (pro.MainModule != null)
                 {
-                    if (pro.MainModule.FileName.Equals(Path.Combine(ModItem.ActivatedFolder, "Artemis.exe")))
+                    if (pro.MainModule.FileName.Equals(Path.Combine(ModItem.ActivatedFolder, ArtemisEXE)))
                     {
                         return true;
                     }
@@ -595,7 +615,7 @@ namespace ArtemisManagerAction
         public static void StopArtemis()
         {
             runningArtemisProcess?.Kill(true);
-            var processes = System.Diagnostics.Process.GetProcessesByName("Artemis");
+            var processes = System.Diagnostics.Process.GetProcessesByName(Artemis);
             foreach (var pro in processes)
             {
                 pro.Kill(true);

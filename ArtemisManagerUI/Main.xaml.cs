@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1537,7 +1538,16 @@ namespace ArtemisManagerUI
             */
 
 
-            PopupMessage = "This is a test.  It works on my machine, so all is good.";
+            //PopupMessage = "This is a test.  It works on my machine, so all is good.";
+
+            /* Screen resolutions test */
+            var sizes = TakeAction.GetAvailableScreenResolutions();
+            StringBuilder sb = new();
+            foreach (var sz in sizes)
+            {
+                sb.AppendLine(sz.Width.ToString() + "x" + sz.Height.ToString());
+            }
+            PopupMessage = sb.ToString();
             
         }
 

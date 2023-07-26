@@ -21,9 +21,6 @@ namespace ArtemisManagerUI
     /// </summary>
     public partial class SettingsWindow : Window
     {
-        [GeneratedRegex("[^0-9.-]+")]
-        private static partial Regex MyRegex();
-
         public SettingsWindow()
         {
             SettingsData = SettingsAction.Current;
@@ -69,11 +66,7 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnPreviewPortInput(object sender, TextCompositionEventArgs e)
-        {
-            Regex regex = MyRegex();
-            e.Handled = regex.IsMatch(e.Text);
-        }
+       
 
         private void OnEngineeringPresets(object sender, RoutedEventArgs e)
         {

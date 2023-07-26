@@ -34,11 +34,24 @@ namespace ArtemisManagerUI
             ModManager.CreateFolder(ArtemisManager.EngineeringPresetsFolder);
             watcher = new FileSystemWatcher(ArtemisManager.EngineeringPresetsFolder);
             watcher.Created += Watcher_Created;
+            watcher.Deleted += Watcher_Deleted;
             watcher.EnableRaisingEvents = true;
         }
 
-       
-       
+        private void Watcher_Deleted(object sender, FileSystemEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.DATFileExtension))
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (PresetFiles.Contains(e.Name))
+                    {
+                        PresetFiles.Remove(e.Name);
+                    }
+                });
+            }
+        }
+
         public static readonly DependencyProperty PopupMessageProperty =
          DependencyProperty.Register(nameof(PopupMessage), typeof(string),
              typeof(EngineeringPresetEditWindow));
@@ -58,7 +71,7 @@ namespace ArtemisManagerUI
         }
         private void Watcher_Created(object sender, FileSystemEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(".dat") )
+            if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.DATFileExtension))
             {
                 Dispatcher.Invoke(() =>
                 {

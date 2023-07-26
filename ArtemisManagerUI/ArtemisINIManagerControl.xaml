@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="ArtemisManagerUI.ArtemisINIManagerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
+             mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
+    </UserControl.Resources>
+
+    <DockPanel>
+       
+        <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+        <DockPanel
+            DockPanel.Dock="Left" Width="200">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Button 
+                Click="OnAddSettingsFile"
+                HorizontalAlignment="Left" >
+                    <StackPanel Orientation="Horizontal" >
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
+                        <TextBlock VerticalAlignment="Center" Text="Create new presets file" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Button>
+                <Button
+                    Click="OnRestoreToDefault"
+                    Margin="5,0,0,0" ToolTip="Restore Active Engineering presets in Active folder to defaults">
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
+                </Button>
+            </StackPanel>
+
+            <GroupBox
+                IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedArtemisSettingsFile}"
+                DockPanel.Dock="Top" Header="Transmit selected presets file to:">
+                <DockPanel>
+                    <Button
+                        DockPanel.Dock="Right"
+                        CommandParameter="{Binding}"
+                        ToolTip="Send selected presets file to selected network peer client"
+                        Click="OnSendSelectedFile"
+                        HorizontalAlignment="Left" >
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
+                    </Button>
+                    <!--<ComboBox
+                        VerticalAlignment="Center" VerticalContentAlignment="Center"
+                        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
+                        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding IP}" />
+                                    <TextBlock VerticalAlignment="Center" Text=" - " />
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding Hostname}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>-->
+
+                </DockPanel>
+            </GroupBox>
+
+            <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import Engineering Presets file">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
+            </Button>
+            <ListBox
+                SelectionMode="Single"
+                ItemsSource="{Binding ElementName=uc, Path=ArtemisSettingsFiles, Mode=TwoWay}"
+                SelectedItem="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Width="200">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid HorizontalAlignment="Stretch" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="154" />
+                                <ColumnDefinition  />
+                            </Grid.ColumnDefinitions>
+
+
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Stretch" Padding="5,10,5,10" VerticalAlignment="Center" Text="{Binding}" />
+                            <Button Grid.Column="1"
+                                HorizontalContentAlignment="Right" HorizontalAlignment="Right"
+                                DockPanel.Dock="Right" Click="OnExportFile" ToolTip="Export Engineering Presets file" CommandParameter="{Binding}">
+                                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/export.png" />
+                            </Button>
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        <local:ArtemisINIControl />
+    </DockPanel>
+</UserControl>

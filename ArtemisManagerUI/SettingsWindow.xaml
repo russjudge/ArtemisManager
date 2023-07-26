@@ -88,17 +88,21 @@
                 <TextBlock
                     Grid.Row="1" Grid.Column="0"
                     Text="Listening Port:" VerticalAlignment="Center" />
-                <TextBox
+                
+                <local:NumericTextBox
                     Grid.Row="1" Grid.Column="1"
                     HorizontalAlignment="Left"
-                    IsEnabled="{Binding ElementName=uc, Path=SettingsData.IsMaster}" PreviewTextInput="OnPreviewPortInput"
-                    VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=SettingsData.ListeningPort}" Width="80"/>
+                    IsEnabled="{Binding ElementName=uc, Path=SettingsData.IsMaster}"
+                    Value="{Binding ElementName=uc, Path=SettingsData.ListeningPort, Mode=TwoWay}"
+                    MinValue="100"
+                    MaxValue="65535"
+                    VerticalAlignment="Center" />
             </Grid>
         </GroupBox>
         <GroupBox
             Header="Localized Custom Artemis.ini"
             DockPanel.Dock="Top">
-            <TextBlock Text="Under Development.  Available in the next release" />
+            <local:ArtemisINIControl />
             <!--
             Notes: DO Not store this in settings, but in it's own file.  Use this window for changing each client independently.
             Use <tabcontrol> for each connected client for artemis ini (local settings only), with first tab being this pc.
