@@ -37,6 +37,25 @@ namespace ArtemisManagerUI
             watcher.EnableRaisingEvents = true;
         }
 
+       
+       
+        public static readonly DependencyProperty PopupMessageProperty =
+         DependencyProperty.Register(nameof(PopupMessage), typeof(string),
+             typeof(EngineeringPresetEditWindow));
+
+        public string PopupMessage
+        {
+            get
+            {
+                return (string)this.GetValue(PopupMessageProperty);
+
+            }
+            set
+            {
+                this.SetValue(PopupMessageProperty, value);
+
+            }
+        }
         private void Watcher_Created(object sender, FileSystemEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(".dat") )
@@ -349,6 +368,7 @@ namespace ArtemisManagerUI
             if (SelectedFile != null && !string.IsNullOrEmpty(SelectedFile.SaveFile) && System.IO.File.Exists(SelectedFile.SaveFile))
             {
                 File.Copy(SelectedFile.SaveFile, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
+                PopupMessage = "Presets Activated.";
             }
         }
 
@@ -365,6 +385,11 @@ namespace ArtemisManagerUI
                 SelectedFile = null;
                 
             }
+        }
+
+        private void OnSaved(object sender, RoutedEventArgs e)
+        {
+            PopupMessage = "Presets Saved.";
         }
     }
 }

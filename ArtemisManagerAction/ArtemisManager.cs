@@ -26,10 +26,17 @@ namespace ArtemisManagerAction
         public const string OriginalArtemisEngineeringFile = "Original.dat";
         public const string ArtemisUpgradesURLFolder = "https://artemis.russjudge.com/artemisupgrades/";
         public const string ExternalToolsURLFolder = "https://artemis.russjudge.com/Tools/";
-        //public static readonly string EngineeringPresetsOriginal = Path.Combine(ModManager.ModArchiveFolder, ArtemisEngineeringFile);
         public static readonly string EngineeringPresetsFolder = Path.Combine(ModManager.DataFolder, "EngineeringPresets");
 
+        public static readonly string ControlsINIFolder = Path.Combine(ModManager.DataFolder, "controlsINI");
+        public const string controlsINI = "controls.ini";
+        public static readonly string DMXCommandsFolder = Path.Combine(ModManager.DataFolder, "DMXCommands");
+        public const string ArtemisDATSubfolder = "dat";
+        public const string DMXCommands = "DMXcommands.xml";
+        public const string ArtemisINI = "artemis.ini";
+
         static System.Diagnostics.Process? runningArtemisProcess = null;
+        
 
         static ArtemisManager()
         {
@@ -40,7 +47,44 @@ namespace ArtemisManagerAction
             ArtemisVersionIdentifiers.Add("2.8.0", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
             ArtemisVersionIdentifiers.Add("2.8.1", new Guid("AF0EC3FE-D26A-4AAD-8E1A-8584DE044688"));  //If from zip file the exe file date should be 1/23/2022.
         }
-
+        public static void SaveDMXCommandsFile(string sourceFile)
+        {
+            ModManager.CreateFolder(DMXCommandsFolder);
+            FileInfo source = new(sourceFile);
+            if (source.Exists)
+            {
+                source.CopyTo(Path.Combine(DMXCommandsFolder, source.Name), true);
+            }
+        }
+        public static string[] GetDMXCommandsFileList()
+        {
+            ModManager.CreateFolder(DMXCommandsFolder);
+            List<string> list = new();
+            foreach (var fle in new DirectoryInfo(DMXCommandsFolder).GetFiles("*.xml"))
+            {
+                list.Add(fle.Name);
+            }
+            return list.ToArray();
+        }
+        public static void SaveControlsINIFile(string sourceFile)
+        {
+            ModManager.CreateFolder(ControlsINIFolder);
+            FileInfo source = new(sourceFile);
+            if (source.Exists)
+            {
+                source.CopyTo(Path.Combine(ControlsINIFolder, source.Name), true);
+            }
+        }
+        public static string[] GetControlsINIFileList()
+        {
+            ModManager.CreateFolder(ControlsINIFolder);
+            List<string> list = new();
+            foreach (var fle in new DirectoryInfo(ControlsINIFolder).GetFiles("*.ini"))
+            {
+                list.Add(fle.Name);
+            }
+            return list.ToArray();
+        }
         public static string[] GetEngineeringPresetFiles()
         {
             List<string> retVal = new();

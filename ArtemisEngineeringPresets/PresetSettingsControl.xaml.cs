@@ -88,7 +88,27 @@ namespace ArtemisEngineeringPresets
         private void OnSave(object sender, RoutedEventArgs e)
         {
             File.Save();
+            RaiseSavedEvent();
         }
+
+        void RaiseSavedEvent()
+        {
+            RaiseEvent(new RoutedEventArgs(SavedEvent, File));
+        }
+
+        public static readonly RoutedEvent SavedEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(Saved),
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(RoutedEventHandler),
+            ownerType: typeof(PresetSettingsControl));
+        public event RoutedEventHandler Saved
+        {
+            add { AddHandler(SavedEvent, value); }
+            remove { RemoveHandler(SavedEvent, value); }
+        }
+
+
+
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {

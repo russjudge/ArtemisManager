@@ -349,54 +349,6 @@ namespace ArtemisManagerUI
             }
         }
 
-
-        public static readonly DependencyProperty ShowPopupProperty =
-         DependencyProperty.Register(nameof(ShowPopup), typeof(bool),
-             typeof(Main), new PropertyMetadata(OnShowPopup));
-
-        private static void OnShowPopup(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is Main me)
-            {
-                if (me.ShowPopup)
-                {
-                    System.Timers.Timer timer = new()
-                    {
-                        Interval = 5000
-                    };
-                    timer.Elapsed += me.Timer_Elapsed;
-                    timer.Start();
-                }
-            }
-        }
-
-        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() =>
-            {
-                ShowPopup = false;
-                PopupMessage = string.Empty;
-            }));
-            if (sender is System.Timers.Timer tmr)
-            {
-                tmr.Stop();
-                tmr.Dispose();
-            }
-        }
-
-        public bool ShowPopup
-        {
-            get
-            {
-                return (bool)this.GetValue(ShowPopupProperty);
-
-            }
-            set
-            {
-                this.SetValue(ShowPopupProperty, value);
-
-            }
-        }
         public static readonly DependencyProperty PopupMessageProperty =
          DependencyProperty.Register(nameof(PopupMessage), typeof(string),
              typeof(Main));
@@ -485,17 +437,15 @@ namespace ArtemisManagerUI
             {
                 if (!me.isLoading)
                 {
-                    string name = nameof(ConnectOnStart);
-                    string value = me.ConnectOnStart.ToString();
-                    //TakeAction.DoChangeSetting(name, value);
-                    //if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString()))
-                    //{
-                    //    me.ConnectOnStart = SettingsAction.Current.ConnectOnStart;
-                    //}
-                    //else
-                    //{
-                    //    UpdateAutoStart(me.ConnectOnStart);
-                    //}
+                    
+                    if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString()))
+                    {
+                        me.ConnectOnStart = SettingsAction.Current.ConnectOnStart;
+                    }
+                    else
+                    {
+                        UpdateAutoStart(me.ConnectOnStart);
+                    }
                 }
             }
         }
@@ -840,7 +790,7 @@ namespace ArtemisManagerUI
             this.Dispatcher.Invoke(() =>
             {
                 this.PopupMessage += "\r\n\r\n" + e.Message;
-                this.ShowPopup = true;
+                
             });
         }
 
@@ -1044,7 +994,7 @@ namespace ArtemisManagerUI
             this.Dispatcher.Invoke(new Action(() =>
             {
                 PopupMessage = e.AlertItem.ToString() + "\r\n" + e.RelatedData;
-                ShowPopup = true;
+                
                 System.Windows.MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
             }));
         }
@@ -1054,8 +1004,6 @@ namespace ArtemisManagerUI
             SettingsAction.Current.SynchronizeEnabled = false;
             SettingsAction.Current.ChangeSetting(e.SettingName, e.SettingValue);
             SettingsAction.Current.Save();
-
-            TakeAction.ChangeSetting(e.SettingName, e.SettingValue);
 
             switch (e.SettingName)
             {
@@ -1588,12 +1536,7 @@ namespace ArtemisManagerUI
 
 
             PopupMessage = "This is a test.  It works on my machine, so all is good.";
-            ShowPopup = true;
-        }
-
-        private void OnPopupMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            ShowPopup = false;
+            
         }
 
        

@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
+        xmlns:local="clr-namespace:ArtemisManagerUI"
         mc:Ignorable="d" Name="uc" Width="1560" Height="510"
         Title="Engineering Presets Edit" Icon="/ArtemisManagerUI;component/Resources/Presets.png">
     <Window.Resources>
@@ -64,6 +65,7 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
+        <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
         <DockPanel
             DockPanel.Dock="Left" Width="200">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -142,6 +144,7 @@
             </ListBox>
         </DockPanel>
         <engineering:PresetSettingsControl
+            Saved="OnSaved"
             Activate="OnActivate"
             Delete="OnDelete"
             File="{Binding ElementName=uc, Path=SelectedFile, Mode=OneWay}" />

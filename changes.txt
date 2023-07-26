@@ -15,6 +15,9 @@ Other changes:
 	- Added ability to edit Engineering presets.
 	- Added links to Artemis SBS Upgrade install files for download and install.  Will add to the available list as other people submit them to me.
 	- Added links to external useful tools for download and install.
+	- Added a setup window and moved settings to it.  Expansion is planned for adding localized Artemis.ini settings.
+	- Added backup/restore of controls.ini
+	- Added backup/restore of DMXCommands.xml
 
 ------------------------------
 Version 0.1 (beta) 07/23/2023:

@@ -77,21 +77,21 @@ namespace ArtemisManagerUI
                 }
             }
         }
-        public static void ChangeSetting(string settingName,string value)
-        {
-            switch(settingName)
-            {
-                case "ConnectOnStart":
-                    Properties.Settings.Default.ConnectOnStart = bool.Parse(value);
-                    break;
-                case "ListeningPort":
-                    Properties.Settings.Default.ListeningPort = int.Parse(value);
-                    break;
-                case "IsMaster":
-                    break;
-            }
-            Properties.Settings.Default.Save();
-        }
+        //public static void ChangeSetting(string settingName,string value)
+        //{
+        //    switch(settingName)
+        //    {
+        //        case "ConnectOnStart":
+        //            Properties.Settings.Default.ConnectOnStart = bool.Parse(value);
+        //            break;
+        //        case "ListeningPort":
+        //            Properties.Settings.Default.ListeningPort = int.Parse(value);
+        //            break;
+        //        case "IsMaster":
+        //            break;
+        //    }
+        //    Properties.Settings.Default.Save();
+        //}
         public static bool ProcessPCAction(PCActions action, bool force, IPAddress? source)
         {
             if (!force)
@@ -494,6 +494,74 @@ oLink.Save
                 file.Save();
             }
 
+        }
+        public static bool DoChangePassword(string? password)
+        {
+            bool success = false;
+
+            if (ConnectedPCs != null)
+            {
+                switch (System.Windows.MessageBox.Show("Update all connected peers with new password?\r\nWarning--if not changing the password on all connected peers will mean these peers will NOT be able to reconnect if they lose connection.\r\nThe current connection will be unaffected.", "Update Managers", MessageBoxButton.YesNoCancel))
+                {
+                    case MessageBoxResult.Yes:
+                        foreach (var pc in ConnectedPCs)
+                        {
+                            if (pc.IP != null)
+                            {
+                                string pass = string.Empty;
+                                if (!string.IsNullOrEmpty(password))
+                                {
+                                    pass = password;
+                                }
+                                Network.Current?.SendChangePassword(pc.IP, pass);
+                            }
+                        }
+                        success = true;
+                        break;
+                    case MessageBoxResult.No:
+                        success = true;
+                        break;
+                    case MessageBoxResult.Cancel:
+                        success = false;
+                        break;
+                }
+            }
+            return success;
+        }
+        public static bool DoChangeSetting(string setting, string? value)
+        {
+            if (setting == "NetworkPassword" || setting == "Password")
+            {
+                return DoChangePassword(value);
+            }
+            else
+            {
+                bool success = false;
+                switch (System.Windows.MessageBox.Show("Do you want to change this setting on all connected peers?", "Change setting on peer-to-peer network", MessageBoxButton.YesNoCancel))
+                {
+                    case MessageBoxResult.Cancel:
+                        success = false;
+                        break;
+                    case MessageBoxResult.Yes:
+                        success = true;
+                        if (ConnectedPCs != null)
+                        {
+                            foreach (var pc in ConnectedPCs)
+                            {
+                                if (pc.IP != null)
+                                {
+                                    Network.Current?.SendChangeSetting(pc.IP, setting, value);
+                                }
+                            }
+                        }
+                        break;
+                    case MessageBoxResult.No:
+                        success = true;
+                        break;
+                }
+
+                return success;
+            }
         }
     }
 }

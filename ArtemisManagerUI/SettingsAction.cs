@@ -124,7 +124,6 @@ namespace ArtemisManagerUI
                     DoChanged(name);
                 }
                 DoSynchronizeAction(name, value);
-               
             }
         }
         private void DoSynchronizeAction(string name, string? value)
@@ -132,16 +131,16 @@ namespace ArtemisManagerUI
             if (SynchronizeEnabled && IsSynchronizable(name))
             {
                 //var result = TakeAction.DoChangeSetting(name, value);
-                //if (TakeAction.DoChangeSetting(name, value))
-                //{
-                //    this.Save();
-                //}
-                //else
-                //{
-                //    Settings.Default.Reload();
-                //    Network.ConnectionPort = ListeningPort;
-                //    Network.Password = NetworkPassword;
-                //}
+                if (TakeAction.DoChangeSetting(name, value))
+                {
+                    this.Save();
+                }
+                else
+                {
+                    Settings.Default.Reload();
+                    Network.ConnectionPort = ListeningPort;
+                    Network.Password = NetworkPassword;
+                }
             }
         }
         public bool ConnectOnStart

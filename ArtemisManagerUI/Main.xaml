@@ -160,11 +160,7 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Popup  PopupAnimation="Scroll" Placement="RelativePoint" AllowsTransparency="True" DockPanel.Dock="Top" IsOpen="{Binding ElementName=uc, Path=ShowPopup, Mode=TwoWay}" MouseUp="OnPopupMouseUp" >
-            <Border Padding="20,20,20,20" BorderThickness="2" BorderBrush="Chartreuse" Background="Yellow">
-                <TextBlock FontWeight="Bold" TextWrapping="Wrap" Text="{Binding ElementName=uc, Path=PopupMessage, Mode=OneWay}" />
-            </Border>
-        </Popup>
+        <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
         <DockPanel DockPanel.Dock="Top">
             <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
