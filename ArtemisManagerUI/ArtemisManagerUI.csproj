@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <FileVersion>0.2.0.558</FileVersion>
-    <AssemblyVersion>0.2.0.558</AssemblyVersion>
+    <FileVersion>0.3.0.560</FileVersion>
+    <AssemblyVersion>0.3.0.560</AssemblyVersion>
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>
@@ -71,6 +71,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DisplaySettings" Version="1.0.1" />
     <PackageReference Include="Lnk" Version="1.3.4" />
     <PackageReference Include="WindowsAPICodePack.Shell.CommonFileDialogs.Wpf" Version="1.1.5" />
     <PackageReference Include="WPFFolderBrowser.Net" Version="2.0.0" />
