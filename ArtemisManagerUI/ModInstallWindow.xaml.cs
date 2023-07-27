@@ -90,7 +90,7 @@ namespace ArtemisManagerUI
                                
                                 int bytesRead = 0;
                                 byte[] buffer = new byte[1024];
-                                List<byte> bufList = new List<byte>();
+                                List<byte> bufList = new();
 
                                 using EntryStream entryStream = reader.OpenEntryStream();
                                 if (entryStream != null)
@@ -99,7 +99,7 @@ namespace ArtemisManagerUI
                                     {
                                         bufList.AddRange(buffer);
                                     }
-                                    string? data = System.Text.ASCIIEncoding.ASCII.GetString(bufList.ToArray());
+                                    string? data = Encoding.ASCII.GetString(bufList.ToArray());
                                     if (!string.IsNullOrEmpty(data))
                                     {
                                         try
@@ -220,7 +220,9 @@ namespace ArtemisManagerUI
                 }
                 else
                 {
-                    MessageBox.Show("Cannot create Mod. No modifications found in the current active folder.\r\nCreate your mod at:\r\n" + ModItem.ActivatedFolder);
+                    MessageBox.Show(
+                        string.Format("Cannot create Mod. No modifications found in the current active folder.{0}Create your mod at:{0}{1}", Environment.NewLine, ModItem.ActivatedFolder),
+                            "FAILED: Generate Mod", MessageBoxButton.OK, MessageBoxImage.Error);
                     this.DialogResult = false;
                 }
                 this.Close();

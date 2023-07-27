@@ -64,6 +64,7 @@ namespace ArtemisManagerAction
                 };
                 
                 item.Save(Path.Combine(ModManager.DataFolder, SaveFile));
+                
             }
             else
             {
@@ -73,6 +74,7 @@ namespace ArtemisManagerAction
             }
             string sourcePath = Path.Combine(GetFullSavePath(), InstallFolder);
             ModManager.CopyFolder(sourcePath, targetPath);
+            ArtemisManager.ActivateLocalArtemisINISettings();
             this.IsActive = true;
             this.Save();
 

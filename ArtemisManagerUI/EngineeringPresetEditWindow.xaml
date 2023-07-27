@@ -83,8 +83,13 @@
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
             </StackPanel>
-
-            <GroupBox
+            <local:JsonPackageSenderControl
+                FileRequest="OnSendFileRequest"
+                TransmissionCompleted="OnTransmissionCompleted"
+                Prompt="Transmit selected presets file to:"
+                IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedPresetFile}"
+                DockPanel.Dock="Top" />
+            <!--<GroupBox
                 IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedPresetFile}"
                 DockPanel.Dock="Top" Header="Transmit selected presets file to:">
                 <DockPanel>
@@ -112,7 +117,7 @@
                     </ComboBox>
 
                 </DockPanel>
-            </GroupBox>
+            </GroupBox>-->
 
             <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />

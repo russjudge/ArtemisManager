@@ -4,6 +4,8 @@ Version 0.3 (beta) xx/xx/2023:
 Bug Fix:
 	- If, while viewing Engineering presets, a presets file was deleted from the folder where Engineering Presets is stored, it would not be removed from the list.
 	   This could potentially crash the app.  Fixed so that it does get removed.
+Enhancements:
+	- Added code to automatically back up the original version of artemis.ini from the vanilla Artemis, for each Artemis version that gets snapshotted.
 
 ------------------------------
 Version 0.2 (beta) 07/25/2023:

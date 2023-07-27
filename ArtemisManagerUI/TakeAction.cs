@@ -5,6 +5,7 @@ using Lnk;
 using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace ArtemisManagerUI
         {
             PopupEvent?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
-        public static IList<PCItem>? ConnectedPCs { get; set; }
+        public static ObservableCollection<PCItem> ConnectedPCs { get; set; }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
         public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
@@ -98,10 +99,7 @@ namespace ArtemisManagerUI
         {
             if (!force)
             {
-                if (MessageBox.Show(
-                    "The follow action is being requested: " 
-                    + action.ToString()
-                    + ".\r\nDo you wish to allow this?",
+                if (MessageBox.Show(string.Format("The follow action is being requested: {0}.{1}Do you wish to allow this?", action.ToString(), Environment.NewLine),
                     "Action requested", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 {
                     return false;
@@ -190,8 +188,7 @@ namespace ArtemisManagerUI
                 using ManagementObjectSearcher searcher = new("root\\WMI", "SELECT * FROM WmiMonitorListedSupportedSourceModes");
                 foreach (ManagementObject queryObj in searcher.Get().Cast<ManagementObject>())
                 {
-                    var monitorSourceModes = queryObj["MonitorSourceModes"] as Array;
-                    if (monitorSourceModes != null && monitorSourceModes.Length > 0)
+                    if (queryObj["MonitorSourceModes"] is Array monitorSourceModes && monitorSourceModes.Length > 0)
                     {
                         foreach (var mode in monitorSourceModes)
                         {
@@ -202,7 +199,7 @@ namespace ArtemisManagerUI
                                 //VideoModeDescriptor vmd = 
                                 var horizontalPixels = Convert.ToInt32(md["HorizontalActivePixels"]);
                                 var verticalPixels = Convert.ToInt32(md["VerticalActivePixels"]);
-                                Size sz = new Size(horizontalPixels, verticalPixels);
+                                Size sz = new(horizontalPixels, verticalPixels);
                                 retVal.Add(sz);
                             }
                         }
@@ -312,7 +309,7 @@ namespace ArtemisManagerUI
                 RaiseStatusUpdate("Unable to check for update: {0}", ex.Message);
                 if (AlertIfCannotCheck)
                 {
-                    MessageBox.Show("Unable to check for update: \r\n" + ex.Message, "Update Check Failed");
+                    MessageBox.Show("Unable to check for update: "+ Environment.NewLine + ex.Message, "Update Check Failed");
                     
                 }
                 else
@@ -335,7 +332,8 @@ namespace ArtemisManagerUI
             //2. Start the setup and exit.
             if (doPrompt)
             {
-                if (MessageBox.Show("An update to Artemis Manager was found.\r\nDo you wish to download the update?", "Update Found", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                if (MessageBox.Show(string.Format("An update to Artemis Manager was found.{0}Do you wish to download the update?", Environment.NewLine),
+                    "Update Found", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 {
                     return false;
                 }
@@ -345,24 +343,22 @@ namespace ArtemisManagerUI
                 string installFile = Path.GetTempFileName() + ".msi";
                 using (HttpClient client = new())
                 {
-                    using (Stream strm = await client.GetStreamAsync(setupURL))
+                    using Stream strm = await client.GetStreamAsync(setupURL);
+                    int bytesRead = 0;
+                    byte[] buffer = new byte[32768];
+
+                    using FileStream fs = new(installFile, FileMode.Create);
+                    while ((bytesRead = strm.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        int bytesRead = 0;
-                        byte[] buffer = new byte[32768];
-                        
-                        using (FileStream fs = new FileStream(installFile, FileMode.Create))
-                        {
-                            while ((bytesRead = strm.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                fs.Write(buffer, 0, bytesRead);
-                            }
-                        }
+                        fs.Write(buffer, 0, bytesRead);
                     }
                 }
                 RaiseStatusUpdate("Starting update.");
-                System.Diagnostics.ProcessStartInfo startInfo = new ProcessStartInfo(installFile);
-                startInfo.UseShellExecute = true;
-                System.Diagnostics.Process.Start(startInfo);
+                ProcessStartInfo startInfo = new(installFile)
+                {
+                    UseShellExecute = true
+                };
+                Process.Start(startInfo);
             }
             catch (Exception ex)
             {
@@ -389,7 +385,7 @@ namespace ArtemisManagerUI
                     {
                         try
                         {
-                            retVal = data.TargetIDs[data.TargetIDs.Count - 1].Value.Contains(fle.Name.Replace(".dll", ".exe"), StringComparison.InvariantCultureIgnoreCase);
+                            retVal = data.TargetIDs[^1].Value.Contains(fle.Name.Replace(".dll", ".exe"), StringComparison.InvariantCultureIgnoreCase);
                         }
                         catch (NullReferenceException)
                         {
@@ -410,7 +406,7 @@ namespace ArtemisManagerUI
                 foreach (var l in new DirectoryInfo(StartupFolder).GetFiles("*.lnk"))
                 {
                     var lnkFile = Lnk.Lnk.LoadFile(l.FullName);
-                    if (lnkFile.TargetIDs[lnkFile.TargetIDs.Count - 1].Value.Contains(new FileInfo(loc).Name, StringComparison.InvariantCultureIgnoreCase))
+                    if (lnkFile.TargetIDs[^1].Value.Contains(new FileInfo(loc).Name, StringComparison.InvariantCultureIgnoreCase))
                     {
                         l.Delete();
                         break;
@@ -543,7 +539,8 @@ oLink.Save
 
             if (ConnectedPCs != null)
             {
-                switch (System.Windows.MessageBox.Show("Update all connected peers with new password?\r\nWarning--if not changing the password on all connected peers will mean these peers will NOT be able to reconnect if they lose connection.\r\nThe current connection will be unaffected.", "Update Managers", MessageBoxButton.YesNoCancel))
+                switch (MessageBox.Show(
+                    string.Format("Update all connected peers with new password?{0}Warning--if not changing the password on all connected peers will mean these peers will NOT be able to reconnect if they lose connection.{0}The current connection will be unaffected.", Environment.NewLine), "Update Managers", MessageBoxButton.YesNoCancel))
                 {
                     case MessageBoxResult.Yes:
                         foreach (var pc in ConnectedPCs)

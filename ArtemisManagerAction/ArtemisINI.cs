@@ -1,4 +1,6 @@
-﻿using SharpCompress.Common;
+﻿using AMCommunicator;
+using AMCommunicator.Messages;
+using SharpCompress.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +10,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
@@ -60,7 +63,7 @@ namespace ArtemisManagerAction
 
         public ArtemisINI(string file) : base()
         {
-            LoadFile<ArtemisINI>(file);
+            //LoadFile<ArtemisINI>(file);
         }
 
         public static ArtemisINI Merge(ArtemisINI localFile, ArtemisINI modFile)
@@ -92,6 +95,18 @@ namespace ArtemisManagerAction
                 return Merge(this, INIFile);
             }
         }
+
+        public override JsonPackageFile FileType
+        {
+            get
+            {
+                return JsonPackageFile.ArtemisINI;
+            }
+        }
+
+        
+
+
 
         [INISetting(1, ClientServerType.Both)]
         public INISetting cameraPitch

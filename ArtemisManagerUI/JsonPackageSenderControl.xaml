@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="ArtemisManagerUI.JsonPackageSenderControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             mc:Ignorable="d" Name="uc">
+    <GroupBox
+        DockPanel.Dock="Top" Header="{Binding ElementName=uc, Path=Prompt, Mode=OneWay}">
+        <DockPanel>
+            <Button
+                DockPanel.Dock="Right"
+                ToolTip="Send selected file to selected network peer client"
+                Click="OnSendSelectedFile"
+                HorizontalAlignment="Left" >
+                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
+            </Button>
+            <ComboBox
+                VerticalAlignment="Center" VerticalContentAlignment="Center"
+                SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
+                ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center" Text="{Binding IP}" />
+                            <TextBlock VerticalAlignment="Center" Text=" - " />
+                            <TextBlock VerticalAlignment="Center" Text="{Binding Hostname}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </DockPanel>
+    </GroupBox>
+</UserControl>

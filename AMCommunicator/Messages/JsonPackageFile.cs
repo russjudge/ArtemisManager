@@ -10,5 +10,9 @@ namespace AMCommunicator.Messages
     {
         Generic,
         EngineeringPreset,
+        ArtemisINI,
+        controlsINI,
+        vesselDataXML,
+        DMXCommandsXML
     }
 }

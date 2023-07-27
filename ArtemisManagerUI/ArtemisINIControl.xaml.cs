@@ -25,6 +25,23 @@ namespace ArtemisManagerUI
         {
             InitializeComponent();
         }
+        public static readonly DependencyProperty ForLocalSettingsProperty =
+         DependencyProperty.Register(nameof(ForLocalSettings), typeof(bool),
+        typeof(ArtemisINIControl));
+
+        public bool ForLocalSettings
+        {
+            get
+            {
+                return (bool)this.GetValue(ForLocalSettingsProperty);
+
+            }
+            set
+            {
+                this.SetValue(ForLocalSettingsProperty, value);
+            }
+        }
+
         public static readonly DependencyProperty SettingsFileProperty =
           DependencyProperty.Register(nameof(SettingsFile), typeof(ArtemisINI),
          typeof(ArtemisINIControl));
@@ -40,6 +57,11 @@ namespace ArtemisManagerUI
             {
                 this.SetValue(SettingsFileProperty, value);
             }
+        }
+
+        private void OnActivate(object sender, RoutedEventArgs e)
+        {
+            ArtemisManager.SetActiveLocalArtemisINISettings(SettingsFile.SaveFile);
         }
     }
 }

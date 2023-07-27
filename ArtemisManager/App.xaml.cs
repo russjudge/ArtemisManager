@@ -19,12 +19,13 @@ namespace ArtemisManager
     {
         const string mutextName = "D4133AFE-31E8-4351-85B0-7F27FB0AFD20"; //Is a generated GUID so that this will work regardless of where installed, even if installed in multiple locations.
                                                                           //"ArtemisManager";
+#pragma warning disable IDE0052 // Remove unread private members
         static Mutex? Mutex;
+#pragma warning restore IDE0052 // Remove unread private members
         public static bool ProbablyUnattended { get; private set; }
         private void OnStartup(object sender, StartupEventArgs e)
         {
-            bool createdNew;
-            Mutex = new Mutex(true, mutextName, out createdNew);
+            Mutex = new Mutex(true, mutextName, out bool createdNew);
             if (createdNew)
             {
                 foreach (var arg in e.Args)
@@ -67,40 +68,41 @@ namespace ArtemisManager
 
             string workFile = Path.GetTempFileName() + ".txt";
 
-            using (StreamWriter sw = new StreamWriter(workFile))
+            using StreamWriter sw = new(workFile);
+            sw.WriteLine(e.Exception.ToString());
+            sw.WriteLine();
+            try
             {
-                sw.WriteLine(e.Exception.ToString());
-                sw.WriteLine();
-                try
+                this.Dispatcher.Invoke(new Action(() =>
                 {
-                    this.Dispatcher.Invoke(new Action(() =>
+                    if (TakeAction.MainWindow != null)
                     {
-                        if (TakeAction.MainWindow != null)
+                        foreach (var line in TakeAction.MainWindow.Status)
                         {
-                            foreach (var line in TakeAction.MainWindow.Status)
-                            {
-                                sw.WriteLine(line);
-                            }
+                            sw.WriteLine(line);
                         }
-                    }));
-                }
-                catch
-                {
-
-                }
-                MessageBox.Show("FATAL ERROR: " + e.Exception.Message +
-                    "\r\n\r\nLoading debugging information.\r\nPlease cut and paste this information into the \"Contact Us\" form at:\r\nhttps://russjudge/contact\r\n\r\n" +
-                    "We need to exit now....", "FATAL ERROR", MessageBoxButton.OK, MessageBoxImage.Error
-                    );
-                ProcessStartInfo startInfo = new(workFile);
-                startInfo.UseShellExecute = true;
-                Process.Start(startInfo);
-
-                startInfo = new("https://russjudge.com/contact");
-                startInfo.UseShellExecute = true;
-                Process.Start(startInfo);
+                    }
+                }));
+            }
+            catch
+            {
 
             }
+            MessageBox.Show(string.Format("FATAL ERROR: {0}" +
+                "{1}{1}Loading debugging information.{1}Please cut and paste this information into the \"Contact Us\" form at:{1}https://russjudge/contact{1}{1}" +
+                "We need to exit now....", e.Exception.Message, Environment.NewLine), "FATAL ERROR", MessageBoxButton.OK, MessageBoxImage.Error
+                );
+            ProcessStartInfo startInfo = new(workFile)
+            {
+                UseShellExecute = true
+            };
+            Process.Start(startInfo);
+
+            startInfo = new("https://russjudge.com/contact")
+            {
+                UseShellExecute = true
+            };
+            Process.Start(startInfo);
         }
     }
 }

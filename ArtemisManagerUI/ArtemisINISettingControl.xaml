@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="ArtemisManagerUI.ArtemisINISettingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*" SharedSizeGroup="INISettingColumnOne" />
+            <ColumnDefinition Width="3*" SharedSizeGroup="INISettingColumnTwo" />
+            <ColumnDefinition Width="*" SharedSizeGroup="INISettingColumnThree" />
+        </Grid.ColumnDefinitions>
+        <CheckBox
+            Grid.Column="2"
+            IsChecked="{Binding ElementName=uc, Path=Setting.UsingDefault, Mode=TwoWay}" />
+        <CheckBox
+            Grid.Column="0" Grid.ColumnSpan="2"
+            IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
+            Visibility="{Binding ElementName=uc, Path=IsBool, Mode=OneWay}"
+            IsChecked="{Binding ElementName=uc, Path=Setting.BoolValue, Mode=TwoWay}"
+            Content="{Binding ElementName=uc, Path=Setting.SettingName, Mode=OneWay}" />
+        <TextBlock
+            Grid.Column="0"
+            Text="{Binding ElementName=uc, Path=Setting.SettingName, Mode=OneWay}" />
+        <local:NumericTextBox
+            Grid.Column="1"
+            MaxValue="{Binding ElementName=uc, Path=IntMaxValue, Mode=OneWay}"
+            MinValue="{Binding ElementName=uc, Path=IntMinValue, Mode=OneWay}"
+            IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
+            Visibility="{Binding ElementName=uc, Path=IsInt, Mode=OneWay}"
+            Value="{Binding ElementName=uc, Path=Setting.IntValue}"
+            />
+        <TextBox
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
+            Visibility="{Binding ElementName=uc, Path=IsDouble, Mode=OneWay}"
+            Text="{Binding ElementName=uc, Path=Setting.DoubleValue}" />
+
+        <TextBox
+            Grid.Column="1"
+            HorizontalAlignment="Stretch"
+            IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
+            Visibility="{Binding ElementName=uc, Path=IsString, Mode=OneWay}"
+            Text="{Binding ElementName=uc, Path=Setting.FileValue}" />
+
+    </Grid>
+</UserControl>

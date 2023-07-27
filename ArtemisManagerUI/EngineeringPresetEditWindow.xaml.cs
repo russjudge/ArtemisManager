@@ -14,7 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Forms;
+using Microsoft.Win32;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -206,23 +206,24 @@ namespace ArtemisManagerUI
 
         private void OnAddPresetFile(object sender, RoutedEventArgs e)
         {
-            using (SaveFileDialog dialg = new())
+            SaveFileDialog dialg = new()
             {
-                dialg.CheckPathExists = true;
-                dialg.Filter = "Engineering Presets (*.dat)|*.dat";
-                dialg.DefaultExt = "dat";
-                dialg.InitialDirectory = ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder;
-                dialg.Title = "Select new presets filename";
-                if (dialg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                CheckPathExists = true,
+                Filter = "Engineering Presets (*" + ArtemisManager.DATFileExtension + ")|*" + ArtemisManager.DATFileExtension,
+                DefaultExt = "dat",
+                InitialDirectory = ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder,
+                Title = "Select new presets filename"
+            };
+            if (dialg.ShowDialog() == true)
+            {
+                PresetsFile f = new()
                 {
-                    PresetsFile f = new()
-                    {
-                        SaveFile = dialg.FileName
-                    };
-                    f.Save();
-                    SelectedFile = new PresetsFile(dialg.FileName);
-                }
+                    SaveFile = dialg.FileName
+                };
+                f.Save();
+                SelectedFile = new PresetsFile(dialg.FileName);
             }
+
         }
 
         private void OnDelete(object sender, RoutedEventArgs e)
@@ -292,14 +293,15 @@ namespace ArtemisManagerUI
         {
             if (e.OriginalSource is PresetsFile presetsFile)
             {
-                using (SaveFileDialog dialg = new())
+                SaveFileDialog dialg = new()
                 {
-                    dialg.CheckPathExists = true;
-                    dialg.Filter = "Engineering Presets (*.dat)|*.dat";
-                    dialg.DefaultExt = "dat";
-                    dialg.InitialDirectory = ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder;
-                    dialg.Title = "Select new presets filename";
-                    if (dialg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    CheckPathExists = true,
+                    Filter = "Engineering Presets (*" + ArtemisManager.DATFileExtension + ")|*" + ArtemisManager.DATFileExtension,
+                    DefaultExt = "dat",
+                    InitialDirectory = ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder,
+                    Title = "Select new presets filename"
+                };
+                if (dialg.ShowDialog() == true)
                     {
                         bool OkayToSave = true;
                         if (File.Exists(dialg.FileName))
@@ -312,20 +314,22 @@ namespace ArtemisManagerUI
                             File.Copy(presetsFile.SaveFile, dialg.FileName, true);
                         }
                     }
-                }
+                
             }
         }
 
         private void OnImportPresets(object sender, RoutedEventArgs e)
         {
             bool OkayToSave = true;
-            using OpenFileDialog dialg = new();
-            dialg.CheckPathExists = true;
-            dialg.CheckFileExists = true;
-            dialg.Filter = "Engineering Presets (*.dat)|*.dat";
-            dialg.DefaultExt = "dat";
-            dialg.Title = "Select presets filename";
-            if (dialg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            OpenFileDialog dialg = new()
+            {
+                CheckPathExists = true,
+                CheckFileExists = true,
+                Filter = "Engineering Presets (*" + ArtemisManager.DATFileExtension + ")|*" + ArtemisManager.DATFileExtension,
+                DefaultExt = "dat",
+                Title = "Select presets filename"
+            };
+            if (dialg.ShowDialog() == true)
             {
                 FileInfo source = new(dialg.FileName);
                 PresetsFile? work = null;
@@ -336,7 +340,7 @@ namespace ArtemisManagerUI
                 catch (Exception ex)
                 {
                     System.Windows.MessageBox.Show(
-                        "Invalid Engineering Presets file:\r\n\r\n" + ex.Message,
+                        string.Format("Invalid Engineering Presets file:{1}{1}{0}", ex.Message, Environment.NewLine),
                         "Import Engineering Presets",
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
@@ -403,6 +407,16 @@ namespace ArtemisManagerUI
         private void OnSaved(object sender, RoutedEventArgs e)
         {
             PopupMessage = "Presets Saved.";
+        }
+
+        private void OnSendFileRequest(object sender, FileRequestRoutedEventArgs e)
+        {
+            e.File = SelectedFile;
+        }
+
+        private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
+        {
+            PopupMessage = "Transmission completed.";
         }
     }
 }

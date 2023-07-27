@@ -65,7 +65,7 @@ namespace AMCommunicator
             }
             catch (SocketException ex)
             {
-                RaiseStatusUpdate("SocketException connecting to {0}: \r\n{1}", target, ex.Message);
+                RaiseStatusUpdate("SocketException connecting to {0}: {2}{1}", target, ex.Message, Environment.NewLine);
             }
             finally
             {
@@ -400,11 +400,11 @@ namespace AMCommunicator
             }
             catch (System.IO.IOException e)
             {
-                RaiseStatusUpdate("IOException in StartConnection on Host {0}:\r\n{1}", hostname, e.Message);
+                RaiseStatusUpdate("IOException in StartConnection on Host {0}:{2}{1}", hostname, e.Message, Environment.NewLine);
             }
             catch (System.Net.Sockets.SocketException e)
             {
-                RaiseStatusUpdate("SocketException in StartConnection on Host {0}:\r\n{1}", hostname, e.Message);
+                RaiseStatusUpdate("SocketException in StartConnection on Host {0}:{2}{1}", hostname, e.Message, Environment.NewLine);
             }
             catch (Exception e)
             {
@@ -537,8 +537,8 @@ namespace AMCommunicator
                     {
                         //We might be unattended here, so we need to alert the sender of an issue.
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                            string.Format("JsonPackageMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
-                            JsonPackageMessage.ThisVersion, msg.MessageVersion));
+                            string.Format("JsonPackageMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            JsonPackageMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
@@ -549,7 +549,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        List<byte> buffer = new List<byte>();
+        List<byte> buffer = new();
         private bool ProcessModPackage(NetworkStream? stream, ModPackageMessage? msg)
         {
             if (msg != null)
@@ -564,8 +564,8 @@ namespace AMCommunicator
                     {
                         //We might be unattended here, so we need to alert the sender of an issue.
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                            string.Format("ModPackageMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
-                            ModPackageMessage.ThisVersion, msg.MessageVersion));
+                            string.Format("ModPackageMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            ModPackageMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
@@ -599,8 +599,8 @@ namespace AMCommunicator
                     {
                         //We might be unattended here, so we need to alert the sender of an issue.
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                            string.Format("ArtemisActionMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
-                            ArtemisActionMessage.ThisVersion, msg.MessageVersion));
+                            string.Format("ArtemisActionMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            ArtemisActionMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
@@ -644,8 +644,8 @@ namespace AMCommunicator
                     {
                         //We might be unattended here, so we need to alert the sender of an issue.
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                            string.Format("ChangeAppSettingsMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Settings cannot be changed.",
-                            ChangeAppSettingMessage.ThisVersion, msg.MessageVersion));
+                            string.Format("ChangeAppSettingsMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            ChangeAppSettingMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
@@ -669,8 +669,8 @@ namespace AMCommunicator
                     else
                     {
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("ChangePasswordMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Password cannot be changed.\r\nIf this peer is restarted, it will not be able to reconnect to the peer-to-peer network until the password is manually changed.",
-                          ChangePasswordMessage.ThisVersion, msg.MessageVersion));
+                          string.Format("ChangePasswordMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Password cannot be changed.{2}If this peer is restarted, it will not be able to reconnect to the peer-to-peer network until the password is manually changed.",
+                          ChangePasswordMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
@@ -699,8 +699,8 @@ namespace AMCommunicator
                     else
                     {
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("CommunicationMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. .",
-                          CommunicationMessage.ThisVersion, msg.MessageVersion));
+                          string.Format("CommunicationMessage: Expected version={0}, Actual version={1}.{2}Update recommended. .",
+                          CommunicationMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 CommunicationMessageReceived?.Invoke(this, new CommunicationMessageEventArgs(msg.Source?.ToString(), msg.Message));
@@ -717,8 +717,8 @@ namespace AMCommunicator
                     if (msg.Source != null)
                     {
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("PingMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
-                          PingMessage.ThisVersion, msg.MessageVersion));
+                          string.Format("PingMessage: Expected version={0}, Actual version={1}.{2}Update recommended.",
+                          PingMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                     else
                     {
@@ -755,8 +755,8 @@ namespace AMCommunicator
                     if (msg.Source != null)
                     {
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("PCActionMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process PC Action until update is performed.",
-                          PCActionMessage.ThisVersion, msg.MessageVersion));
+                          string.Format("PCActionMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Unable to process PC Action until update is performed.",
+                          PCActionMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                         return false;
                     }
                     else
@@ -808,8 +808,8 @@ namespace AMCommunicator
                     if (msg.Source != null)
                     {
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("RequestItemMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process request until update is performed.",
-                          RequestModPackageMessage.ThisVersion, msg.MessageVersion));
+                          string.Format("RequestItemMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Unable to process request until update is performed.",
+                          RequestModPackageMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                     else
                     {
@@ -841,8 +841,8 @@ namespace AMCommunicator
                     else
                     {
                         SendAlert(IPAddress.Parse(message.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("HandshakeMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended.",
-                          HandshakeMessage.ThisVersion, message.MessageVersion));
+                          string.Format("HandshakeMessage: Expected version={0}, Actual version={1}.{2}Update recommended.",
+                          HandshakeMessage.ThisVersion, message.MessageVersion, Environment.NewLine));
                     }
                 }
                 retVal = !message.IsValid();
@@ -874,8 +874,8 @@ namespace AMCommunicator
                     else
                     {
                         SendAlert(IPAddress.Parse(message.Source), AlertItems.MessageVersionMismatch,
-                          string.Format("ClientInfoMessage: Expected version={0}, Actual version={1}.\r\nUpdate recommended. Unable to process Information until update is performed.",
-                          ClientInfoMessage.ThisVersion, message.MessageVersion));
+                          string.Format("ClientInfoMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Unable to process Information until update is performed.",
+                          ClientInfoMessage.ThisVersion, message.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
@@ -943,7 +943,7 @@ namespace AMCommunicator
             }
             catch (SocketException e)
             {
-                RaiseStatusUpdate("SocketException on TCPListener server:\r\n{0}", e.Message);
+                RaiseStatusUpdate("SocketException on TCPListener server:{1}{0}", e.Message, Environment.NewLine);
                 Console.WriteLine("SocketException: {0}", e);
             }
             finally
@@ -1030,7 +1030,7 @@ namespace AMCommunicator
             }
             catch (SocketException e)
             {
-                RaiseStatusUpdate("SocketException on UDPListener server:\r\n{0}", e.Message);
+                RaiseStatusUpdate("SocketException on UDPListener server:{1}{0}", e.Message, Environment.NewLine);
             }
             catch (ThreadInterruptedException) 
             {

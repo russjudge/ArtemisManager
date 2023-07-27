@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AMCommunicator;
+using AMCommunicator.Messages;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,7 +14,7 @@ using System.Windows.Automation.Provider;
 
 namespace ArtemisEngineeringPresets
 {
-    public class PresetsFile : DependencyObject
+    public class PresetsFile : DependencyObject, ISendableJsonFile
     {
         public const int MaxPresets = 10;
         public const int MaxStations = 8;
@@ -155,6 +157,14 @@ namespace ArtemisEngineeringPresets
             private set
             {
                 this.SetValue(PresetsProperty, value);
+            }
+        }
+
+        public JsonPackageFile FileType
+        {
+            get
+            {
+                return JsonPackageFile.EngineeringPreset;
             }
         }
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
 {
-    public class INISetting : INotifyPropertyChanged
+    public class INISetting : INotifyPropertyChanged, IINISetting
     {
         //Notes for artemis.ini:
 
@@ -61,7 +61,7 @@ namespace ArtemisManagerAction
         {
 
         }
-        
+
         public List<string> CommentLines { get; set; } = new();
         private string settingName = string.Empty;
         public string SettingName
@@ -120,8 +120,7 @@ namespace ArtemisManagerAction
         }
         public double GetDoubleValue()
         {
-            double retVal = 0;
-            if (double.TryParse(FileValue, out retVal))
+            if (double.TryParse(FileValue, out double retVal))
             {
 
             }
@@ -141,8 +140,7 @@ namespace ArtemisManagerAction
         }
         public int GetIntValue()
         {
-            int retVal = 0;
-            if (int.TryParse(FileValue, out retVal))
+            if (int.TryParse(FileValue, out int retVal))
             {
 
             }
@@ -170,7 +168,7 @@ namespace ArtemisManagerAction
             int i = FileValue.IndexOf('.');
             if (i < FileValue.Length - 2)
             {
-                FileValue = FileValue.Substring(0, i) + FileValue.Substring(i, 2);
+                FileValue = string.Concat(FileValue.AsSpan(0, i), FileValue.AsSpan(i, 2));
             }
             //Decimal points found: 0.00, 0.0
         }
@@ -218,7 +216,7 @@ namespace ArtemisManagerAction
         }
         public override string ToString()
         {
-            return string.Join("\r\n", GetOutLines());
+            return string.Join(Environment.NewLine, GetOutLines());
         }
 
     }

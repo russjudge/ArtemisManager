@@ -4,13 +4,13 @@ namespace VersionBump
 {
     class Program
     {
-        const string versionMatch1 = "<FileVersion>";
-        const string versionMatch2 = "<AssemblyVersion>";
-        const string match3 = "</PropertyGroup>";
-        static string NewFileVersion;
-        static string NewAssemblyVersion;
+        private const string VersionMatch1 = "<FileVersion>";
+        private const string VersionMatch2 = "<AssemblyVersion>";
+        private const string Match3 = "</PropertyGroup>";
+        private static string newFileVersion;
+        private static string newAssemblyVersion;
 
-        static string UpdateMatch(string projectData, string match, out string theNewVersion)
+        private static string UpdateMatch(string projectData, string match, out string theNewVersion)
         {
             string retVal;
             theNewVersion = string.Empty;
@@ -43,35 +43,36 @@ namespace VersionBump
             {
                 retVal = InsertMissingVersionMatch(projectData, match);
             }
+
             return retVal;
         }
-        static string InsertMissingVersionMatch(string projectData, string match)
+        private static string InsertMissingVersionMatch(string projectData, string match)
         {
-            int i = projectData.IndexOf(match3, StringComparison.InvariantCultureIgnoreCase);
-            string retVal = projectData.Substring(0, i) + "  " + match + "1.0.0.0</" + match.Substring(1) + "\r\n  " + projectData.Substring(i);
+            int i = projectData.IndexOf(Match3, StringComparison.InvariantCultureIgnoreCase);
+            string retVal = projectData.Substring(0, i) + "  " + match + "1.0.0.0</" + match.Substring(1) + Environment.NewLine + "  " + projectData.Substring(i);
             return retVal;
         }
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (args.Length > 0)
             {
                 string projectFile = args[0];
                 string projectData;
-                using (System.IO.StreamReader sr = new System.IO.StreamReader(projectFile))
+                using (System.IO.StreamReader sr = new (projectFile))
                 {
                     projectData = sr.ReadToEnd();
                 }
                
-                projectData = UpdateMatch(projectData, versionMatch1, out NewFileVersion);
-                projectData = UpdateMatch(projectData, versionMatch2, out NewAssemblyVersion);
+                projectData = UpdateMatch(projectData, VersionMatch1, out newFileVersion);
+                projectData = UpdateMatch(projectData, VersionMatch2, out newAssemblyVersion);
 
-                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(projectFile))
+                using (System.IO.StreamWriter sw = new (projectFile))
                 {
                     sw.Write(projectData);
                 }
                 Console.WriteLine("****************************************************");
-                Console.WriteLine("***   Project FileVersion update to    " + NewFileVersion + "   ***");
-                Console.WriteLine("***   Project AsemblyVersion update to " + NewAssemblyVersion + "   ***");
+                Console.WriteLine("***   Project FileVersion update to    " + newFileVersion + "   ***");
+                Console.WriteLine("***   Project AsemblyVersion update to " + newAssemblyVersion + "   ***");
                 Console.WriteLine("****************************************************");
 
             }

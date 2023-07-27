@@ -4,21 +4,57 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+    </UserControl.Resources>
     <StackPanel>
-        <GroupBox Header="Localized Settings">
-            <Grid
-                local:GridHelpers.ColumnCount="2"
-                local:GridHelpers.RowCount="{Binding ElementName=uc, Path=SettingsFile.Settings.Keys.Count, Mode=OneWay}">
-                <Label
-                    Grid.Row="0" Grid.Column="0"
-                    >
-                    Network Port:
-                </Label>
-                
+        <GroupBox
+            Visibility="{Binding ElementName=uc, Path=ForLocalSettings, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+            Header="Localized Settings">
+            <DockPanel Grid.IsSharedSizeScope="True">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                    <Button Click="OnActivate">Activate</Button>
+                </StackPanel>
 
-            </Grid>
+                <local:ArtemisINISettingControl
+                    DockPanel.Dock="Top"
+                    ForLocalSettings="True"
+                    IsInt="True"
+                    IntMaxValue="65535"
+                    IntMinValue="100"
+                    Setting="{Binding ElementName=uc, Path=SettingsFile.networkPort, Mode=TwoWay}"
+                    />
+                <local:ArtemisINISettingControl
+                    DockPanel.Dock="Top"
+                    ForLocalSettings="True"
+                    IsBool="True"
+                    Setting="{Binding ElementName=uc, Path=SettingsFile.useDebugConsoleWindow, Mode=TwoWay}"
+                    />
+                
+                <local:ArtemisINISettingControl
+                    DockPanel.Dock="Top"
+                    ForLocalSettings="True"
+                    IsDouble="True"
+                    Setting="{Binding ElementName=uc, Path=SettingsFile.musicObjectMasterVolume, Mode=TwoWay}"
+                    />
+                <local:ArtemisINISettingControl
+                    DockPanel.Dock="Top"
+                    ForLocalSettings="True"
+                    IsDouble="True"
+                    Setting="{Binding ElementName=uc, Path=SettingsFile.commsObjectMasterVolume, Mode=TwoWay}"
+                    />
+                <local:ArtemisINISettingControl
+                    DockPanel.Dock="Top"
+                    ForLocalSettings="True"
+                    IsDouble="True"
+                    Setting="{Binding ElementName=uc, Path=SettingsFile.commsObjectMasterVolume, Mode=TwoWay}"
+                    />
+
+            </DockPanel>
+            
         </GroupBox>
     </StackPanel>
 </UserControl>

@@ -152,68 +152,65 @@ namespace ArtemisManagerUI
 
                         Task.Run(async () =>
                         {
-                            using (HttpClient client = new())
+                            using HttpClient client = new();
+                            try
                             {
-                                try
+
+                                using var stream = await client.GetStreamAsync(ArtemisManager.ExternalToolsURLFolder + item.Item2);
+                                if (stream != null)
                                 {
-
-                                    using (var stream = await client.GetStreamAsync(ArtemisManager.ExternalToolsURLFolder + item.Item2))
+                                    byte[] buffer = new byte[32768];
+                                    int bytesRead = 0;
+                                    if (stream != null)
                                     {
-                                        if (stream != null)
+                                        string target = System.IO.Path.Combine(targetFolder, item.Item2);
+                                        using (FileStream fs = new(target, FileMode.Create))
                                         {
-                                            byte[] buffer = new byte[32768];
-                                            int bytesRead = 0;
-                                            if (stream != null)
+                                            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                                             {
-                                                string target = System.IO.Path.Combine(targetFolder, item.Item2);
-                                                using (FileStream fs = new(target, FileMode.Create))
-                                                {
-                                                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                                    {
-                                                        fs.Write(buffer, 0, bytesRead);
-                                                    }
-                                                }
-                                                Dispatcher.Invoke(() =>
-                                                {
-                                                    if (System.Windows.MessageBox.Show(
-                                                        item.Item1 + " downloaded successfully.\r\n\r\nDo you want to run the install?",
-                                                        item.Item1 + " download", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                                                    {
-                                                        ProcessStartInfo startInfo = new(target)
-                                                        {
-                                                            UseShellExecute = true
-                                                        };
-                                                        Process.Start(startInfo);
-                                                    }
-                                                });
-                                            }
-                                            else
-                                            {
-                                                Dispatcher.Invoke(() =>
-                                                {
-                                                    System.Windows.MessageBox.Show("Error downloading " + item.Item1,
-                                                    item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
-                                                });
-
+                                                fs.Write(buffer, 0, bytesRead);
                                             }
                                         }
-                                        else
+                                        Dispatcher.Invoke(() =>
                                         {
-                                            Dispatcher.Invoke(() =>
+                                            if (System.Windows.MessageBox.Show(
+                                                string.Format("{0} downloaded successfully.{1}{1}Do you want to run the install?",
+                                                item.Item1, Environment.NewLine),
+                                                item.Item1 + " download", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                                             {
+                                                ProcessStartInfo startInfo = new(target)
+                                                {
+                                                    UseShellExecute = true
+                                                };
+                                                Process.Start(startInfo);
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        Dispatcher.Invoke(() =>
+                                        {
+                                            System.Windows.MessageBox.Show("Error downloading " + item.Item1,
+                                            item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                        });
 
-                                                System.Windows.MessageBox.Show("Error downloading " + item.Item1,
-                                                    item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                                            });
-                                        }
                                     }
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    System.Windows.MessageBox.Show("Error downloading " + item.Item1 + ":\r\n\r\n" + ex.Message,
-                                                       item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    Dispatcher.Invoke(() =>
+                                    {
+
+                                        System.Windows.MessageBox.Show("Error downloading " + item.Item1,
+                                            item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                                    });
                                 }
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Windows.MessageBox.Show(string.Format("Error downloading {0}:{2}{2}{1}", item.Item1, ex.Message, Environment.NewLine),
+                                                   item.Item1 + " download", MessageBoxButton.OK, MessageBoxImage.Error);
                             }
 
                         });
@@ -266,7 +263,9 @@ namespace ArtemisManagerUI
                         {
                             ArtemisChanged = true;
                             string? version = ArtemisManager.GetArtemisVersion(ArtemisInstallFolder);
-                            if (version != null && System.Windows.MessageBox.Show(string.Format("New Version of Artemis SBS detected (Version {0}).\r\nDo you wish to make a new snapshot?", version), "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                            if (version != null && System.Windows.MessageBox.Show(
+                                string.Format("New Version of Artemis SBS detected (Version {0}).{1}{1}Do you wish to make a new snapshot?", version, Environment.NewLine),
+                                "New Artemis Version", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                             {
                                 SnapshotArtemis();
                             }
@@ -292,6 +291,7 @@ namespace ArtemisManagerUI
                     {
                         this.WindowState = WindowState.Minimized;
                     }
+                    ArtemisManager.VerifyArtemisINIBackup();
                 }
             }
         }
@@ -792,7 +792,7 @@ namespace ArtemisManagerUI
         {
             this.Dispatcher.Invoke(() =>
             {
-                this.PopupMessage += "\r\n\r\n" + e.Message;
+                this.PopupMessage += Environment.NewLine+Environment.NewLine + e.Message;
                 
             });
         }
@@ -996,7 +996,7 @@ namespace ArtemisManagerUI
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                PopupMessage = e.AlertItem.ToString() + "\r\n" + e.RelatedData;
+                PopupMessage = e.AlertItem.ToString() + Environment.NewLine + e.RelatedData;
                 
                 System.Windows.MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
             }));
@@ -1155,7 +1155,7 @@ namespace ArtemisManagerUI
             }
             else
             {
-                System.Windows.MessageBox.Show("FATAL Exception:\r\n" + e.ToString());
+                System.Windows.MessageBox.Show("FATAL Exception:\r\n"+ Environment.NewLine + e.Message, "FATAL ERROR!!!", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
         }
@@ -1365,7 +1365,7 @@ namespace ArtemisManagerUI
                     }
                     else
                     {
-                        MessageBox.Show("Invalid folder selected:\r\n\r\nArtemis executable not found.\r\n\r\nPlease select another folder.",
+                        MessageBox.Show(string.Format("Invalid folder selected:{0}{0}Artemis executable not found.{0}Please select another folder.", Environment.NewLine),
                             "Invalid Artemis install location.", MessageBoxButton.OK, MessageBoxImage.Hand);
                     }
                 }
@@ -1744,67 +1744,65 @@ namespace ArtemisManagerUI
 
                         Task.Run(async () =>
                         {
-                            using (HttpClient client = new())
+                            using HttpClient client = new();
+                            try
                             {
-                                try
+
+                                using var stream = await client.GetStreamAsync(ArtemisManager.ArtemisUpgradesURLFolder + file);
+                                if (stream != null)
                                 {
-
-                                    using (var stream = await client.GetStreamAsync(ArtemisManager.ArtemisUpgradesURLFolder + file))
+                                    byte[] buffer = new byte[32768];
+                                    int bytesRead = 0;
+                                    if (stream != null)
                                     {
-                                        if (stream != null)
+                                        string target = System.IO.Path.Combine(targetFolder, file);
+                                        using (FileStream fs = new(target, FileMode.Create))
                                         {
-                                            byte[] buffer = new byte[32768];
-                                            int bytesRead = 0;
-                                            if (stream != null)
+                                            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                                             {
-                                                string target = System.IO.Path.Combine(targetFolder, file);
-                                                using (FileStream fs = new(target, FileMode.Create))
-                                                {
-                                                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                                    {
-                                                        fs.Write(buffer, 0, bytesRead);
-                                                    }
-                                                }
-                                                Dispatcher.Invoke(() =>
-                                                {
-                                                    if (System.Windows.MessageBox.Show("Artemis SBS Upgrade downloaded successfully.\r\n\r\nDo you want to run the install?", "Artemis SBS Upgrade download", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                                                    {
-                                                        ProcessStartInfo startInfo = new(target)
-                                                        {
-                                                            UseShellExecute = true
-                                                        };
-                                                        Process.Start(startInfo);
-
-                                                    }
-                                                });
-                                            }
-                                            else
-                                            {
-                                                Dispatcher.Invoke(() =>
-                                                {
-                                                    System.Windows.MessageBox.Show("Error downloading " + file,
-                                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
-                                                });
-
+                                                fs.Write(buffer, 0, bytesRead);
                                             }
                                         }
-                                        else
+                                        Dispatcher.Invoke(() =>
                                         {
-                                            Dispatcher.Invoke(() =>
+                                            if (MessageBox.Show(
+                                                string.Format("Artemis SBS Upgrade downloaded successfully.{0}{0}Do you want to run the install?", Environment.NewLine),
+                                                    "Artemis SBS Upgrade download", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                                             {
+                                                ProcessStartInfo startInfo = new(target)
+                                                {
+                                                    UseShellExecute = true
+                                                };
+                                                Process.Start(startInfo);
 
-                                                System.Windows.MessageBox.Show("Error downloading " + file,
-                                                        "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        Dispatcher.Invoke(() =>
+                                        {
+                                            MessageBox.Show("Error downloading " + file,
+                                                "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                        });
 
-                                            });
-                                        }
                                     }
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    System.Windows.MessageBox.Show("Error downloading " + file + ":\r\n\r\n" + ex.Message,
-                                                       "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    Dispatcher.Invoke(() =>
+                                    {
+
+                                        MessageBox.Show("Error downloading " + file,
+                                            "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                                    });
                                 }
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(string.Format("Error downloading {0}:{2}{2}{1}", file, ex.Message, Environment.NewLine),
+                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
                             }
 
                         });

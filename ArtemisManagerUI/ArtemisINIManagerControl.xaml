@@ -9,72 +9,48 @@
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
+        
     </UserControl.Resources>
 
     <DockPanel>
-       
         <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
         <DockPanel
-            DockPanel.Dock="Left" Width="200">
+            DockPanel.Dock="Left" Width="205">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Button 
                 Click="OnAddSettingsFile"
                 HorizontalAlignment="Left" >
                     <StackPanel Orientation="Horizontal" >
                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
-                        <TextBlock VerticalAlignment="Center" Text="Create new presets file" TextWrapping="Wrap"/>
+                        <TextBlock VerticalAlignment="Center" Text="Create new settings file" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
                 <Button
                     Click="OnRestoreToDefault"
-                    Margin="5,0,0,0" ToolTip="Restore Active Engineering presets in Active folder to defaults">
+                    Margin="5,0,0,0" ToolTip="Restore Original artemis.ini file ({0}) to defaults">
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
             </StackPanel>
-
-            <GroupBox
+            <local:JsonPackageSenderControl
+                FileRequest="OnSendFileRequest" TransmissionCompleted="OnTransmissionCompleted"
+                Prompt="Transmit selected settings file to:"
                 IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedArtemisSettingsFile}"
-                DockPanel.Dock="Top" Header="Transmit selected presets file to:">
-                <DockPanel>
-                    <Button
-                        DockPanel.Dock="Right"
-                        CommandParameter="{Binding}"
-                        ToolTip="Send selected presets file to selected network peer client"
-                        Click="OnSendSelectedFile"
-                        HorizontalAlignment="Left" >
-                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
-                    </Button>
-                    <!--<ComboBox
-                        VerticalAlignment="Center" VerticalContentAlignment="Center"
-                        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
-                        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding IP}" />
-                                    <TextBlock VerticalAlignment="Center" Text=" - " />
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding Hostname}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>-->
-
-                </DockPanel>
-            </GroupBox>
+                DockPanel.Dock="Top" />
+            
 
             <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import Engineering Presets file">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
             </Button>
             <ListBox
+                HorizontalAlignment="Stretch"
                 SelectionMode="Single"
                 ItemsSource="{Binding ElementName=uc, Path=ArtemisSettingsFiles, Mode=TwoWay}"
-                SelectedItem="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Width="200">
+                SelectedItem="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid HorizontalAlignment="Stretch" >
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="154" />
+                                <ColumnDefinition Width="142" />
                                 <ColumnDefinition  />
                             </Grid.ColumnDefinitions>
 
@@ -91,6 +67,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <local:ArtemisINIControl />
+        <local:ArtemisINIControl ForLocalSettings="True" SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

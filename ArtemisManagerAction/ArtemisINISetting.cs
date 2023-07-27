@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
 {
-    public class ArtemisINISetting : INISetting, INotifyPropertyChanged
+    public class ArtemisINISetting : INISetting, INotifyPropertyChanged, IINISetting
     {
         /*
         public ArtemisINISetting(string key, string value, bool useDefault = false) : base(key, value, useDefault) { }

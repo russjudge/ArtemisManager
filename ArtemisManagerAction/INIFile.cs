@@ -1,22 +1,26 @@
-﻿using System;
+﻿using AMCommunicator;
+using AMCommunicator.Messages;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
 {
-    public class INIFile : INotifyPropertyChanged
+    public class INIFile : INotifyPropertyChanged, ISendableJsonFile
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void DoChanged([CallerMemberName] string property = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
-        protected void LoadFile<T>(string file)
+
+        protected void LoadFile<T>(string file, Type iniSettingType) where T : INISetting
         {
             var constructor = typeof(T).GetConstructor(Type.EmptyTypes);
             if (constructor != null)
@@ -24,7 +28,11 @@ namespace ArtemisManagerAction
                 SaveFile = file;
                 using StreamReader sr = new(file);
                 T resultSetting = (T)constructor.Invoke(Array.Empty<object>());
-                if (resultSetting is INISetting setting)
+
+                INISetting setting = resultSetting;
+
+
+                if (setting != null)
                 {
                     string? line;
                     while ((line = sr.ReadLine()) != null)
@@ -78,23 +86,18 @@ namespace ArtemisManagerAction
                     if (prop != null)
                     {
                         var attr = prop.GetCustomAttribute<INISettingAttribute>();
-                        if (attr == null)
-                        {
-                            attr = prop.GetCustomAttribute<LocalINISettingAttribute>();
-                        }
+                        attr ??= prop.GetCustomAttribute<LocalINISettingAttribute>();
                         if (attr != null)
                         {
                             items.Add(attr.Sequence, item);
                         }
                     }
                 }
-                
-                using (StreamWriter sw = new(SaveFile))
+
+                using StreamWriter sw = new(SaveFile);
+                foreach (var key in items.Keys)
                 {
-                    foreach (var key in items.Keys)
-                    {
-                        sw.WriteLine(items[key].ToString());
-                    }
+                    sw.WriteLine(items[key].ToString());
                 }
             }
             else
@@ -203,6 +206,21 @@ namespace ArtemisManagerAction
         {
             EnsureSettingExists(key);
             return Settings[key].GetBoolValue();
+        }
+        public virtual JsonPackageFile FileType
+        {
+            get
+            {
+                return JsonPackageFile.Generic;
+            }
+        }
+        public string GetJSON()
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = false
+            };
+            return JsonSerializer.Serialize(this, options);
         }
     }
 }

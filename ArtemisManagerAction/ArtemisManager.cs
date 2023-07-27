@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace ArtemisManagerAction
         public const string Artemis = "Artemis";
         public static readonly Dictionary<string, Guid> ArtemisVersionIdentifiers = new();
         public const string RegistryArtemisInstallLocation = "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\windows\\CurrentVersion\\App Paths\\" + ArtemisEXE;
-        
+
         public const string SaveFileExtension = ".json";
         public const string INIFileExtension = ".ini";
         public const string XMLFileExtension = ".xml";
@@ -36,16 +37,17 @@ namespace ArtemisManagerAction
         public static readonly string ControlsINIFolder = Path.Combine(ModManager.DataFolder, "controlsINI");
         public static readonly string DMXCommandsFolder = Path.Combine(ModManager.DataFolder, "DMXCommands");
         public static readonly string ArtemisINIFolder = Path.Combine(ModManager.DataFolder, "artemisINI");
+        public static readonly string ActiveLocallSettingsArtemisINIFileMarker = Path.Combine(ModManager.DataFolder, "ActiveLocalSettingsArtemisINI" + TXTFileExtension);
 
 
         public const string ArtemisDATSubfolder = "dat";
+        
         public const string originalIdentifier = "Original";
 
         public const string ArtemisEngineeringFile = "engineeringSettings" + DATFileExtension;
         public const string OriginalArtemisEngineeringFile = originalIdentifier + DATFileExtension;
 
-
-        public const string OriginalArtemisINIFile = originalIdentifier + Artemis + INIFileExtension;
+        
 
         public const string ArtemisEXE = Artemis + EXEFileExtension;
         public const string controlsINI = "controls" + INIFileExtension;
@@ -54,7 +56,7 @@ namespace ArtemisManagerAction
 
         public const string ChangesTXT = "changes" + TXTFileExtension;
         static System.Diagnostics.Process? runningArtemisProcess = null;
-        
+
 
         static ArtemisManager()
         {
@@ -65,7 +67,51 @@ namespace ArtemisManagerAction
             ArtemisVersionIdentifiers.Add("2.8.0", new Guid("D141B467-1A2F-48CE-8BDF-3540BDC48215"));
             ArtemisVersionIdentifiers.Add("2.8.1", new Guid("AF0EC3FE-D26A-4AAD-8E1A-8584DE044688"));  //If from zip file the exe file date should be 1/23/2022.
         }
+        public static void SetActiveLocalArtemisINISettings(string file)
+        {
+            if (File.Exists(ActiveLocallSettingsArtemisINIFileMarker))
+            {
+                File.Delete(ActiveLocallSettingsArtemisINIFileMarker);
+            }
+            using StreamWriter sw = new(ActiveLocallSettingsArtemisINIFileMarker);
+            sw.WriteLine(file);
+            ActivateLocalArtemisINISettings();
+        }
+        public static bool ActivateLocalArtemisINISettings()
+        {
+            bool retVal;
+            if (!File.Exists(ActiveLocallSettingsArtemisINIFileMarker))
+            {
+                retVal = false;
+            }
+            else
+            {
+                string? source;
+                using (StreamReader sr = new(ActiveLocallSettingsArtemisINIFileMarker))
+                {
+                    source = sr.ReadLine();
+                }
+                if (source == null)
+                {
+                    retVal = false;
+                }
+                else
+                {
+                    var local = new ArtemisINI(source);
+                    string target = Path.Combine(ModItem.ActivatedFolder, ArtemisINI);
+                    if (File.Exists(target))
+                    {
+                        ArtemisINI remote = new(target);
+                        local.Merge(remote, false);
 
+                    }
+                    local.SaveFile = target;
+                    local.Save();
+                    retVal = true;
+                }
+            }
+            return retVal;
+        }
         public static string[] GetArtemisINIFileList()
         {
             ModManager.CreateFolder(ArtemisINIFolder);
@@ -182,7 +228,7 @@ namespace ArtemisManagerAction
                     //line 1 = version
                     //line 2 = setup file to download.
                     info = data.Replace("\r", string.Empty).Split('\n');
-                    
+
                 }
                 foreach (var line in info)
                 {
@@ -192,7 +238,7 @@ namespace ArtemisManagerAction
                         links.Add(new(item[0], item[1]));
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -201,67 +247,61 @@ namespace ArtemisManagerAction
             return links.ToArray();
         }
         [Obsolete("Need to somehow get failure or success back to user.")]
-       public static async void DownloadFile(string url, string target)
+        public static async void DownloadFile(string url, string target)
         {
-            using (HttpClient client = new())
+            using HttpClient client = new();
+            try
             {
-                try
+
+                using var stream = await client.GetStreamAsync(url);
+                if (stream != null)
                 {
-
-                    using (var stream = await client.GetStreamAsync(url))
+                    byte[] buffer = new byte[32768];
+                    int bytesRead = 0;
+                    if (stream != null)
                     {
-                        if (stream != null)
-                        {
-                            byte[] buffer = new byte[32768];
-                            int bytesRead = 0;
-                            if (stream != null)
-                            {
-                             
-                                using (FileStream fs = new(target, FileMode.Create))
-                                {
-                                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
-                                    {
-                                        fs.Write(buffer, 0, bytesRead);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                /*
-                                Dispatcher.Invoke(() =>
-                                {
-                                    System.Windows.MessageBox.Show("Error downloading " + file,
-                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
-                                });
-                                */
-                            }
-                        }
-                        else
-                        {
-                            /*
-                            Dispatcher.Invoke(() =>
-                            {
 
-                                System.Windows.MessageBox.Show("Error downloading " + file,
-                                    "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                            });
-                            */
+                        using FileStream fs = new(target, FileMode.Create);
+                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            fs.Write(buffer, 0, bytesRead);
                         }
                     }
+                    else
+                    {
+                        /*
+                        Dispatcher.Invoke(() =>
+                        {
+                            System.Windows.MessageBox.Show("Error downloading " + file,
+                            "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                        });
+                        */
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    //System.Windows.MessageBox.Show("Error downloading " + file + ":\r\n\r\n" + ex.Message,
-                    //                   "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+                    /*
+                    Dispatcher.Invoke(() =>
+                    {
+
+                        System.Windows.MessageBox.Show("Error downloading " + file,
+                            "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    });
+                    */
                 }
+            }
+            catch (Exception ex)
+            {
+                //System.Windows.MessageBox.Show("Error downloading " + file + ":\r\n\r\n" + ex.Message,
+                //                   "Artmis SBS Upgrade file download", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         public static bool CheckIfArtemisSnapshotNeeded(string installFolder)
         {
             bool matchFound = false;
             string? installedVersion = GetArtemisVersion(installFolder);
-            if (!string.IsNullOrEmpty(installedVersion) )
+            if (!string.IsNullOrEmpty(installedVersion))
             {
                 foreach (var mod in GetInstalledMods())
                 {
@@ -315,7 +355,7 @@ namespace ArtemisManagerAction
                     mission.Save();
                 }
             }
-            
+
             foreach (var fle in new DirectoryInfo(ModManager.DataFolder).GetFiles("*" + SaveFileExtension))
             {
                 fle.Delete();
@@ -358,7 +398,7 @@ namespace ArtemisManagerAction
                 {
                     item.Save();
                 }
-                
+
             }
 
             return retVal;
@@ -374,7 +414,7 @@ namespace ArtemisManagerAction
                 }
                 item.IsActive = (File.Exists(Path.Combine(ModManager.DataFolder, item.SaveFile)));
             }
-            
+
             return retVal;
         }
         public static ModItem[] GetActivatedMods()
@@ -414,12 +454,63 @@ namespace ArtemisManagerAction
                 }
             }
             string target = Path.Combine(ModItem.ModInstallFolder, retVal.GetInstallFolder());
-            
+
             ModManager.CopyFolder(installFolder, target);
 
             retVal.Save();
-            
+            if (version != null)
+            {
+                ModManager.CreateFolder(ArtemisINIFolder);
+                System.IO.File.Copy(Path.Combine(installFolder, ArtemisManager.ArtemisINI), GetOriginalArtemisINIFilename(version), true);
+            }
             return retVal;
+        }
+        public static string GetOriginalArtemisININame(string version)
+        {
+            return originalIdentifier + "_V" + version + INIFileExtension;
+        }
+        public static string GetOriginalArtemisINIFilename(string version)
+        {
+            return Path.Combine(ModManager.DataFolder, GetOriginalArtemisININame(version));
+        }
+        public static string GetOriginalArtemisINIFile(string installFolder)
+        {
+            string? version = GetArtemisVersion(installFolder);
+            if (version != null)
+            {
+                return GetOriginalArtemisINIFilename(version);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+        public static void VerifyArtemisINIBackup()
+        {
+            foreach (var mod in GetInstalledMods())
+            {
+                if (mod.IsArtemisBase)
+                {
+                    string installFolder = Path.Combine(ModItem.ModInstallFolder, mod.InstallFolder);
+                    string target = GetOriginalArtemisINIFile(installFolder);
+                    string target2 = Path.Combine(ModManager.DataFolder, new FileInfo(target).Name);
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        string source = Path.Combine(installFolder, ArtemisINI);
+                        if (File.Exists(source))
+                        {
+                            if (!File.Exists(target))
+                            {
+                                File.Copy(source, target, true);
+                            }
+                            if (!File.Exists(target2))
+                            {
+                                File.Copy(source, target2, true);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public static string? AutoDetectArtemisInstallPath()
@@ -485,7 +576,7 @@ namespace ArtemisManagerAction
                     retVal = wrkKey.GetValue(string.Empty) as string;
                     if (retVal != null)
                     {
-                        FileInfo f = new (retVal);
+                        FileInfo f = new(retVal);
                         if (f.Exists)
                         {
                             retVal = f.DirectoryName;
@@ -531,7 +622,7 @@ namespace ArtemisManagerAction
                             int i = line.IndexOf(" V");
                             if (i > -1)
                             {
-                                int j = line.IndexOf(" ", i+1);
+                                int j = line.IndexOf(" ", i + 1);
                                 if (j < 0)
                                 {
                                     j = line.Length;
@@ -563,7 +654,7 @@ namespace ArtemisManagerAction
         }
         public static bool IsArtemisRunning()
         {
-            var processes =  System.Diagnostics.Process.GetProcessesByName(Artemis);
+            var processes = System.Diagnostics.Process.GetProcessesByName(Artemis);
             return (processes.Length > 0);
         }
         public static bool IsRunningArtemisUnderMyControl()
