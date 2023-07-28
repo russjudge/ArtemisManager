@@ -53,14 +53,14 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty AvailableResolutionsProperty =
-           DependencyProperty.Register(nameof(AvailableResolutions), typeof(ObservableCollection<Size>),
+           DependencyProperty.Register(nameof(AvailableResolutions), typeof(ObservableCollection<System.Drawing.Size>),
             typeof(VideoScreenSettingControl));
 
-        public ObservableCollection<Size> AvailableResolutions
+        public ObservableCollection<System.Drawing.Size> AvailableResolutions
         {
             get
             {
-                return (ObservableCollection<Size>)this.GetValue(AvailableResolutionsProperty);
+                return (ObservableCollection<System.Drawing.Size>)this.GetValue(AvailableResolutionsProperty);
 
             }
             set
@@ -87,6 +87,18 @@ namespace ArtemisManagerUI
                 this.SetValue(AvailableModesProperty, value);
 
             }
+        }
+
+        private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender is ComboBox me)
+            {
+                if (me.SelectedItem is System.Drawing.Size sz)
+                {
+                    SettingsFile.ScreenResolution = sz;
+                }
+            }
+
         }
     }
 }

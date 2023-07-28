@@ -24,6 +24,7 @@ namespace ArtemisManagerUI
     {
         public ArtemisINIControl()
         {
+            ArtemisFolder = ModItem.ActivatedFolder;
             InitializeComponent();
         }
         public static readonly DependencyProperty ForLocalSettingsProperty =
@@ -42,10 +43,53 @@ namespace ArtemisManagerUI
                 this.SetValue(ForLocalSettingsProperty, value);
             }
         }
+        public static readonly DependencyProperty ArtemisFolderProperty =
+         DependencyProperty.Register(nameof(ArtemisFolder), typeof(string),
+        typeof(ArtemisINIControl));
+
+        public string ArtemisFolder
+        {
+            get
+            {
+                return (string)this.GetValue(ArtemisFolderProperty);
+
+            }
+            set
+            {
+                this.SetValue(ArtemisFolderProperty, value);
+            }
+        }
+
+
+        public static readonly DependencyProperty PopupMessageProperty =
+          DependencyProperty.Register(nameof(PopupMessage), typeof(string),
+         typeof(ArtemisINIControl));
+
+        public string PopupMessage
+        {
+            get
+            {
+                return (string)this.GetValue(PopupMessageProperty);
+
+            }
+            set
+            {
+                this.SetValue(PopupMessageProperty, value);
+            }
+        }
+
 
         public static readonly DependencyProperty SettingsFileProperty =
           DependencyProperty.Register(nameof(SettingsFile), typeof(ArtemisINI),
-         typeof(ArtemisINIControl));
+         typeof(ArtemisINIControl), new PropertyMetadata(OnSettingsFileChanged));
+
+        private static void OnSettingsFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ArtemisINIControl me)
+            {
+                var x = me.SettingsFile;
+            }
+        }
 
         public ArtemisINI SettingsFile
         {
@@ -63,16 +107,17 @@ namespace ArtemisManagerUI
         private void OnActivate(object sender, RoutedEventArgs e)
         {
             ArtemisManager.SetActiveLocalArtemisINISettings(SettingsFile.SaveFile);
+            PopupMessage = "Settings file activated.";
         }
         public static readonly DependencyProperty AvailableResolutionsProperty =
-          DependencyProperty.Register(nameof(AvailableResolutions), typeof(ObservableCollection<Size>),
+          DependencyProperty.Register(nameof(AvailableResolutions), typeof(ObservableCollection<System.Drawing.Size>),
            typeof(ArtemisINIControl));
 
-        public ObservableCollection<Size> AvailableResolutions
+        public ObservableCollection<System.Drawing.Size> AvailableResolutions
         {
             get
             {
-                return (ObservableCollection<Size>)this.GetValue(AvailableResolutionsProperty);
+                return (ObservableCollection<System.Drawing.Size>)this.GetValue(AvailableResolutionsProperty);
 
             }
             set
@@ -80,6 +125,16 @@ namespace ArtemisManagerUI
                 this.SetValue(AvailableResolutionsProperty, value);
 
             }
+        }
+
+        private void OnAllowOptionMouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void OnSave(object sender, RoutedEventArgs e)
+        {
+            SettingsFile.Save();
         }
     }
 }

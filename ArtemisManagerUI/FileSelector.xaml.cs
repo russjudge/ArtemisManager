@@ -103,12 +103,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedItemProperty =
           DependencyProperty.Register(nameof(SelectedItem), typeof(string),
-          typeof(FileSelector), new PropertyMetadata(OnSelectedItemChanged));
-
-        private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-
-        }
+          typeof(FileSelector));
 
         public string SelectedItem
         {

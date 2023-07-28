@@ -29,7 +29,11 @@ namespace ArtemisManagerUI
     {
         public EngineeringPresetEditWindow()
         {
-            PresetFiles = new ObservableCollection<string>(ArtemisManagerAction.ArtemisManager.GetEngineeringPresetFiles());
+            PresetFiles = new ObservableCollection<FileListItem>();
+            foreach (var name in ArtemisManagerAction.ArtemisManager.GetEngineeringPresetFiles())
+            {
+                PresetFiles.Add(new FileListItem(name.Substring(0, name.Length - 4)));
+            }
             InitializeComponent();
             ModManager.CreateFolder(ArtemisManager.EngineeringPresetsFolder);
             watcher = new FileSystemWatcher(ArtemisManager.EngineeringPresetsFolder);
@@ -44,9 +48,19 @@ namespace ArtemisManagerUI
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (PresetFiles.Contains(e.Name))
+                    string match = e.Name.Substring(0, e.Name.Length - 4);
+                    FileListItem? remover = null;
+                    foreach (var item in PresetFiles)
                     {
-                        PresetFiles.Remove(e.Name);
+                        if (item.Name == match)
+                        {
+                            remover = item;
+                            break;
+                        }
+                    }
+                    if (remover != null)
+                    {
+                        PresetFiles.Remove(remover);
                     }
                 });
             }
@@ -75,9 +89,19 @@ namespace ArtemisManagerUI
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (!PresetFiles.Contains(e.Name))
+                    string match = e.Name.Substring(0, e.Name.Length - 4);
+                    FileListItem? remover = null;
+                    foreach (var item in PresetFiles)
                     {
-                        PresetFiles.Add(e.Name);
+                        if (item.Name == match)
+                        {
+                            remover = item;
+                            break;
+                        }
+                    }
+                    if (remover == null)
+                    {
+                        PresetFiles.Add(new(match));
                     }
                 });
             }
@@ -117,14 +141,14 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty PresetFilesProperty =
-          DependencyProperty.Register(nameof(PresetFiles), typeof(ObservableCollection<string>),
+          DependencyProperty.Register(nameof(PresetFiles), typeof(ObservableCollection<FileListItem>),
           typeof(EngineeringPresetEditWindow));
 
-        public ObservableCollection<string> PresetFiles
+        public ObservableCollection<FileListItem> PresetFiles
         {
             get
             {
-                return (ObservableCollection<string>)this.GetValue(PresetFilesProperty);
+                return (ObservableCollection<FileListItem>)this.GetValue(PresetFilesProperty);
             }
             set
             {
@@ -133,14 +157,15 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty SelectedPresetFileProperty =
-         DependencyProperty.Register(nameof(SelectedPresetFile), typeof(string),
+         DependencyProperty.Register(nameof(SelectedPresetFile), typeof(FileListItem),
          typeof(EngineeringPresetEditWindow), new PropertyMetadata(OnSelectedPresetFileChanged));
 
         private static void OnSelectedPresetFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is EngineeringPresetEditWindow me)
             {
-                if (!string.IsNullOrEmpty(me.SelectedPresetFile) && System.IO.File.Exists(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile)))
+                if (me.SelectedPresetFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.Name)
+                    && System.IO.File.Exists(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension)))
                 {
                     bool IsOkay = true;
 
@@ -162,24 +187,25 @@ namespace ArtemisManagerUI
                     }
                     if (IsOkay)
                     {
-                        me.SelectedFile = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder,me.SelectedPresetFile));
+                        me.SelectedFile = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension));
                     }
                     else
                     {
                         if (me.SelectedFile != null && !string.IsNullOrEmpty(me.SelectedFile.SaveFile))
                         {
-                            me.SelectedPresetFile = new System.IO.FileInfo(me.SelectedFile.SaveFile).Name;
+                            var fle = new System.IO.FileInfo(me.SelectedFile.SaveFile);
+                            me.SelectedPresetFile = new(fle.Name.Substring(0, fle.Name.Length - 4));
                         }
                     }
                 }
             }
         }
 
-        public string SelectedPresetFile
+        public FileListItem? SelectedPresetFile
         {
             get
             {
-                return (string)this.GetValue(SelectedPresetFileProperty);
+                return (FileListItem?)this.GetValue(SelectedPresetFileProperty);
             }
             set
             {
@@ -206,39 +232,58 @@ namespace ArtemisManagerUI
 
         private void OnAddPresetFile(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog dialg = new()
+            string newFile = "NewPresets";
+            int i = 0;
+            bool mustretry = true;
+            while (mustretry)
             {
-                CheckPathExists = true,
-                Filter = "Engineering Presets (*" + ArtemisManager.DATFileExtension + ")|*" + ArtemisManager.DATFileExtension,
-                DefaultExt = "dat",
-                InitialDirectory = ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder,
-                Title = "Select new presets filename"
-            };
-            if (dialg.ShowDialog() == true)
-            {
-                PresetsFile f = new()
+                mustretry = false;
+                foreach (var item in PresetFiles)
                 {
-                    SaveFile = dialg.FileName
-                };
-                f.Save();
-                SelectedFile = new PresetsFile(dialg.FileName);
+                    if (item.Name == newFile)
+                    {
+                        newFile = "NewPresets(" + (++i).ToString() + ")";
+                        mustretry = true;
+                        break;
+                    }
+                }
             }
 
+            PresetsFile f = new()
+            {
+                SaveFile = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, newFile + ArtemisManager.DATFileExtension)
+            };
+            f.Save();
         }
 
         private void OnDelete(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is PresetsFile presetsFile && !string.IsNullOrEmpty(presetsFile?.SaveFile) && System.IO.File.Exists(presetsFile?.SaveFile))
             {
-                string nm = new FileInfo(presetsFile.SaveFile).Name;
+                string nm = new FileInfo(presetsFile.SaveFile).Name.Substring(presetsFile.SaveFile.Length - 4);
+
                 string fullname = presetsFile.SaveFile;
                 if (System.Windows.MessageBox.Show(string.Format("Are you sure you want to delete {0}", nm), "Delete Presets file",
                     MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     presetsFile.Delete();
-                    if (PresetFiles.Contains(nm))
+
+                    FileListItem? remover = null;
+                    foreach (var item in PresetFiles)
                     {
-                        PresetFiles.Remove(nm);
+                        if (item.Name == nm)
+                        {
+                            remover = item;
+                            break;
+                        }
+                    }
+                    if (remover != null)
+                    {
+                        PresetFiles.Remove(remover);
+                    }
+                    if (SelectedPresetFile?.Name == nm)
+                    {
+                        SelectedPresetFile = null;
                     }
                     if (SelectedFile?.SaveFile == fullname)
                     {
@@ -246,7 +291,6 @@ namespace ArtemisManagerUI
                     }
                 }
             }
-            
         }
 
         private void OnSendSelectedFile(object sender, RoutedEventArgs e)
@@ -302,19 +346,18 @@ namespace ArtemisManagerUI
                     Title = "Select new presets filename"
                 };
                 if (dialg.ShowDialog() == true)
+                {
+                    bool OkayToSave = true;
+                    if (File.Exists(dialg.FileName))
                     {
-                        bool OkayToSave = true;
-                        if (File.Exists(dialg.FileName))
-                        {
-                            OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
-                                "Export Presets File", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
-                        }
-                        if (OkayToSave)
-                        {
-                            File.Copy(presetsFile.SaveFile, dialg.FileName, true);
-                        }
+                        OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
+                            "Export Presets File", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
                     }
-                
+                    if (OkayToSave)
+                    {
+                        File.Copy(presetsFile.SaveFile, dialg.FileName, true);
+                    }
+                }
             }
         }
 
@@ -345,7 +388,7 @@ namespace ArtemisManagerUI
                         MessageBoxButton.OK,
                         MessageBoxImage.Error);
                     OkayToSave = false;
-                    
+
                 }
                 if (OkayToSave)
                 {
@@ -382,25 +425,47 @@ namespace ArtemisManagerUI
 
         private void OnActivateSelectedPresets(object sender, RoutedEventArgs e)
         {
-            if (SelectedFile != null && !string.IsNullOrEmpty(SelectedFile.SaveFile) && System.IO.File.Exists(SelectedFile.SaveFile))
+            if (sender is MenuItem me)
             {
-                File.Copy(SelectedFile.SaveFile, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
-                PopupMessage = "Presets Activated.";
+                if (me.CommandParameter is FileListItem selectedFile)
+                {
+                    if (!string.IsNullOrEmpty(selectedFile.Name))
+                    {
+                        string source = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.DATFileExtension);
+                        if (System.IO.File.Exists(source))
+                        {
+                            File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
+                            PopupMessage = "Presets Activated.";
+                        }
+                    }
+                }
             }
         }
 
         private void OnDeleteSelectedPresets(object sender, RoutedEventArgs e)
         {
-            if (SelectedFile != null && !string.IsNullOrEmpty(SelectedFile.SaveFile) && System.IO.File.Exists(SelectedFile.SaveFile))
+            if (sender is MenuItem me)
             {
-                var nm = new FileInfo(SelectedFile.SaveFile).Name;
-                SelectedFile.Delete();
-                if (PresetFiles.Contains(nm))
+                if (me.CommandParameter is FileListItem selectedFile)
                 {
-                    PresetFiles.Remove(nm);
+                    if (!string.IsNullOrEmpty(selectedFile.Name))
+                    {
+                        PresetsFile pf = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.DATFileExtension));
+                        pf.Delete();
+                        if (PresetFiles.Contains(selectedFile))
+                        {
+                            PresetFiles.Remove(selectedFile);
+                        }
+                        if (SelectedFile != null && SelectedFile.SaveFile == selectedFile.Name + ArtemisManager.DATFileExtension)
+                        {
+                            SelectedFile = null;
+                        }
+                        if (SelectedPresetFile == selectedFile)
+                        {
+                            SelectedPresetFile = null;
+                        }
+                    }
                 }
-                SelectedFile = null;
-                
             }
         }
 
@@ -417,6 +482,46 @@ namespace ArtemisManagerUI
         private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
         {
             PopupMessage = "Transmission completed.";
+        }
+
+        private void OnPresetRename(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem me)
+            {
+                if (me.CommandParameter is FileListItem selectedFile)
+                {
+                    selectedFile.IsEditMode = true;
+                }
+            }
+        }
+
+        private void OnSelectedFilenameTextChanged(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBlockEditControl me)
+            {
+                if (me.Tag is FileListItem selectedFile)
+                {
+                    if (!string.IsNullOrEmpty(selectedFile.Name) && !string.IsNullOrEmpty(selectedFile.OriginalName) && selectedFile.Name != selectedFile.OriginalName)
+                    {
+                        string source = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.OriginalName + ArtemisManager.DATFileExtension);
+                        string target = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.DATFileExtension);
+                        if (File.Exists(target))
+                        {
+                            MessageBox.Show("Cannot rename--new name already exists.", "Rename presets file", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                        else
+                        {
+                            File.Move(source, target, true);
+                            selectedFile.OriginalName = selectedFile.Name;
+
+                            if (SelectedFile != null && SelectedFile.SaveFile == selectedFile.OriginalName + ArtemisManager.DATFileExtension)
+                            {
+                                SelectedFile.SaveFile = selectedFile.Name + ArtemisManager.DATFileExtension;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

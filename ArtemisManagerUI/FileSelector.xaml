@@ -11,7 +11,7 @@
         <Button
             ToolTip="{Binding ButtonToolTip, ElementName=uc}"
             DockPanel.Dock="Right" Click="OnBrowse">
-            <Image Width="32" Height="32" Source="/ArtemisManagerUI;component/Resources/fileexplore.png" />
+            <Image Width="16" Height="16" Source="/ArtemisManagerUI;component/Resources/fileexplore.png" />
         </Button>
         <TextBox
             VerticalContentAlignment="Center"  Text="{Binding Path=SelectedItem, ElementName=uc, Mode=TwoWay}" />

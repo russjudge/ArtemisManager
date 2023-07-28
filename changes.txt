@@ -6,6 +6,12 @@ Bug Fix:
 	   This could potentially crash the app.  Fixed so that it does get removed.
 Enhancements:
 	- Added code to automatically back up the original version of artemis.ini from the vanilla Artemis, for each Artemis version that gets snapshotted.
+	- Added context menu on Engineering presets file list, which includes ability to rename files.
+	- On Adding an engineering presets file, changed to auto name the file instead of using a file dialog.  This way the user can't try to move the file
+		to a location other than the required folder.
+	- Added ability to change settings in artemis.ini that control local settings (such as default screen size and station restriction)--basically
+		any setting that would have nothing to do with a mod.  Remaining settings will to be added as part of new functionality to be used for creating
+		a mod.
 
 ------------------------------
 Version 0.2 (beta) 07/25/2023:

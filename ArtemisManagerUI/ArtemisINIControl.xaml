@@ -15,8 +15,20 @@
             Visibility="{Binding ElementName=uc, Path=ForLocalSettings, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
             Header="Localized Settings">
         <DockPanel Grid.IsSharedSizeScope="True">
+            <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                <Button Click="OnActivate">Activate</Button>
+                <Button Click="OnActivate">
+                    <StackPanel>
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                        <TextBlock Text="Activate" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnSave">
+                    <StackPanel>
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/save.png" />
+                        <TextBlock Text="Save" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
             <Grid DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>
@@ -141,6 +153,55 @@
                         ForLocalSettings="True"
                         IsBool="True"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.helmShipEditing, Mode=TwoWay}" />
+
+                    <local:SpecialFileControl
+                        Title="operatorLogoImage:"
+                        FileFolderPrefix="{Binding ElementName=uc, Path=ArtemisFolder, Mode=OneTime}"
+                        Value="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImage, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsInt="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImageX, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsInt="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImageY, Mode=TwoWay}" />
+                    
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True" MouseDown="OnAllowOptionMouseDown"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.allowOptionButton, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.allowVolumeControls, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True" ToolTip="Checked is &quot;down&quot;, unchecked is &quot;up&quot;."
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.tacticleViewType, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsInt="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.damageEffectType, Mode=TwoWay}" />
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.damConTeamAutonomy, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsString="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.ServerNetworkName, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsString="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.ServerNetworkName, Mode=TwoWay}" />
 
                 </StackPanel>
             </ScrollViewer>

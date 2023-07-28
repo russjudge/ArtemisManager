@@ -20,8 +20,9 @@
         <ComboBox
             Margin="0,5,15,5"
             Grid.Column="1"
+            SelectionChanged="OnSelectionChanged"
             ItemsSource="{Binding ElementName=uc, Path=AvailableResolutions, Mode=OneWay}"
-            SelectedItem="{Binding ElementName=uc, Path=SettingsFile.ScreenResolution}">
+            SelectedItem="{Binding ElementName=uc, Path=SettingsFile.ScreenResolution, Mode=TwoWay}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -51,7 +52,7 @@
             Width="150"
             Margin="0,5,15,5"
             ItemsSource="{Binding ElementName=uc, Path=AvailableModes, Mode=OneTime}"
-            SelectedValue="{Binding ElementName=uc, Path=SettingsFile.VideoMode}"
+            SelectedValue="{Binding ElementName=uc, Path=SettingsFile.VideoMode, Mode=TwoWay}"
             SelectedValuePath="Key"
             >
             <ComboBox.ItemTemplate>

@@ -5,12 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
         xmlns:local="clr-namespace:ArtemisManagerUI"
+        xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Width="1560" Height="510"
         Title="Engineering Presets Edit" Icon="/ArtemisManagerUI;component/Resources/Presets.png">
     <Window.Resources>
         <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </Window.Resources>
-   
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" >
             <MenuItem Header="File">
@@ -69,14 +71,14 @@
         <DockPanel
             DockPanel.Dock="Left" Width="200">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <Button 
+                <Button 
+                    ToolTip="Create new presets file"
                 Click="OnAddPresetFile"
                 HorizontalAlignment="Left" >
-                <StackPanel Orientation="Horizontal" >
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
-                    <TextBlock VerticalAlignment="Center" Text="Create new presets file" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Button>
+                    <StackPanel Orientation="Horizontal" >
+                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
+                    </StackPanel>
+                </Button>
                 <Button
                     Click="OnRestoreToDefault"
                     Margin="5,0,0,0" ToolTip="Restore Active Engineering presets in Active folder to defaults">
@@ -89,60 +91,81 @@
                 Prompt="Transmit selected presets file to:"
                 IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedPresetFile}"
                 DockPanel.Dock="Top" />
-            <!--<GroupBox
-                IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedPresetFile}"
-                DockPanel.Dock="Top" Header="Transmit selected presets file to:">
-                <DockPanel>
-                    <Button
-                        DockPanel.Dock="Right"
-                        CommandParameter="{Binding}"
-                        ToolTip="Send selected presets file to selected network peer client"
-                        Click="OnSendSelectedFile"
-                        HorizontalAlignment="Left" >
-                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
-                    </Button>
-                    <ComboBox
-                        VerticalAlignment="Center" VerticalContentAlignment="Center"
-                        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
-                        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding IP}" />
-                                    <TextBlock VerticalAlignment="Center" Text=" - " />
-                                    <TextBlock VerticalAlignment="Center" Text="{Binding Hostname}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
 
-                </DockPanel>
-            </GroupBox>-->
 
             <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
             </Button>
             <ListBox
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                Grid.IsSharedSizeScope="True"
                 SelectionMode="Single"
-                ItemsSource="{Binding ElementName=uc, Path=PresetFiles, Mode=TwoWay}"
+                ItemsSource="{Binding ElementName=uc, Path=PresetFiles}"
                 SelectedItem="{Binding ElementName=uc, Path=SelectedPresetFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Width="200">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid HorizontalAlignment="Stretch" >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="154" />
-                                <ColumnDefinition  />
-                            </Grid.ColumnDefinitions>
 
-                          
-                            <TextBlock Grid.Column="0" HorizontalAlignment="Stretch" Padding="5,10,5,10" VerticalAlignment="Center" Text="{Binding}" />
-                            <Button Grid.Column="1"
-                                HorizontalContentAlignment="Right" HorizontalAlignment="Right"
-                                DockPanel.Dock="Right" Click="OnExportPresets" ToolTip="Export Engineering Presets file" CommandParameter="{Binding}">
-                                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/export.png" />
-                            </Button>
-                        </Grid>
+                        <StackPanel>
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        IsEnabled="False" FontWeight="Bold" >
+                                        <MenuItem.Header>
+                                            <StackPanel Orientation="Horizontal" >
+                                                <TextBlock Text="-- " />
+                                                <TextBlock Text="{Binding Name}" />
+                                                <TextBlock Text=" --" />
+                                            </StackPanel>
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Activate" Click="OnActivateSelectedPresets" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                                        </MenuItem.Icon>
+
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Rename" Click="OnPresetRename" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/rename.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Delete" Click="OnDeleteSelectedPresets" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/trash.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Export" Click="OnExportPresets" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/export.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                            <local:TextBlockEditControl
+                                Tag="{Binding}"
+                                EditMode="{Binding Path=IsEditMode, Mode=TwoWay}"
+                                Padding="5,10,5,10"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Text="{Binding Path=Name, Mode=TwoWay}"
+                                TextChanged="OnSelectedFilenameTextChanged"
+                                />
+                        </StackPanel>
 
                     </DataTemplate>
                 </ListBox.ItemTemplate>

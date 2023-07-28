@@ -17,6 +17,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Media.Imaging;
 using static System.Windows.Forms.Design.AxImporter;
 
 namespace ArtemisManagerUI
@@ -179,9 +180,9 @@ namespace ArtemisManagerUI
         /// NOTE: this MIGHT only work for the screen that the app is running on--or the primary screen (not sure).  This needs tested.
         /// </summary>
         /// <returns></returns>
-        public static Size[] GetAvailableScreenResolutions()
+        public static System.Drawing.Size[] GetAvailableScreenResolutions()
         {
-            List<Size> retVal = new();
+            List<System.Drawing.Size> retVal = new();
             //(gwmi - N "root\wmi" - Class WmiMonitorListedSupportedSourceModes)[0].MonitorSourceModes | select { "$($_.HorizontalActivePixels)x$($_.VerticalActivePixels)"}
             try
             {
@@ -199,7 +200,7 @@ namespace ArtemisManagerUI
                                 //VideoModeDescriptor vmd = 
                                 var horizontalPixels = Convert.ToInt32(md["HorizontalActivePixels"]);
                                 var verticalPixels = Convert.ToInt32(md["VerticalActivePixels"]);
-                                Size sz = new(horizontalPixels, verticalPixels);
+                                System.Drawing.Size sz = new(horizontalPixels, verticalPixels);
                                 if (!retVal.Contains(sz))
                                 {
                                     retVal.Add(sz);
@@ -215,6 +216,7 @@ namespace ArtemisManagerUI
             }
             return retVal.ToArray();
         }
+       
         public static void SendClientInfo(IPAddress? source)
         {
             if (source != null)

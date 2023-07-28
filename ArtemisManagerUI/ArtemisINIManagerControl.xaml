@@ -10,7 +10,7 @@
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
-        
+        <converter:NullToVisibility x:Key="NullToVisibility" />
     </UserControl.Resources>
 
     <DockPanel>
@@ -19,11 +19,11 @@
             DockPanel.Dock="Left" Width="205">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Button 
-                Click="OnAddSettingsFile"
-                HorizontalAlignment="Left" >
+                    ToolTip="Create new settings file"
+                    Click="OnAddSettingsFile"
+                    HorizontalAlignment="Left" >
                     <StackPanel Orientation="Horizontal" >
                         <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
-                        <TextBlock VerticalAlignment="Center" Text="Create new settings file" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
                 <Button
@@ -49,26 +49,72 @@
                 SelectedItem="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid HorizontalAlignment="Stretch" >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="142" />
-                                <ColumnDefinition  />
-                            </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        IsEnabled="False" FontWeight="Bold" >
+                                        <MenuItem.Header>
+                                            <StackPanel Orientation="Horizontal" >
+                                                <TextBlock Text="-- " />
+                                                <TextBlock Text="{Binding Name}" />
+                                                <TextBlock Text=" --" />
+                                            </StackPanel>
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Activate" Click="OnActivateSettingsFile" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                                        </MenuItem.Icon>
 
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Rename" Click="OnSettingsFileRename" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/rename.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
 
-                            <TextBlock Grid.Column="0" HorizontalAlignment="Stretch" Padding="5,10,5,10" VerticalAlignment="Center" Text="{Binding}" />
-                            <Button Grid.Column="1"
-                                HorizontalContentAlignment="Right" HorizontalAlignment="Right"
-                                DockPanel.Dock="Right" Click="OnExportFile" ToolTip="Export artemis.ini settings file" CommandParameter="{Binding}">
-                                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/export.png" />
-                            </Button>
-                        </Grid>
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Delete" Click="OnDeleteSettingsFile" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/trash.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem
+                                        CommandParameter="{Binding}"
+                                        Header="_Export" Click="OnExportSettingsFile" >
+                                        <MenuItem.Icon>
+                                            <Image Source="/ArtemisManagerUI;component/Resources/export.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
 
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                            <local:TextBlockEditControl
+                                Tag="{Binding}"
+                                EditMode="{Binding Path=IsEditMode, Mode=TwoWay}"
+                                Padding="5,10,5,10"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Text="{Binding Path=Name, Mode=TwoWay}"
+                                TextChanged="OnSettingsFilenameChanged"
+                                />
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
         <local:ArtemisINIControl
+            Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
             AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
             ForLocalSettings="True" SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
     </DockPanel>

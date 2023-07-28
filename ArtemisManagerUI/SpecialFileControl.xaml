@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="ArtemisManagerUI.SpecialFileControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             
+             mc:Ignorable="d" Name="uc" Unloaded="OnUnloaded">
+    <UserControl.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+    </UserControl.Resources>
+    <Border BorderBrush="Gray" BorderThickness="1">
+    <DockPanel>
+        <StackPanel
+            DockPanel.Dock="Top" Orientation="Horizontal">
+            <TextBlock
+            Text="Relative path:" />
+            <TextBlock
+                Text="{Binding ElementName=uc, Path=RelativeFolderPath}" />
+        </StackPanel>
+        <DockPanel>
+
+            <Button
+                Visibility="{Binding ElementName=uc, Path=IsImage, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Click="OnShowImage"
+                Width="32"
+                DockPanel.Dock="Right" ToolTip="Show Image">
+                <Image Source="{Binding ElementName=uc, Path=Image}" />
+            </Button>
+            <Button
+                Visibility="{Binding ElementName=uc, Path=IsSound, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Click="OnPlaySound"
+                Width="32"
+                DockPanel.Dock="Right" ToolTip="Play Sound">
+                <StackPanel>
+                <Image
+                    Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Source="/ArtemisManagerUI;component/Resources/play.png" />
+                <Image
+                    Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Source="/ArtemisManagerUI;component/Resources/stopplaying.png" />
+                </StackPanel>
+            </Button>
+
+            <local:FileSelector 
+                DockPanel.Dock="Left"
+                IsFolderPicker="False"
+                Title="{Binding ElementName=uc, Path=Title, Mode=TwoWay}"/>
+        </DockPanel>
+    </DockPanel>
+    </Border>
+</UserControl>

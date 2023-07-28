@@ -38,7 +38,7 @@
             Margin="0,5,15,5"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            IsChecked="{Binding ElementName=uc, Path=SettingsFile.CommentOutFixedScreenResolution, Mode=TwoWay}" />
+            IsChecked="{Binding ElementName=uc, Path=SettingsFile.clientSide.UsingDefault, Mode=TwoWay}" />
 
     </Grid>
 </UserControl>

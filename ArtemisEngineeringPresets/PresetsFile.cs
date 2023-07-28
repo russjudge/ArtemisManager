@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Automation.Provider;
+using System.Windows.Media;
 
 namespace ArtemisEngineeringPresets
 {
@@ -159,6 +160,7 @@ namespace ArtemisEngineeringPresets
                 this.SetValue(PresetsProperty, value);
             }
         }
+
 
         public JsonPackageFile FileType
         {

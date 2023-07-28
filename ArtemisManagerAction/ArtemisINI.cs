@@ -1,18 +1,6 @@
-﻿using AMCommunicator;
-using AMCommunicator.Messages;
-using SharpCompress.Common;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using AMCommunicator.Messages;
 using System.Drawing;
-using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-
 namespace ArtemisManagerAction
 {
     public class ArtemisINI : INIFile
@@ -260,14 +248,10 @@ namespace ArtemisManagerAction
             {
                 int height = 0;
                 int width = 0;
-                if (!gameWindowHeight.UsingDefault)
-                {
-                    height = gameWindowHeight.GetIntValue();
-                }
-                if (!gameWindowWidth.UsingDefault)
-                {
-                    width = gameWindowWidth.GetIntValue();
-                }
+                height = gameWindowHeight.GetIntValue();
+                
+                width = gameWindowWidth.GetIntValue();
+                
                 return new Size(width, height);
             }
             set
@@ -278,6 +262,7 @@ namespace ArtemisManagerAction
                 }
                 else
                 {
+                    gameWindowWidth.UsingDefault = false;
                     gameWindowWidth.SetValue(value.Width);
                 }
                 if (value.Height == 0)
@@ -286,6 +271,7 @@ namespace ArtemisManagerAction
                 }
                 else
                 {
+                    gameWindowHeight.UsingDefault = false;
                     gameWindowHeight.SetValue(value.Height);
                 }
                 DoChanged();
@@ -305,6 +291,7 @@ namespace ArtemisManagerAction
                 var winWidth = EnsureSettingExists(nameof(gameWindowWidth));
                 var winHeight = EnsureSettingExists(nameof(gameWindowHeight));
                 var windowMode = EnsureSettingExists(nameof(gameWindowMode));
+
                 winWidth.UsingDefault = value;
                 winHeight.UsingDefault = value;
                 windowMode.UsingDefault = value;
@@ -333,6 +320,7 @@ namespace ArtemisManagerAction
                 }
                 else
                 {
+                    gameWindowMode.UsingDefault = false;
                     gameWindowMode.SetValue((int)value);
                 }
                 DoChanged();
@@ -373,6 +361,7 @@ namespace ArtemisManagerAction
                 }
                 else
                 {
+                    clientSide.UsingDefault = false;
                     clientSide.SetValue((int)value);
                 }
                 DoChanged();
@@ -610,7 +599,7 @@ namespace ArtemisManagerAction
             }
         }
        
-        public Size OperatorLogoImageSize
+        public System.Drawing.Size OperatorLogoImageSize
         {
             get
             {
