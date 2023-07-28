@@ -493,7 +493,7 @@ namespace ArtemisManagerAction
                 {
                     string installFolder = Path.Combine(ModItem.ModInstallFolder, mod.InstallFolder);
                     string target = GetOriginalArtemisINIFile(installFolder);
-                    string target2 = Path.Combine(ModManager.DataFolder, new FileInfo(target).Name);
+                    string target2 = Path.Combine(ArtemisINIFolder, new FileInfo(target).Name);
                     if (!string.IsNullOrEmpty(target))
                     {
                         string source = Path.Combine(installFolder, ArtemisINI);

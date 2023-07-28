@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArtemisManagerUI"
         mc:Ignorable="d" Name="uc" Closed="OnClosed"
-        Title="Settings" Height="450" Width="800" Icon="/ArtemisManagerUI;component/Resources/Settings-icon.png">
+        Title="Settings" Height="700" MaxHeight="700" Width="800" Icon="/ArtemisManagerUI;component/Resources/Settings-icon.png">
 
     <DockPanel>
         <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />

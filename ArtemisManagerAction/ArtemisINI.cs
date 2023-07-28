@@ -63,7 +63,7 @@ namespace ArtemisManagerAction
 
         public ArtemisINI(string file) : base()
         {
-            //LoadFile<ArtemisINI>(file);
+            LoadFile(file);
         }
 
         public static ArtemisINI Merge(ArtemisINI localFile, ArtemisINI modFile)
@@ -109,7 +109,7 @@ namespace ArtemisManagerAction
 
 
         [INISetting(1, ClientServerType.Both)]
-        public INISetting cameraPitch
+        public ArtemisINISetting cameraPitch
         {
             get
             {
@@ -121,7 +121,7 @@ namespace ArtemisManagerAction
             }
         }
         [INISetting(2, ClientServerType.Both)]
-        public INISetting cameraDistance
+        public ArtemisINISetting cameraDistance
         {
             get
             {
@@ -133,7 +133,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(3, ClientServerType.Both)]
-        public INISetting networkPort
+        public ArtemisINISetting networkPort
         {
             get
             {
@@ -146,7 +146,7 @@ namespace ArtemisManagerAction
         }
 
         [INISetting(4, ClientServerType.Both)]
-        public INISetting jumpTimeCoeff
+        public ArtemisINISetting jumpTimeCoeff
         {
             get
             {
@@ -158,7 +158,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(5, ClientServerType.Both)]
-        public INISetting useDebugConsoleWindow
+        public ArtemisINISetting useDebugConsoleWindow
         {
             get
             {
@@ -170,7 +170,7 @@ namespace ArtemisManagerAction
             }
         }
         [INISetting(6, ClientServerType.Both)]
-        public INISetting energyCostOfOneBeamShot
+        public ArtemisINISetting energyCostOfOneBeamShot
         {
             get
             {
@@ -182,7 +182,7 @@ namespace ArtemisManagerAction
             }
         }
         [INISetting(7, ClientServerType.Both)]
-        public INISetting gSoundOneShotVolume
+        public ArtemisINISetting gSoundOneShotVolume
         {
             get
             {
@@ -194,7 +194,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(8, ClientServerType.Both)]
-        public INISetting musicObjectMasterVolume
+        public ArtemisINISetting musicObjectMasterVolume
         {
             get
             {
@@ -206,7 +206,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(9, ClientServerType.Both)]
-        public INISetting commsObjectMasterVolume
+        public ArtemisINISetting commsObjectMasterVolume
         {
             get
             {
@@ -218,7 +218,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(10, ClientServerType.Both)]
-        public INISetting gameWindowWidth
+        public ArtemisINISetting gameWindowWidth
         {
             get
             {
@@ -230,7 +230,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(11, ClientServerType.Both)]
-        public INISetting gameWindowHeight
+        public ArtemisINISetting gameWindowHeight
         {
             get
             {
@@ -242,7 +242,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(12, ClientServerType.Both)]
-        public INISetting gameWindowMode
+        public ArtemisINISetting gameWindowMode
         {
             get
             {
@@ -340,7 +340,7 @@ namespace ArtemisManagerAction
         }
 
         [LocalINISetting(13, ClientServerType.ClientOnly)]
-        public INISetting clientSide
+        public ArtemisINISetting clientSide
         {
             get
             {
@@ -380,7 +380,7 @@ namespace ArtemisManagerAction
         }
 
         [LocalINISetting(14, ClientServerType.ClientOnly)]
-        public INISetting clientMainScreen
+        public ArtemisINISetting clientMainScreen
         {
             get
             {
@@ -393,7 +393,7 @@ namespace ArtemisManagerAction
         }
 
         [LocalINISetting(15, ClientServerType.ClientOnly)]
-        public INISetting clientHelm
+        public ArtemisINISetting clientHelm
         {
             get
             {
@@ -406,7 +406,7 @@ namespace ArtemisManagerAction
         }
 
         [LocalINISetting(16, ClientServerType.ClientOnly)]
-        public INISetting clientWeapon
+        public ArtemisINISetting clientWeapon
         {
             get
             {
@@ -418,7 +418,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(17, ClientServerType.ClientOnly)]
-        public INISetting clientEngineer
+        public ArtemisINISetting clientEngineer
         {
             get
             {
@@ -430,7 +430,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(18, ClientServerType.ClientOnly)]
-        public INISetting clientScience
+        public ArtemisINISetting clientScience
         {
             get
             {
@@ -442,7 +442,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(19, ClientServerType.ClientOnly)]
-        public INISetting clientComms
+        public ArtemisINISetting clientComms
         {
             get
             {
@@ -454,7 +454,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(20, ClientServerType.ClientOnly)]
-        public INISetting clientFighter
+        public ArtemisINISetting clientFighter
         {
             get
             {
@@ -466,7 +466,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(21, ClientServerType.ClientOnly)]
-        public INISetting clientData
+        public ArtemisINISetting clientData
         {
             get
             {
@@ -478,7 +478,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(22, ClientServerType.ClientOnly)]
-        public INISetting clientObserver
+        public ArtemisINISetting clientObserver
         {
             get
             {
@@ -490,7 +490,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(23, ClientServerType.ClientOnly)]
-        public INISetting clientCaptMap
+        public ArtemisINISetting clientCaptMap
         {
             get
             {
@@ -502,7 +502,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(24, ClientServerType.ClientOnly)]
-        public INISetting useJoystick
+        public ArtemisINISetting useJoystick
         {
             get
             {
@@ -514,7 +514,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(25, ClientServerType.ClientOnly)]
-        public INISetting touchScreen
+        public ArtemisINISetting touchScreen
         {
             get
             {
@@ -526,7 +526,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(26, ClientServerType.ClientOnly)]
-        public INISetting forceAddress
+        public ArtemisINISetting forceAddress
         {
             get
             {
@@ -538,7 +538,7 @@ namespace ArtemisManagerAction
             }
         }
         [INISetting(27, ClientServerType.ClientOnly)]
-        public INISetting showVisTab
+        public ArtemisINISetting showVisTab
         {
             get
             {
@@ -550,7 +550,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(28, ClientServerType.ClientOnly)]
-        public INISetting showScrnPopups
+        public ArtemisINISetting showScrnPopups
         {
             get
             {
@@ -562,7 +562,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(29, ClientServerType.ClientOnly)]
-        public INISetting helmShipEditing
+        public ArtemisINISetting helmShipEditing
         {
             get
             {
@@ -574,7 +574,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(30, ClientServerType.ClientOnly)]
-        public INISetting operatorLogoImage
+        public ArtemisINISetting operatorLogoImage
         {
             get
             {
@@ -586,7 +586,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(31, ClientServerType.ClientOnly)]
-        public INISetting operatorLogoImageX
+        public ArtemisINISetting operatorLogoImageX
         {
             get
             {
@@ -598,7 +598,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(33, ClientServerType.ClientOnly)]
-        public INISetting operatorLogoImageY
+        public ArtemisINISetting operatorLogoImageY
         {
             get
             {
@@ -649,7 +649,7 @@ namespace ArtemisManagerAction
         }
 
         [LocalINISetting(34, ClientServerType.ClientOnly)]
-        public INISetting allowOptionButton
+        public ArtemisINISetting allowOptionButton
         {
             get
             {
@@ -662,7 +662,7 @@ namespace ArtemisManagerAction
         }
 
         [LocalINISetting(35, ClientServerType.ClientOnly)]
-        public INISetting allowVolumeControls
+        public ArtemisINISetting allowVolumeControls
         {
             get
             {
@@ -675,7 +675,7 @@ namespace ArtemisManagerAction
         }
 
         [INISetting(36, ClientServerType.ClientOnly)]
-        public INISetting showWeaponArcToggle
+        public ArtemisINISetting showWeaponArcToggle
         {
             get
             {
@@ -687,7 +687,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(37, ClientServerType.ClientOnly)]
-        public INISetting tacticleViewType
+        public ArtemisINISetting tacticleViewType
         {
             get
             {
@@ -699,7 +699,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(38, ClientServerType.ClientOnly)]
-        public INISetting damageEffectType
+        public ArtemisINISetting damageEffectType
         {
             get
             {
@@ -711,7 +711,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(39, ClientServerType.ClientOnly)]
-        public INISetting damConTeamAutonomy
+        public ArtemisINISetting damConTeamAutonomy
         {
             get
             {
@@ -728,7 +728,7 @@ namespace ArtemisManagerAction
         ; -------------------------------------------------------------------------------------
         */
         [LocalINISetting(40, ClientServerType.ServerOnly)]
-        public INISetting ServerNetworkName
+        public ArtemisINISetting ServerNetworkName
         {
             get
             {
@@ -741,7 +741,7 @@ namespace ArtemisManagerAction
         }
 
         [INISetting(41, ClientServerType.ServerOnly)]
-        public INISetting stationEnergy
+        public ArtemisINISetting stationEnergy
         {
             get
             {
@@ -760,7 +760,7 @@ namespace ArtemisManagerAction
         // USE: How fast player ship's shields recharge
         // ACCEPTABLE: 0.02 to 2.0
         [INISetting(42, ClientServerType.ServerOnly)]
-        public INISetting playerShieldRechargeRate
+        public ArtemisINISetting playerShieldRechargeRate
         {
             get
             {
@@ -776,7 +776,7 @@ namespace ArtemisManagerAction
         // USE: How fast enemy ship's shields recharge
         // ACCEPTABLE: 0.02 to 2.0
         [INISetting(43, ClientServerType.ServerOnly)]
-        public INISetting enemyShieldRechargeRate
+        public ArtemisINISetting enemyShieldRechargeRate
         {
             get
             {
@@ -792,7 +792,7 @@ namespace ArtemisManagerAction
         // USE: how many meters away can a station detect an enemy?
         // ACCEPTABLE: 5000 to 100000
         [INISetting(44, ClientServerType.ServerOnly)]
-        public INISetting stationSensorRange
+        public ArtemisINISetting stationSensorRange
         {
             get
             {
@@ -808,7 +808,7 @@ namespace ArtemisManagerAction
         // USE: how many meters away can a player detect an enemy?
         // ACCEPTABLE: 5000 to 100000
         [INISetting(45, ClientServerType.ServerOnly)]
-        public INISetting playerSensorRange
+        public ArtemisINISetting playerSensorRange
         {
             get
             {
@@ -823,7 +823,7 @@ namespace ArtemisManagerAction
         // USE: adjustment to base speed of torpedo loading over time
         // ACCEPTABLE: 0.2 to 3.0
         [INISetting(50, ClientServerType.ServerOnly)]
-        public INISetting torpedoTubeLoadingCoeff
+        public ArtemisINISetting torpedoTubeLoadingCoeff
         {
             get
             {
@@ -839,7 +839,7 @@ namespace ArtemisManagerAction
         // USE: adjustment to total amount of energy the player ship uses over time
         // ACCEPTABLE: 0.2 to 3.0
         [INISetting(51, ClientServerType.ServerOnly)]
-        public INISetting energyUseCoeff
+        public ArtemisINISetting energyUseCoeff
         {
             get
             {
@@ -855,7 +855,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(52, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffBeams
+        public ArtemisINISetting energyCoeffBeams
         {
             get
             {
@@ -871,7 +871,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(53, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffTubes
+        public ArtemisINISetting energyCoeffTubes
         {
             get
             {
@@ -887,7 +887,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(54, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffTactical
+        public ArtemisINISetting energyCoeffTactical
         {
             get
             {
@@ -903,7 +903,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(55, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffManeuver
+        public ArtemisINISetting energyCoeffManeuver
         {
             get
             {
@@ -919,7 +919,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(56, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffImpulse
+        public ArtemisINISetting energyCoeffImpulse
         {
             get
             {
@@ -935,7 +935,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(57, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffWarp
+        public ArtemisINISetting energyCoeffWarp
         {
             get
             {
@@ -951,7 +951,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(58, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffFrontShlds
+        public ArtemisINISetting energyCoeffFrontShlds
         {
             get
             {
@@ -967,7 +967,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy this system uses
         // ACCEPTABLE: 1.0 to 10.0
         [INISetting(59, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffRearShlds
+        public ArtemisINISetting energyCoeffRearShlds
         {
             get
             {
@@ -983,7 +983,7 @@ namespace ArtemisManagerAction
         // USE: coefficient of how much energy a jump uses (* distance)
         // ACCEPTABLE: 0.01 to 100.0
         [INISetting(60, ClientServerType.ServerOnly)]
-        public INISetting energyCoeffJump
+        public ArtemisINISetting energyCoeffJump
         {
             get
             {
@@ -1000,7 +1000,7 @@ namespace ArtemisManagerAction
         // USE: time delay between individual beams firing, so all beams don't fire at once
         // ACCEPTABLE: 0.0 to 1.0
         [INISetting(61, ClientServerType.ServerOnly)]
-        public INISetting playerBeamDelay
+        public ArtemisINISetting playerBeamDelay
         {
             get
             {
@@ -1016,7 +1016,7 @@ namespace ArtemisManagerAction
         // USE: Systems heat up if the ship has more than this minimum of energy
         // ACCEPTABLE: 1000 to 6000
         [INISetting(62, ClientServerType.ServerOnly)]
-        public INISetting overloadThreshold
+        public ArtemisINISetting overloadThreshold
         {
             get
             {
@@ -1032,7 +1032,7 @@ namespace ArtemisManagerAction
         // USE: Systems heat up this much if the ship has more than the overloadThreshold of energy
         // ACCEPTABLE: 0.0 to 5.0
         [INISetting(63, ClientServerType.ServerOnly)]
-        public INISetting overloadHeat
+        public ArtemisINISetting overloadHeat
         {
             get
             {
@@ -1048,7 +1048,7 @@ namespace ArtemisManagerAction
         // USE: energy you get for sacrificing a homing torp
         // ACCEPTABLE: 1-
         [INISetting(64, ClientServerType.ServerOnly)]
-        public INISetting torpEnergyValue
+        public ArtemisINISetting torpEnergyValue
         {
             get
             {
@@ -1064,7 +1064,7 @@ namespace ArtemisManagerAction
         // USE: energy you pay for creating a homing torp
         // ACCEPTABLE: 1-
         [INISetting(65, ClientServerType.ServerOnly)]
-        public INISetting torpEnergyCostValue
+        public ArtemisINISetting torpEnergyCostValue
         {
             get
             {
@@ -1080,7 +1080,7 @@ namespace ArtemisManagerAction
         // USE: max damage an enemy beam can be, relative to the difficulty level
         // ACCEPTABLE: 3-10
         [INISetting(66, ClientServerType.ServerOnly)]
-        public INISetting beamDamageCap
+        public ArtemisINISetting beamDamageCap
         {
             get
             {
@@ -1096,7 +1096,7 @@ namespace ArtemisManagerAction
         // USE: max damage an ai ship beam can be, relative to the difficulty level
         // ACCEPTABLE: 3-10
         [INISetting(67, ClientServerType.ServerOnly)]
-        public INISetting friendlyBeamDamageCap
+        public ArtemisINISetting friendlyBeamDamageCap
         {
             get
             {
@@ -1112,7 +1112,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(68, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpHom
+        public ArtemisINISetting lowStartStationTorpHom
         {
             get
             {
@@ -1128,7 +1128,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(69, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpHom
+        public ArtemisINISetting highStartStationTorpHom
         {
             get
             {
@@ -1145,7 +1145,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by homing torpedoes
         // ACCEPTABLE: ?
         [INISetting(70, ClientServerType.ServerOnly)]
-        public INISetting damageTorpHom
+        public ArtemisINISetting damageTorpHom
         {
             get
             {
@@ -1161,7 +1161,7 @@ namespace ArtemisManagerAction
         // USE: speed of homing torpedoes
         // ACCEPTABLE: ?
         [INISetting(71, ClientServerType.ServerOnly)]
-        public INISetting speedTorpHom
+        public ArtemisINISetting speedTorpHom
         {
             get
             {
@@ -1177,7 +1177,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of homing torpedoes
         // ACCEPTABLE: ?
         [INISetting(72, ClientServerType.ServerOnly)]
-        public INISetting turnTorpHom
+        public ArtemisINISetting turnTorpHom
         {
             get
             {
@@ -1193,7 +1193,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce homing torpedoes
         // ACCEPTABLE: ?
         [INISetting(73, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpHom
+        public ArtemisINISetting minutesToProduceTorpHom
         {
             get
             {
@@ -1209,7 +1209,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(74, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpNuk
+        public ArtemisINISetting lowStartStationTorpNuk
         {
             get
             {
@@ -1225,7 +1225,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(75, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpNuk
+        public ArtemisINISetting highStartStationTorpNuk
         {
             get
             {
@@ -1242,7 +1242,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by nuke torpedoes
         // ACCEPTABLE: ?
         [INISetting(76, ClientServerType.ServerOnly)]
-        public INISetting damageTorpNuk
+        public ArtemisINISetting damageTorpNuk
         {
             get
             {
@@ -1258,7 +1258,7 @@ namespace ArtemisManagerAction
         // USE: speed of nuke torpedoes
         // ACCEPTABLE: ?
         [INISetting(77, ClientServerType.ServerOnly)]
-        public INISetting speedTorpNuk
+        public ArtemisINISetting speedTorpNuk
         {
             get
             {
@@ -1274,7 +1274,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of nuke torpedoes
         // ACCEPTABLE: ?
         [INISetting(78, ClientServerType.ServerOnly)]
-        public INISetting turnTorpNuk
+        public ArtemisINISetting turnTorpNuk
         {
             get
             {
@@ -1290,7 +1290,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce nuke torpedoes
         // ACCEPTABLE: ?
         [INISetting(79, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpNuk
+        public ArtemisINISetting minutesToProduceTorpNuk
         {
             get
             {
@@ -1306,7 +1306,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(80, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpMin
+        public ArtemisINISetting lowStartStationTorpMin
         {
             get
             {
@@ -1322,7 +1322,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(81, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpMin
+        public ArtemisINISetting highStartStationTorpMin
         {
             get
             {
@@ -1339,7 +1339,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by mine torpedoes
         // ACCEPTABLE: ?
         [INISetting(82, ClientServerType.ServerOnly)]
-        public INISetting damageTorpMin
+        public ArtemisINISetting damageTorpMin
         {
             get
             {
@@ -1355,7 +1355,7 @@ namespace ArtemisManagerAction
         // USE: speed of mine torpedoes
         // ACCEPTABLE: ?
         [INISetting(83, ClientServerType.ServerOnly)]
-        public INISetting speedTorpMin
+        public ArtemisINISetting speedTorpMin
         {
             get
             {
@@ -1371,7 +1371,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of mine torpedoes
         // ACCEPTABLE: ?
         [INISetting(84, ClientServerType.ServerOnly)]
-        public INISetting turnTorpMin
+        public ArtemisINISetting turnTorpMin
         {
             get
             {
@@ -1387,7 +1387,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce mine torpedoes
         // ACCEPTABLE: ?
         [INISetting(85, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpMin
+        public ArtemisINISetting minutesToProduceTorpMin
         {
             get
             {
@@ -1404,7 +1404,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(86, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpEmp
+        public ArtemisINISetting lowStartStationTorpEmp
         {
             get
             {
@@ -1420,7 +1420,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(87, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpEmp
+        public ArtemisINISetting highStartStationTorpEmp
         {
             get
             {
@@ -1437,7 +1437,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by ECM torpedoes
         // ACCEPTABLE: ?
         [INISetting(88, ClientServerType.ServerOnly)]
-        public INISetting damageTorpEmp
+        public ArtemisINISetting damageTorpEmp
         {
             get
             {
@@ -1453,7 +1453,7 @@ namespace ArtemisManagerAction
         // USE: speed of ECM torpedoes
         // ACCEPTABLE: ?
         [INISetting(89, ClientServerType.ServerOnly)]
-        public INISetting speedTorpEmp
+        public ArtemisINISetting speedTorpEmp
         {
             get
             {
@@ -1469,7 +1469,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of ECM torpedoes
         // ACCEPTABLE: ?
         [INISetting(90, ClientServerType.ServerOnly)]
-        public INISetting turnTorpEmp
+        public ArtemisINISetting turnTorpEmp
         {
             get
             {
@@ -1485,7 +1485,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce ECM torpedoes
         // ACCEPTABLE: ?
         [INISetting(91, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpEmp
+        public ArtemisINISetting minutesToProduceTorpEmp
         {
             get
             {
@@ -1502,7 +1502,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(92, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpShk
+        public ArtemisINISetting lowStartStationTorpShk
         {
             get
             {
@@ -1518,7 +1518,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(93, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpShk
+        public ArtemisINISetting highStartStationTorpShk
         {
             get
             {
@@ -1535,7 +1535,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by Phase Shock torpedoes
         // ACCEPTABLE: ?
         [INISetting(94, ClientServerType.ServerOnly)]
-        public INISetting damageTorpShk
+        public ArtemisINISetting damageTorpShk
         {
             get
             {
@@ -1551,7 +1551,7 @@ namespace ArtemisManagerAction
         // USE: speed of Phase Shock torpedoes
         // ACCEPTABLE: ?
         [INISetting(95, ClientServerType.ServerOnly)]
-        public INISetting speedTorpShk
+        public ArtemisINISetting speedTorpShk
         {
             get
             {
@@ -1567,7 +1567,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of Phase Shock torpedoes
         // ACCEPTABLE: ?
         [INISetting(96, ClientServerType.ServerOnly)]
-        public INISetting turnTorpShk
+        public ArtemisINISetting turnTorpShk
         {
             get
             {
@@ -1583,7 +1583,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce Phase Shock torpedoes
         // ACCEPTABLE: ?
         [INISetting(97, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpShk
+        public ArtemisINISetting minutesToProduceTorpShk
         {
             get
             {
@@ -1600,7 +1600,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(98, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpBoy
+        public ArtemisINISetting lowStartStationTorpBoy
         {
             get
             {
@@ -1616,7 +1616,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(99, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpBoy
+        public ArtemisINISetting highStartStationTorpBoy
         {
             get
             {
@@ -1633,7 +1633,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by Buoy torpedoes
         // ACCEPTABLE: ?
         [INISetting(100, ClientServerType.ServerOnly)]
-        public INISetting damageTorpBea
+        public ArtemisINISetting damageTorpBea
         {
             get
             {
@@ -1649,7 +1649,7 @@ namespace ArtemisManagerAction
         // USE: speed of Buoy torpedoes
         // ACCEPTABLE: ?
         [INISetting(101, ClientServerType.ServerOnly)]
-        public INISetting speedTorpBea
+        public ArtemisINISetting speedTorpBea
         {
             get
             {
@@ -1665,7 +1665,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of Buoy torpedoes
         // ACCEPTABLE: ?
         [INISetting(102, ClientServerType.ServerOnly)]
-        public INISetting turnTorpBea
+        public ArtemisINISetting turnTorpBea
         {
             get
             {
@@ -1681,7 +1681,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce Buoy torpedoes
         // ACCEPTABLE: ?
         [INISetting(103, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpBea
+        public ArtemisINISetting minutesToProduceTorpBea
         {
             get
             {
@@ -1697,7 +1697,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(104, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpPro
+        public ArtemisINISetting lowStartStationTorpPro
         {
             get
             {
@@ -1713,7 +1713,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(105, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpPro
+        public ArtemisINISetting highStartStationTorpPro
         {
             get
             {
@@ -1730,7 +1730,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by Probe torpedoes
         // ACCEPTABLE: ?
         [INISetting(106, ClientServerType.ServerOnly)]
-        public INISetting damageTorpPro
+        public ArtemisINISetting damageTorpPro
         {
             get
             {
@@ -1746,7 +1746,7 @@ namespace ArtemisManagerAction
         // USE: speed of Probe torpedoes
         // ACCEPTABLE: ?
         [INISetting(107, ClientServerType.ServerOnly)]
-        public INISetting speedTorpPro
+        public ArtemisINISetting speedTorpPro
         {
             get
             {
@@ -1762,7 +1762,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of Probe torpedoes
         // ACCEPTABLE: ?
         [INISetting(108, ClientServerType.ServerOnly)]
-        public INISetting turnTorpPro
+        public ArtemisINISetting turnTorpPro
         {
             get
             {
@@ -1778,7 +1778,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce Probe torpedoes
         // ACCEPTABLE: ?
         [INISetting(109, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpPro
+        public ArtemisINISetting minutesToProduceTorpPro
         {
             get
             {
@@ -1795,7 +1795,7 @@ namespace ArtemisManagerAction
         // USE: least possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(110, ClientServerType.ServerOnly)]
-        public INISetting lowStartStationTorpTag
+        public ArtemisINISetting lowStartStationTorpTag
         {
             get
             {
@@ -1811,7 +1811,7 @@ namespace ArtemisManagerAction
         // USE: most possible number of torps at each station at the start of the game
         // ACCEPTABLE: 0 to ?
         [INISetting(111, ClientServerType.ServerOnly)]
-        public INISetting highStartStationTorpTag
+        public ArtemisINISetting highStartStationTorpTag
         {
             get
             {
@@ -1828,7 +1828,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by Tag torpedoes
         // ACCEPTABLE: ?
         [INISetting(112, ClientServerType.ServerOnly)]
-        public INISetting damageTorpTag
+        public ArtemisINISetting damageTorpTag
         {
             get
             {
@@ -1844,7 +1844,7 @@ namespace ArtemisManagerAction
         // USE: speed of Tag torpedoes
         // ACCEPTABLE: ?
         [INISetting(113, ClientServerType.ServerOnly)]
-        public INISetting speedTorpTag
+        public ArtemisINISetting speedTorpTag
         {
             get
             {
@@ -1860,7 +1860,7 @@ namespace ArtemisManagerAction
         // USE: turn rate of Tag torpedoes
         // ACCEPTABLE: ?
         [INISetting(114, ClientServerType.ServerOnly)]
-        public INISetting turnTorpTag
+        public ArtemisINISetting turnTorpTag
         {
             get
             {
@@ -1876,7 +1876,7 @@ namespace ArtemisManagerAction
         // USE: time taken to produce Tag torpedoes
         // ACCEPTABLE: ?
         [INISetting(115, ClientServerType.ServerOnly)]
-        public INISetting minutesToProduceTorpTag
+        public ArtemisINISetting minutesToProduceTorpTag
         {
             get
             {
@@ -1893,7 +1893,7 @@ namespace ArtemisManagerAction
         // USE: speed of a torgoth drone
         // ACCEPTABLE: positive value, around 2-3
         [INISetting(120, ClientServerType.ServerOnly)]
-        public INISetting droneSpeed
+        public ArtemisINISetting droneSpeed
         {
             get
             {
@@ -1909,7 +1909,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by a torgoth drone. Internally, this value is multiplied by the port power of the torgoth launcher.
         // ACCEPTABLE: positive value, around 1
         [INISetting(121, ClientServerType.ServerOnly)]
-        public INISetting droneDamageTorgoth
+        public ArtemisINISetting droneDamageTorgoth
         {
             get
             {
@@ -1925,7 +1925,7 @@ namespace ArtemisManagerAction
         // USE: damage caused by a Skaraan drone.
         // ACCEPTABLE: positive value, around 1
         [INISetting(122, ClientServerType.ServerOnly)]
-        public INISetting droneDamageSkaraan
+        public ArtemisINISetting droneDamageSkaraan
         {
             get
             {
@@ -1941,7 +1941,7 @@ namespace ArtemisManagerAction
         // USE: against player ships, this is the number of times a drone will cause internal damage
         // ACCEPTABLE: positive value, 1-10
         [INISetting(123, ClientServerType.ServerOnly)]
-        public INISetting droneDamageSegmentCount
+        public ArtemisINISetting droneDamageSegmentCount
         {
             get
             {
@@ -1958,7 +1958,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when shields are lowered by buttons on the helm and weapon stations
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(200, ClientServerType.Both)]
-        public INISetting cueShieldsDown
+        public ArtemisINISetting cueShieldsDown
         {
             get
             {
@@ -1974,7 +1974,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueShieldsDown sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(201, ClientServerType.Both)]
-        public INISetting cueShieldsDownVol
+        public ArtemisINISetting cueShieldsDownVol
         {
             get
             {
@@ -1990,7 +1990,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when shields are raised by buttons on the helm and weapon stations
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(202, ClientServerType.Both)]
-        public INISetting cueShieldsUp
+        public ArtemisINISetting cueShieldsUp
         {
             get
             {
@@ -2006,7 +2006,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueShieldsUp sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(203, ClientServerType.Both)]
-        public INISetting cueShieldsUpVol
+        public ArtemisINISetting cueShieldsUpVol
         {
             get
             {
@@ -2022,7 +2022,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when an AIShip dies within 3000m of the Artemis
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(204, ClientServerType.Both)]
-        public INISetting cueAIShipExplode
+        public ArtemisINISetting cueAIShipExplode
         {
             get
             {
@@ -2038,7 +2038,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueAIShipExplode sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(205, ClientServerType.Both)]
-        public INISetting cueAIShipExplodeVol
+        public ArtemisINISetting cueAIShipExplodeVol
         {
             get
             {
@@ -2054,7 +2054,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the comms officer toggles the "red alert" state to on
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(206, ClientServerType.Both)]
-        public INISetting cueRedAlert
+        public ArtemisINISetting cueRedAlert
         {
             get
             {
@@ -2070,7 +2070,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueRedAlert sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(207, ClientServerType.Both)]
-        public INISetting cueRedAlertVol
+        public ArtemisINISetting cueRedAlertVol
         {
             get
             {
@@ -2086,7 +2086,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when an enemy damages an internal part of the player ship
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(208, ClientServerType.Both)]
-        public INISetting cueInternalDamageAlarm
+        public ArtemisINISetting cueInternalDamageAlarm
         {
             get
             {
@@ -2102,7 +2102,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueInternalDamageAlarm sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(209, ClientServerType.Both)]
-        public INISetting cueInternalDamageAlarmVol
+        public ArtemisINISetting cueInternalDamageAlarmVol
         {
             get
             {
@@ -2118,7 +2118,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when an enemy damages an internal part of the player ship
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(210, ClientServerType.Both)]
-        public INISetting cueHullHit
+        public ArtemisINISetting cueHullHit
         {
             get
             {
@@ -2134,7 +2134,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueHullHit sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(211, ClientServerType.Both)]
-        public INISetting cueHullHitVol
+        public ArtemisINISetting cueHullHitVol
         {
             get
             {
@@ -2150,7 +2150,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when an enemy damages a shield of the player ship
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(212, ClientServerType.Both)]
-        public INISetting cueShieldHit
+        public ArtemisINISetting cueShieldHit
         {
             get
             {
@@ -2166,7 +2166,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueShieldHit sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(213, ClientServerType.Both)]
-        public INISetting cueShieldHitVol
+        public ArtemisINISetting cueShieldHitVol
         {
             get
             {
@@ -2182,7 +2182,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the player ship fires a beam
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(214, ClientServerType.Both)]
-        public INISetting cuePlayerBeam
+        public ArtemisINISetting cuePlayerBeam
         {
             get
             {
@@ -2198,7 +2198,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cuePlayerBeam sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(215, ClientServerType.Both)]
-        public INISetting cuePlayerBeamVol
+        public ArtemisINISetting cuePlayerBeamVol
         {
             get
             {
@@ -2214,7 +2214,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the player ship fires a torpedo of any type
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(216, ClientServerType.Both)]
-        public INISetting cuePlayerTorpedo
+        public ArtemisINISetting cuePlayerTorpedo
         {
             get
             {
@@ -2230,7 +2230,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cuePlayerTorpedo sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(217, ClientServerType.Both)]
-        public INISetting cuePlayerTorpedoVol
+        public ArtemisINISetting cuePlayerTorpedoVol
         {
             get
             {
@@ -2246,7 +2246,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cuePlayerTorpedo sound for fighter torpedoes
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(218, ClientServerType.Both)]
-        public INISetting cueFighterTorpedoVol
+        public ArtemisINISetting cueFighterTorpedoVol
         {
             get
             {
@@ -2262,7 +2262,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the player ship docks with a station
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(219, ClientServerType.Both)]
-        public INISetting cueStationDock
+        public ArtemisINISetting cueStationDock
         {
             get
             {
@@ -2278,7 +2278,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueStationDock sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(220, ClientServerType.Both)]
-        public INISetting cueStationDockVol
+        public ArtemisINISetting cueStationDockVol
         {
             get
             {
@@ -2294,7 +2294,7 @@ namespace ArtemisManagerAction
         // USE: looping sound.  The main screen plays two copies of this simultaneously, and pitches one according to the speed of the ship
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(221, ClientServerType.Both)]
-        public INISetting cueEngineLoop
+        public ArtemisINISetting cueEngineLoop
         {
             get
             {
@@ -2310,7 +2310,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueEngineLoop sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(222, ClientServerType.Both)]
-        public INISetting cueEngineLoopVol
+        public ArtemisINISetting cueEngineLoopVol
         {
             get
             {
@@ -2326,7 +2326,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the warp jump fails
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(223, ClientServerType.Both)]
-        public INISetting cueWarpFail
+        public ArtemisINISetting cueWarpFail
         {
             get
             {
@@ -2342,7 +2342,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueWarpFail sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(224, ClientServerType.Both)]
-        public INISetting cueWarpFailVol
+        public ArtemisINISetting cueWarpFailVol
         {
             get
             {
@@ -2358,7 +2358,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the warp jump succeeds
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(225, ClientServerType.Both)]
-        public INISetting cueWarpTravel
+        public ArtemisINISetting cueWarpTravel
         {
             get
             {
@@ -2374,7 +2374,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueWarpTravel sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(226, ClientServerType.Both)]
-        public INISetting cueWarpTravelVol
+        public ArtemisINISetting cueWarpTravelVol
         {
             get
             {
@@ -2390,7 +2390,7 @@ namespace ArtemisManagerAction
         // USE: played on the main screen when the warp jump starts
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(227, ClientServerType.Both)]
-        public INISetting cueJumpWarmup
+        public ArtemisINISetting cueJumpWarmup
         {
             get
             {
@@ -2406,7 +2406,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueJumpWarmup sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(228, ClientServerType.Both)]
-        public INISetting cueJumpWarmupVol
+        public ArtemisINISetting cueJumpWarmupVol
         {
             get
             {
@@ -2424,7 +2424,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(229, ClientServerType.Both)]
-        public INISetting cueUI00
+        public ArtemisINISetting cueUI00
         {
             get
             {
@@ -2440,7 +2440,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI00 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(230, ClientServerType.Both)]
-        public INISetting cueUI00Vol
+        public ArtemisINISetting cueUI00Vol
         {
             get
             {
@@ -2456,7 +2456,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(231, ClientServerType.Both)]
-        public INISetting cueUI01
+        public ArtemisINISetting cueUI01
         {
             get
             {
@@ -2472,7 +2472,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI01 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(232, ClientServerType.Both)]
-        public INISetting cueUI01Vol
+        public ArtemisINISetting cueUI01Vol
         {
             get
             {
@@ -2488,7 +2488,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(233, ClientServerType.Both)]
-        public INISetting cueUI02
+        public ArtemisINISetting cueUI02
         {
             get
             {
@@ -2504,7 +2504,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI02 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(234, ClientServerType.Both)]
-        public INISetting cueUI02Vol
+        public ArtemisINISetting cueUI02Vol
         {
             get
             {
@@ -2520,7 +2520,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(235, ClientServerType.Both)]
-        public INISetting cueUI03
+        public ArtemisINISetting cueUI03
         {
             get
             {
@@ -2536,7 +2536,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI03 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(236, ClientServerType.Both)]
-        public INISetting cueUI03Vol
+        public ArtemisINISetting cueUI03Vol
         {
             get
             {
@@ -2552,7 +2552,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(237, ClientServerType.Both)]
-        public INISetting cueUI04
+        public ArtemisINISetting cueUI04
         {
             get
             {
@@ -2568,7 +2568,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI04 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(238, ClientServerType.Both)]
-        public INISetting cueUI04Vol
+        public ArtemisINISetting cueUI04Vol
         {
             get
             {
@@ -2584,7 +2584,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(239, ClientServerType.Both)]
-        public INISetting cueUI05
+        public ArtemisINISetting cueUI05
         {
             get
             {
@@ -2600,7 +2600,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI05 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(240, ClientServerType.Both)]
-        public INISetting cueUI05Vol
+        public ArtemisINISetting cueUI05Vol
         {
             get
             {
@@ -2616,7 +2616,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(241, ClientServerType.Both)]
-        public INISetting cueUI06
+        public ArtemisINISetting cueUI06
         {
             get
             {
@@ -2632,7 +2632,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI06 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(242, ClientServerType.Both)]
-        public INISetting cueUI06Vol
+        public ArtemisINISetting cueUI06Vol
         {
             get
             {
@@ -2648,7 +2648,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(243, ClientServerType.Both)]
-        public INISetting cueUI07
+        public ArtemisINISetting cueUI07
         {
             get
             {
@@ -2664,7 +2664,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI07 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(244, ClientServerType.Both)]
-        public INISetting cueUI07Vol
+        public ArtemisINISetting cueUI07Vol
         {
             get
             {
@@ -2680,7 +2680,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(245, ClientServerType.Both)]
-        public INISetting cueUI08
+        public ArtemisINISetting cueUI08
         {
             get
             {
@@ -2696,7 +2696,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI08 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(246, ClientServerType.Both)]
-        public INISetting cueUI08Vol
+        public ArtemisINISetting cueUI08Vol
         {
             get
             {
@@ -2712,7 +2712,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(247, ClientServerType.Both)]
-        public INISetting cueUI09
+        public ArtemisINISetting cueUI09
         {
             get
             {
@@ -2728,7 +2728,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI09 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(248, ClientServerType.Both)]
-        public INISetting cueUI09Vol
+        public ArtemisINISetting cueUI09Vol
         {
             get
             {
@@ -2744,7 +2744,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(249, ClientServerType.Both)]
-        public INISetting cueUI10
+        public ArtemisINISetting cueUI10
         {
             get
             {
@@ -2760,7 +2760,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI10 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(250, ClientServerType.Both)]
-        public INISetting cueUI10Vol
+        public ArtemisINISetting cueUI10Vol
         {
             get
             {
@@ -2776,7 +2776,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(251, ClientServerType.Both)]
-        public INISetting cueUI11
+        public ArtemisINISetting cueUI11
         {
             get
             {
@@ -2792,7 +2792,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI11 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(252, ClientServerType.Both)]
-        public INISetting cueUI11Vol
+        public ArtemisINISetting cueUI11Vol
         {
             get
             {
@@ -2808,7 +2808,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(253, ClientServerType.Both)]
-        public INISetting cueUI12
+        public ArtemisINISetting cueUI12
         {
             get
             {
@@ -2824,7 +2824,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI12 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(254, ClientServerType.Both)]
-        public INISetting cueUI12Vol
+        public ArtemisINISetting cueUI12Vol
         {
             get
             {
@@ -2840,7 +2840,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(255, ClientServerType.Both)]
-        public INISetting cueUI13
+        public ArtemisINISetting cueUI13
         {
             get
             {
@@ -2856,7 +2856,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI13 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(256, ClientServerType.Both)]
-        public INISetting cueUI13Vol
+        public ArtemisINISetting cueUI13Vol
         {
             get
             {
@@ -2872,7 +2872,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(257, ClientServerType.Both)]
-        public INISetting cueUI14
+        public ArtemisINISetting cueUI14
         {
             get
             {
@@ -2888,7 +2888,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI14 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(258, ClientServerType.Both)]
-        public INISetting cueUI14Vol
+        public ArtemisINISetting cueUI14Vol
         {
             get
             {
@@ -2904,7 +2904,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(259, ClientServerType.Both)]
-        public INISetting cueUI15
+        public ArtemisINISetting cueUI15
         {
             get
             {
@@ -2920,7 +2920,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI15 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(260, ClientServerType.Both)]
-        public INISetting cueUI15Vol
+        public ArtemisINISetting cueUI15Vol
         {
             get
             {
@@ -2936,7 +2936,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(261, ClientServerType.Both)]
-        public INISetting cueUI16
+        public ArtemisINISetting cueUI16
         {
             get
             {
@@ -2952,7 +2952,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI16 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(262, ClientServerType.Both)]
-        public INISetting cueUI16Vol
+        public ArtemisINISetting cueUI16Vol
         {
             get
             {
@@ -2968,7 +2968,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(263, ClientServerType.Both)]
-        public INISetting cueUI17
+        public ArtemisINISetting cueUI17
         {
             get
             {
@@ -2984,7 +2984,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI17 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(264, ClientServerType.Both)]
-        public INISetting cueUI17Vol
+        public ArtemisINISetting cueUI17Vol
         {
             get
             {
@@ -3000,7 +3000,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(265, ClientServerType.Both)]
-        public INISetting cueUI18
+        public ArtemisINISetting cueUI18
         {
             get
             {
@@ -3016,7 +3016,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI18 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(266, ClientServerType.Both)]
-        public INISetting cueUI18Vol
+        public ArtemisINISetting cueUI18Vol
         {
             get
             {
@@ -3032,7 +3032,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(267, ClientServerType.Both)]
-        public INISetting cueUI19
+        public ArtemisINISetting cueUI19
         {
             get
             {
@@ -3048,7 +3048,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI19 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(268, ClientServerType.Both)]
-        public INISetting cueUI19Vol
+        public ArtemisINISetting cueUI19Vol
         {
             get
             {
@@ -3064,7 +3064,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(269, ClientServerType.Both)]
-        public INISetting cueUI20
+        public ArtemisINISetting cueUI20
         {
             get
             {
@@ -3080,7 +3080,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI20 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(270, ClientServerType.Both)]
-        public INISetting cueUI20Vol
+        public ArtemisINISetting cueUI20Vol
         {
             get
             {
@@ -3096,7 +3096,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(271, ClientServerType.Both)]
-        public INISetting cueUI21
+        public ArtemisINISetting cueUI21
         {
             get
             {
@@ -3112,7 +3112,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI21 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(272, ClientServerType.Both)]
-        public INISetting cueUI21Vol
+        public ArtemisINISetting cueUI21Vol
         {
             get
             {
@@ -3128,7 +3128,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(273, ClientServerType.Both)]
-        public INISetting cueUI22
+        public ArtemisINISetting cueUI22
         {
             get
             {
@@ -3144,7 +3144,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI22 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(274, ClientServerType.Both)]
-        public INISetting cueUI22Vol
+        public ArtemisINISetting cueUI22Vol
         {
             get
             {
@@ -3160,7 +3160,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(275, ClientServerType.Both)]
-        public INISetting cueUI23
+        public ArtemisINISetting cueUI23
         {
             get
             {
@@ -3176,7 +3176,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI23 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(276, ClientServerType.Both)]
-        public INISetting cueUI23Vol
+        public ArtemisINISetting cueUI23Vol
         {
             get
             {
@@ -3192,7 +3192,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(277, ClientServerType.Both)]
-        public INISetting cueUI24
+        public ArtemisINISetting cueUI24
         {
             get
             {
@@ -3208,7 +3208,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI24 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(278, ClientServerType.Both)]
-        public INISetting cueUI24Vol
+        public ArtemisINISetting cueUI24Vol
         {
             get
             {
@@ -3224,7 +3224,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(279, ClientServerType.Both)]
-        public INISetting cueUI25
+        public ArtemisINISetting cueUI25
         {
             get
             {
@@ -3240,7 +3240,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI25 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(280, ClientServerType.Both)]
-        public INISetting cueUI25Vol
+        public ArtemisINISetting cueUI25Vol
         {
             get
             {
@@ -3256,7 +3256,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(281, ClientServerType.Both)]
-        public INISetting cueUI26
+        public ArtemisINISetting cueUI26
         {
             get
             {
@@ -3272,7 +3272,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueUI26 sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(282, ClientServerType.Both)]
-        public INISetting cueUI26Vol
+        public ArtemisINISetting cueUI26Vol
         {
             get
             {
@@ -3288,7 +3288,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(283, ClientServerType.Both)]
-        public INISetting cueOverheat
+        public ArtemisINISetting cueOverheat
         {
             get
             {
@@ -3304,7 +3304,7 @@ namespace ArtemisManagerAction
         // USE: volume of the cueOverheat sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(284, ClientServerType.Both)]
-        public INISetting cueOverheatVol
+        public ArtemisINISetting cueOverheatVol
         {
             get
             {
@@ -3320,7 +3320,7 @@ namespace ArtemisManagerAction
         // USE: played on consoles when buttons are pressed
         // ACCEPTABLE: a file name to a WAV file
         [INISetting(285, ClientServerType.Both)]
-        public INISetting fighterBeamShot
+        public ArtemisINISetting fighterBeamShot
         {
             get
             {
@@ -3336,7 +3336,7 @@ namespace ArtemisManagerAction
         // USE: volume of the fighterBeamShot sound
         // ACCEPTABLE: a floating-point value from 0.0 to 1.0
         [INISetting(286, ClientServerType.Both)]
-        public INISetting fighterBeamShotVol
+        public ArtemisINISetting fighterBeamShotVol
         {
             get
             {

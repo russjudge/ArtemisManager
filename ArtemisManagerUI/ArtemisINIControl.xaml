@@ -10,51 +10,142 @@
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
-    <StackPanel>
-        <GroupBox
+
+    <GroupBox
             Visibility="{Binding ElementName=uc, Path=ForLocalSettings, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
             Header="Localized Settings">
-            <DockPanel Grid.IsSharedSizeScope="True">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                    <Button Click="OnActivate">Activate</Button>
+        <DockPanel Grid.IsSharedSizeScope="True">
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+                <Button Click="OnActivate">Activate</Button>
+            </StackPanel>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="INISettingColumnOne" />
+                    <ColumnDefinition SharedSizeGroup="INISettingColumnTwo" />
+                    <ColumnDefinition SharedSizeGroup="INISettingColumnThree" />
+                </Grid.ColumnDefinitions>
+                <Border BorderBrush="Blue" BorderThickness="0,0,0,1" Grid.Column="0">
+                    <Label Content="Setting" FontWeight="Bold" />
+                </Border>
+                <Border BorderBrush="Blue" BorderThickness="0,0,0,1" Grid.Column="1">
+                    <Label Content="Value" FontWeight="Bold" />
+                </Border>
+                <Border BorderBrush="Blue" BorderThickness="0,0,0,1" Grid.Column="2">
+                    <Label Content="Using default (commented out in file)" FontWeight="Bold" />
+                </Border>
+            </Grid>
+            <ScrollViewer
+                VerticalScrollBarVisibility="Auto"
+                DockPanel.Dock="Top">
+                <StackPanel >
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsInt="True"
+                        IntMaxValue="65535"
+                        IntMinValue="100"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.networkPort, Mode=TwoWay}"
+                    />
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.useDebugConsoleWindow, Mode=TwoWay}"
+                    />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsDouble="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.musicObjectMasterVolume, Mode=TwoWay}"
+                    />
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsDouble="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.commsObjectMasterVolume, Mode=TwoWay}"
+                    />
+                    <local:VideoScreenSettingControl
+                        AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
+                        SettingsFile="{Binding ElementName=uc, Path=SettingsFile}" />
+
+                    <local:ShipSettingControl
+                        SettingsFile="{Binding ElementName=uc, Path=SettingsFile}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientMainScreen, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientHelm, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientWeapon, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientEngineer, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientScience, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientComms, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientFighter, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientData, Mode=TwoWay}" />
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientObserver, Mode=TwoWay}" />
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.clientCaptMap, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.useJoystick, Mode=TwoWay}" />
+
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.touchScreen, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsString="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.forceAddress, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.showScrnPopups, Mode=TwoWay}" />
+
+                    <local:ArtemisINISettingControl
+                        ForLocalSettings="True"
+                        IsBool="True"
+                        Setting="{Binding ElementName=uc, Path=SettingsFile.helmShipEditing, Mode=TwoWay}" />
+
                 </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
 
-                <local:ArtemisINISettingControl
-                    DockPanel.Dock="Top"
-                    ForLocalSettings="True"
-                    IsInt="True"
-                    IntMaxValue="65535"
-                    IntMinValue="100"
-                    Setting="{Binding ElementName=uc, Path=SettingsFile.networkPort, Mode=TwoWay}"
-                    />
-                <local:ArtemisINISettingControl
-                    DockPanel.Dock="Top"
-                    ForLocalSettings="True"
-                    IsBool="True"
-                    Setting="{Binding ElementName=uc, Path=SettingsFile.useDebugConsoleWindow, Mode=TwoWay}"
-                    />
-                
-                <local:ArtemisINISettingControl
-                    DockPanel.Dock="Top"
-                    ForLocalSettings="True"
-                    IsDouble="True"
-                    Setting="{Binding ElementName=uc, Path=SettingsFile.musicObjectMasterVolume, Mode=TwoWay}"
-                    />
-                <local:ArtemisINISettingControl
-                    DockPanel.Dock="Top"
-                    ForLocalSettings="True"
-                    IsDouble="True"
-                    Setting="{Binding ElementName=uc, Path=SettingsFile.commsObjectMasterVolume, Mode=TwoWay}"
-                    />
-                <local:ArtemisINISettingControl
-                    DockPanel.Dock="Top"
-                    ForLocalSettings="True"
-                    IsDouble="True"
-                    Setting="{Binding ElementName=uc, Path=SettingsFile.commsObjectMasterVolume, Mode=TwoWay}"
-                    />
+    </GroupBox>
 
-            </DockPanel>
-            
-        </GroupBox>
-    </StackPanel>
 </UserControl>

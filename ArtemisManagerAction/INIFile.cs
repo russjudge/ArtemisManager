@@ -20,51 +20,63 @@ namespace ArtemisManagerAction
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
-        protected void LoadFile<T>(string file, Type iniSettingType) where T : INISetting
+        protected void LoadFile(string file)
         {
-            var constructor = typeof(T).GetConstructor(Type.EmptyTypes);
-            if (constructor != null)
+            List<string> settingNames = new();
+
+
+            SaveFile = file;
+            using StreamReader sr = new(file);
+            ArtemisINISetting setting = new();
+            string? line;
+            while ((line = sr.ReadLine()) != null)
             {
-                SaveFile = file;
-                using StreamReader sr = new(file);
-                T resultSetting = (T)constructor.Invoke(Array.Empty<object>());
-
-                INISetting setting = resultSetting;
-
-
-                if (setting != null)
+                setting.ProcessLine(line);
+                if (!string.IsNullOrEmpty(setting.SettingName))
                 {
-                    string? line;
-                    while ((line = sr.ReadLine()) != null)
+                    bool okaytoAdd = true;
+                    if (settingNames.Contains(setting.SettingName.ToUpperInvariant()))
                     {
-                        setting.ProcessLine(line);
-                        if (!string.IsNullOrEmpty(setting.SettingName))
+                        okaytoAdd = false;
+                        if (!setting.UsingDefault)
                         {
-                            settingList.Add(setting);
-                            resultSetting = (T)constructor.Invoke(Array.Empty<object>());
-                            if (resultSetting is INISetting setItem)
+
+                            ArtemisINISetting? settingToRemove = null;
+                            foreach (var s in settingList)
                             {
-                                setting = setItem;
+                                if (s.SettingName == setting.SettingName)
+                                {
+                                    settingToRemove = s;
+                                    break;
+                                }
                             }
-                            else
+                            if (settingToRemove != null)
                             {
-                                break;
+                                okaytoAdd = true;
+                                settingList.Remove(settingToRemove);
                             }
                         }
                     }
-                    if (setting.CommentLines.Count > 0)
+                    if (okaytoAdd)
                     {
                         settingList.Add(setting);
+                        settingNames.Add(setting.SettingName.ToUpperInvariant());
                     }
-                    foreach (var item in settingList)
-                    {
-                        if (!string.IsNullOrEmpty(item.SettingName))
-                        {
-                            Settings.Add(item.SettingName.ToUpperInvariant(), item);
-                        }
-                    }
+                    setting = new();
                 }
             }
+            if (setting.CommentLines.Count > 0)
+            {
+                settingList.Add(setting);
+            }
+            foreach (var item in settingList)
+            {
+                if (!string.IsNullOrEmpty(item.SettingName))
+                {
+                    Settings.Add(item.SettingName.ToUpperInvariant(), item);
+                }
+            }
+
         }
         public void Save(string filename)
         {
@@ -79,35 +91,40 @@ namespace ArtemisManagerAction
                 {
                     File.Delete(SaveFile);
                 }
-                Dictionary<int, INISetting> items = new();
-                foreach (var item in settingList)
-                {
-                    var prop = this.GetType().GetProperty(item.SettingName);
-                    if (prop != null)
-                    {
-                        var attr = prop.GetCustomAttribute<INISettingAttribute>();
-                        attr ??= prop.GetCustomAttribute<LocalINISettingAttribute>();
-                        if (attr != null)
-                        {
-                            items.Add(attr.Sequence, item);
-                        }
-                    }
-                }
-
                 using StreamWriter sw = new(SaveFile);
-                foreach (var key in items.Keys)
-                {
-                    sw.WriteLine(items[key].ToString());
-                }
+                sw.WriteLine(ToString());
             }
             else
             {
                 throw new InvalidOperationException("Cannot save: save file not set.");
             }
         }
-        List<INISetting> settingList = new();
-        Dictionary<string, INISetting> _settings = new();
-        public Dictionary<string, INISetting> Settings
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            Dictionary<int, ArtemisINISetting> items = new();
+            foreach (var item in settingList)
+            {
+                var prop = this.GetType().GetProperty(item.SettingName);
+                if (prop != null)
+                {
+                    var attr = prop.GetCustomAttribute<INISettingAttribute>();
+                    attr ??= prop.GetCustomAttribute<LocalINISettingAttribute>();
+                    if (attr != null)
+                    {
+                        items.Add(attr.Sequence, item);
+                    }
+                }
+            }
+            foreach (var key in items.Keys)
+            {
+                sb.AppendLine(items[key].ToString());
+            }
+            return sb.ToString();
+        }
+        List<ArtemisINISetting> settingList = new();
+        Dictionary<string, ArtemisINISetting> _settings = new();
+        public Dictionary<string, ArtemisINISetting> Settings
         {
             get
             {
@@ -132,7 +149,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        protected void SetSetting(INISetting value, [CallerMemberName] string? key = null)
+        protected void SetSetting(ArtemisINISetting value, [CallerMemberName] string? key = null)
         {
             if (!string.IsNullOrEmpty(key))
             {
@@ -145,11 +162,11 @@ namespace ArtemisManagerAction
                 throw new NullReferenceException("Null key value");
             }
         }
-        protected INISetting EnsureSettingExists([CallerMemberName] string? key = null)
+        protected ArtemisINISetting EnsureSettingExists([CallerMemberName] string? key = null)
         {
             if (!string.IsNullOrEmpty(key) && !Settings.ContainsKey(key.ToUpperInvariant()))
             {
-                INISetting defaultValue = new(key, string.Empty, true);
+                ArtemisINISetting defaultValue = new(key, string.Empty, true);
                 Settings.Add(key.ToUpperInvariant(), defaultValue);
                 settingList.Add(defaultValue);
                 DoChanged(key);

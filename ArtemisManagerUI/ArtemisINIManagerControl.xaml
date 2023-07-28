@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
+             
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
@@ -38,7 +39,7 @@
                 DockPanel.Dock="Top" />
             
 
-            <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import Engineering Presets file">
+            <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
             </Button>
             <ListBox
@@ -58,7 +59,7 @@
                             <TextBlock Grid.Column="0" HorizontalAlignment="Stretch" Padding="5,10,5,10" VerticalAlignment="Center" Text="{Binding}" />
                             <Button Grid.Column="1"
                                 HorizontalContentAlignment="Right" HorizontalAlignment="Right"
-                                DockPanel.Dock="Right" Click="OnExportFile" ToolTip="Export Engineering Presets file" CommandParameter="{Binding}">
+                                DockPanel.Dock="Right" Click="OnExportFile" ToolTip="Export artemis.ini settings file" CommandParameter="{Binding}">
                                 <Image Height="16" Source="/ArtemisManagerUI;component/Resources/export.png" />
                             </Button>
                         </Grid>
@@ -67,6 +68,8 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <local:ArtemisINIControl ForLocalSettings="True" SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
+        <local:ArtemisINIControl
+            AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
+            ForLocalSettings="True" SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

@@ -43,14 +43,14 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty SettingProperty =
-           DependencyProperty.Register(nameof(Setting), typeof(INISetting),
+           DependencyProperty.Register(nameof(Setting), typeof(ArtemisINISetting),
            typeof(ArtemisINISettingControl));
 
-        public INISetting Setting
+        public ArtemisINISetting Setting
         {
             get
             {
-                return (INISetting)this.GetValue(SettingProperty);
+                return (ArtemisINISetting)this.GetValue(SettingProperty);
 
             }
             set

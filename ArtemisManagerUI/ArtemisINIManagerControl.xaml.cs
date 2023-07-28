@@ -29,7 +29,7 @@ namespace ArtemisManagerUI
         public ArtemisINIManagerControl()
         {
             ArtemisSettingsFiles = new(ArtemisManager.GetArtemisINIFileList());
-
+            AvailableResolutions = new(TakeAction.GetAvailableScreenResolutions());
             RestoreOriginalToolTip = string.Format("Restore Original artemis.ini file ({0}) to defaults.",  ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder));
             InitializeFSW();
             InitializeComponent();
@@ -174,6 +174,23 @@ namespace ArtemisManagerUI
             set
             {
                 this.SetValue(SelectedArtemisSettingsFileProperty, value);
+
+            }
+        }
+        public static readonly DependencyProperty AvailableResolutionsProperty =
+          DependencyProperty.Register(nameof(AvailableResolutions), typeof(ObservableCollection<Size>),
+           typeof(ArtemisINIManagerControl));
+
+        public ObservableCollection<Size> AvailableResolutions
+        {
+            get
+            {
+                return (ObservableCollection<Size>)this.GetValue(AvailableResolutionsProperty);
+
+            }
+            set
+            {
+                this.SetValue(AvailableResolutionsProperty, value);
 
             }
         }

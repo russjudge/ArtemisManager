@@ -200,7 +200,10 @@ namespace ArtemisManagerUI
                                 var horizontalPixels = Convert.ToInt32(md["HorizontalActivePixels"]);
                                 var verticalPixels = Convert.ToInt32(md["VerticalActivePixels"]);
                                 Size sz = new(horizontalPixels, verticalPixels);
-                                retVal.Add(sz);
+                                if (!retVal.Contains(sz))
+                                {
+                                    retVal.Add(sz);
+                                }
                             }
                         }
                     }
