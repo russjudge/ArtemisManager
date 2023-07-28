@@ -114,6 +114,8 @@
             </ListBox>
         </DockPanel>
         <local:ArtemisINIControl
+            SavingSettings="OnSavingSettings"
+            SettingsSaved="OnSettingsSaved"
             Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
             AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
             ForLocalSettings="True" SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />

@@ -187,6 +187,8 @@
                     <local:ArtemisINISettingControl
                         ForLocalSettings="True"
                         IsInt="True"
+                        IntMinValue="0"
+                        IntMaxValue="3"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.damageEffectType, Mode=TwoWay}" />
                     <local:ArtemisINISettingControl
                         ForLocalSettings="True"

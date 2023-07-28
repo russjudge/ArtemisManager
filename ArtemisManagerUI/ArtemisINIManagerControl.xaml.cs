@@ -439,5 +439,15 @@ namespace ArtemisManagerUI
                 }
             }
         }
+
+        private void OnSavingSettings(object sender, RoutedEventArgs e)
+        {
+            this.fsw.EnableRaisingEvents = false;
+        }
+
+        private void OnSettingsSaved(object sender, RoutedEventArgs e)
+        {
+            fsw.EnableRaisingEvents = true;
+        }
     }
 }

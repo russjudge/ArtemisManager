@@ -16,6 +16,7 @@ using System.Windows.Controls;
 //using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using WPFFolderBrowser;
 
 namespace ArtemisManagerUI
@@ -123,7 +124,24 @@ namespace ArtemisManagerUI
                     }
                 });
             });
+            timer = new DispatcherTimer(DispatcherPriority.Background, this.Dispatcher);
+            timer.Interval = new TimeSpan(0, 0, 5);
+            timer.Tick += Timer_Tick;
+            
+            timer.Start();
 
+        }
+
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+            CheckArtemisSBSStatus();
+        }
+
+        DispatcherTimer timer;
+        void CheckArtemisSBSStatus()
+        {
+            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
+            IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
         }
         private void OnGotoOwnerWebsite(object sender, RoutedEventArgs e)
         {
@@ -1423,20 +1441,17 @@ namespace ArtemisManagerUI
                 TakeAction.SendClientInfo(IPAddress.Any);
             }
         }
+        //@@@@
+
+       
         private void OnStartArtemisSBS(object sender, RoutedEventArgs e)
         {
             ArtemisManager.StartArtemis();
-            System.Threading.Thread.Sleep(2000);
-            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
-            IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
         }
 
         private void OnStopArtemisSBS(object sender, RoutedEventArgs e)
         {
             ArtemisManager.StopArtemis();
-            System.Threading.Thread.Sleep(2000);
-            IsArtemisRunning = ArtemisManager.IsArtemisRunning();
-            IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
         }
 
         private void DeactivateAllButBase(Guid? activeIdentifier)

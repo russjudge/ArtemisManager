@@ -1,7 +1,9 @@
-﻿using ArtemisManagerAction;
+﻿using ArtemisEngineeringPresets;
+using ArtemisManagerAction;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -131,10 +133,45 @@ namespace ArtemisManagerUI
         {
 
         }
+        void RaiseSavingSettingsEvent()
+        {
+            RaiseEvent(new RoutedEventArgs(SavingSettingsEvent));
+        }
+
+        public static readonly RoutedEvent SavingSettingsEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(SavingSettings),
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(RoutedEventHandler),
+            ownerType: typeof(PresetSettingsControl));
+        public event RoutedEventHandler SavingSettings
+        {
+            add { AddHandler(SavingSettingsEvent, value); }
+            remove { RemoveHandler(SavingSettingsEvent, value); }
+        }
+        void RaiseSettingsSavedEvent()
+        {
+            RaiseEvent(new RoutedEventArgs(SettingsSavedEvent));
+        }
+
+        public static readonly RoutedEvent SettingsSavedEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(SettingsSaved),
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(RoutedEventHandler),
+            ownerType: typeof(PresetSettingsControl));
+        public event RoutedEventHandler SettingsSaved
+        {
+            add { AddHandler(SettingsSavedEvent, value); }
+            remove { RemoveHandler(SettingsSavedEvent, value); }
+        }
+
+
 
         private void OnSave(object sender, RoutedEventArgs e)
         {
+            RaiseSavingSettingsEvent();
             SettingsFile.Save();
+            PopupMessage = "Settings Saved.";
+            RaiseSettingsSavedEvent();
         }
     }
 }

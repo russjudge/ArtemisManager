@@ -91,8 +91,10 @@ namespace ArtemisManagerAction
                 {
                     File.Delete(SaveFile);
                 }
+                string data = ToString();
                 using StreamWriter sw = new(SaveFile);
-                sw.WriteLine(ToString());
+                
+                sw.WriteLine(data);
             }
             else
             {
@@ -118,6 +120,7 @@ namespace ArtemisManagerAction
             }
             foreach (var key in items.Keys)
             {
+                
                 sb.AppendLine(items[key].ToString());
             }
             return sb.ToString();

@@ -73,8 +73,10 @@ namespace ArtemisManagerAction
             {
                 File.Delete(ActiveLocallSettingsArtemisINIFileMarker);
             }
-            using StreamWriter sw = new(ActiveLocallSettingsArtemisINIFileMarker);
-            sw.WriteLine(file);
+            using (StreamWriter sw = new(ActiveLocallSettingsArtemisINIFileMarker))
+            {
+                sw.WriteLine(file);
+            }
             ActivateLocalArtemisINISettings();
         }
         public static bool ActivateLocalArtemisINISettings()
@@ -99,14 +101,17 @@ namespace ArtemisManagerAction
                 {
                     var local = new ArtemisINI(source);
                     string target = Path.Combine(ModItem.ActivatedFolder, ArtemisINI);
+                    ArtemisINI? result = null;
                     if (File.Exists(target))
                     {
                         ArtemisINI remote = new(target);
-                        local.Merge(remote, false);
+                        result = ArtemisManagerAction.ArtemisINI.Merge(local, remote);
 
                     }
-                    local.SaveFile = target;
-                    local.Save();
+                    if (result != null)
+                    {
+                        result.Save(target);
+                    }
                     retVal = true;
                 }
             }
@@ -705,12 +710,20 @@ namespace ArtemisManagerAction
         }
         public static void StopArtemis()
         {
-            runningArtemisProcess?.Kill(true);
-            var processes = System.Diagnostics.Process.GetProcessesByName(Artemis);
-            foreach (var pro in processes)
+            try
             {
-                pro.Kill(true);
+                runningArtemisProcess?.Kill(true);
             }
+            catch { }
+            try
+            {
+                var processes = System.Diagnostics.Process.GetProcessesByName(Artemis);
+                foreach (var pro in processes)
+                {
+                    pro.Kill(true);
+                }
+            }
+            catch { }
         }
     }
 }

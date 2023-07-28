@@ -4,6 +4,11 @@ Version 0.3 (beta) xx/xx/2023:
 Bug Fix:
 	- If, while viewing Engineering presets, a presets file was deleted from the folder where Engineering Presets is stored, it would not be removed from the list.
 	   This could potentially crash the app.  Fixed so that it does get removed.
+	- Artemis SBS is started from Artemis Manager, but stopped by exiting Artemis SBS normally,
+		you would not be able to start Artemis SBS again from Artemis Manager until you restarted
+		Artemis Manager.  Clicking "Stop" would crash the application.  Coded to occasionally check
+		that Artemis SBS is still running (once every 5 seconds), and also fixed so that clicking "Stop" will no longer
+		crash the application.
 Enhancements:
 	- Added code to automatically back up the original version of artemis.ini from the vanilla Artemis, for each Artemis version that gets snapshotted.
 	- Added context menu on Engineering presets file list, which includes ability to rename files.

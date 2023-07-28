@@ -53,24 +53,38 @@ namespace ArtemisManagerAction
         {
             LoadFile(file);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="localFile"></param>
+        /// <param name="modFile"></param>
+        /// <returns></returns>
         public static ArtemisINI Merge(ArtemisINI localFile, ArtemisINI modFile)
         {
-            ArtemisINI retVal = new();
+            ArtemisINI workFile = new(modFile.SaveFile);
             var properties = typeof(ArtemisINI).GetProperties();
+            var settingProperties = typeof(ArtemisINISetting).GetProperties();
             foreach (var property in properties)
             {
-                var attr = property.GetCustomAttribute<LocalINISettingAttribute>();
-                if (attr != null)
+                if (property.PropertyType == typeof(ArtemisINISetting))
                 {
-                    property.SetValue(retVal, localFile);
-                }
-                else
-                {
-                    property.SetValue(retVal, modFile);
+                    if (property.CanWrite)
+                    {
+                        if (property.GetCustomAttribute<LocalINISettingAttribute>() != null)
+                        {
+                            var localPropertyValue = property.GetValue(localFile);
+                            var modPropertyValue = property.GetValue(workFile);
+
+                            ArtemisINISetting localvalue = (ArtemisINISetting)localPropertyValue;
+                            ArtemisINISetting modvalue = (ArtemisINISetting)modPropertyValue;
+                            
+                            modvalue.FileValue = localvalue.FileValue;
+                            modvalue.UsingDefault = localvalue.UsingDefault;
+                        }
+                    }
                 }
             }
-            return retVal;
+            return workFile;
         }
         public ArtemisINI Merge(ArtemisINI INIFile, bool ParmIsForLocal)
         {
