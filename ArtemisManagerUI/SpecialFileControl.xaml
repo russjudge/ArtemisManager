@@ -5,21 +5,48 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
-             
              mc:Ignorable="d" Name="uc" Unloaded="OnUnloaded">
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
+        <Style TargetType="CheckBox">
+            <Setter Property="Margin" Value="0,5,15,5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="local:NumericTextBox">
+            <Setter Property="Margin" Value="5,5,15,5" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="5,5,15,5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
     </UserControl.Resources>
-    <Border BorderBrush="Gray" BorderThickness="1">
-    <DockPanel>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition  SharedSizeGroup="INISettingColumnOne" />
+            <ColumnDefinition  SharedSizeGroup="INISettingColumnTwo" />
+            <ColumnDefinition SharedSizeGroup="INISettingColumnThree" />
+        </Grid.ColumnDefinitions>
+
         <StackPanel
-            DockPanel.Dock="Top" Orientation="Horizontal">
+            IsEnabled="{Binding ElementName=uc, Path=UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
+            Grid.Column="0"
+            Orientation="Horizontal">
             <TextBlock
-            Text="Relative path:" />
+                Text="{Binding ElementName=uc, Path=Prompt, Mode=TwoWay}" />
             <TextBlock
-                Text="{Binding ElementName=uc, Path=RelativeFolderPath}" />
+                        Padding="0,0,5,0" Text=":" />
+            <TextBlock
+                Text="{Binding ElementName=uc, Path=Value}" />
         </StackPanel>
-        <DockPanel>
+
+        <DockPanel
+            IsEnabled="{Binding ElementName=uc, Path=UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
+            Grid.Column="1">
 
             <Button
                 Visibility="{Binding ElementName=uc, Path=IsImage, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
@@ -28,26 +55,35 @@
                 DockPanel.Dock="Right" ToolTip="Show Image">
                 <Image Source="{Binding ElementName=uc, Path=Image}" />
             </Button>
+            <!-- Button hidden for now: must use a special media player. Built-in SoundPlayer can only support wav files. -->
+            <!--Visibility="{Binding ElementName=uc, Path=IsSound, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"-->
             <Button
-                Visibility="{Binding ElementName=uc, Path=IsSound, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="Collapsed"
                 Click="OnPlaySound"
                 Width="32"
                 DockPanel.Dock="Right" ToolTip="Play Sound">
                 <StackPanel>
-                <Image
+                    <Image
                     Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                     Source="/ArtemisManagerUI;component/Resources/play.png" />
-                <Image
+                    <Image
                     Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                     Source="/ArtemisManagerUI;component/Resources/stopplaying.png" />
                 </StackPanel>
             </Button>
 
-            <local:FileSelector 
+            <local:FileSelector
+                Filter="{Binding ElementName=uc, Path=FileFilter,Mode=OneWayToSource}"
+                ShowButtonOnly="True"
                 DockPanel.Dock="Left"
                 IsFolderPicker="False"
-                Title="{Binding ElementName=uc, Path=Title, Mode=TwoWay}"/>
+                SelectedItem="{Binding ElementName=uc, Path=Filename}"
+                Title="Full path:"/>
         </DockPanel>
-    </DockPanel>
-    </Border>
+        <CheckBox
+            Grid.Column="2"
+            HorizontalAlignment="Center"
+            IsChecked="{Binding ElementName=uc, Path=UsingDefault, Mode=TwoWay}" />
+
+    </Grid>
 </UserControl>

@@ -75,11 +75,13 @@ namespace ArtemisManagerAction
                             var localPropertyValue = property.GetValue(localFile);
                             var modPropertyValue = property.GetValue(workFile);
 
-                            ArtemisINISetting localvalue = (ArtemisINISetting)localPropertyValue;
-                            ArtemisINISetting modvalue = (ArtemisINISetting)modPropertyValue;
-                            
-                            modvalue.FileValue = localvalue.FileValue;
-                            modvalue.UsingDefault = localvalue.UsingDefault;
+                            ArtemisINISetting? localvalue = (ArtemisINISetting?)localPropertyValue;
+                            ArtemisINISetting? modvalue = (ArtemisINISetting?)modPropertyValue;
+                            if (localvalue != null && modvalue != null)
+                            {
+                                modvalue.FileValue = localvalue.FileValue;
+                                modvalue.UsingDefault = localvalue.UsingDefault;
+                            }
                         }
                     }
                 }

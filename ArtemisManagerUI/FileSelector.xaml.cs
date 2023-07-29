@@ -60,6 +60,36 @@ namespace ArtemisManagerUI
             }
         }
 
+        public static readonly DependencyProperty ShowButtonOnlyProperty =
+           DependencyProperty.Register(nameof(ShowButtonOnly), typeof(bool),
+           typeof(FileSelector));
+        public bool ShowButtonOnly
+        {
+            get
+            {
+                return (bool)GetValue(ShowButtonOnlyProperty);
+            }
+            set
+            {
+                this.SetValue(ShowButtonOnlyProperty, value);
+            }
+        }
+
+
+        public static readonly DependencyProperty FilterProperty =
+           DependencyProperty.Register(nameof(Filter), typeof(string),
+           typeof(FileSelector));
+        public string? Filter
+        {
+            get
+            {
+                return (string?)GetValue(FilterProperty);
+            }
+            set
+            {
+                this.SetValue(FilterProperty, value);
+            }
+        }
 
         public static readonly DependencyProperty TitleProperty =
            DependencyProperty.Register(nameof(Title), typeof(string),
@@ -119,7 +149,28 @@ namespace ArtemisManagerUI
 
         private void OnBrowse(object sender, RoutedEventArgs e)
         {
-            string? value = BrowseForOneFile(Title, IsFolderPicker, null);
+            string? initialDirectory = null;
+            if (!string.IsNullOrEmpty(SelectedItem))
+            {
+                initialDirectory = new System.IO.FileInfo(SelectedItem).DirectoryName;
+            }
+            List<Tuple<string,string>>? filter= new List<Tuple<string,string>>();
+            if (!string.IsNullOrEmpty(Filter))
+            {
+                string[] filters = Filter.Split('|');
+                for (int i = 0; i < filters.Length; i+=2)
+                {
+                    if (i + 1 < filters.Length)
+                    {
+                        filter.Add(new(filters[i], filters[i + 1]));
+                    }
+                }
+                if (filter.Count ==0)
+                {
+                    filter = null;
+                }
+            }
+            string? value = BrowseForOneFile(Title, IsFolderPicker, initialDirectory, filter);
             if (!string.IsNullOrEmpty(value))
             {
                 SelectedItem = value;

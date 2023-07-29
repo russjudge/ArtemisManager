@@ -126,6 +126,39 @@ namespace ArtemisManagerUI
             }
         }
 
+        public static readonly DependencyProperty DoubleMaxValueProperty =
+          DependencyProperty.Register(nameof(DoubleMaxValue), typeof(double),
+          typeof(ArtemisINISettingControl), new PropertyMetadata(double.MaxValue));
+
+        public double DoubleMaxValue
+        {
+            get
+            {
+                return (double)this.GetValue(DoubleMaxValueProperty);
+
+            }
+            set
+            {
+                this.SetValue(DoubleMaxValueProperty, value);
+            }
+        }
+        public static readonly DependencyProperty DoubleMinValueProperty =
+          DependencyProperty.Register(nameof(DoubleMinValue), typeof(double),
+          typeof(ArtemisINISettingControl), new PropertyMetadata(double.MinValue));
+
+        public double DoubleMinValue
+        {
+            get
+            {
+                return (double)this.GetValue(DoubleMinValueProperty);
+
+            }
+            set
+            {
+                this.SetValue(DoubleMinValueProperty, value);
+            }
+        }
+
         public static readonly DependencyProperty IsDoubleProperty =
            DependencyProperty.Register(nameof(IsDouble), typeof(bool),
            typeof(ArtemisINISettingControl));

@@ -20,37 +20,38 @@ namespace ArtemisManagerUI
     /// <summary>
     /// Interaction logic for NumericTextBox.xaml
     /// </summary>
-    public partial class NumericTextBox : UserControl
+    public partial class NumericDoubleTextBox : UserControl
     {
-        [GeneratedRegex("[^0-9-]+")]
+        [GeneratedRegex("[^0-9.-]+")]
         private static partial Regex MyRegex();
-        public NumericTextBox()
+        public NumericDoubleTextBox()
         {
             InitializeComponent();
         }
         public static readonly DependencyProperty ValueProperty =
-            DependencyProperty.Register(nameof(Value), typeof(int),
-            typeof(NumericTextBox), new PropertyMetadata(OnValueChanged));
+            DependencyProperty.Register(nameof(Value), typeof(double),
+            typeof(NumericDoubleTextBox), new PropertyMetadata(OnValueChanged));
+
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is NumericTextBox me)
+            if (d is NumericDoubleTextBox me)
             {
                 if (me.Value > me.MaxValue)
                 {
-                    me.Value = me.MaxValue;
+                    me.Value= me.MaxValue;
                 }
-                if (me.Value < me.MinValue)
+                if (me.Value< me.MinValue)
                 {
-                    me.Value = me.MinValue;
+                    me.Value= me.MinValue;
                 }
             }
         }
 
-        public int Value
+        public double Value
         {
             get
             {
-                return (int)this.GetValue(ValueProperty);
+                return (double)this.GetValue(ValueProperty);
 
             }
             set
@@ -59,14 +60,14 @@ namespace ArtemisManagerUI
             }
         }
         public static readonly DependencyProperty MaxValueProperty =
-           DependencyProperty.Register(nameof(MaxValue), typeof(int),
-           typeof(NumericTextBox), new PropertyMetadata(int.MaxValue));
+           DependencyProperty.Register(nameof(MaxValue), typeof(double),
+           typeof(NumericDoubleTextBox), new PropertyMetadata(double.MaxValue));
 
-        public int MaxValue
+        public double MaxValue
         {
             get
             {
-                return (int)this.GetValue(MaxValueProperty);
+                return (double)this.GetValue(MaxValueProperty);
 
             }
             set
@@ -75,14 +76,14 @@ namespace ArtemisManagerUI
             }
         }
         public static readonly DependencyProperty MinValueProperty =
-           DependencyProperty.Register(nameof(MinValue), typeof(int),
-           typeof(NumericTextBox), new PropertyMetadata(int.MinValue));
+           DependencyProperty.Register(nameof(MinValue), typeof(double),
+           typeof(NumericDoubleTextBox), new PropertyMetadata(double.MinValue));
 
-        public int MinValue
+        public double MinValue
         {
             get
             {
-                return (int)this.GetValue(MinValueProperty);
+                return (double)this.GetValue(MinValueProperty);
 
             }
             set
@@ -90,21 +91,7 @@ namespace ArtemisManagerUI
                 this.SetValue(MinValueProperty, value);
             }
         }
-        private void OnDown(object sender, RoutedEventArgs e)
-        {
-            if (Value > MinValue)
-            {
-                Value--;
-            }
-        }
-
-        private void OnUp(object sender, RoutedEventArgs e)
-        {
-            if (Value < MaxValue)
-            {
-                Value++;
-            }
-        }
+       
 
         private void OnPreviewPortInput(object sender, TextCompositionEventArgs e)
         {

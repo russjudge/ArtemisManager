@@ -23,13 +23,44 @@ namespace ArtemisManagerUI
     /// </summary>
     public partial class SpecialFileControl : UserControl
     {
+        public const string ImageFilter = "Image Files|*.jpg;*.jpeg;*.png;*.jfif;*.bmp;*.gif;*.tif;*.tiff;*.ico|" + AllFilter;
+        public const string AudioFilter = "Audio Files |*.mp3;*.wav;*.ogg;*.flac;*.aac;*.wma;*.m4a" + AllFilter;
+        public const string AllFilter = "All Files (*.*)|*.*";
         public SpecialFileControl()
         {
+            FileFilter = AllFilter;
             InitializeComponent();
         }
+        public static readonly DependencyProperty FileFilterProperty =
+        DependencyProperty.Register(nameof(FileFilter), typeof(string),
+        typeof(SpecialFileControl));
+        public string FileFilter
+        {
+            get
+            {
+                return (string)GetValue(FileFilterProperty);
+            }
+            set
+            {
+                this.SetValue(FileFilterProperty, value);
+            }
+        }
+
         public static readonly DependencyProperty IsImageProperty =
          DependencyProperty.Register(nameof(IsImage), typeof(bool),
-         typeof(SpecialFileControl));
+         typeof(SpecialFileControl), new PropertyMetadata(OnIsImageChanged));
+
+        private static void OnIsImageChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SpecialFileControl me)
+            {
+                if (me.IsImage)
+                {
+                    me.FileFilter = ImageFilter;
+                }
+            }
+        }
+
         public bool IsImage
         {
             get
@@ -43,7 +74,19 @@ namespace ArtemisManagerUI
         }
         public static readonly DependencyProperty IsSoundProperty =
         DependencyProperty.Register(nameof(IsSound), typeof(bool),
-        typeof(SpecialFileControl));
+        typeof(SpecialFileControl), new PropertyMetadata(OnIsSoundChanged));
+
+        private static void OnIsSoundChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is SpecialFileControl me)
+            {
+                if (me.IsSound)
+                {
+                    me.FileFilter = AudioFilter;
+                }
+            }
+        }
+
         public bool IsSound
         {
             get
@@ -55,6 +98,23 @@ namespace ArtemisManagerUI
                 this.SetValue(IsSoundProperty, value);
             }
         }
+
+        public static readonly DependencyProperty UsingDefaultProperty =
+           DependencyProperty.Register(nameof(UsingDefault), typeof(bool),
+           typeof(SpecialFileControl));
+        public bool UsingDefault
+        {
+            get
+            {
+                return (bool)GetValue(UsingDefaultProperty);
+            }
+            set
+            {
+                this.SetValue(UsingDefaultProperty, value);
+            }
+        }
+
+
         public static readonly DependencyProperty IsPlayingProperty =
             DependencyProperty.Register(nameof(IsPlaying), typeof(bool),
             typeof(SpecialFileControl));
@@ -96,6 +156,9 @@ namespace ArtemisManagerUI
                 if (!me.IsSetting)
                 {
                     me.IsSetting = true;
+                    // Also, need to process for "/" 
+                    // Also, validate RelativeFolderPath.  ONLY starting with "art" or "dat" is valid.
+                    //  
                     while (me.RelativeFolderPath.StartsWith("\\"))
                     {
                         me.RelativeFolderPath = me.RelativeFolderPath.Substring(1);
@@ -229,7 +292,7 @@ namespace ArtemisManagerUI
                         if (i >= 0)
                         {
                             me.RelativeFolderPath = me.Value.Substring(0, i);
-                            me.File = me.Value.Substring(i + 1, i);
+                            me.File = me.Value.Substring(i + 1, me.Value.Length - (i + 1));
                         }
                         else
                         {
@@ -259,18 +322,18 @@ namespace ArtemisManagerUI
                 this.SetValue(ValueProperty, value);
             }
         }
-        public static readonly DependencyProperty TitleProperty =
-           DependencyProperty.Register(nameof(Title), typeof(string),
+        public static readonly DependencyProperty PromptProperty =
+           DependencyProperty.Register(nameof(Prompt), typeof(string),
            typeof(SpecialFileControl), new PropertyMetadata("File:"));
-        public string Title
+        public string Prompt
         {
             get
             {
-                return (string)GetValue(TitleProperty);
+                return (string)GetValue(PromptProperty);
             }
             set
             {
-                this.SetValue(TitleProperty, value);
+                this.SetValue(PromptProperty, value);
             }
         }
 
@@ -288,7 +351,17 @@ namespace ArtemisManagerUI
                     if (!me.IsSetting)
                     {
                         me.IsSetting = true;
+
+                        //me.FileFolderPrefix
+                        //TODO: If Base part of Filename is NOT FileFolderPrefix, then copy the file to
+                        //     ArtemisActiveFolder + RelativeFolderPath that's already set.
+                        //Note: NOTHING should ever go into base Artemis folder.  Everything should
+                        // be under art or dat.
+                        //Therefore, RelativeFolderPath MUST start with either "art" or "dat".  Can include more, though.
                         me.File = f.Name;
+
+
+                        me.Value = me.RelativeFolderPath + "/" + me.File;
                         me.IsSetting = false;
                     }
                     if (f != null && !string.IsNullOrEmpty(f.DirectoryName) && f.Exists)
@@ -339,7 +412,7 @@ namespace ArtemisManagerUI
                 }
                 else
                 {
-                    player = new System.Media.SoundPlayer();
+                    player = new System.Media.SoundPlayer();  //Can only play *.wav files.
                     player.SoundLocation = Filename;
                     player.Load();
                     player.Play();

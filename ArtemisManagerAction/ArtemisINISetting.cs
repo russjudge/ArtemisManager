@@ -67,6 +67,7 @@ namespace ArtemisManagerAction
             }
             else
             {
+
                 if (line.Substring(0, posEqual).Contains(' '))
                 {
                     isComment = true;
@@ -92,7 +93,10 @@ namespace ArtemisManagerAction
                 if (line[0] == ';')
                 {
                     useDefault = true;
-                    startPos++;
+                    do
+                    {
+                        startPos++;
+                    } while (line[startPos] == ' ');
                 }
                 int posEqual = line.IndexOf('=');
 

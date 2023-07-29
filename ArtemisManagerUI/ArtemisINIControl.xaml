@@ -43,7 +43,7 @@
                     <Label Content="Value" FontWeight="Bold" />
                 </Border>
                 <Border BorderBrush="Blue" BorderThickness="0,0,0,1" Grid.Column="2">
-                    <Label Content="Using default (commented out in file)" FontWeight="Bold" />
+                    <TextBlock TextWrapping="Wrap" Text="Using default (commented out in file)" FontWeight="Bold" />
                 </Border>
             </Grid>
             <ScrollViewer
@@ -66,11 +66,15 @@
                     <local:ArtemisINISettingControl
                         ForLocalSettings="True"
                         IsDouble="True"
+                        DoubleMaxValue="1.0"
+                        DoubleMinValue="0.0"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.musicObjectMasterVolume, Mode=TwoWay}"
                     />
                     <local:ArtemisINISettingControl
                         ForLocalSettings="True"
                         IsDouble="True"
+                        DoubleMaxValue="1.0"
+                        DoubleMinValue="0.0"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.commsObjectMasterVolume, Mode=TwoWay}"
                     />
                     <local:VideoScreenSettingControl
@@ -155,9 +159,11 @@
                         Setting="{Binding ElementName=uc, Path=SettingsFile.helmShipEditing, Mode=TwoWay}" />
 
                     <local:SpecialFileControl
-                        Title="operatorLogoImage:"
+                        IsImage="True"
+                        UsingDefault="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImage.UsingDefault, Mode=TwoWay}"
+                        Prompt="operatorLogoImage"
                         FileFolderPrefix="{Binding ElementName=uc, Path=ArtemisFolder, Mode=OneTime}"
-                        Value="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImage, Mode=TwoWay}" />
+                        Value="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImage.FileValue, Mode=TwoWay}" />
 
                     <local:ArtemisINISettingControl
                         ForLocalSettings="True"
@@ -200,10 +206,6 @@
                         IsString="True"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.ServerNetworkName, Mode=TwoWay}" />
 
-                    <local:ArtemisINISettingControl
-                        ForLocalSettings="True"
-                        IsString="True"
-                        Setting="{Binding ElementName=uc, Path=SettingsFile.ServerNetworkName, Mode=TwoWay}" />
 
                 </StackPanel>
             </ScrollViewer>

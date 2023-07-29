@@ -1,7 +1,7 @@
 Change History
 ===============================
-Version 0.3 (beta) xx/xx/2023:
-Bug Fix:
+Version 0.3 (beta) 07/30/2023:
+Bug Fixes:
 	- If, while viewing Engineering presets, a presets file was deleted from the folder where Engineering Presets is stored, it would not be removed from the list.
 	   This could potentially crash the app.  Fixed so that it does get removed.
 	- Artemis SBS is started from Artemis Manager, but stopped by exiting Artemis SBS normally,
@@ -18,6 +18,8 @@ Enhancements:
 		any setting that would have nothing to do with a mod.  Remaining settings will to be added as part of new functionality to be used for creating
 		a mod.
 
+	--TODO before ready for release:
+		- Add ability to transmit Artemis.ini file to connected PCs.
 ------------------------------
 Version 0.2 (beta) 07/25/2023:
 Bug Fixes:
