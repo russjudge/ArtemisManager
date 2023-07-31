@@ -100,11 +100,11 @@ namespace ArtemisManagerAction
             }
         }
 
-        public override JsonPackageFile FileType
+        public override SendableStringPackageFile FileType
         {
             get
             {
-                return JsonPackageFile.ArtemisINI;
+                return SendableStringPackageFile.ArtemisINI;
             }
         }
 

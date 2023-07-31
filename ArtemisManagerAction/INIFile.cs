@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
 {
-    public class INIFile : INotifyPropertyChanged, ISendableJsonFile
+    public class INIFile : INotifyPropertyChanged, ISendableStringFile
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void DoChanged([CallerMemberName] string property = "")
@@ -227,12 +227,16 @@ namespace ArtemisManagerAction
             EnsureSettingExists(key);
             return Settings[key].GetBoolValue();
         }
-        public virtual JsonPackageFile FileType
+        public virtual SendableStringPackageFile FileType
         {
             get
             {
-                return JsonPackageFile.Generic;
+                return SendableStringPackageFile.Generic;
             }
+        }
+        public string GetSerializedString()
+        {
+            return ToString();
         }
         public string GetJSON()
         {

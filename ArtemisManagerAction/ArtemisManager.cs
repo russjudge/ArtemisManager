@@ -492,6 +492,7 @@ namespace ArtemisManagerAction
         }
         public static void VerifyArtemisINIBackup()
         {
+            ModManager.CreateFolder(ArtemisINIFolder);
             foreach (var mod in GetInstalledMods())
             {
                 if (mod.IsArtemisBase)

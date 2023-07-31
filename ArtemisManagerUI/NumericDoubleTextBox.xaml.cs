@@ -22,8 +22,8 @@ namespace ArtemisManagerUI
     /// </summary>
     public partial class NumericDoubleTextBox : UserControl
     {
-        [GeneratedRegex("[^0-9.-]+")]
-        private static partial Regex MyRegex();
+        //[GeneratedRegex("[^0-9.-]+")]
+        //private static Regex MyRegex = MyRegex1();
         public NumericDoubleTextBox()
         {
             InitializeComponent();
@@ -98,5 +98,8 @@ namespace ArtemisManagerUI
             Regex regex = MyRegex();
             e.Handled = regex.IsMatch(e.Text);
         }
+
+        [GeneratedRegex("[^0-9.-];+")]
+        private static partial Regex MyRegex();
     }
 }

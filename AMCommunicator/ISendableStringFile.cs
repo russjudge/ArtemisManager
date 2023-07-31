@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator
 {
-    public interface ISendableJsonFile
+    public interface ISendableStringFile
     {
-        Messages.JsonPackageFile FileType { get; }
-        string GetJSON();
+        Messages.SendableStringPackageFile FileType { get; }
+        string GetSerializedString();
         string SaveFile { get; set; }
     }
 }

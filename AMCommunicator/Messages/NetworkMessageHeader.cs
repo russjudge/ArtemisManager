@@ -59,6 +59,14 @@ namespace AMCommunicator.Messages
             {
                 Command= MessageCommand.RequestModPackage;
             }
+            else if (message.GetType() == typeof(StringPackageMessage))
+            {
+                Command = MessageCommand.StringPackage;
+            }
+            else
+            {
+                Command = MessageCommand.UndefinedPackage;
+            }
             Version = message.MessageVersion;
             JSON = message.GetJSON();
             Length = JSON.Length;

@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    [NetworkMessageCommand(MessageCommand.JsonPackage)]
-    public class JsonPackageMessage : NetworkMessage
+    [NetworkMessageCommand(MessageCommand.StringPackage)]
+    public class StringPackageMessage : NetworkMessage
     {
         public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
-        public JsonPackageMessage() : base()
+        public StringPackageMessage() : base()
         {
-            JsonData = string.Empty;
-            FileType = JsonPackageFile.Generic;
+            SerializedString = string.Empty;
+            FileType = SendableStringPackageFile.Generic;
             FileName = string.Empty;
         }
 
-        public JsonPackageMessage(string jsonData, JsonPackageFile fileType, string fileName) : base()
+        public StringPackageMessage(string serializedString, SendableStringPackageFile fileType, string fileName) : base()
         {
-            JsonData = jsonData;
+            SerializedString = serializedString;
             FileType = fileType;
             FileName = fileName;
         }
@@ -28,9 +28,9 @@ namespace AMCommunicator.Messages
             MessageVersion = ThisVersion;
         }
 
-        public string JsonData { get; set; }
+        public string SerializedString { get; set; }
 
-        public JsonPackageFile FileType { get; set; }
+        public SendableStringPackageFile FileType { get; set; }
         public string FileName { get; set; }
 
 

@@ -22,7 +22,7 @@ namespace AMCommunicator.Messages
     [JsonDerivedType(typeof(PCActionMessage), nameof(PCActionMessage))]
     [JsonDerivedType(typeof(PingMessage), nameof(PingMessage))]
     [JsonDerivedType(typeof(RequestModPackageMessage), nameof(RequestModPackageMessage))]
-    [JsonDerivedType(typeof(JsonPackageMessage), nameof(JsonPackageMessage))]
+    [JsonDerivedType(typeof(StringPackageMessage), nameof(StringPackageMessage))]
     public abstract class NetworkMessage : INetworkMessage
     {
         protected NetworkMessage()

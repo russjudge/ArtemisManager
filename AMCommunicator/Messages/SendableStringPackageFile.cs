@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    public enum JsonPackageFile
+    public enum SendableStringPackageFile
     {
         Generic,
         EngineeringPreset,

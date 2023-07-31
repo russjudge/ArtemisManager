@@ -22,16 +22,19 @@ namespace ArtemisManagerUI
     /// <summary>
     /// Interaction logic for JsonPackageSenderControl.xaml
     /// </summary>
-    public partial class JsonPackageSenderControl : UserControl
+    public partial class StringPackageSenderControl : UserControl
     {
-        public JsonPackageSenderControl()
+        public StringPackageSenderControl()
         {
-            ConnectedPCs = TakeAction.ConnectedPCs;
+            if (TakeAction.ConnectedPCs != null)
+            {
+                ConnectedPCs = TakeAction.ConnectedPCs;
+            }
             InitializeComponent();
         }
         public static readonly DependencyProperty PromptProperty =
             DependencyProperty.Register(nameof(Prompt), typeof(string),
-            typeof(JsonPackageSenderControl));
+            typeof(StringPackageSenderControl));
 
         public string Prompt
         {
@@ -48,7 +51,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedTargetPCProperty =
         DependencyProperty.Register(nameof(SelectedTargetPC), typeof(PCItem),
-        typeof(JsonPackageSenderControl));
+        typeof(StringPackageSenderControl));
 
         public PCItem SelectedTargetPC
         {
@@ -64,7 +67,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty ConnectedPCsProperty =
           DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
-          typeof(JsonPackageSenderControl));
+          typeof(StringPackageSenderControl));
 
         public ObservableCollection<PCItem> ConnectedPCs
         {
@@ -83,7 +86,7 @@ namespace ArtemisManagerUI
             name: nameof(TransmissionCompleted),
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(RoutedEventHandler),
-            ownerType: typeof(JsonPackageSenderControl));
+            ownerType: typeof(StringPackageSenderControl));
 
         public event RoutedEventHandler TransmissionCompleted
         {
@@ -97,7 +100,7 @@ namespace ArtemisManagerUI
             name: nameof(FileRequest),
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(EventHandler<FileRequestRoutedEventArgs>),
-            ownerType: typeof(JsonPackageSenderControl));
+            ownerType: typeof(StringPackageSenderControl));
 
         public event EventHandler<FileRequestRoutedEventArgs> FileRequest
         {
@@ -118,13 +121,13 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null && pcItem.IP.ToString() != IPAddress.Any.ToString())
                         {
-                            Network.Current?.SendJsonPackageFile(pcItem.IP, eFileRequest.File.GetJSON(), eFileRequest.File.FileType, eFileRequest.File.SaveFile);
+                            Network.Current?.SendStringPackageFile(pcItem.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile);
                         }
                     }
                 }
                 else
                 {
-                    Network.Current?.SendJsonPackageFile(SelectedTargetPC.IP, eFileRequest.File.GetJSON(), eFileRequest.File.FileType, eFileRequest.File.SaveFile);
+                    Network.Current?.SendStringPackageFile(SelectedTargetPC.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile);
                 }
                 RaiseEvent(new RoutedEventArgs(TransmissionCompletedEvent));
             }

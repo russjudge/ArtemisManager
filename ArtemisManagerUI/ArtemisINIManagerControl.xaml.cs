@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-
+using System;
 namespace ArtemisManagerUI
 {
     /// <summary>
@@ -20,7 +20,14 @@ namespace ArtemisManagerUI
             {
                 ArtemisSettingsFiles.Add(new FileListItem(ini.Substring(0, ini.Length - 4)));
             }
-            AvailableResolutions = new(TakeAction.GetAvailableScreenResolutions());
+            try
+            {
+                AvailableResolutions = new(TakeAction.GetAvailableScreenResolutions());
+            }
+            catch (FileNotFoundException ex)
+            {
+                MessageBox.Show("Error Loading available resolutions: " +  Environment.NewLine + ex.Message);
+            }
             RestoreOriginalToolTip = string.Format("Restore Original artemis.ini file ({0}) to defaults.",  ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder));
             InitializeFSW();
             InitializeComponent();
@@ -332,8 +339,8 @@ namespace ArtemisManagerUI
                 {
                     if (!string.IsNullOrEmpty(selectedFile.Name) && !string.IsNullOrEmpty(selectedFile.OriginalName) && selectedFile.Name != selectedFile.OriginalName)
                     {
-                        string source = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.OriginalName + ArtemisManager.INIFileExtension);
-                        string target = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
+                        string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.OriginalName + ArtemisManager.INIFileExtension);
+                        string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
                         if (File.Exists(target))
                         {
                             MessageBox.Show("Cannot rename--new name already exists.", "Rename settings file", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -442,12 +449,18 @@ namespace ArtemisManagerUI
 
         private void OnSavingSettings(object sender, RoutedEventArgs e)
         {
-            this.fsw.EnableRaisingEvents = false;
+            if (fsw != null)
+            {
+                this.fsw.EnableRaisingEvents = false;
+            }
         }
 
         private void OnSettingsSaved(object sender, RoutedEventArgs e)
         {
-            fsw.EnableRaisingEvents = true;
+            if (fsw != null)
+            {
+                fsw.EnableRaisingEvents = true;
+            }
         }
     }
 }

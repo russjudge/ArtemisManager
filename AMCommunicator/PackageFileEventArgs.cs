@@ -9,14 +9,14 @@ namespace AMCommunicator
 {
     public class PackageFileEventArgs : EventArgs
     {
-        internal PackageFileEventArgs(string json, JsonPackageFile fileType, string filename)
+        internal PackageFileEventArgs(string serializedString, SendableStringPackageFile fileType, string filename)
         {
             Filename = filename;
-            JSON = json;
+            SerializedString = serializedString;
             FileType = fileType;
         }
         public string Filename { get; set; }
-        public string JSON { get; set; }
-        public JsonPackageFile FileType { get; set; }
+        public string SerializedString { get; set; }
+        public SendableStringPackageFile FileType { get; set; }
     }
 }

@@ -11,8 +11,8 @@
     <Copyright>Copyright (c) 2023 Confederate In Blue Gaming</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/russjudge/ArtemisManager</RepositoryUrl>
-    <FileVersion>0.3.0.652</FileVersion>
-    <AssemblyVersion>0.3.0.652</AssemblyVersion>
+    <FileVersion>0.3.0.678</FileVersion>
+    <AssemblyVersion>0.3.0.678</AssemblyVersion>
     <ApplicationIcon>am.ico</ApplicationIcon>
   </PropertyGroup>
   
@@ -53,6 +53,14 @@
       <PackagePath>\</PackagePath>
     </None>
    </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lnk" Version="1.3.4" />
+    <PackageReference Include="SharpCompress" Version="0.33.0" />
+    <PackageReference Include="System.Management" Version="7.0.2" />
+    <PackageReference Include="WindowsAPICodePack.Shell.CommonFileDialogs.Wpf" Version="1.1.5" />
+    <PackageReference Include="WPFFolderBrowser.Net" Version="2.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AMCommunicator\AMCommunicator.csproj" />

@@ -293,26 +293,26 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnSendSelectedFile(object sender, RoutedEventArgs e)
-        {
-            if (SelectedFile != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(SelectedFile.SaveFile) && System.IO.File.Exists(SelectedFile.SaveFile))
-            {
-                if (SelectedTargetPC.IP.ToString() == IPAddress.Any.ToString())
-                {
-                    foreach (var pcItem in ConnectedPCs)
-                    {
-                        if (pcItem.IP != null && pcItem.IP.ToString() != IPAddress.Any.ToString())
-                        {
-                            Network.Current?.SendJsonPackageFile(pcItem.IP, SelectedFile.GetJSON(), AMCommunicator.Messages.JsonPackageFile.EngineeringPreset, SelectedFile.SaveFile);
-                        }
-                    }
-                }
-                else
-                {
-                    Network.Current?.SendJsonPackageFile(SelectedTargetPC.IP, SelectedFile.GetJSON(), AMCommunicator.Messages.JsonPackageFile.EngineeringPreset, SelectedFile.SaveFile);
-                }
-            }
-        }
+        //private void OnSendSelectedFile(object sender, RoutedEventArgs e)
+        //{
+        //    if (SelectedFile != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(SelectedFile.SaveFile) && System.IO.File.Exists(SelectedFile.SaveFile))
+        //    {
+        //        if (SelectedTargetPC.IP.ToString() == IPAddress.Any.ToString())
+        //        {
+        //            foreach (var pcItem in ConnectedPCs)
+        //            {
+        //                if (pcItem.IP != null && pcItem.IP.ToString() != IPAddress.Any.ToString())
+        //                {
+        //                    Network.Current?.SendStringPackageFile(pcItem.IP, SelectedFile.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset, SelectedFile.SaveFile);
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            Network.Current?.SendStringPackageFile(SelectedTargetPC.IP, SelectedFile.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset, SelectedFile.SaveFile);
+        //        }
+        //    }
+        //}
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {

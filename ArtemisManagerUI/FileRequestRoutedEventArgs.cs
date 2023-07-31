@@ -11,7 +11,7 @@ namespace ArtemisManagerUI
     public class FileRequestRoutedEventArgs : RoutedEventArgs
     {
         public FileRequestRoutedEventArgs(RoutedEvent routedEvent) : base(routedEvent) { }
-        public ISendableJsonFile? File { get; set; } = null;
+        public ISendableStringFile? File { get; set; } = null;
 
     }
 }

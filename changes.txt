@@ -17,9 +17,6 @@ Enhancements:
 	- Added ability to change settings in artemis.ini that control local settings (such as default screen size and station restriction)--basically
 		any setting that would have nothing to do with a mod.  Remaining settings will to be added as part of new functionality to be used for creating
 		a mod.
-
-	--TODO before ready for release:
-		- Add ability to transmit Artemis.ini file to connected PCs.
 ------------------------------
 Version 0.2 (beta) 07/25/2023:
 Bug Fixes:

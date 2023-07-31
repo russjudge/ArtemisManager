@@ -11,6 +11,7 @@ namespace AMCommunicator.Messages
         MessageVersionMismatch,
         UpdateCheckFail,
         UpdateCheckSuccess,
-        Uninstall_Failure
+        Uninstall_Failure,
+        UndefinedMessageReceived
     }
 }

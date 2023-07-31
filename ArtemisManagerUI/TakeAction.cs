@@ -37,7 +37,7 @@ namespace ArtemisManagerUI
         {
             PopupEvent?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
-        public static ObservableCollection<PCItem> ConnectedPCs { get; set; }
+        public static ObservableCollection<PCItem>? ConnectedPCs { get; set; }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
         public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
@@ -213,6 +213,11 @@ namespace ArtemisManagerUI
             catch (ManagementException e)
             {
                 Console.WriteLine("An error occurred while querying for WMI data: " + e.Message);
+                MessageBox.Show("(ManagmentException) There was an error getting available screen resolutions:" + Environment.NewLine + e.Message);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("There was an error getting available screen resolutions:" + Environment.NewLine + e.Message);
             }
             return retVal.ToArray();
         }
@@ -533,10 +538,47 @@ oLink.Save
             PresetsFile? file = JsonSerializer.Deserialize<PresetsFile>(JsonData);
             if (file != null)
             {
-                file.SaveFile = Path.Combine(ArtemisManager.EngineeringPresetsFolder, filename);
-                file.Save();
-            }
+                string target = Path.Combine(ArtemisManager.EngineeringPresetsFolder, filename);
+                if (File.Exists(target))
+                {
+                    int i = 1;
+                    FileInfo n = new(target);
+                    if (!string.IsNullOrEmpty(n.DirectoryName))
+                    {
+                        FileInfo x = new (target);
+                        var wrk = Path.GetFileNameWithoutExtension(n.Name);
+                        while (x.Exists)
+                        {
+                            x = new(Path.Combine(n.DirectoryName, wrk + "(" + (i++).ToString() + ")" + n.Extension));
+                        }
+                        target = x.FullName;
+                    }
 
+                }
+                file.Save(target);
+            }
+        }
+        public static void SaveArtemisINISettingsFile(string filename, string stringData)
+        {
+            string target = Path.Combine(ArtemisManager.ArtemisINIFolder, filename);
+            if (File.Exists(target))
+            {
+                int i = 1;
+                FileInfo n = new(target);
+                if (!string.IsNullOrEmpty(n.DirectoryName))
+                {
+                    FileInfo x = new(target);
+                    var wrk = Path.GetFileNameWithoutExtension(n.Name);
+                    while (x.Exists)
+                    {
+
+                        x = new(Path.Combine(n.DirectoryName, wrk + "(" + (i++).ToString() + ")" + n.Extension));
+                    }
+                    target = x.FullName;
+                }
+            }
+            using StreamWriter sw = new(target);
+            sw.WriteLine(stringData);
         }
         public static bool DoChangePassword(string? password)
         {
@@ -592,7 +634,7 @@ oLink.Save
                         {
                             foreach (var pc in ConnectedPCs)
                             {
-                                if (pc.IP != null)
+                                if (pc.IP != null && value != null)
                                 {
                                     Network.Current?.SendChangeSetting(pc.IP, setting, value);
                                 }

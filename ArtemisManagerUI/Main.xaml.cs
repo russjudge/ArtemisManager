@@ -800,8 +800,11 @@ namespace ArtemisManagerUI
         {
             switch (e.FileType)
             {
-                case AMCommunicator.Messages.JsonPackageFile.EngineeringPreset:
-                    TakeAction.SaveEngineeringPreset(e.Filename, e.JSON);
+                case AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset:
+                    TakeAction.SaveEngineeringPreset(e.Filename, e.SerializedString);
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.ArtemisINI:
+                    TakeAction.SaveArtemisINISettingsFile(e.Filename, e.SerializedString);
                     break;
             }
         }

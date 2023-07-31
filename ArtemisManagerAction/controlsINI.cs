@@ -16,11 +16,11 @@ namespace ArtemisManagerAction
             //LoadFile<controlsINI>(file);
         }
 
-        public override JsonPackageFile FileType
+        public override SendableStringPackageFile FileType
         {
             get
             {
-                return JsonPackageFile.controlsINI;
+                return SendableStringPackageFile.controlsINI;
             }
         }
     }

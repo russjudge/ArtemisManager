@@ -248,11 +248,11 @@ namespace AMCommunicator
 
             }
         }
-        public void SendJsonPackageFile(IPAddress target, string JSON, JsonPackageFile fileType, string filename)
+        public void SendStringPackageFile(IPAddress target, string serializedString, SendableStringPackageFile fileType, string filename)
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                JsonPackageMessage msg = new(JSON, fileType, filename);
+                StringPackageMessage msg = new(serializedString, fileType, filename);
                 Transmit(connection.Stream, msg);
             }
         }
@@ -480,8 +480,11 @@ namespace AMCommunicator
                 case MessageCommand.Alert:
                     disconnect = ProcessAlert(stream, message?.GetItem<AlertMessage>());
                     break;
-                case MessageCommand.JsonPackage:
-                    disconnect = ProcessJsonPackage(stream, message?.GetItem<JsonPackageMessage>());
+                case MessageCommand.StringPackage:
+                    disconnect = ProcessStringPackage(stream, message?.GetItem<StringPackageMessage>());
+                    break;
+                case MessageCommand.UndefinedPackage:
+                    disconnect = ProcessUndefinedMessage(stream, message?.GetItem<NetworkMessage>()); 
                     break;
                 default:
                     RaiseStatusUpdate("Invalid Message command.  Ignored.  Check for software update to Artemis Manager.");
@@ -523,7 +526,22 @@ namespace AMCommunicator
                 stream.Write(bytes, 0, bytes.Length);
             }
         }
-        private bool ProcessJsonPackage(NetworkStream? stream, JsonPackageMessage? msg)
+        private bool ProcessUndefinedMessage(NetworkStream? stream, NetworkMessage? msg)
+        {
+            if (msg != null)
+            {
+                IPAddress? IP = null;
+                if (!string.IsNullOrEmpty(msg.Source))
+                {
+                    IP = IPAddress.Parse(msg.Source);
+                }
+                AlertReceived?.Invoke(this, new AlertEventArgs(IP, AlertItems.UndefinedMessageReceived,
+                    "Unknown messager received." +Environment.NewLine + "Be sure all versions of Artemis Manager are up-to-date."
+                    +Environment.NewLine + "The problem may also be that the developer forgot to add code to process this message."));
+            }
+            return false;
+        }
+        private bool ProcessStringPackage(NetworkStream? stream, StringPackageMessage? msg)
         {
             if (msg != null)
             {
@@ -537,13 +555,14 @@ namespace AMCommunicator
                     {
                         //We might be unattended here, so we need to alert the sender of an issue.
                         SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
-                            string.Format("JsonPackageMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
-                            JsonPackageMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
+                            string.Format("StringPackageMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            StringPackageMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
                     }
                 }
                 else
                 {
-                    PackageFileReceived?.Invoke(this, new PackageFileEventArgs(msg.JsonData, msg.FileType, msg.FileName));
+                    RaiseStatusUpdate("Received StringPackageMessage.  length={0}.  filename={1}.  filetype={2}", msg.SerializedString.Length, msg.FileName, msg.FileType.ToString());
+                    PackageFileReceived?.Invoke(this, new PackageFileEventArgs(msg.SerializedString, msg.FileType, msg.FileName));
 
                 }
             }

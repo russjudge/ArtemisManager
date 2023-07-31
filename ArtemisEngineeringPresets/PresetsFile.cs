@@ -15,7 +15,7 @@ using System.Windows.Media;
 
 namespace ArtemisEngineeringPresets
 {
-    public class PresetsFile : DependencyObject, ISendableJsonFile
+    public class PresetsFile : DependencyObject, ISendableStringFile
     {
         public const int MaxPresets = 10;
         public const int MaxStations = 8;
@@ -162,15 +162,15 @@ namespace ArtemisEngineeringPresets
         }
 
 
-        public JsonPackageFile FileType
+        public SendableStringPackageFile FileType
         {
             get
             {
-                return JsonPackageFile.EngineeringPreset;
+                return SendableStringPackageFile.EngineeringPreset;
             }
         }
 
-        public string GetJSON()
+        public string GetSerializedString()
         {
             var options = new JsonSerializerOptions
             {

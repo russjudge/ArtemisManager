@@ -32,7 +32,7 @@
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
             </StackPanel>
-            <local:JsonPackageSenderControl
+            <local:StringPackageSenderControl
                 FileRequest="OnSendFileRequest" TransmissionCompleted="OnTransmissionCompleted"
                 Prompt="Transmit selected settings file to:"
                 IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedArtemisSettingsFile}"
