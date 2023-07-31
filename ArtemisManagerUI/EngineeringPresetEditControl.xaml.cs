@@ -1,33 +1,31 @@
-﻿using AMCommunicator;
-using ArtemisEngineeringPresets;
+﻿using ArtemisEngineeringPresets;
 using ArtemisManagerAction;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using Microsoft.Win32;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace ArtemisManagerUI
 {
     /// <summary>
-    /// Interaction logic for EngineeringPresetEditWindow.xaml
+    /// Interaction logic for EngineeringPresetEditControl.xaml
     /// </summary>
-    public partial class EngineeringPresetEditWindow : Window
+    public partial class EngineeringPresetEditControl : UserControl
     {
-        public EngineeringPresetEditWindow()
+        public EngineeringPresetEditControl()
         {
             PresetFiles = new ObservableCollection<FileListItem>();
             foreach (var name in ArtemisManagerAction.ArtemisManager.GetEngineeringPresetFiles())
@@ -41,7 +39,6 @@ namespace ArtemisManagerUI
             watcher.Deleted += Watcher_Deleted;
             watcher.EnableRaisingEvents = true;
         }
-
         private void Watcher_Deleted(object sender, FileSystemEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.DATFileExtension))
@@ -68,7 +65,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty PopupMessageProperty =
          DependencyProperty.Register(nameof(PopupMessage), typeof(string),
-             typeof(EngineeringPresetEditWindow));
+             typeof(EngineeringPresetEditControl));
 
         public string PopupMessage
         {
@@ -108,11 +105,11 @@ namespace ArtemisManagerUI
         }
 
         FileSystemWatcher? watcher;
-       
+
 
         public static readonly DependencyProperty PresetFilesProperty =
           DependencyProperty.Register(nameof(PresetFiles), typeof(ObservableCollection<FileListItem>),
-          typeof(EngineeringPresetEditWindow));
+          typeof(EngineeringPresetEditControl));
 
         public ObservableCollection<FileListItem> PresetFiles
         {
@@ -128,11 +125,11 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedPresetFileProperty =
          DependencyProperty.Register(nameof(SelectedPresetFile), typeof(FileListItem),
-         typeof(EngineeringPresetEditWindow), new PropertyMetadata(OnSelectedPresetFileChanged));
+         typeof(EngineeringPresetEditControl), new PropertyMetadata(OnSelectedPresetFileChanged));
 
         private static void OnSelectedPresetFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is EngineeringPresetEditWindow me)
+            if (d is EngineeringPresetEditControl me)
             {
                 if (me.SelectedPresetFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.Name)
                     && System.IO.File.Exists(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension)))
@@ -186,7 +183,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedFileProperty =
           DependencyProperty.Register(nameof(SelectedFile), typeof(PresetsFile),
-          typeof(EngineeringPresetEditWindow));
+          typeof(EngineeringPresetEditControl));
 
         public PresetsFile? SelectedFile
         {

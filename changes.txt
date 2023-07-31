@@ -1,5 +1,9 @@
 Change History
 ===============================
+Version 0.4 (beta) 08/xx/2023:
+Enhancements:
+	- Improved interface for working with remote engineering presets and artemis.ini settings.
+------------------------------
 Version 0.3 (beta) 07/30/2023:
 Bug Fixes:
 	- If, while viewing Engineering presets, a presets file was deleted from the folder where Engineering Presets is stored, it would not be removed from the list.

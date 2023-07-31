@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <FileVersion>0.3.0.736</FileVersion>
-    <AssemblyVersion>0.3.0.736</AssemblyVersion>
+    <FileVersion>0.4.0.760</FileVersion>
+    <AssemblyVersion>0.4.0.760</AssemblyVersion>
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>
@@ -48,6 +48,7 @@
     <None Remove="Resources\ping.png" />
     <None Remove="Resources\play.png" />
     <None Remove="Resources\Presets.png" />
+    <None Remove="Resources\receive.png" />
     <None Remove="Resources\remote.png" />
     <None Remove="Resources\rename.png" />
     <None Remove="Resources\restart.png" />
@@ -164,6 +165,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Presets.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\receive.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\remote.png">

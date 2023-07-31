@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="ArtemisManagerUI.ClientManagerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             Name="uc">
+    <TabControl
+        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
+        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs, Mode=OneWay}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Hostname}" />
+                    <TextBlock Text=" - " />
+                    <TextBlock Text="{Binding IP}" />
+                </StackPanel>
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <DockPanel>
+                    <local:StringPackageSenderControl
+                        SourcePC="{Binding ElementName=uc, Path=SourcePC, Mode=OneWay}"
+                        FileRequest="OnSendFileRequest" TransmissionCompleted="OnTransmissionCompleted"
+                        Prompt="Transmit selected settings file to:"
+                        DockPanel.Dock="Top" />
+                    <ContentPresenter Content="{Binding ChildContent, ElementName=uc}"  />
+                </DockPanel>
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+    </TabControl>
+</UserControl>

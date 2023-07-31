@@ -42,6 +42,7 @@ namespace ArtemisManagerUI
                 ConnectedPCs = new();
                 if (SettingsAction.Current.IsMaster)
                 {
+                    ConnectedPCs.Add(new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback));
                     ConnectedPCs.Add(new PCItem("All Connections", IPAddress.Any));
                 };
                 TakeAction.ConnectedPCs = ConnectedPCs;
@@ -1559,14 +1560,15 @@ namespace ArtemisManagerUI
             //PopupMessage = "This is a test.  It works on my machine, so all is good.";
 
             /* Screen resolutions test */
-            var sizes = TakeAction.GetAvailableScreenResolutions();
-            StringBuilder sb = new();
-            foreach (var sz in sizes)
-            {
-                sb.AppendLine(sz.Width.ToString() + "x" + sz.Height.ToString());
-            }
-            PopupMessage = sb.ToString();
-            
+            //var sizes = TakeAction.GetAvailableScreenResolutions();
+            //StringBuilder sb = new();
+            //foreach (var sz in sizes)
+            //{
+            //    sb.AppendLine(sz.Width.ToString() + "x" + sz.Height.ToString());
+            //}
+            //PopupMessage = sb.ToString();
+            TestClientManagerWindow win = new TestClientManagerWindow();
+            win.Show();
         }
 
        
@@ -1833,11 +1835,7 @@ namespace ArtemisManagerUI
 
         private void OnEngineeringPresets(object sender, RoutedEventArgs e)
         {
-            EngineeringPresetEditWindow win = new()
-            {
-                ConnectedPCs = ConnectedPCs
-            };
-            win.SelectedTargetPC = win.ConnectedPCs[0];
+            EngineeringPresetEditWindow win = new();
             win.Show();
         }
 

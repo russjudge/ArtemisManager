@@ -11,8 +11,8 @@
     <Copyright>Copyright (c) 2023 Confederate In Blue Gaming</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/russjudge/ArtemisManager</RepositoryUrl>
-    <FileVersion>0.3.0.678</FileVersion>
-    <AssemblyVersion>0.3.0.678</AssemblyVersion>
+    <FileVersion>0.4.0.702</FileVersion>
+    <AssemblyVersion>0.4.0.702</AssemblyVersion>
     <ApplicationIcon>am.ico</ApplicationIcon>
   </PropertyGroup>
   
@@ -67,6 +67,21 @@
     <ProjectReference Include="..\ArtemisEngineeringPresets\ArtemisEngineeringPresets.csproj" />
     <ProjectReference Include="..\ArtemisManagerAction\ArtemisManagerAction.csproj" />
     <ProjectReference Include="..\ArtemisManagerUI\ArtemisManagerUI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

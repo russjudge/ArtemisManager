@@ -1,0 +1,17 @@
+﻿<Window x:Class="ArtemisManagerUI.TestClientManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ArtemisManagerUI"
+        mc:Ignorable="d" Name="uc"
+        Title="TestClientManagerWindow" Height="450" Width="800">
+    <local:ClientManagerControl SourcePC="{Binding ElementName=uc, Path=SourcePC}">
+        <local:ClientManagerControl.ChildContent>
+        <StackPanel>
+            <TextBlock Text="Got it working..." />
+            <TextBlock Text="Maybe" />
+        </StackPanel>
+        </local:ClientManagerControl.ChildContent>
+    </local:ClientManagerControl>
+</Window>

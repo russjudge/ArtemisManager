@@ -31,7 +31,7 @@ namespace ArtemisManagerUI
                 ConnectedPCs = TakeAction.ConnectedPCs;
             }
             InitializeComponent();
-        }
+        } 
         public static readonly DependencyProperty PromptProperty =
             DependencyProperty.Register(nameof(Prompt), typeof(string),
             typeof(StringPackageSenderControl));
@@ -47,7 +47,21 @@ namespace ArtemisManagerUI
                 this.SetValue(PromptProperty, value);
             }
         }
+        public static readonly DependencyProperty SourcePCProperty =
+        DependencyProperty.Register(nameof(SourcePC), typeof(PCItem),
+        typeof(StringPackageSenderControl));
 
+        public PCItem SourcePC
+        {
+            get
+            {
+                return (PCItem)this.GetValue(SourcePCProperty);
+            }
+            set
+            {
+                this.SetValue(SourcePCProperty, value);
+            }
+        }
 
         public static readonly DependencyProperty SelectedTargetPCProperty =
         DependencyProperty.Register(nameof(SelectedTargetPC), typeof(PCItem),
@@ -131,6 +145,11 @@ namespace ArtemisManagerUI
                 }
                 RaiseEvent(new RoutedEventArgs(TransmissionCompletedEvent));
             }
+        }
+
+        private void OnReceiveSelectedFile(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
