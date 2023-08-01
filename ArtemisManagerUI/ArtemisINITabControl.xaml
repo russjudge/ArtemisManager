@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="ArtemisManagerUI.ArtemisINITabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             mc:Ignorable="d" Name="uc">
+    <DockPanel>
+        <local:AMPopup
+            DockPanel.Dock="Top"
+            PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+
+        <TabControl
+            Tag="{Binding ElementName=uc, Path=SourcePC, Mode=OneWay}"
+            DockPanel.Dock="Top"
+            ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}"
+            SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Connection.Hostname}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <!-- SourcePC="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" -->
+                        <local:StringPackageSenderControl
+                            Tag="{Binding}"
+                            SourcePC="{Binding ElementName=uc, Path=SourcePC, Mode=OneWay}"
+                            FileRequest="OnSendFileRequest"
+                            TransmissionCompleted="OnTransmissionCompleted"
+                            Prompt="Transmit selected settings file to:"
+                            DockPanel.Dock="Top" />
+                        <local:ArtemisINIManagerControl
+                            IsRemote="{Binding Path=IsRemote, Mode=OneWay}"/>
+                    </DockPanel>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </DockPanel>
+</UserControl>

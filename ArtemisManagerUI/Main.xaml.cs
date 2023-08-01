@@ -40,12 +40,16 @@ namespace ArtemisManagerUI
 
                 Status = new ObservableCollection<string>();
                 ConnectedPCs = new();
+                TakeAction.ConnectedPCs = ConnectedPCs;
+                PCItem thisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback);
+                TakeAction.AddConnection(thisMachine);
+                
                 if (SettingsAction.Current.IsMaster)
                 {
-                    ConnectedPCs.Add(new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback));
-                    ConnectedPCs.Add(new PCItem("All Connections", IPAddress.Any));
+                    TakeAction.AddConnection(new PCItem("All Connections", IPAddress.Any));
                 };
-                TakeAction.ConnectedPCs = ConnectedPCs;
+                
+                TakeAction.SourcePC = thisMachine;
                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
 
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
@@ -53,6 +57,7 @@ namespace ArtemisManagerUI
                 InstalledMods = new(ArtemisManager.GetInstalledMods());
                 InstalledMissions = new(ArtemisManager.GetInstalledMissions());
                 AppVersion = TakeAction.GetAppVersion();
+
                 IsMaster = SettingsAction.Current.IsMaster;
 
                 var drives = DriveInfo.GetDrives();
@@ -1160,7 +1165,7 @@ namespace ArtemisManagerUI
                     }
                     if (remover != null)
                     {
-                        ConnectedPCs.Remove(remover);
+                        TakeAction.RemoveConnection(remover);
                     }
                 }
                 catch
@@ -1198,7 +1203,8 @@ namespace ArtemisManagerUI
             }
             else
             {
-                ConnectedPCs.Add(pcItem);
+                TakeAction.AddConnection(pcItem);
+                //ConnectedPCs.Add(pcItem);
             }
         }
 

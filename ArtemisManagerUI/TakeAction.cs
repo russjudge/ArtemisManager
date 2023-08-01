@@ -37,7 +37,21 @@ namespace ArtemisManagerUI
         {
             PopupEvent?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
+        public static PCItem? SourcePC { get; set; }
         public static ObservableCollection<PCItem>? ConnectedPCs { get; set; }
+        public static event EventHandler<ConnectionEventArgs>? ConnectionAdded;
+        public static event EventHandler<ConnectionEventArgs>? ConnectionRemoved;
+        public static void AddConnection(PCItem item)
+        {
+            ConnectedPCs?.Add(item);
+            ConnectionAdded?.Invoke(null, new ConnectionEventArgs(item));
+            
+        }
+        public static void RemoveConnection(PCItem item)
+        {
+            ConnectedPCs?.Remove(item);
+            ConnectionRemoved?.Invoke(null, new ConnectionEventArgs(item));
+        }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
         public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)

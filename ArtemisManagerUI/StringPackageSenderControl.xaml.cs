@@ -30,8 +30,41 @@ namespace ArtemisManagerUI
             {
                 ConnectedPCs = TakeAction.ConnectedPCs;
             }
+            SelectedTargetPC = ConnectedPCs[1];
             InitializeComponent();
-        } 
+        }
+        public static readonly DependencyProperty IsForReceiveProperty =
+           DependencyProperty.Register(nameof(IsForReceive), typeof(bool),
+           typeof(StringPackageSenderControl), new PropertyMetadata(OnIsForReceiveChanged));
+
+        private static void OnIsForReceiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is StringPackageSenderControl me)
+            {
+                if (me.IsForReceive)
+                {
+                    me.SelectedTargetPC = me.ConnectedPCs[1];
+                }
+                else
+                {
+                    me.SelectedTargetPC = me.ConnectedPCs[0];
+                }
+            }
+        }
+
+        public bool IsForReceive
+        {
+            get
+            {
+                return (bool)this.GetValue(IsForReceiveProperty);
+            }
+            set
+            {
+                this.SetValue(IsForReceiveProperty, value);
+            }
+        }
+
+
         public static readonly DependencyProperty PromptProperty =
             DependencyProperty.Register(nameof(Prompt), typeof(string),
             typeof(StringPackageSenderControl));

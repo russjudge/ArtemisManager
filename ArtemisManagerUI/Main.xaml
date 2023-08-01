@@ -18,6 +18,7 @@
             <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
             <converter:NullToVisibility x:Key="NullToVisibility" />
             <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
+            <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
         </DockPanel.Resources>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Artemis SBS" >
@@ -312,197 +313,224 @@
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding ElementName=uc, Path=LastStatus, Mode=OneWay}" />
         </StatusBar>
-        <DockPanel
-            local:DragHelper.DragScopeId="DragScope1">
-            <DockPanel
-            DockPanel.Dock="Right" >
-                <TabControl
-                Tag="{Binding ElementName=uc, Mode=OneWay, Path=SelectedPeer}"
-                Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
-                    <TabItem
-                    AllowDrop="True"
-                        DragEnter="OnModDragEnter"
-                        DragLeave="OnModDragLeave"
-                        DragOver="OnModDragOver"
-                        Drop="OnModDrop"
-                    Tag="InstalledMods" >
-                        <TabItem.Header>
-                            <StackPanel Orientation="Horizontal">
-                                <Label VerticalAlignment="Center"  Content="Installed Mods" />
-                            </StackPanel>
 
-                        </TabItem.Header>
-                        <DockPanel>
-                            <DockPanel DockPanel.Dock="Top" >
-                                <Button
-                Click="OnInstallMod" ToolTip="Install a Mod or Mission"
-                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                 >
+
+
+        <TabControl TabStripPlacement="Bottom">
+            <TabItem Header="Mods &amp; Missions">
+                <DockPanel
+                    local:DragHelper.DragScopeId="DragScope1">
+                    <DockPanel
+                        DockPanel.Dock="Right" >
+                        <TabControl
+                            Tag="{Binding ElementName=uc, Mode=OneWay, Path=SelectedPeer}"
+                            Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
+                            <TabItem
+                                AllowDrop="True"
+                                DragEnter="OnModDragEnter"
+                                DragLeave="OnModDragLeave"
+                                DragOver="OnModDragOver"
+                                Drop="OnModDrop"
+                                Tag="InstalledMods" >
+                                <TabItem.Header>
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
-                                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
+                                        <Label VerticalAlignment="Center"  Content="Installed Mods" />
                                     </StackPanel>
-                                </Button>
-                                <Button DockPanel.Dock="Top" 
-                            HorizontalAlignment="Left"
-                            Click="OnDeactivateMods"
-                            Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                            ToolTip="Deactivate All Mods by reseting activated Artemis folder to base Artemis" >
-                                    <StackPanel Orientation="Horizontal">
-                                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
-                                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
-                                    </StackPanel>
-                                </Button>
-                            </DockPanel>
-                            <ListBox
-                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
-                        ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
 
-                                        <local:ModItemControl
-                                        ModActivated="OnModActivated"
-                                        RemoteInstallMod="OnRemoteInstallMod"
-                                        ModUninstalled="OnModUninstalled"
-                                        IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
-                                        IsRemote="False"
-                                        Mod="{Binding}" />
+                                </TabItem.Header>
+                                <DockPanel>
+                                    <DockPanel DockPanel.Dock="Top" >
+                                        <Button
+                                            Click="OnInstallMod" ToolTip="Install a Mod or Mission"
+                                            Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            DockPanel.Dock="Top"
+                                            HorizontalAlignment="Left"
+                                            Click="OnDeactivateMods"
+                                            Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
+                                            ToolTip="Deactivate All Mods by reseting activated Artemis folder to base Artemis" >
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
+                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
+                                            </StackPanel>
+                                        </Button>
+                                    </DockPanel>
+                                    <ListBox
+                                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
+                                        ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
 
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </DockPanel>
-                    </TabItem>
-                    <TabItem
-                     AllowDrop="True"
-                        DragEnter="OnMissionDragEnter"
-                        DragLeave="OnMissionDragLeave"
-                        DragOver="OnMissionDragOver"
-                        Drop="OnMissionDrop"
-                    Tag="InstalledMissions" >
-                        <TabItem.Header>
-                            <Label Content="Installed Missions" />
-                        </TabItem.Header>
-                        <DockPanel>
-                            <Button DockPanel.Dock="Top" HorizontalAlignment="Left"
-                Click="OnInstallMod" ToolTip="Install a Mod or Mission"
-                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                 >
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
-                                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
-                                </StackPanel>
-                            </Button>
+                                                <local:ModItemControl
+                                                    ModActivated="OnModActivated"
+                                                    RemoteInstallMod="OnRemoteInstallMod"
+                                                    ModUninstalled="OnModUninstalled"
+                                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                                    IsRemote="False"
+                                                    Mod="{Binding}" />
 
-                            <ListBox
-                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
-                        ItemsSource="{Binding ElementName=uc, Path=InstalledMissions, Mode=OneWay}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <local:ModItemControl
-                                    RemoteInstallMod="OnRemoteInstallMod"
-                                    ModUninstalled="OnMissionUninstalled"
-                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
-                                    IsRemote="False"
-                                    Mod="{Binding}" />
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </DockPanel>
-                    </TabItem>
-                    <TabItem Tag="Chat" >
-                        <TabItem.Header>
-                            <Label>
-                                <TextBlock
-                                Text="Chat" />
-                                <Label.Style>
-                                    <Style>
-                                        <Style.Triggers>
-                                            <DataTrigger
-                                            Binding="{Binding ElementName=uc, Path=ChatAlert}"
-                                            Value="True">
-                                                <DataTrigger.EnterActions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <ColorAnimation
-                                                            To="Red"
-                                                            Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
-                                                            FillBehavior="Stop"
-                                                            AutoReverse="True" RepeatBehavior="Forever"
-                                                            Duration="0:0:1"/>
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.EnterActions>
-                                                <DataTrigger.ExitActions>
-                                                    <BeginStoryboard>
-                                                        <Storyboard>
-                                                            <ColorAnimation
-                                                            To="Transparent"
-                                                            Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
-                                                            FillBehavior="Stop"
-                                                            Duration="0:0:1"/>
-                                                        </Storyboard>
-                                                    </BeginStoryboard>
-                                                </DataTrigger.ExitActions>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Label.Style>
-                            </Label>
-                        </TabItem.Header>
-                        <ListBox
-                        ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}"
-                        local:ListBoxBehavior.AutoScroll="True">
-                            <ListBox.ItemTemplate>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem
+                                AllowDrop="True"
+                                DragEnter="OnMissionDragEnter"
+                                DragLeave="OnMissionDragLeave"
+                                DragOver="OnMissionDragOver"
+                                Drop="OnMissionDrop"
+                                Tag="InstalledMissions" >
+                                <TabItem.Header>
+                                    <Label Content="Installed Missions" />
+                                </TabItem.Header>
+                                <DockPanel>
+                                    <Button
+                                        DockPanel.Dock="Top" HorizontalAlignment="Left"
+                                        Click="OnInstallMod" ToolTip="Install a Mod or Mission"
+                                        Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
+                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <ListBox
+                                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
+                                        ItemsSource="{Binding ElementName=uc, Path=InstalledMissions, Mode=OneWay}">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:ModItemControl
+                                                    RemoteInstallMod="OnRemoteInstallMod"
+                                                    ModUninstalled="OnMissionUninstalled"
+                                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                                    IsRemote="False"
+                                                    Mod="{Binding}" />
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem Tag="Chat" >
+                                <TabItem.Header>
+                                    <Label>
+                                        <TextBlock Text="Chat" />
+                                        <Label.Style>
+                                            <Style>
+                                                <Style.Triggers>
+                                                    <DataTrigger
+                                                        Binding="{Binding ElementName=uc, Path=ChatAlert}"
+                                                        Value="True">
+                                                        <DataTrigger.EnterActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <ColorAnimation
+                                                                        To="Red"
+                                                                        Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
+                                                                        FillBehavior="Stop"
+                                                                        AutoReverse="True" RepeatBehavior="Forever"
+                                                                        Duration="0:0:1"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.EnterActions>
+                                                        <DataTrigger.ExitActions>
+                                                            <BeginStoryboard>
+                                                                <Storyboard>
+                                                                    <ColorAnimation
+                                                                        To="Transparent"
+                                                                        Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
+                                                                        FillBehavior="Stop"
+                                                                        Duration="0:0:1"/>
+                                                                </Storyboard>
+                                                            </BeginStoryboard>
+                                                        </DataTrigger.ExitActions>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Label.Style>
+                                    </Label>
+                                </TabItem.Header>
+                                <ListBox
+                                    ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}"
+                                    local:ListBoxBehavior.AutoScroll="True">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
+                                                <TextBlock Text="> " />
+                                                <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
+                                                <TextBlock Text="{Binding Message}" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </TabItem>
+                            <TabItem Tag="Activity">
+                                <TabItem.Header>
+                                    <Label Content="Activity" />
+                                </TabItem.Header>
+                                <ListBox
+                                    ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}"
+                                    VerticalAlignment="Top"
+                                    local:ListBoxBehavior.AutoScroll="True" />
+                            </TabItem>
+                        </TabControl>
+                    </DockPanel>
+                    <GroupBox
+                        Header="Connected Peers"
+                        BorderThickness="2,2,2,2"
+                        BorderBrush="CadetBlue"
+                        Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+                        <TabControl
+                            SelectedValue="{Binding ElementName=uc, Mode=TwoWay, Path=SelectedPeer}"
+                            Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
+                            ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
+
+                            <TabControl.ItemContainerStyle>
+                                <Style TargetType="TabItem">
+                                    <Setter
+                                        Property="Visibility"
+                                        Value="{Binding IP, Converter={StaticResource IPLoopbackToVisibility}, ConverterParameter='Collapsed|Visible'}" />
+                                </Style>
+                            </TabControl.ItemContainerStyle>
+                            <TabControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
-                                        <TextBlock Text="> " />
-                                        <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
-                                        <TextBlock Text="{Binding Message}" />
-                                    </StackPanel>
+                                    <TextBlock Text="{Binding Hostname}" />
                                 </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </TabItem>
-                    <TabItem Tag="Activity">
-                        <TabItem.Header>
-                            <Label Content="Activity" />
-                        </TabItem.Header>
-                        <ListBox
-                        ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}"
-                        VerticalAlignment="Top"
-                        local:ListBoxBehavior.AutoScroll="True" />
-                    </TabItem>
-                </TabControl>
-            </DockPanel>
-            <GroupBox
-             
-            Header="Connected Peers"
-            BorderThickness="2,2,2,2"
-            BorderBrush="CadetBlue"
-            Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-                <TabControl
-                SelectedValue="{Binding ElementName=uc, Mode=TwoWay, Path=SelectedPeer}"
-                Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
-                ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
-                    <TabControl.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Hostname}" />
-                        </DataTemplate>
-                    </TabControl.ItemTemplate>
-                    <TabControl.ContentTemplate>
-                        <DataTemplate>
-                            <local:PeerInfoControl
-                            IsMaster="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
-                            ItemData="{Binding}"
-                            SendMessage="OnSendMessage"
-                            ConnectedPCs="{Binding Mode=OneWay, Path=(TabControl.ItemsSource), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" >
-                            </local:PeerInfoControl>
-                        </DataTemplate>
-                    </TabControl.ContentTemplate>
-                </TabControl>
-            </GroupBox>
-        </DockPanel>
+                            </TabControl.ItemTemplate>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate>
+                                    <local:PeerInfoControl
+                                        IsMaster="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
+                                        ItemData="{Binding}"
+                                        SendMessage="OnSendMessage"
+                                        ConnectedPCs="{Binding Mode=OneWay, Path=(TabControl.ItemsSource), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" >
+                                    </local:PeerInfoControl>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="Localized Custom Artemis.ini settings" TextWrapping="Wrap" />
+                </TabItem.Header>
+                <local:ArtemisINITabControl />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/Presets.png" />
+                        <TextBlock Text="Engineering Presets" TextWrapping="Wrap" />
+                    </WrapPanel>
+                </TabItem.Header>
+            </TabItem>
+        </TabControl>
     </DockPanel>
 </Window>

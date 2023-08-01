@@ -14,7 +14,7 @@
     <GroupBox
             Visibility="{Binding ElementName=uc, Path=ForLocalSettings, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
             Header="Localized Settings">
-        <DockPanel Grid.IsSharedSizeScope="True">
+        <DockPanel>
             <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                 <Button Click="OnActivate">

@@ -7,43 +7,48 @@
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
-        <converter:IPToVisibility x:Key="IPToVisibility" />
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
     </UserControl.Resources>
     <GroupBox
         DockPanel.Dock="Top" Header="{Binding ElementName=uc, Path=Prompt, Mode=OneWay}">
         <DockPanel>
             <Button
-                Visibility="{Binding ElementName=uc, Path=SourcePC.IP, Mode=OneWay, Converter={StaticResource IPToVisibility}, ConverterParameter='Collapsed|Visible'}"
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                 DockPanel.Dock="Right"
                 ToolTip="Send selected file to selected network peer client"
                 Click="OnSendSelectedFile"
                 HorizontalAlignment="Left" >
                     <Image
-                    Visibility="{Binding ElementName=uc, Path=SourcePC.IP, Mode=OneWay, Converter={StaticResource IPToVisibility}, ConverterParameter='Collapsed|Visible'}"
-                    Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
+                        Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
 
             </Button>
             <Button
-                Visibility="{Binding ElementName=uc, Path=SourcePC.IP, Mode=OneWay, Converter={StaticResource IPToVisibility}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 DockPanel.Dock="Left"
                 ToolTip="Received selected file to local client"
                 Click="OnReceiveSelectedFile"
                 HorizontalAlignment="Left" >
                     <Image
-                    Visibility="{Binding ElementName=uc, Path=SourcePC.IP, Mode=OneWay, Converter={StaticResource IPToVisibility}, ConverterParameter='Visible|Collapsed'}"
-                    Height="16" Source="/ArtemisManagerUI;component/Resources/receive.png" />
+                        Height="16" Source="/ArtemisManagerUI;component/Resources/receive.png" />
                 
             </Button>
             <TextBlock
-                
                 Padding="5,0,5,0"
                 Text="Receive File" VerticalAlignment="Center"
-                Visibility="{Binding ElementName=uc, Path=SourcePC.IP, Mode=OneWay, Converter={StaticResource IPToVisibility}, ConverterParameter='Visible|Collapsed'}" />
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" />
             <ComboBox
-                Visibility="{Binding ElementName=uc, Path=SourcePC.IP, Mode=OneWay, Converter={StaticResource IPToVisibility}, ConverterParameter='Collapsed|Visible'}"
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                 VerticalAlignment="Center" VerticalContentAlignment="Center"
                 SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
                 ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                            <Setter
+                                Property="Visibility"
+                                Value="{Binding IP, Converter={StaticResource IPLoopbackToVisibility}, ConverterParameter=Collapsed|Visible}" />
+                    </Style>
+                </ComboBox.ItemContainerStyle>
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AMCommunicator;
+using ArtemisManagerAction;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,6 +15,7 @@ namespace ArtemisManagerUI
         private string _name = string.Empty;
         private string originalName = string.Empty;
         private bool isEditMode = false;
+        private ISendableStringFile? settingsFile = null;
         public FileListItem(string name)
         {
             Name = name;
@@ -51,6 +54,16 @@ namespace ArtemisManagerUI
             set
             {
                 isEditMode = value;
+                DoChanged();
+            }
+        }
+
+        public ISendableStringFile? SettingsFile 
+        {
+            get => settingsFile;
+            set
+            {
+                settingsFile = value;
                 DoChanged();
             }
         }

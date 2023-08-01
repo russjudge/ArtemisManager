@@ -32,11 +32,11 @@
                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
             </StackPanel>
-            <local:StringPackageSenderControl
+            <!--<local:StringPackageSenderControl
                 FileRequest="OnSendFileRequest" TransmissionCompleted="OnTransmissionCompleted"
                 Prompt="Transmit selected settings file to:"
                 IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedArtemisSettingsFile}"
-                DockPanel.Dock="Top" />
+                DockPanel.Dock="Top" />-->
             
 
             <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
