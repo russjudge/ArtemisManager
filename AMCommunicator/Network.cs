@@ -11,6 +11,7 @@ using System.Text;
 using System.Net.WebSockets;
 using System;
 using AMCommunicator.Messages;
+using Microsoft.VisualBasic.FileIO;
 
 namespace AMCommunicator
 {
@@ -256,6 +257,31 @@ namespace AMCommunicator
                 Transmit(connection.Stream, msg);
             }
         }
+        public void SendRequestInformation(IPAddress target, RequestInformationType requestType, string identifier = "")
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                RequestInformationMessage msg = new(requestType, identifier);
+                Transmit(connection.Stream, msg);
+            }
+        }
+        public void SendInformation(IPAddress target, RequestInformationType requestType, string identifier = "", string[]? data = null)
+        {
+            if (activeConnections.TryGetValue(target, out var connection))
+            {
+                string[] d; 
+                if (data == null)
+                {
+                    d = Array.Empty<string>();
+                }
+                else
+                {
+                    d = data;
+                }
+                InformationMessage msg = new(requestType, identifier, d);
+                Transmit(connection.Stream, msg);
+            }
+        }
         //For tracking and processing on active connections.
         private readonly Dictionary<IPAddress, ConnectionTracker> activeConnections = new();
 
@@ -486,6 +512,12 @@ namespace AMCommunicator
                 case MessageCommand.UndefinedPackage:
                     disconnect = ProcessUndefinedMessage(stream, message?.GetItem<NetworkMessage>()); 
                     break;
+                case MessageCommand.RequestInformation:
+                    disconnect = ProcessInformationRequestMessage(stream, message?.GetItem<RequestInformationMessage>());
+                    break;
+                case MessageCommand.Information:
+                    disconnect = ProcessInformationMessage(stream, message?.GetItem<InformationMessage>());
+                    break;
                 default:
                     RaiseStatusUpdate("Invalid Message command.  Ignored.  Check for software update to Artemis Manager.");
                     return false;
@@ -511,6 +543,11 @@ namespace AMCommunicator
         public event EventHandler<ClientInfoEventArgs>? ClientInfoReceived;
         public event EventHandler<ArtemisActionEventArgs>? ArtemisActionReceived;
         public event EventHandler<PackageFileEventArgs>? PackageFileReceived;
+
+        public event EventHandler<InformationRequestEventArgs>? InfoRequestReceived;
+        public event EventHandler<InformationEventArgs>? InfoReceived;
+
+
         void Transmit(NetworkStream? stream, NetworkMessage msg)
         {
             if (stream == null)
@@ -525,6 +562,66 @@ namespace AMCommunicator
                 var bytes = data.GetBytes();
                 stream.Write(bytes, 0, bytes.Length);
             }
+        }
+        private bool ProcessInformationRequestMessage(NetworkStream? stream, RequestInformationMessage? msg)
+        {
+            if (msg != null)
+            {
+                if (msg.MessageVersion != RequestInformationMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //We might be unattended here, so we need to alert the sender of an issue.
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
+                            string.Format("RequestInformationMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            RequestInformationMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(msg.Source))
+                    {
+                        InfoRequestReceived?.Invoke(this, new InformationRequestEventArgs(IPAddress.Parse(msg.Source), msg.RequestType, msg.Identifier));
+                    }
+                }
+            }
+            return false;
+        }
+        private bool ProcessInformationMessage(NetworkStream? stream, InformationMessage? msg)
+        {
+            if (msg != null)
+            {
+                if (msg.MessageVersion != InformationMessage.ThisVersion)
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        //We might be unattended here, so we need to alert the sender of an issue.
+                        SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
+                            string.Format("InformationMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+                            InformationMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
+                    }
+                }
+                else
+                {
+                    if (msg.Source == null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        InfoRequestReceived?.Invoke(this, new InformationEventArgs(IPAddress.Parse(msg.Source), msg.RequestType, msg.Identifier, msg.Data));
+                    }
+                }
+            }
+            return false;
         }
         private bool ProcessUndefinedMessage(NetworkStream? stream, NetworkMessage? msg)
         {
@@ -545,7 +642,7 @@ namespace AMCommunicator
         {
             if (msg != null)
             {
-                if (msg.MessageVersion != ModPackageMessage.ThisVersion)
+                if (msg.MessageVersion != StringPackageMessage.ThisVersion)
                 {
                     if (msg.Source == null)
                     {

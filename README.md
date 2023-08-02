@@ -35,31 +35,33 @@ There will be three phases of development for this application, and once complet
 To avoid scope creep and creating a monster, Artemis Manager will be limited to ONLY managing mods and missions for Artemis SBS. There will be no functionality added for generating Missions,
 since the Mission Editor already.  DMX editing will not be implemented since there is already a tool for this.
 
+Planned for release 0.5 (beta):
+- Adding edit pages and remote management for controls.ini and DMXCommands.xml.
+	This will be kept simple--editing for both will be nothing more than a basic text editor with no validity checking, but will offer ability to create multiple different
+	versions, like for artemis.ini and the engineering presets, and to activate locally and remotely.  Sophisticated DMXCommands.xml editing might be considered AFTER review of 
+	the external tool Artemis Bridge Tools, which claims to have good editing features for DMXCommands.xml.  If developing this editor is deemed necessary, it will be considered for
+	Release 0.6 (beta), with the releases specified below pushed forward one release cycle.
 
+Planned for release 0.6 (beta):
+- UI for building a mod.  The first release for this will include an editor for vesselData.xml, as well as access to the non-localized settings in artemis.ini.
 
--->preserve DMXCommands.xml file, controls.ini, and local settings for artemis.ini.
+Planned for release 0.7 (beta):
+- Full UI toolkit for pulling in files for building a mod (such as graphics and audio files).
 
-Phase 2
--- Add mechanism for editing artemis.ini file to restrict peers to specific consoles and ships and port (default 2010) (need to confirm this works).
-	-- Since some mods include this file, the console restriction will need to be stored in the peer's settings, and applied to artemis.ini whenever a new mod is activated.
-	-- The staging folder for mods and the vanilla artemis version will need to leave the artemis.ini file untouched.
--- Add mechanism for updating various settings in artemis.ini that might be useful (Touchscreen=1 or 0???).  Settings that might be useful for this will need tested.
--- Add mechanism to prevent the replacement of the DMXControl.xml file, since modification of this will be unique to each setting.
--- Add links to all useful tools for Artemis SBS (ship editor, Mission editor, DMX editor, etc.).  Include links to download and install these tools.
--- Establish a repository of mods and missons on a central internet website that the application can access and provide a means of automatic install of these mods and missions.  This
-	repository will be maintained by the developer only.  The required information on Mods include: name, author, URL of the source (copy will be kept on website, however), version, date,
-	required artemis version and any required mods.  missions require same data.
-
-Phase 3
--- Establish an automated process for mod and mission creators to submit their creation for review and additon to the repository.
--- Add full mod creation functionality (for version 2.8):
-	-- automatic noting of artemis verison being edited.
-	-- Allow editing of ALL artemis.ini settings (excluding console restriction).  Warn of possible incompatibility of different versions.  
-	-- Add editing of vesselData.xml file.
-	-- add buttons for opening applications such as blender for editing the ship images
+Planned for release 1.0 (which should bring Artemis Manager out of beta):
+- Linkage to website https://artemis.russjudge.com to allow submission of mods and missions to a central repository that Artemis Manager can query for offering mods and missions for
+	direct download.
 
 
 Stuff that will NOT be done:
 -- Mission editor/scripting.  There is already an adaquate tool for this.
 -- DMX editor.  There appears to already be an adaquate tool for this, though I have not tested it.
 -- Graphics for Artemis SBS.  No modeling, no meshes, nothing of this.  This isn't where my expertise lies and would be nothing be frustration if I were to even try.
+
+
+Once out of beta, examination of Artemis Cosmos will be performed.  If it is determined that Artemis Cosmos is similar enough to Artemis SBS, then Artemis Manager will be
+modified to offer support for Artemis Cosmos as well--otherwise a new tool might be built to support Artemis Cosmos.
+
+However, before work to support Artemis Cosmos is performed, examination of my application "The Big Red Button of Death" will be performed.  It has been reported that this
+does not work anymore.  Coding for self-destruct is pretty straight-forward, so the plan is to create a new application that is cross-platform (Windows & Android) that will
+provide self-destruct functionality.

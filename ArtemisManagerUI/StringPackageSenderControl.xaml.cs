@@ -30,7 +30,7 @@ namespace ArtemisManagerUI
             {
                 ConnectedPCs = TakeAction.ConnectedPCs;
             }
-            SelectedTargetPC = ConnectedPCs[1];
+            SelectedTargetPC = ConnectedPCs[TakeAction.AllConnectionsElement];
             InitializeComponent();
         }
         public static readonly DependencyProperty IsForReceiveProperty =
@@ -41,14 +41,14 @@ namespace ArtemisManagerUI
         {
             if (d is StringPackageSenderControl me)
             {
-                if (me.IsForReceive)
-                {
-                    me.SelectedTargetPC = me.ConnectedPCs[1];
-                }
-                else
-                {
-                    me.SelectedTargetPC = me.ConnectedPCs[0];
-                }
+                //if (me.IsForReceive)
+                //{
+                //    me.SelectedTargetPC = me.ConnectedPCs[0];
+                //}
+                //else
+                //{
+                //    me.SelectedTargetPC = me.ConnectedPCs[1];
+                //}
             }
         }
 

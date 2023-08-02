@@ -440,6 +440,35 @@ namespace ArtemisManagerAction
             }
             return installedMods.ToArray();
         }
+        public static string GetArtemisINIData(string name)
+        {
+            string retVal = string.Empty;
+            if (!string.IsNullOrEmpty(name))
+            {
+                string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, name + ArtemisManager.INIFileExtension);
+                if (File.Exists(source))
+                {
+                    using (var data =  new StreamReader(source))
+                    {
+                        retVal = data.ReadToEnd();
+                    }
+                }
+            }
+            return retVal;
+        }
+        public static ArtemisINI? GetArtemisINI(string name)
+        {
+            ArtemisINI? retVal = null;
+            if (!string.IsNullOrEmpty(name))
+            {
+                string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, name + ArtemisManager.INIFileExtension);
+                if (File.Exists(source))
+                {
+                    retVal = new ArtemisINI(source);
+                }
+            }
+            return retVal;
+        }
         public static ModItem SnapshotInstalledArtemisVersion(string installFolder)
         {
             ModItem retVal = new();
@@ -469,6 +498,26 @@ namespace ArtemisManagerAction
                 System.IO.File.Copy(Path.Combine(installFolder, ArtemisManager.ArtemisINI), GetOriginalArtemisINIFilename(version), true);
             }
             return retVal;
+        
+        }
+        public static bool ActivateArtemisINIFile(string name)
+        {
+            
+            string sourceName = name;
+            if (!sourceName.Contains('.'))
+            {
+                sourceName += ArtemisManager.INIFileExtension;
+            }
+            string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, sourceName);
+            if (System.IO.File.Exists(source))
+            {
+                File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisINI), true);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public static string GetOriginalArtemisININame(string version)
         {

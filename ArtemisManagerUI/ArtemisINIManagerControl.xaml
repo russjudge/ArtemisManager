@@ -11,6 +11,8 @@
     <UserControl.Resources>
         <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
         <converter:NullToVisibility x:Key="NullToVisibility" />
+        <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
 
     <DockPanel>
@@ -39,7 +41,9 @@
                 DockPanel.Dock="Top" />-->
             
 
-            <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
+            <Button
+                Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
             </Button>
             <ListBox
@@ -90,6 +94,7 @@
                                     </MenuItem>
                                     <Separator />
                                     <MenuItem
+                                        Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                                         CommandParameter="{Binding}"
                                         Header="_Export" Click="OnExportSettingsFile" >
                                         <MenuItem.Icon>
@@ -114,10 +119,12 @@
             </ListBox>
         </DockPanel>
         <local:ArtemisINIControl
+            TargetClient="{Binding ElementName=uc, Path=TargetClient, Mode=OneWay}"
+            IsRemote="{Binding ElementName=uc, Path=IsRemote, Mode=OneWay}"
             SavingSettings="OnSavingSettings"
             SettingsSaved="OnSettingsSaved"
             Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
             AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
-            ForLocalSettings="True" SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
+            SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

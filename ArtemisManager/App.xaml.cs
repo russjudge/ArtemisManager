@@ -1,4 +1,5 @@
-﻿using ArtemisManagerUI;
+﻿using ArtemisManagerAction;
+using ArtemisManagerUI;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,6 +24,17 @@ namespace ArtemisManager
         static Mutex? Mutex;
 #pragma warning restore IDE0052 // Remove unread private members
         public static bool ProbablyUnattended { get; private set; }
+        private void CreateFolders()
+        {
+            ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.ArtemisINIFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.ControlsINIFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.DMXCommandsFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.EngineeringPresetsFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ModManager.ModArchiveFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ModItem.ModInstallFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ModItem.ActivatedFolder);
+            ModManager.CreateFolder(ArtemisManagerAction.ModItem.MissionInstallFolder);
+        }
         private void OnStartup(object sender, StartupEventArgs e)
         {
             Mutex = new Mutex(true, mutextName, out bool createdNew);
@@ -36,7 +48,7 @@ namespace ArtemisManager
                         break;
                     }
                 }
-
+                CreateFolders();
                 if (!Debugger.IsAttached)
                 {
                     Task.Run(async () =>

@@ -1,10 +1,12 @@
-﻿using ArtemisEngineeringPresets;
+﻿using AMCommunicator;
+using ArtemisEngineeringPresets;
 using ArtemisManagerAction;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,20 +31,20 @@ namespace ArtemisManagerUI
             ArtemisFolder = ModItem.ActivatedFolder;
             InitializeComponent();
         }
-        public static readonly DependencyProperty ForLocalSettingsProperty =
-         DependencyProperty.Register(nameof(ForLocalSettings), typeof(bool),
-        typeof(ArtemisINIControl));
+        public static readonly DependencyProperty IsRemoteProperty =
+            DependencyProperty.Register(nameof(IsRemote), typeof(bool),
+            typeof(ArtemisINIControl));
 
-        public bool ForLocalSettings
+        public bool IsRemote
         {
             get
             {
-                return (bool)this.GetValue(ForLocalSettingsProperty);
+                return (bool)this.GetValue(IsRemoteProperty);
 
             }
             set
             {
-                this.SetValue(ForLocalSettingsProperty, value);
+                this.SetValue(IsRemoteProperty, value);
             }
         }
         public static readonly DependencyProperty ArtemisFolderProperty =
@@ -61,7 +63,24 @@ namespace ArtemisManagerUI
                 this.SetValue(ArtemisFolderProperty, value);
             }
         }
+        public static readonly DependencyProperty TargetClientProperty =
+          DependencyProperty.Register(nameof(TargetClient), typeof(IPAddress),
+          typeof(ArtemisINIControl));
 
+
+        public IPAddress? TargetClient
+        {
+            get
+            {
+                return (IPAddress?)this.GetValue(TargetClientProperty);
+
+            }
+            set
+            {
+                this.SetValue(TargetClientProperty, value);
+
+            }
+        }
 
         public static readonly DependencyProperty PopupMessageProperty =
           DependencyProperty.Register(nameof(PopupMessage), typeof(string),
@@ -108,8 +127,18 @@ namespace ArtemisManagerUI
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {
-            ArtemisManager.SetActiveLocalArtemisINISettings(SettingsFile.SaveFile);
-            PopupMessage = "Settings file activated.";
+            if (IsRemote)
+            {
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty, SettingsFile.SaveFile);
+                }
+            }
+            else
+            {
+                ArtemisManager.SetActiveLocalArtemisINISettings(SettingsFile.SaveFile);
+                PopupMessage = "Settings file activated.";
+            }
         }
         public static readonly DependencyProperty AvailableResolutionsProperty =
           DependencyProperty.Register(nameof(AvailableResolutions), typeof(ObservableCollection<System.Drawing.Size>),
@@ -168,10 +197,20 @@ namespace ArtemisManagerUI
 
         private void OnSave(object sender, RoutedEventArgs e)
         {
-            RaiseSavingSettingsEvent();
-            SettingsFile.Save();
-            PopupMessage = "Settings Saved.";
-            RaiseSettingsSavedEvent();
+            if (IsRemote)
+            {
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendInformation(TargetClient, RequestInformationType.SaveSpecificArtemisINIFile, SettingsFile.SaveFile, new string[] { SettingsFile.ToString() });
+                }
+            }
+            else
+            {
+                RaiseSavingSettingsEvent();
+                SettingsFile.Save();
+                PopupMessage = "Settings Saved.";
+                RaiseSettingsSavedEvent();
+            }
         }
     }
 }

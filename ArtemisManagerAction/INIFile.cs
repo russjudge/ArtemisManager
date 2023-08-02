@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ArtemisManagerAction
 {
@@ -19,17 +20,11 @@ namespace ArtemisManagerAction
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
-
-        protected void LoadFile(string file)
+        public void Deserialize(string data)
         {
             List<string> settingNames = new();
-
-
-            SaveFile = file;
-            using StreamReader sr = new(file);
             ArtemisINISetting setting = new();
-            string? line;
-            while ((line = sr.ReadLine()) != null)
+            foreach (var line in data.Replace("\r", string.Empty).Split('\n'))
             {
                 setting.ProcessLine(line);
                 if (!string.IsNullOrEmpty(setting.SettingName))
@@ -40,7 +35,6 @@ namespace ArtemisManagerAction
                         okaytoAdd = false;
                         if (!setting.UsingDefault)
                         {
-
                             ArtemisINISetting? settingToRemove = null;
                             foreach (var s in settingList)
                             {
@@ -76,7 +70,13 @@ namespace ArtemisManagerAction
                     Settings.Add(item.SettingName.ToUpperInvariant(), item);
                 }
             }
-
+        }
+        protected void LoadFile(string file)
+        {
+            SaveFile = file;
+            using StreamReader sr = new(file);
+            string data = sr.ReadToEnd();
+            Deserialize(data);
         }
         public void Save(string filename)
         {

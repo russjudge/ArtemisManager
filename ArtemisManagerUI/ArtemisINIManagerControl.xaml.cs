@@ -6,6 +6,10 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System;
+using System.Windows.Forms;
+using AMCommunicator;
+using System.Net;
+
 namespace ArtemisManagerUI
 {
     /// <summary>
@@ -16,57 +20,110 @@ namespace ArtemisManagerUI
         public ArtemisINIManagerControl()
         {
             ArtemisSettingsFiles = new();
-            foreach (var ini in ArtemisManager.GetArtemisINIFileList())
-            {
-                ArtemisSettingsFiles.Add(new FileListItem(ini.Substring(0, ini.Length - 4)));
-            }
-            try
-            {
-                AvailableResolutions = new(TakeAction.GetAvailableScreenResolutions());
-            }
-            catch (FileNotFoundException ex)
-            {
-                MessageBox.Show("Error Loading available resolutions: " +  Environment.NewLine + ex.Message);
-            }
+            AvailableResolutions = new();
+
             RestoreOriginalToolTip = string.Format("Restore Original artemis.ini file ({0}) to defaults.",  ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder));
-            InitializeFSW();
+            
             InitializeComponent();
+            InitializeFileList();
         }
-
-        void InitializeFSW()
+        void InitializeFileList()
         {
-            fsw = new FileSystemWatcher(ArtemisManager.ArtemisINIFolder);
-            fsw.Created += OnINIFileCreated;
-            fsw.Deleted += OnINIFileDeleted;
-            fsw.EnableRaisingEvents = true;
-        }
-        FileSystemWatcher? fsw = null;
-        public static readonly DependencyProperty IsRemoteProperty =
-            DependencyProperty.Register(nameof(IsRemote), typeof(bool),
-            typeof(ArtemisINIManagerControl), new PropertyMetadata(OnIsRemoteChanged));
-
-        private static void OnIsRemoteChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is ArtemisINIManagerControl control)
+            ArtemisSettingsFiles.Clear();
+            AvailableResolutions.Clear();
+            if (IsRemote)
             {
-                if (control.IsRemote)
+                if (fsw != null)
                 {
-                    if (control.fsw != null)
+                    fsw.EnableRaisingEvents = false;
+                    fsw.Created -= OnINIFileCreated;
+                    fsw.Deleted -= OnINIFileDeleted;
+                    fsw.Dispose();
+                    fsw = null;
+                }
+                //Need to send request for: list of artemisINI files
+                //Need to send request for: list of available resolutions.
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfArtemisINIFiles);
+                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfScreenResolutions);
+                    if (Network.Current != null)
                     {
-                        control.fsw.EnableRaisingEvents = false;
-                        control.fsw.Created -= control.OnINIFileCreated;
-                        control.fsw.Deleted -= control.OnINIFileDeleted;
-                        control.fsw.Dispose();
-                        control.fsw = null;
+                        Network.Current.InfoReceived += OnInfoReceived;
                     }
                 }
-                else
+            }
+            else
+            {
+                foreach (var ini in ArtemisManager.GetArtemisINIFileList())
                 {
-                    control.InitializeFSW();
+                    ArtemisSettingsFiles.Add(new FileListItem(ini.Substring(0, ini.Length - 4)));
+                }
+                fsw = new FileSystemWatcher(ArtemisManager.ArtemisINIFolder);
+                fsw.Created += OnINIFileCreated;
+                fsw.Deleted += OnINIFileDeleted;
+                fsw.EnableRaisingEvents = true;
+                
+                foreach (var resolution in TakeAction.GetAvailableScreenResolutions())
+                {
+                    AvailableResolutions.Add(resolution);
                 }
             }
         }
 
+        private void OnInfoReceived(object? sender, InformationEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                if (e.Source != null && TargetClient != null)
+                {
+                    if (e.Source.ToString() == TargetClient.ToString())
+                    {
+                        switch (e.RequestType)
+                        {
+                            case RequestInformationType.ListOfArtemisINIFiles:
+                                ProcessListOfArtemisINIFiles(e.Data);
+                                e.Handled = true;
+                                break;
+                            case RequestInformationType.SpecificArtemisINIFile:
+                                if (e.Data.Length > 0)
+                                {
+                                    ProcessSpecificArtemisINIFile(e.Identifier, e.Data[0]);
+                                }
+                                e.Handled = true;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        private void ProcessListOfArtemisINIFiles(string[] names)
+        {
+            foreach (var nm in names)
+            {
+                string newnm = nm;
+                if (nm.Contains('.'))
+                {
+                    newnm = nm.Substring(0, nm.Length - 4);
+                }
+                ArtemisSettingsFiles.Add(new FileListItem(newnm));
+            }
+        }
+        private void ProcessSpecificArtemisINIFile(string filename, string data)
+        {
+            foreach (var item in ArtemisSettingsFiles)
+            {
+                if ( item.Name == filename)
+                {
+                    var ini = new ArtemisINI();
+                    ini.Deserialize(data);
+                    //ini.SaveFile = filename + ArtemisManager.INIFileExtension;
+                    item.SettingsFile = ini;
+                }
+            }
+        }
+        FileSystemWatcher? fsw = null;
+       
         private void OnINIFileDeleted(object sender, FileSystemEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.INIFileExtension))
@@ -115,7 +172,17 @@ namespace ArtemisManagerUI
                 });
             }
         }
+        public static readonly DependencyProperty IsRemoteProperty =
+           DependencyProperty.Register(nameof(IsRemote), typeof(bool),
+           typeof(ArtemisINIManagerControl), new PropertyMetadata(OnIsRemoteChanged));
 
+        private static void OnIsRemoteChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ArtemisINIManagerControl control)
+            {
+                control.InitializeFileList();
+            }
+        }
         public bool IsRemote
         {
             get
@@ -130,6 +197,25 @@ namespace ArtemisManagerUI
             }
         }
 
+
+        public static readonly DependencyProperty TargetClientProperty =
+           DependencyProperty.Register(nameof(TargetClient), typeof(IPAddress),
+           typeof(ArtemisINIManagerControl));
+
+    
+        public IPAddress? TargetClient
+        {
+            get
+            {
+                return (IPAddress?)this.GetValue(TargetClientProperty);
+
+            }
+            set
+            {
+                this.SetValue(TargetClientProperty, value);
+
+            }
+        }
 
         public static readonly DependencyProperty PopupMessageProperty =
          DependencyProperty.Register(nameof(PopupMessage), typeof(string),
@@ -175,11 +261,7 @@ namespace ArtemisManagerUI
         {
             if (d is ArtemisINIManagerControl me && me.SelectedArtemisSettingsFile != null)
             {
-                string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, me.SelectedArtemisSettingsFile.Name + ArtemisManager.INIFileExtension);
-                if (!string.IsNullOrEmpty(me.SelectedArtemisSettingsFile.Name) && File.Exists(source))
-                {
-                    me.SelectedArtemisSettings = new ArtemisINI(source);
-                }
+                me.SelectedArtemisSettings = ArtemisManager.GetArtemisINI(me.SelectedArtemisSettingsFile.Name);
             }
         }
 
@@ -251,46 +333,60 @@ namespace ArtemisManagerUI
 
         private void OnAddSettingsFile(object sender, RoutedEventArgs e)
         {
-            ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.ArtemisINIFolder);
-            string newFile = "NewArtemisSettings";
-            int i = 0;
-            bool mustretry = true;
-            while (mustretry)
+            if (IsRemote)
             {
-                mustretry = false;
-                foreach (var item in ArtemisSettingsFiles)
-                {
-                    if (item.Name == newFile)
-                    {
-                        newFile = "NewArtemisSettings(" + (++i).ToString() + ")";
-                        mustretry = true;
-                        break;
-                    }
-                }
-            }
 
-            string? source = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
-            string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, newFile + ArtemisManager.INIFileExtension);
-            if (!string.IsNullOrEmpty(source) && File.Exists(source))
-            {
-                File.Copy(source, target, true);
             }
             else
             {
-                ArtemisINI f = new()
+                ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.ArtemisINIFolder);
+                string newFile = "NewArtemisSettings";
+                int i = 0;
+                bool mustretry = true;
+                while (mustretry)
                 {
-                    SaveFile = target
-                };
-                f.Save();
+                    mustretry = false;
+                    foreach (var item in ArtemisSettingsFiles)
+                    {
+                        if (item.Name == newFile)
+                        {
+                            newFile = "NewArtemisSettings(" + (++i).ToString() + ")";
+                            mustretry = true;
+                            break;
+                        }
+                    }
+                }
+
+                string? source = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
+                string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, newFile + ArtemisManager.INIFileExtension);
+                if (!string.IsNullOrEmpty(source) && File.Exists(source))
+                {
+                    File.Copy(source, target, true);
+                }
+                else
+                {
+                    ArtemisINI f = new()
+                    {
+                        SaveFile = target
+                    };
+                    f.Save();
+                }
             }
         }
 
         private void OnRestoreToDefault(object sender, RoutedEventArgs e)
         {
-            string originalINI = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
-            if (!string.IsNullOrEmpty(originalINI) && File.Exists(originalINI))
+            if (IsRemote)
             {
-                File.Copy(originalINI, ArtemisManager.ArtemisINIFolder);
+
+            }
+            else
+            {
+                string originalINI = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
+                if (!string.IsNullOrEmpty(originalINI) && File.Exists(originalINI))
+                {
+                    File.Copy(originalINI, ArtemisManager.ArtemisINIFolder);
+                }
             }
         }
 
@@ -309,14 +405,22 @@ namespace ArtemisManagerUI
             };
             if (ofd.ShowDialog() == true)
             {
+
                 FileInfo source =new(ofd.FileName);
-                string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, source.Name);
-                int i = 0;
-                while (File.Exists(target))
+                if (IsRemote)
                 {
-                    target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
+
                 }
-                source.CopyTo(target, true);
+                else
+                {
+                    string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, source.Name);
+                    int i = 0;
+                    while (File.Exists(target))
+                    {
+                        target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
+                    }
+                    source.CopyTo(target, true);
+                }
             }
         }
 
@@ -337,22 +441,28 @@ namespace ArtemisManagerUI
             {
                 if (me.Tag is FileListItem selectedFile)
                 {
-                    if (!string.IsNullOrEmpty(selectedFile.Name) && !string.IsNullOrEmpty(selectedFile.OriginalName) && selectedFile.Name != selectedFile.OriginalName)
+                    if (IsRemote)
                     {
-                        string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.OriginalName + ArtemisManager.INIFileExtension);
-                        string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
-                        if (File.Exists(target))
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(selectedFile.Name) && !string.IsNullOrEmpty(selectedFile.OriginalName) && selectedFile.Name != selectedFile.OriginalName)
                         {
-                            MessageBox.Show("Cannot rename--new name already exists.", "Rename settings file", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                        else
-                        {
-                            File.Move(source, target, true);
-                            selectedFile.OriginalName = selectedFile.Name;
-
-                            if (SelectedArtemisSettings != null && SelectedArtemisSettings.SaveFile == selectedFile.OriginalName + ArtemisManager.INIFileExtension)
+                            string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.OriginalName + ArtemisManager.INIFileExtension);
+                            string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
+                            if (File.Exists(target))
                             {
-                                SelectedArtemisSettings.SaveFile = selectedFile.Name + ArtemisManager.INIFileExtension;
+                                System.Windows.MessageBox.Show("Cannot rename--new name already exists.", "Rename settings file", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                            else
+                            {
+                                File.Move(source, target, true);
+                                selectedFile.OriginalName = selectedFile.Name;
+
+                                if (SelectedArtemisSettings != null && SelectedArtemisSettings.SaveFile == selectedFile.OriginalName + ArtemisManager.INIFileExtension)
+                                {
+                                    SelectedArtemisSettings.SaveFile = selectedFile.Name + ArtemisManager.INIFileExtension;
+                                }
                             }
                         }
                     }
@@ -362,27 +472,30 @@ namespace ArtemisManagerUI
 
         private void OnExportSettingsFile(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is ArtemisINI presetsFile)
+            if (!IsRemote)
             {
-                SaveFileDialog dialg = new()
+                if (e.OriginalSource is ArtemisINI presetsFile)
                 {
-                    CheckPathExists = true,
-                    Filter = "Artemis INI settings files (*" + ArtemisManager.INIFileExtension + ")|*" + ArtemisManager.INIFileExtension,
-                    DefaultExt = "ini",
-                    InitialDirectory = ArtemisManager.ArtemisINIFolder,
-                    Title = "Select new Artemis settings filename"
-                };
-                if (dialg.ShowDialog() == true)
-                {
-                    bool OkayToSave = true;
-                    if (File.Exists(dialg.FileName))
+                    Microsoft.Win32.SaveFileDialog dialg = new()
                     {
-                        OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
-                            "Artemis INI Settings", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
-                    }
-                    if (OkayToSave)
+                        CheckPathExists = true,
+                        Filter = "Artemis INI settings files (*" + ArtemisManager.INIFileExtension + ")|*" + ArtemisManager.INIFileExtension,
+                        DefaultExt = "ini",
+                        InitialDirectory = ArtemisManager.ArtemisINIFolder,
+                        Title = "Select new Artemis settings filename"
+                    };
+                    if (dialg.ShowDialog() == true)
                     {
-                        File.Copy(presetsFile.SaveFile, dialg.FileName, true);
+                        bool OkayToSave = true;
+                        if (File.Exists(dialg.FileName))
+                        {
+                            OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
+                                "Artemis INI Settings", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
+                        }
+                        if (OkayToSave)
+                        {
+                            File.Copy(presetsFile.SaveFile, dialg.FileName, true);
+                        }
                     }
                 }
             }
@@ -396,20 +509,30 @@ namespace ArtemisManagerUI
                 {
                     if (!string.IsNullOrEmpty(selectedFile.Name))
                     {
-                        string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
-                        if (File.Exists(target))
+                        if (IsRemote)
                         {
-                            if (ArtemisSettingsFiles.Contains(selectedFile))
+                            if (TargetClient != null)
                             {
-                                ArtemisSettingsFiles.Remove(selectedFile);
+                                Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.DeleteArtemisINIFile, Guid.Empty, selectedFile.Name);
                             }
-                            if (SelectedArtemisSettings != null && SelectedArtemisSettings.SaveFile == selectedFile.Name + ArtemisManager.INIFileExtension)
+                        }
+                        else
+                        {
+                            string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
+                            if (File.Exists(target))
                             {
-                                SelectedArtemisSettings = null;
-                            }
-                            if (SelectedArtemisSettingsFile == selectedFile)
-                            {
-                                SelectedArtemisSettingsFile = null;
+                                if (ArtemisSettingsFiles.Contains(selectedFile))
+                                {
+                                    ArtemisSettingsFiles.Remove(selectedFile);
+                                }
+                                if (SelectedArtemisSettings != null && SelectedArtemisSettings.SaveFile == selectedFile.Name + ArtemisManager.INIFileExtension)
+                                {
+                                    SelectedArtemisSettings = null;
+                                }
+                                if (SelectedArtemisSettingsFile == selectedFile)
+                                {
+                                    SelectedArtemisSettingsFile = null;
+                                }
                             }
                         }
                     }
@@ -436,11 +559,19 @@ namespace ArtemisManagerUI
                 {
                     if (!string.IsNullOrEmpty(selectedFile.Name))
                     {
-                        string source = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.INIFileExtension);
-                        if (System.IO.File.Exists(source))
+                        if (IsRemote)
                         {
-                            File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisINI), true);
-                            PopupMessage = "Artemis INI file activated.";
+                            if (TargetClient != null)
+                            {
+                                Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty, selectedFile.Name);
+                            }
+                        }
+                        else
+                        {
+                            if (ArtemisManager.ActivateArtemisINIFile(selectedFile.Name))
+                            {
+                                PopupMessage = "Artemis INI file activated.";
+                            }
                         }
                     }
                 }
@@ -449,7 +580,7 @@ namespace ArtemisManagerUI
 
         private void OnSavingSettings(object sender, RoutedEventArgs e)
         {
-            if (fsw != null)
+            if (!IsRemote && fsw != null)
             {
                 this.fsw.EnableRaisingEvents = false;
             }
@@ -457,7 +588,7 @@ namespace ArtemisManagerUI
 
         private void OnSettingsSaved(object sender, RoutedEventArgs e)
         {
-            if (fsw != null)
+            if (!IsRemote && fsw != null)
             {
                 fsw.EnableRaisingEvents = true;
             }

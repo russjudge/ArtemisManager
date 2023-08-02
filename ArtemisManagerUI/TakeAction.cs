@@ -24,7 +24,12 @@ namespace ArtemisManagerUI
 {
     public static class TakeAction
     {
-        public static Main? MainWindow { get; set; } = null;
+        public const int SelfElement = 0;
+        public const int AllConnectionsElement = 1;
+
+        public static readonly IPAddress SelfIP = IPAddress.Loopback;
+        public static readonly IPAddress AllConnections = IPAddress.Any;
+    public static Main? MainWindow { get; set; } = null;
         public static bool MustExit { get; set; }
 
         public static event EventHandler<StatusUpdateEventArgs>? StatusUpdate;

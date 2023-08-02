@@ -15,6 +15,12 @@ namespace AMCommunicator.Messages
         ResetToVanilla,
         InstallMission,
         ActivateMission,
-        UninstallMod
+        UninstallMod,
+        ActivateArtemisINIFile,
+        RenameArtemisINIFile,
+        DeleteArtemisINIFile,
+        ActivateEngineeringPresetsFile,
+        RenameEngineeringPresetsFile,
+        DeleteEngineeringPresetsFile
     }
 }

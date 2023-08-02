@@ -31,9 +31,7 @@ namespace ArtemisManagerUI
         {
             try
            {
-                
                 SettingsAction.Touch();
-                
                 ArtemisUpgradeLinks = new();
                 ExternalToolsLinks = new();
                 Chat = new();
@@ -798,8 +796,41 @@ namespace ArtemisManagerUI
             MyNetwork.ModPackageReceived += MyNetwork_ModPackageReceived;
             MyNetwork.PopupMessageEvent += MyNetwork_PopupMessageEvent;
             MyNetwork.PackageFileReceived += MyNetwork_PackageFileReceived;
+
+            MyNetwork.InfoRequestReceived += MyNetwork_InfoRequestReceived;
             MyNetwork.Connect();
             IsStarted = true;
+        }
+
+        private void MyNetwork_InfoRequestReceived(object? sender, InformationRequestEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                switch (e.RequestType)
+                {
+                    case RequestInformationType.ListOfArtemisINIFiles:
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetArtemisINIFileList());
+                        break;
+                    case RequestInformationType.SpecificArtemisINIFile:
+                        string data = ArtemisManager.GetArtemisINIData(e.Identifier);
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
+                        break;
+                    case RequestInformationType.ListOfEngineeringPresets:
+                        break;
+                    case RequestInformationType.SpecificEngineeringPreset:
+                        break;
+                    case RequestInformationType.ListOfDMXCommandfiles:
+                        break;
+                    case RequestInformationType.SpecificDMXCommandFile:
+                        break;
+                    case RequestInformationType.ListOfControLINIFiles:
+                        break;
+                    case RequestInformationType.SpecificControlINIFile:
+                        break;
+                    case RequestInformationType.ListOfScreenResolutions:
+                        break;
+                }
+            }
         }
 
         private void MyNetwork_PackageFileReceived(object? sender, PackageFileEventArgs e)

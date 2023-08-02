@@ -21,6 +21,8 @@ namespace AMCommunicator
         ChangeAppSetting = 10,
         Alert = 11,
         StringPackage = 12,
-        UndefinedPackage = 13
+        UndefinedPackage = 13,
+        RequestInformation = 14,
+        Information = 15
     }
 }

@@ -317,7 +317,13 @@
 
 
         <TabControl TabStripPlacement="Bottom">
-            <TabItem Header="Mods &amp; Missions">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/wrench.png" />
+                        <TextBlock Text="Mods &amp; Missions" />
+                    </StackPanel>
+                </TabItem.Header>
                 <DockPanel
                     local:DragHelper.DragScopeId="DragScope1">
                     <DockPanel
@@ -519,7 +525,10 @@
             </TabItem>
             <TabItem>
                 <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/Settings-icon.png" />
                     <TextBlock Text="Localized Custom Artemis.ini settings" TextWrapping="Wrap" />
+                    </StackPanel>
                 </TabItem.Header>
                 <local:ArtemisINITabControl />
             </TabItem>

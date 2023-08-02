@@ -4,7 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
+        <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
+    </UserControl.Resources>
     <DockPanel>
         <local:AMPopup
             DockPanel.Dock="Top"
@@ -15,6 +20,14 @@
             DockPanel.Dock="Top"
             ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}"
             SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter
+                        Property="Visibility"
+                        Value="{Binding IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}" />
+                </Style>
+            </TabControl.ItemContainerStyle>
+                
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Connection.Hostname}" />
@@ -26,13 +39,14 @@
                         <!-- SourcePC="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" -->
                         <local:StringPackageSenderControl
                             Tag="{Binding}"
-                            SourcePC="{Binding ElementName=uc, Path=SourcePC, Mode=OneWay}"
+                            IsForReceive="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
                             FileRequest="OnSendFileRequest"
                             TransmissionCompleted="OnTransmissionCompleted"
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />
                         <local:ArtemisINIManagerControl
-                            IsRemote="{Binding Path=IsRemote, Mode=OneWay}"/>
+                            TargetClient="{Binding Connection.IP, Mode=OneWay}"
+                            IsRemote="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"/>
                     </DockPanel>
                 </DataTemplate>
             </TabControl.ContentTemplate>

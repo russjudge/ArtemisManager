@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -29,7 +30,11 @@ namespace ArtemisManagerUI
             {
                 foreach (var PC in TakeAction.ConnectedPCs)
                 {
-                    ConnectedPCs.Add(new(PC));
+                    if (PC.IP?.ToString() != TakeAction.AllConnections.ToString())
+                    {
+                        ConnectedPCs.Add(new(PC));
+                    }
+                    
                 }
             }
             TakeAction.ConnectionAdded += TakeAction_ConnectionAdded;
