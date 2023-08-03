@@ -30,10 +30,9 @@ namespace AMCommunicator
         }
 
         public static Network? Current { get; private set; }
-        public static Network GetNetwork(string password)
+        public static Network GetNetwork()
         {
             Current ??= new Network();
-            Password = password;
             return Current;
         }
         static Network()
@@ -41,7 +40,7 @@ namespace AMCommunicator
             MyHostname = Dns.GetHostName();
             MyIP = GetMyIP();
             ConnectionPort = tcpPort;
-            Password = "";
+            Password = string.Empty;
         }
         private static bool abort = false;
         

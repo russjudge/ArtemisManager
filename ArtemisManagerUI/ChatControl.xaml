@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="ArtemisManagerUI.ChatControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             mc:Ignorable="d" Name="uc"
+             Loaded="OnLoaded">
+    <UserControl.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
+        <converter:DateFormatter x:Key="DateFormatter" />
+    </UserControl.Resources>
+    <DockPanel>
+        <GroupBox DockPanel.Dock="Bottom">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Chat" />
+                </StackPanel>
+            </GroupBox.Header>
+            <DockPanel>
+                <DockPanel
+                    DockPanel.Dock="Top">
+                    <TextBlock VerticalAlignment="Center"  Text="Send Chat to: " DockPanel.Dock="Left" />
+                    <ComboBox
+                        VerticalAlignment="Center" VerticalContentAlignment="Center"
+                        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
+                        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter
+                                    Property="Visibility"
+                                    Value="{Binding IP, Converter={StaticResource IPLoopbackToVisibility}, ConverterParameter=Collapsed|Visible}" />
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding IP}" />
+                                    <TextBlock VerticalAlignment="Center" Text=" - " />
+                                    <TextBlock VerticalAlignment="Center" Text="{Binding Hostname}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </DockPanel>
+                <DockPanel DockPanel.Dock="Bottom">
+                    <Button
+                        VerticalAlignment="Center"
+                        IsDefault="true" DockPanel.Dock="Right"
+                        ToolTip="Send chat" Click="OnSendMessage">
+                        <Image VerticalAlignment="Center" Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
+                    </Button>
+                    <TextBox
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center" VerticalContentAlignment="Center"
+                        Text="{Binding ElementName=uc, Path=ChatMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  />
+                </DockPanel>
+                <ListBox
+                    ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}"
+                    local:ListBoxBehavior.AutoScroll="True">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
+                                <TextBlock Text="> " />
+                                <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
+                                <TextBlock Text="{Binding Message}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </GroupBox>
+    </DockPanel>
+</UserControl>

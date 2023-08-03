@@ -316,13 +316,15 @@
 
 
 
-        <TabControl TabStripPlacement="Bottom">
+        <TabControl
+            SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}"
+            TabStripPlacement="Bottom">
             <TabItem>
                 <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
+                    <WrapPanel>
                         <Image Height="16" Source="/ArtemisManagerUI;component/Resources/wrench.png" />
                         <TextBlock Text="Mods &amp; Missions" />
-                    </StackPanel>
+                    </WrapPanel>
                 </TabItem.Header>
                 <DockPanel
                     local:DragHelper.DragScopeId="DragScope1">
@@ -330,7 +332,7 @@
                         DockPanel.Dock="Right" >
                         <TabControl
                             Tag="{Binding ElementName=uc, Mode=OneWay, Path=SelectedPeer}"
-                            Width="400" SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}">
+                            Width="400">
                             <TabItem
                                 AllowDrop="True"
                                 DragEnter="OnModDragEnter"
@@ -422,69 +424,6 @@
                                     </ListBox>
                                 </DockPanel>
                             </TabItem>
-                            <TabItem Tag="Chat" >
-                                <TabItem.Header>
-                                    <Label>
-                                        <TextBlock Text="Chat" />
-                                        <Label.Style>
-                                            <Style>
-                                                <Style.Triggers>
-                                                    <DataTrigger
-                                                        Binding="{Binding ElementName=uc, Path=ChatAlert}"
-                                                        Value="True">
-                                                        <DataTrigger.EnterActions>
-                                                            <BeginStoryboard>
-                                                                <Storyboard>
-                                                                    <ColorAnimation
-                                                                        To="Red"
-                                                                        Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
-                                                                        FillBehavior="Stop"
-                                                                        AutoReverse="True" RepeatBehavior="Forever"
-                                                                        Duration="0:0:1"/>
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </DataTrigger.EnterActions>
-                                                        <DataTrigger.ExitActions>
-                                                            <BeginStoryboard>
-                                                                <Storyboard>
-                                                                    <ColorAnimation
-                                                                        To="Transparent"
-                                                                        Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
-                                                                        FillBehavior="Stop"
-                                                                        Duration="0:0:1"/>
-                                                                </Storyboard>
-                                                            </BeginStoryboard>
-                                                        </DataTrigger.ExitActions>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Label.Style>
-                                    </Label>
-                                </TabItem.Header>
-                                <ListBox
-                                    ItemsSource="{Binding Chat, Mode=OneWay, ElementName=uc}"
-                                    local:ListBoxBehavior.AutoScroll="True">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Entry, Converter={StaticResource DateFormatter}, ConverterParameter='HH:mm:ss'}" />
-                                                <TextBlock Text="> " />
-                                                <TextBlock Text="{Binding Source}" FontWeight="Bold" Padding="5,0,5,0" />
-                                                <TextBlock Text="{Binding Message}" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                            </TabItem>
-                            <TabItem Tag="Activity">
-                                <TabItem.Header>
-                                    <Label Content="Activity" />
-                                </TabItem.Header>
-                                <ListBox
-                                    ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}"
-                                    VerticalAlignment="Top"
-                                    local:ListBoxBehavior.AutoScroll="True" />
-                            </TabItem>
                         </TabControl>
                     </DockPanel>
                     <GroupBox
@@ -514,7 +453,6 @@
                                     <local:PeerInfoControl
                                         IsMaster="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
                                         ItemData="{Binding}"
-                                        SendMessage="OnSendMessage"
                                         ConnectedPCs="{Binding Mode=OneWay, Path=(TabControl.ItemsSource), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" >
                                     </local:PeerInfoControl>
                                 </DataTemplate>
@@ -525,20 +463,112 @@
             </TabItem>
             <TabItem>
                 <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/Settings-icon.png" />
-                    <TextBlock Text="Localized Custom Artemis.ini settings" TextWrapping="Wrap" />
-                    </StackPanel>
+                    <WrapPanel>
+                        <TextBlock Text="PC Actions &amp; Settings" />
+                    </WrapPanel>
+                </TabItem.Header>
+                <local:PCInfoTabControl />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <TextBlock Text="Mods" />
+                    </WrapPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <TextBlock Text="Missions" />
+                    </WrapPanel>
+                </TabItem.Header>
+            </TabItem>
+
+            
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <Image Margin="0,0,5,0"  Height="16" Source="/ArtemisManagerUI;component/Resources/Settings-icon.png" />
+                        <TextBlock Text="Localized Artemis.ini settings" TextWrapping="Wrap" />
+                    </WrapPanel>
                 </TabItem.Header>
                 <local:ArtemisINITabControl />
             </TabItem>
             <TabItem>
                 <TabItem.Header>
                     <WrapPanel>
-                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/Presets.png" />
+                        <Image Margin="0,0,5,0" Height="16" Source="/ArtemisManagerUI;component/Resources/Presets.png" />
                         <TextBlock Text="Engineering Presets" TextWrapping="Wrap" />
                     </WrapPanel>
                 </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <TextBlock Text="controls.ini" />
+                    </WrapPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <TextBlock Text="DMXCommands.xml" />
+                    </WrapPanel>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Tag="Chat">
+                <TabItem.Header>
+                    <Label>
+                        <TextBlock Text="Chat" />
+                        <Label.Style>
+                            <Style>
+                                <Style.Triggers>
+                                    <DataTrigger
+                                        Binding="{Binding ElementName=uc, Path=ChatAlert}"
+                                        Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation
+                                                        To="Red"
+                                                        Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
+                                                        FillBehavior="Stop"
+                                                        AutoReverse="True" RepeatBehavior="Forever"
+                                                        Duration="0:0:1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation
+                                                        To="Transparent"
+                                                        Storyboard.TargetProperty="(Label.Background).(SolidColorBrush.Color)"
+                                                        FillBehavior="Stop"
+                                                        Duration="0:0:1"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </TabItem.Header>
+                <local:ChatControl
+                        ChatReceived="OnChatReceived"
+                        ConnectedPCs="{Binding ElementName=uc, Path=ConnectedPCs}" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <WrapPanel>
+                        <TextBlock Text="Activity" />
+                    </WrapPanel>
+                </TabItem.Header>
+                <ListBox
+                    ItemsSource="{Binding Status, ElementName=uc, Mode=OneWay}"
+                    VerticalAlignment="Top"
+                    local:ListBoxBehavior.AutoScroll="True" />
             </TabItem>
         </TabControl>
     </DockPanel>

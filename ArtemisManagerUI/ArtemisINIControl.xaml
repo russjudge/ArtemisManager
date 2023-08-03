@@ -9,23 +9,29 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:FilenameToNameConverter x:Key="FilenameToNameConverter" />
     </UserControl.Resources>
 
-    <GroupBox
-            Header="Localized Settings">
+    <GroupBox>
+        <GroupBox.Header>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Localized Settings: "/>
+                <TextBlock Text="{Binding ElementName=uc, Path=SettingsFile.SaveFile, Mode=OneWay, Converter={StaticResource FilenameToNameConverter}}"   />
+            </StackPanel>
+        </GroupBox.Header>
         <DockPanel>
             <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
-                <Button Click="OnActivate">
+                <Button ToolTip="Activate settings." Click="OnActivate">
                     <StackPanel>
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/activate.png" />
-                        <TextBlock Text="Activate" />
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                        <!--<TextBlock Text="Activate" />-->
                     </StackPanel>
                 </Button>
-                <Button Click="OnSave">
+                <Button ToolTip="Save" Click="OnSave">
                     <StackPanel>
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/save.png" />
-                        <TextBlock Text="Save" />
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/save.png" />
+                        <!--<TextBlock Text="Save" />-->
                     </StackPanel>
                 </Button>
             </StackPanel>

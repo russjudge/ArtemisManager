@@ -25,27 +25,21 @@
                     Click="OnAddSettingsFile"
                     HorizontalAlignment="Left" >
                     <StackPanel Orientation="Horizontal" >
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
                     </StackPanel>
                 </Button>
                 <Button
                     Click="OnRestoreToDefault"
-                    Margin="5,0,0,0" ToolTip="Restore Original artemis.ini file ({0}) to defaults">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
+                    ToolTip="Restore Original artemis.ini file ({0}) to defaults">
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
+                </Button>
+                <Button
+                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
             </StackPanel>
-            <!--<local:StringPackageSenderControl
-                FileRequest="OnSendFileRequest" TransmissionCompleted="OnTransmissionCompleted"
-                Prompt="Transmit selected settings file to:"
-                IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedArtemisSettingsFile}"
-                DockPanel.Dock="Top" />-->
-            
-
-            <Button
-                Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
-            </Button>
+          
             <ListBox
                 HorizontalAlignment="Stretch"
                 SelectionMode="Single"
@@ -111,8 +105,7 @@
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Stretch"
                                 Text="{Binding Path=Name, Mode=TwoWay}"
-                                TextChanged="OnSettingsFilenameChanged"
-                                />
+                                TextChanged="OnSettingsFilenameChanged" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

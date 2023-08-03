@@ -1,0 +1,128 @@
+﻿<UserControl x:Class="ArtemisManagerUI.PCInfoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
+        <converter:DateFormatter x:Key="DateFormatter" />
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:NullToVisibility x:Key="NullToVisibility" />
+        <converter:ByteFormatter x:Key="ByteFormatter" />
+    </UserControl.Resources>
+    <GroupBox>
+        <GroupBox.Header>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Path=SelectedTargetPC.IP, ElementName=uc}" />
+                <TextBlock Text=" - " />
+                <TextBlock Text="{Binding Path=SelectedTargetPC.Hostname, ElementName=uc}" />
+            </StackPanel>
+        </GroupBox.Header>
+
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Left" MaxWidth="250" Visibility="{Binding SelectedTargetPC.IP, Converter={StaticResource HideBroadcastIPConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Artemis Manager Version:" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=SelectedTargetPC.AppVersion}" />
+                </StackPanel>
+                <CheckBox
+                    IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    Checked="OnSetConnectOnStart"
+                    Unchecked="OnSetConnectOnStart"
+                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.ConnectOnstart, Mode=TwoWay}" >
+                    <TextBlock
+                        Text="Connect to Peer-to-Peer network on start"
+                        ToolTip="If checked, then when this application starts on the client, it will immediately try to connecto to the peer-to-peer network."
+                        TextWrapping="Wrap"/>
+                </CheckBox>
+                <CheckBox
+                    Checked="OnIsMasterSet"
+                    Unchecked="OnIsMasterSet"
+                    ToolTip="Indicates whether or not this client can control all other clients.  If not checked, then this client cannot control any client, except itself."
+                    Content="Is a Master"
+                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsMaster, Mode=TwoWay}" IsEnabled="{Binding ElementName=uc, Path=IsMaster}"/>
+                <CheckBox Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning}" IsEnabled="False"/>
+                <CheckBox
+                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsUsingThisAppControlledArtemis}"
+                    VerticalContentAlignment="Center" VerticalAlignment="Center" IsEnabled="False" >
+                    <TextBlock
+                        Text="Artemis is under Manager control" ToolTip="Indicates if the version of Artemis is running is running due the the Artemis Manager" TextWrapping="Wrap"/>
+                </CheckBox>
+                <CheckBox
+                    IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    Checked="OnRemoteAddManagerFromStartup"
+                    Unchecked="OnRemoteRemoveManagerFromStartup">
+                    <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
+                </CheckBox>
+                <StackPanel Orientation="Horizontal">
+                    <Label Grid.Row="4" Content="Drive Freespace:" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=SelectedTargetPC.FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
+                </StackPanel>
+            </StackPanel>
+            <DockPanel DockPanel.Dock="Right">
+                <GroupBox
+                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    DockPanel.Dock="Top" Header="Artemis SBS Actions">
+                    <WrapPanel>
+                        <Button
+                            Click="OnStartArtemisRemote"
+                            ToolTip="Start Artemis SBS on Peer."
+                            Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/start.png" />
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Click="OnStopArtemisRemote"
+                            Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                            ToolTip="Stop Artemis SBS on Peer.">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/stop.png" />
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
+                            </StackPanel>
+                        </Button>
+                    </WrapPanel>
+                </GroupBox>
+                <GroupBox
+                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    DockPanel.Dock="Top" Header="Peer Actions">
+                    <WrapPanel>
+                        <Button
+                            Click="OnDisconnect" CommandParameter="{Binding}"
+                            ToolTip="Disconnect. Orders the peer to disconnect.  Useful for kicking someone out.  Change the password after disconnecting to prevent them from reconnecting.">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/disconnect.png" />
+                            </StackPanel>
+                        </Button>
+                        <Button Click="OnCloseApp" ToolTip="Close remote Artemis Manager application">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/close.png" />
+                        </Button>
+                        <Button Click="OnCloseAndRestartApp" ToolTip="Close and restart remote Artemis Manager application">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restart2.png" />
+                        </Button>
+                        <Button Click="OnPing" ToolTip="Ping peer to confirm connection." CommandParameter="{Binding}">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/ping.png" />
+                        </Button>
+                        <Button ToolTip="Restart Peer PC" Click="OnRestart" CommandParameter="{Binding}">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restart.png" />
+                        </Button>
+                        <Button ToolTip="Shutdown Peer PC" Click="OnShutdown" CommandParameter="{Binding}">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/shutdown.png" />
+                        </Button>
+                        <Button
+                            Click="OnUpdateCheck" CommandParameter="{Binding}"
+                            ToolTip="Have Peer check for Software Update. Orders the peer to check for an update to this application and attempt to apply it if available.">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/update.png" />
+                        </Button>
+                    </WrapPanel>
+                </GroupBox>
+            </DockPanel>
+        </DockPanel>
+    </GroupBox>
+</UserControl>

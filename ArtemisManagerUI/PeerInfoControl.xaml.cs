@@ -1,23 +1,9 @@
 ﻿using AMCommunicator;
-using ArtemisManagerAction;
-using Microsoft.VisualBasic.Devices;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ArtemisManagerUI
 {
@@ -63,22 +49,7 @@ namespace ArtemisManagerUI
                 this.SetValue(ItemDataProperty, value);
             }
         }
-        public static readonly DependencyProperty ChatMessageProperty =
-            DependencyProperty.Register(nameof(ChatMessage), typeof(string),
-           typeof(PeerInfoControl));
-
-        public string ChatMessage
-        {
-            get
-            {
-                return (string)this.GetValue(ChatMessageProperty);
-
-            }
-            set
-            {
-                this.SetValue(ChatMessageProperty, value);
-            }
-        }
+       
         public static readonly DependencyProperty IsMasterProperty =
            DependencyProperty.Register(nameof(IsMaster), typeof(bool),
           typeof(PeerInfoControl));
@@ -129,29 +100,6 @@ namespace ArtemisManagerUI
                 AMCommunicator.Network.Current?.SendChangeSetting(ItemData.IP, "ConnectOnStart", this.ItemData.ConnectOnstart.ToString());
                 
             }
-        }
-
-        void RaiseSendMessageEvent()
-        {
-            RoutedEventArgs args = new RoutedEventArgs(SendMessageEvent);
-            RaiseEvent(args);
-        }
-
-        public static readonly RoutedEvent SendMessageEvent = EventManager.RegisterRoutedEvent(
-            name: nameof(SendMessage),
-            routingStrategy: RoutingStrategy.Bubble,
-            handlerType: typeof(RoutedEventHandler),
-            ownerType: typeof(PeerInfoControl));
-        public event RoutedEventHandler SendMessage
-        {
-            add { AddHandler(SendMessageEvent, value); }
-            remove {  RemoveHandler(SendMessageEvent, value); }
-        }
-
-        private void OnSendMessage(object sender, RoutedEventArgs e)
-        {
-            
-            RaiseSendMessageEvent();
         }
 
         private void OnDisconnect(object sender, RoutedEventArgs e)

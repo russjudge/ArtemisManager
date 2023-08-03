@@ -24,22 +24,7 @@
 
         <DockPanel>
             
-            <GroupBox  DockPanel.Dock="Bottom">
-                <GroupBox.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Chat to: " />
-                        <TextBlock Text="{Binding Path=ItemData.Hostname, ElementName=ucPeer}" />
-                    </StackPanel>
-                </GroupBox.Header>
-                <DockPanel>
-                    <Button
-                        IsDefault="true" DockPanel.Dock="Right"
-                        ToolTip="Send to chat" Click="OnSendMessage">
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/send.png" />
-                    </Button>
-                    <TextBox Text="{Binding ElementName=ucPeer, Path=ChatMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center"  />
-                </DockPanel>
-            </GroupBox>
+            
             
             <GroupBox DockPanel.Dock="Top" Header="Info" >
                 <DockPanel>

@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="ArtemisManagerUI.PCInfoTabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             mc:Ignorable="d" Name="uc">
+    <TabControl
+        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
+        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Connection.Hostname}" />
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <local:PCInfoControl
+                    IsMaster="{Binding ElementName=uc, Path=IsMaster}"
+                    SelectedTargetPC="{Binding ElementName=uc, Path=SelectedTargetPC}" />
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+
+    </TabControl>
+</UserControl>

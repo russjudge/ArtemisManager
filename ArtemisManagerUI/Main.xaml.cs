@@ -34,7 +34,7 @@ namespace ArtemisManagerUI
                 SettingsAction.Touch();
                 ArtemisUpgradeLinks = new();
                 ExternalToolsLinks = new();
-                Chat = new();
+                
 
                 Status = new ObservableCollection<string>();
                 ConnectedPCs = new();
@@ -243,7 +243,7 @@ namespace ArtemisManagerUI
         }
 
         bool isLoading = true;
-        readonly Network MyNetwork = Network.GetNetwork("");
+        readonly Network MyNetwork = Network.GetNetwork();
         FileSystemWatcher? watcher = null;
         /*
          * 
@@ -262,7 +262,6 @@ namespace ArtemisManagerUI
         {
             if (isLoading)
             {
-
                 if (TakeAction.MustExit)
                 {
                     this.Close();
@@ -663,38 +662,7 @@ namespace ArtemisManagerUI
         }
 
 
-        public static readonly DependencyProperty ChatsProperty =
-          DependencyProperty.Register(nameof(Chat), typeof(ObservableCollection<ChatMessage>),
-              typeof(Main));
-
-        public ObservableCollection<ChatMessage> Chat
-        {
-            get
-            {
-                return (ObservableCollection<ChatMessage>)this.GetValue(ChatsProperty);
-
-            }
-            set
-            {
-                this.SetValue(ChatsProperty, value);
-            }
-        }
-
-        public void AddChatLine(string source, string message)
-        {
-            if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
-            {
-                this.Dispatcher.Invoke(new Action<string, string>(AddChatLine), source, message);
-            }
-            else
-            {
-                Chat.Add(new ChatMessage(source.ToString(), message));
-                if (SelectedTabItem == null || SelectedTabItem.Tag?.ToString() != "Chat")
-                {
-                    ChatAlert = true;
-                }
-            }
-        }
+       
         private void UpdateStatus(string message)
         {
             try
@@ -774,11 +742,9 @@ namespace ArtemisManagerUI
                 this.SetValue(IsArtemisRunningProperty, value);
             }
         }
-        void DoStartServer()
+        void SubscribeToEvents()
         {
-            UpdateStatus("Starting Connection Service");
             TakeAction.StatusUpdate += MyNetwork_StatusUpdated;
-
 
             MyNetwork.ModPackageRequested += MyNetwork_ModPackageRequested;
             MyNetwork.ConnectionRequested += MyNetwork_ConnectionRequested;
@@ -787,7 +753,6 @@ namespace ArtemisManagerUI
             MyNetwork.FatalExceptionEncountered += MyNetwork_FatalExceptionEncountered;
             MyNetwork.ConnectionClosed += MyNetwork_ConnectionClosed;
             MyNetwork.ActionCommand += MyNetwork_ActionCommand;
-            MyNetwork.CommunicationMessageReceived += MyNetwork_CommunicationMessageReceived;
             MyNetwork.PasswordChanged += MyNetwork_PasswordChanged;
             MyNetwork.ChangeSetting += MyNetwork_ChangeSetting;
             MyNetwork.AlertReceived += MyNetwork_AlertReceived;
@@ -796,8 +761,13 @@ namespace ArtemisManagerUI
             MyNetwork.ModPackageReceived += MyNetwork_ModPackageReceived;
             MyNetwork.PopupMessageEvent += MyNetwork_PopupMessageEvent;
             MyNetwork.PackageFileReceived += MyNetwork_PackageFileReceived;
-
             MyNetwork.InfoRequestReceived += MyNetwork_InfoRequestReceived;
+        }
+        void DoStartServer()
+        {
+            UpdateStatus("Starting Connection Service");
+            SubscribeToEvents();
+
             MyNetwork.Connect();
             IsStarted = true;
         }
@@ -1099,13 +1069,7 @@ namespace ArtemisManagerUI
             SettingsAction.Current.Save();
         }
 
-        private void MyNetwork_CommunicationMessageReceived(object? sender, CommunicationMessageEventArgs e)
-        {
-            if (e.Host != null)
-            {
-                AddChatLine(e.Host, e.Message);
-            }
-        }
+        
 
         void ConsiderClosing(bool force, IPAddress? source)
         {
@@ -1354,41 +1318,7 @@ namespace ArtemisManagerUI
                 this.SetValue(IsMasterProperty, value);
             }
         }
-        private void OnSendMessage(object sender, RoutedEventArgs e)
-        {
-            if (sender is PeerInfoControl me)
-            {
-                PCItem? item = me.ItemData;
-                if (item != null)
-                {
-                    string? msg = me.ChatMessage;
-                    me.ChatMessage = string.Empty;
-
-                    if (item.IP?.ToString() == IPAddress.Any.ToString())
-                    {
-                        foreach (var pcItem in ConnectedPCs)
-                        {
-                            if (pcItem.IP?.ToString() != IPAddress.Any.ToString() && msg != null)
-                            {
-                                if (pcItem.IP != null)
-                                {
-                                    AddChatLine("LOCALHOST -> " + pcItem.Hostname, msg);
-                                    MyNetwork.SendMessage(pcItem.IP, msg);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (msg != null && item.IP != null)
-                        {
-                            AddChatLine("LOCALHOST -> " + item.Hostname, msg);
-                            MyNetwork.SendMessage(item.IP, msg);
-                        }
-                    }
-                }
-            }
-        }
+        
 
         private void OnPutInStartup(object sender, RoutedEventArgs e)
         {
@@ -1883,6 +1813,17 @@ namespace ArtemisManagerUI
             
             win.ShowDialog();
             ConnectOnStart = SettingsAction.Current.ConnectOnStart;
+        }
+
+        private void OnChatReceived(object sender, RoutedEventArgs e)
+        {
+            if (SelectedTabItem != null)
+            {
+                if (SelectedTabItem.Tag?.ToString() != "Chat")
+                {
+                    ChatAlert = true;
+                }
+            }
         }
     }
 }
