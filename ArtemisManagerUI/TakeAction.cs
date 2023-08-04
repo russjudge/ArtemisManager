@@ -29,7 +29,7 @@ namespace ArtemisManagerUI
 
         public static readonly IPAddress SelfIP = IPAddress.Loopback;
         public static readonly IPAddress AllConnections = IPAddress.Any;
-    public static Main? MainWindow { get; set; } = null;
+        public static Main? MainWindow { get; set; } = null;
         public static bool MustExit { get; set; }
 
         public static event EventHandler<StatusUpdateEventArgs>? StatusUpdate;
@@ -46,16 +46,39 @@ namespace ArtemisManagerUI
         public static ObservableCollection<PCItem>? ConnectedPCs { get; set; }
         public static event EventHandler<ConnectionEventArgs>? ConnectionAdded;
         public static event EventHandler<ConnectionEventArgs>? ConnectionRemoved;
+
+        static TakeAction()
+        {
+            ConnectedPCs = new();
+            PCItem thisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback);
+            thisMachine.AppVersion = GetAppVersion();
+            thisMachine.IsMaster = SettingsAction.Current.IsMaster;
+            thisMachine.AppInStartFolder = IsThisAppInStartup();
+            thisMachine.InstalledMissions = new(ArtemisManager.GetInstalledMissions());
+            thisMachine.InstalledMods = new(ArtemisManager.GetInstalledMods());
+            thisMachine.ArtemisIsRunning = ArtemisManager.IsArtemisRunning();
+
+            thisMachine.Drives = new(DriveData.GetDriveData());
+
+            AddConnection(thisMachine);
+            TakeAction.SourcePC = thisMachine;
+            if (SettingsAction.Current.IsMaster)
+            {
+                AddConnection(new PCItem("All Connections", IPAddress.Any));
+            };
+        }
         public static void AddConnection(PCItem item)
         {
             ConnectedPCs?.Add(item);
             ConnectionAdded?.Invoke(null, new ConnectionEventArgs(item));
-            
+            SetAllConnectionsInfo();
+
         }
         public static void RemoveConnection(PCItem item)
         {
             ConnectedPCs?.Remove(item);
             ConnectionRemoved?.Invoke(null, new ConnectionEventArgs(item));
+            SetAllConnectionsInfo();
         }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
@@ -100,21 +123,6 @@ namespace ArtemisManagerUI
                 }
             }
         }
-        //public static void ChangeSetting(string settingName,string value)
-        //{
-        //    switch(settingName)
-        //    {
-        //        case "ConnectOnStart":
-        //            Properties.Settings.Default.ConnectOnStart = bool.Parse(value);
-        //            break;
-        //        case "ListeningPort":
-        //            Properties.Settings.Default.ListeningPort = int.Parse(value);
-        //            break;
-        //        case "IsMaster":
-        //            break;
-        //    }
-        //    Properties.Settings.Default.Save();
-        //}
         public static bool ProcessPCAction(PCActions action, bool force, IPAddress? source)
         {
             if (!force)
@@ -666,6 +674,287 @@ oLink.Save
                 }
 
                 return success;
+            }
+        }
+        public static bool IsBroadcast(IPAddress? address)
+        {
+            return (address?.ToString() == AllConnections.ToString());
+        }
+        
+        public static bool IsLoopback(IPAddress? address)
+        {
+            return (address?.ToString() == SelfIP.ToString());
+        }
+        
+        public static void SetAllConnectionsInfo()
+        {
+            if (ConnectedPCs != null && ConnectedPCs.Count > AllConnectionsElement)
+            {
+                bool? allConnectOnStart = null;
+                bool allConnectOnStartDecided = false;
+
+                bool? allArtemisIsRunning = null;
+                bool allArtemisIsRunningDecided = false;
+
+                bool? allIsUsingThisApp = null;
+                bool allIsUsingThisAppDecided = false;
+
+                bool? allInStartFolder = null;
+                bool allInStartFolderDecided = false;
+
+                string allAppVersion = string.Empty;
+                foreach (var item in ConnectedPCs)
+                {
+                    if (item.IP != null && !TakeAction.IsBroadcast(item.IP))
+                    {
+                        if (string.IsNullOrEmpty(allAppVersion))
+                        {
+                            allAppVersion = item.AppVersion;
+                        }
+                        else
+                        {
+                            if (allAppVersion != "Mixed" && allAppVersion != item.AppVersion)
+                            {
+                                allAppVersion = "Mixed";
+                            }
+                        }
+                        if (!allConnectOnStartDecided)
+                        {
+                            if (allConnectOnStart == null)
+                            {
+                                allConnectOnStart = item.ConnectOnstart;
+                            }
+                            else
+                            {
+                                if (allConnectOnStart != item.ConnectOnstart)
+                                {
+                                    allConnectOnStart = null;
+                                    allConnectOnStartDecided = true;
+                                }
+                            }
+                        }
+                        if (!allArtemisIsRunningDecided)
+                        {
+                            if (allArtemisIsRunning == null)
+                            {
+                                allArtemisIsRunning = item.ArtemisIsRunning;
+                            }
+                            else
+                            {
+                                if (allArtemisIsRunning != item.ArtemisIsRunning)
+                                {
+                                    allArtemisIsRunning = null;
+                                    allArtemisIsRunningDecided = true;
+                                }
+                            }
+                        }
+
+                        if (!allIsUsingThisAppDecided)
+                        {
+                            if (allIsUsingThisApp == null)
+                            {
+                                allIsUsingThisApp = item.IsUsingThisAppControlledArtemis;
+                            }
+                            else
+                            {
+                                if (allIsUsingThisApp != item.IsUsingThisAppControlledArtemis)
+                                {
+                                    allIsUsingThisApp = null;
+                                    allIsUsingThisAppDecided = true;
+                                }
+                            }
+                        }
+                        if (!allInStartFolderDecided)
+                        {
+                            if (allInStartFolder == null)
+                            {
+                                allInStartFolder = item.AppInStartFolder;
+                            }
+                            else
+                            {
+                                if (allInStartFolder != item.AppInStartFolder)
+                                {
+                                    allInStartFolder = null;
+                                    allInStartFolderDecided = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                ConnectedPCs[AllConnectionsElement].ConnectOnstart = allConnectOnStart;
+                ConnectedPCs[AllConnectionsElement].ArtemisIsRunning = allArtemisIsRunning;
+                ConnectedPCs[AllConnectionsElement].IsUsingThisAppControlledArtemis = allIsUsingThisApp;
+                ConnectedPCs[AllConnectionsElement].AppInStartFolder = allInStartFolder;
+                ConnectedPCs[AllConnectionsElement].AppVersion = allAppVersion;
+            }
+        }
+        private static void DoSendPing(IPAddress address)
+        {
+            if (TakeAction.IsBroadcast(address))
+            {
+
+            }
+            else
+            {
+                if (TakeAction.IsLoopback(address))
+                {
+                    //Pinging self here--maybe we do something???
+                }
+                else
+                {
+                    Network.Current?.SendPing(address);
+                }
+            }
+        }
+        public static void SendPing(IPAddress? address)
+        {
+            if (address != null)
+            {
+                if (IsBroadcast(address))
+                {
+                    if (ConnectedPCs != null)
+                    {
+                        foreach (var connection in ConnectedPCs)
+                        {
+                            if (connection != null && connection.IP != null)
+                            {
+                                DoSendPing(connection.IP);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DoSendPing(address);
+                }
+            }
+        }
+        private static void DoSendPCAction(IPAddress address, PCActions action)
+        {
+            if (TakeAction.IsBroadcast(address))
+            {
+
+            }
+            else
+            {
+                if (TakeAction.IsLoopback(address))
+                {
+                    TakeAction.ProcessPCAction(action, true, address);
+                }
+                else
+                {
+                    Network.Current?.SendPCAction(address, action, true);
+                }
+            }
+        }
+        public static void SendPCAction(IPAddress? address, PCActions action)
+        {
+            if (address != null)
+            {
+                if (TakeAction.IsBroadcast(address))
+                {
+                    if (TakeAction.ConnectedPCs != null)
+                    {
+                        foreach (var connection in TakeAction.ConnectedPCs)
+                        {
+                            if (connection != null && connection.IP != null)
+                            {
+                                DoSendPCAction(connection.IP, action);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DoSendPCAction(address, action);
+                }
+            }
+        }
+        private static void DoChangeSetting(IPAddress address, string setting, string value)
+        {
+            if (TakeAction.IsBroadcast(address))
+            {
+
+            }
+            else
+            {
+                if (TakeAction.IsLoopback(address))
+                {
+                    SettingsAction.Current.SynchronizeEnabled = false;
+                    SettingsAction.Current.ChangeSetting(setting, value);
+                    SettingsAction.Current.Save();
+                }
+                else
+                {
+                    Network.Current?.SendChangeSetting(address, setting, value);
+                }
+            }
+        }
+        public static void SendChangeSetting(IPAddress? address, string setting, string? value)
+        {
+            if (address != null && value != null)
+            {
+                if (TakeAction.IsBroadcast(address))
+                {
+                    if (TakeAction.ConnectedPCs != null)
+                    {
+                        foreach (var connection in TakeAction.ConnectedPCs)
+                        {
+                            if (connection != null && connection.IP != null)
+                            {
+
+                                DoChangeSetting(connection.IP, setting, value);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DoChangeSetting(address, setting, value);
+                }
+            }
+        }
+
+        private static void DoSendArtemisAction(IPAddress address, AMCommunicator.Messages.ArtemisActions action, Guid identifier, string JSON)
+        {
+            if (TakeAction.IsBroadcast(address))
+            {
+
+            }
+            else
+            {
+                if (TakeAction.IsLoopback(address))
+                {
+                    TakeArtemisAction.ProcessArtemisAction(address, action, JSON);
+                }
+                else
+                {
+                    Network.Current?.SendArtemisAction(address, action, identifier, JSON);
+                }
+            }
+        }
+        public static void SendArtemisAction(IPAddress? address, AMCommunicator.Messages.ArtemisActions action, Guid identifier, string JSON)
+        {
+            if (address != null)
+            {
+                if (TakeAction.IsBroadcast(address))
+                {
+                    if (TakeAction.ConnectedPCs != null)
+                    {
+                        foreach (var connection in TakeAction.ConnectedPCs)
+                        {
+                            if (connection != null && connection.IP != null)
+                            {
+
+                                DoSendArtemisAction(connection.IP, action, identifier, JSON);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    DoSendArtemisAction(address, action, identifier, JSON);
+                }
             }
         }
     }

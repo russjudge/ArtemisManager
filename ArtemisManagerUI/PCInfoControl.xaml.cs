@@ -1,7 +1,11 @@
-﻿using System;
+﻿using AMCommunicator;
+using SharpCompress.Common;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,23 +29,6 @@ namespace ArtemisManagerUI
         {
             InitializeComponent();
         }
-        //public static readonly DependencyProperty ConnectedPCsProperty =
-        //  DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
-        //      typeof(PCInfoControl));
-
-        //public ObservableCollection<PCItem> ConnectedPCs
-        //{
-        //    get
-        //    {
-        //        return (ObservableCollection<PCItem>)this.GetValue(ConnectedPCsProperty);
-
-        //    }
-        //    set
-        //    {
-        //        this.SetValue(ConnectedPCsProperty, value);
-
-        //    }
-        //}
         public static readonly DependencyProperty SelectedTargetPCProperty =
         DependencyProperty.Register(nameof(SelectedTargetPC), typeof(PCItem),
             typeof(PCInfoControl));
@@ -78,67 +65,71 @@ namespace ArtemisManagerUI
 
         private void OnSetConnectOnStart(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendChangeSetting(SelectedTargetPC?.IP, "ConnectOnStart", SelectedTargetPC?.ConnectOnstart?.ToString());
         }
+
 
         private void OnIsMasterSet(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void OnRemoteAddManagerFromStartup(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void OnRemoteRemoveManagerFromStartup(object sender, RoutedEventArgs e)
-        {
-
+            TakeAction.SendChangeSetting(SelectedTargetPC?.IP, "IsMaster", SelectedTargetPC?.ConnectOnstart?.ToString());
         }
 
         private void OnStartArtemisRemote(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendArtemisAction(SelectedTargetPC?.IP, AMCommunicator.Messages.ArtemisActions.StartArtemis, Guid.Empty, string.Empty);
         }
 
         private void OnStopArtemisRemote(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendArtemisAction(SelectedTargetPC?.IP, AMCommunicator.Messages.ArtemisActions.StopArtemis, Guid.Empty, string.Empty);
         }
 
         private void OnDisconnect(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.DisconnectThisConnection);
         }
 
         private void OnCloseApp(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.CloseApp);
         }
 
         private void OnCloseAndRestartApp(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.RestartApp);
         }
 
         private void OnPing(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendPing(SelectedTargetPC?.IP);
         }
 
         private void OnRestart(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.RestartPC);
         }
 
         private void OnShutdown(object sender, RoutedEventArgs e)
         {
-
+            TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.ShutdownPC);
         }
 
         private void OnUpdateCheck(object sender, RoutedEventArgs e)
         {
+            TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.CheckForUpdate);
+        }
 
+
+        private void OnSetManagerInStartup(object sender, RoutedEventArgs e)
+        {
+            if (SelectedTargetPC?.AppInStartFolder == true)
+            {
+                TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.AddAppToStartup);
+            }
+            else
+            {
+                TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.RemoveAppFromStartup);
+            }
         }
     }
 }

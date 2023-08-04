@@ -13,7 +13,6 @@
 
         <DockPanel.Resources>
             <converter:ByteFormatter x:Key="ByteFormatter" />
-            <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
             <converter:DateFormatter x:Key="DateFormatter" />
             <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
             <converter:NullToVisibility x:Key="NullToVisibility" />
@@ -467,7 +466,8 @@
                         <TextBlock Text="PC Actions &amp; Settings" />
                     </WrapPanel>
                 </TabItem.Header>
-                <local:PCInfoTabControl />
+                <local:PCInfoTabControl
+                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=TwoWay}"/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -475,6 +475,9 @@
                         <TextBlock Text="Mods" />
                     </WrapPanel>
                 </TabItem.Header>
+                <local:ModTabControl
+                    ShowMods="True"
+                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=TwoWay}" />
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -482,6 +485,9 @@
                         <TextBlock Text="Missions" />
                     </WrapPanel>
                 </TabItem.Header>
+                <local:ModTabControl
+                    ShowMods="False"
+                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=TwoWay}" />
             </TabItem>
 
             

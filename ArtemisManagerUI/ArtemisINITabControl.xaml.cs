@@ -24,13 +24,12 @@ namespace ArtemisManagerUI
     {
         public ArtemisINITabControl()
         {
-            
             ConnectedPCs = new();
             if (TakeAction.ConnectedPCs != null)
             {
                 foreach (var PC in TakeAction.ConnectedPCs)
                 {
-                    if (PC.IP?.ToString() != TakeAction.AllConnections.ToString())
+                    if (PC.IP != null && !TakeAction.IsBroadcast(PC.IP))
                     {
                         ConnectedPCs.Add(new(PC));
                     }

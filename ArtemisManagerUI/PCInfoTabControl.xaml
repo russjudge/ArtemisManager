@@ -6,18 +6,19 @@
              xmlns:local="clr-namespace:ArtemisManagerUI"
              mc:Ignorable="d" Name="uc">
     <TabControl
+        Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
         SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
         ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
         <TabControl.ItemTemplate>
             <DataTemplate>
-                <TextBlock Text="{Binding Connection.Hostname}" />
+                <TextBlock Text="{Binding Hostname}" />
             </DataTemplate>
         </TabControl.ItemTemplate>
         <TabControl.ContentTemplate>
             <DataTemplate>
                 <local:PCInfoControl
-                    IsMaster="{Binding ElementName=uc, Path=IsMaster}"
-                    SelectedTargetPC="{Binding ElementName=uc, Path=SelectedTargetPC}" />
+                    IsMaster="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
+                    SelectedTargetPC="{Binding}" />
             </DataTemplate>
         </TabControl.ContentTemplate>
 

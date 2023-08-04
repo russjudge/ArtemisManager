@@ -3,9 +3,12 @@ Change History
 Version 0.4 (beta) 08/xx/2023:
 Enhancements:
 	- Improved interface for working with remote engineering presets and artemis.ini settings.
+	- Reworked the settings, mods, and missions interface for remote control.
+	- Added local/remote editing (text editor) and management for controls.ini and DMXControls.xml.
 Other changes:
 	- Significant change to the layout of the UI to handle remote management of Artemis.ini and engineering presets.  A lot of stuff got moved
 		around because of this.
+
 ------------------------------
 Version 0.3 (beta) 07/30/2023:
 Bug Fixes:

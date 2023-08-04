@@ -25,8 +25,8 @@ namespace AMCommunicator
             IsUsingThisAppControlledArtemis = message.IsUsingThisAppControlledArtemis;
             AppInStartFolder = message.AppInStartFolder;
             FreeSpaceOnAppSrive = message.FreeSpaceOnAppDrive;
-
             AllDrives = message.AllDrives;
+            Drives = message.Drives;
             GeneralSettings = message.GeneralSettings;
         }
         public IPAddress? Source { get; private set; }
@@ -38,8 +38,11 @@ namespace AMCommunicator
         public bool ArtemisIsRunning { get; private set; }
         public bool IsUsingThisAppControlledArtemis { get; private set; }
         public bool AppInStartFolder { get; private set; }
+        [Obsolete]
         public long FreeSpaceOnAppSrive { get; private set; }
+        [Obsolete]
         public string[] AllDrives { get; private set; }
+        public DriveData[] Drives { get; private set; }
         public string GeneralSettings { get; private set; }
     }
 }

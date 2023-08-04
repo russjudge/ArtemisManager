@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="ArtemisManagerUI.DriveInfoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             HorizontalAlignment="Stretch" 
+             mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:NullToVisibility x:Key="NullToVisibility" />
+        <converter:ByteFormatter x:Key="ByteFormatter" />
+    </UserControl.Resources>
+    <GroupBox HorizontalAlignment="Stretch" >
+        <GroupBox.Header>
+            <StackPanel Orientation="Horizontal" >
+                <TextBlock
+                    
+                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Text="{Binding ElementName=uc, Path=Drive.Name}" />
+                <TextBlock
+                    FontWeight="Bold"
+                    Foreground="Green"
+                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Text="{Binding ElementName=uc, Path=Drive.Name}" />
+                <TextBlock
+                    Padding="10,0,0,0"
+                    FontStyle="Italic"
+                    Foreground="Green"
+                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Text="** Application Drive **" />
+            </StackPanel>
+        </GroupBox.Header>
+        <WrapPanel>
+            <TextBlock FontStyle="Italic" Text="Free:" />
+            <TextBlock Padding="5,0,5,0" Text="{Binding ElementName=uc, Path=Drive.FreeSpace, Converter={StaticResource ByteFormatter}}" />
+
+            <TextBlock FontStyle="Italic" Text="of" />
+            <TextBlock Padding="5,0,10,0" Text="{Binding ElementName=uc, Path=Drive.TotalSize, Converter={StaticResource ByteFormatter}}" />
+
+            <TextBlock FontStyle="Italic" Text="Format:" />
+            <TextBlock Padding="5,0,10,0" Text="{Binding ElementName=uc, Path=Drive.DriveFormat}" />
+
+            <TextBlock FontStyle="Italic" Text="Type:" />
+            <TextBlock Padding="5,0,0,0" Text="{Binding ElementName=uc, Path=Drive.DriveType}" />
+        </WrapPanel>
+    </GroupBox>
+</UserControl>

@@ -19,15 +19,18 @@ namespace ArtemisManagerUI
         {
             Hostname = hostname;
             IP = ip;
+            IsRemote = !TakeAction.IsLoopback(IP);
             InstalledMods = new ObservableCollection<ModItem>();
             InstalledMissions = new ObservableCollection<ModItem>();
-            AllDrives = new ObservableCollection<string>();
+            Drives = new();
         }
         public void LoadClientInfoData(ClientInfoEventArgs info)
         {
+            IP = info.Source;
+            IsRemote = !TakeAction.IsLoopback(IP);
             InstalledMods.Clear();
             InstalledMissions.Clear();
-            AllDrives.Clear();
+            Drives.Clear();
             IsMaster = info.IsMaster;
             AppVersion= info.AppVersion;
             ConnectOnstart = info.ConnectOnStart;
@@ -57,12 +60,9 @@ namespace ArtemisManagerUI
             ArtemisIsRunning = info.ArtemisIsRunning;
             IsUsingThisAppControlledArtemis = info.IsUsingThisAppControlledArtemis;
             AppInStartFolder= info.AppInStartFolder;
-            FreeSpaceOnAppDrive = info.FreeSpaceOnAppSrive;
-            foreach(var item in info.AllDrives)
-            {
-                AllDrives.Add(item);
-            }
+            
             GeneralSettings= info.GeneralSettings;
+            TakeAction.SetAllConnectionsInfo();
         }
         public string Hostname { get; private set; }
         public IPAddress? IP { get; private set; }
@@ -79,6 +79,17 @@ namespace ArtemisManagerUI
             }
         }
 
+        private bool isRemote = false;
+        public bool IsRemote
+        {
+            get { return isRemote; }
+            set
+            {
+                isRemote = value;
+                DoChanged();
+            }
+        }
+
         private string appVersion = string.Empty;
         public string AppVersion
         {
@@ -90,8 +101,8 @@ namespace ArtemisManagerUI
             }
         }
 
-        private bool connectOnStart = false;
-        public bool ConnectOnstart
+        private bool? connectOnStart = false;
+        public bool? ConnectOnstart
         {
             get { return connectOnStart; }
             set
@@ -102,15 +113,15 @@ namespace ArtemisManagerUI
         }
 
         
-        public ObservableCollection<ModItem> InstalledMods { get; private set; }
+        public ObservableCollection<ModItem> InstalledMods { get;  set; }
         
 
 
-        public ObservableCollection<ModItem> InstalledMissions {get; private set;}
+        public ObservableCollection<ModItem> InstalledMissions {get;  set;}
 
-        private bool artemisIsRunning = false;
+        private bool? artemisIsRunning = false;
 
-        public bool ArtemisIsRunning
+        public bool? ArtemisIsRunning
         {
             get { return artemisIsRunning; }
             set
@@ -120,8 +131,8 @@ namespace ArtemisManagerUI
             }
         }
 
-        private bool isUsingThisAppControlledArtemis = false;
-        public bool IsUsingThisAppControlledArtemis
+        private bool? isUsingThisAppControlledArtemis = false;
+        public bool? IsUsingThisAppControlledArtemis
         {
             get { return isUsingThisAppControlledArtemis; }
             set
@@ -131,8 +142,8 @@ namespace ArtemisManagerUI
             }
         }
 
-        private bool appInStartFolder = false;
-        public bool AppInStartFolder
+        private bool? appInStartFolder = false;
+        public bool? AppInStartFolder
         {
             get { return appInStartFolder; }
             set
@@ -141,18 +152,8 @@ namespace ArtemisManagerUI
                 DoChanged();
             }
         }
-        private long freeSpaceOnAppDrive = 0;
-        public long FreeSpaceOnAppDrive
-        {
-            get { return freeSpaceOnAppDrive; }
-            set
-            {
-                freeSpaceOnAppDrive = value;
-                DoChanged();
-            }
-        }
 
-        public ObservableCollection<string> AllDrives{get; private set;}
+        public ObservableCollection<DriveData> Drives { get; set; }
 
 
         //This is a catch-all.

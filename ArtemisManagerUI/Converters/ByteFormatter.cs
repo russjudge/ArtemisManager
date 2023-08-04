@@ -35,7 +35,7 @@ namespace ArtemisManagerUI.Converters
                         return default(string);
                     }
                 }
-                string[] items = new string[] { "bytes", "KB", "MB", "GB", "TB", "PB", "EB" };
+                string[] items = new string[] { " bytes", "KB", "MB", "GB", "TB", "PB", "EB" };
                 int p = -1;
 
                 decimal workReturn = decimal.MaxValue;

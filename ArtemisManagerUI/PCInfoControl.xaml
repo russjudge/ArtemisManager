@@ -7,7 +7,9 @@
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
-        <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
+
+        <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
+        <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
         <converter:DateFormatter x:Key="DateFormatter" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
         <converter:NullToVisibility x:Key="NullToVisibility" />
@@ -23,7 +25,7 @@
         </GroupBox.Header>
 
         <DockPanel>
-            <StackPanel DockPanel.Dock="Left" MaxWidth="250" Visibility="{Binding SelectedTargetPC.IP, Converter={StaticResource HideBroadcastIPConverter}}">
+            <StackPanel DockPanel.Dock="Left" MaxWidth="250" Visibility="{Binding SelectedTargetPC.IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}">
                 <StackPanel Orientation="Horizontal">
                     <Label Content="Artemis Manager Version:" />
                     <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=SelectedTargetPC.AppVersion}" />
@@ -31,21 +33,26 @@
                 <CheckBox
                     IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
                     VerticalAlignment="Center" VerticalContentAlignment="Center"
-                    Checked="OnSetConnectOnStart"
-                    Unchecked="OnSetConnectOnStart"
+                    Click="OnSetConnectOnStart"
                     IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.ConnectOnstart, Mode=TwoWay}" >
                     <TextBlock
                         Text="Connect to Peer-to-Peer network on start"
                         ToolTip="If checked, then when this application starts on the client, it will immediately try to connecto to the peer-to-peer network."
                         TextWrapping="Wrap"/>
                 </CheckBox>
+                <AdornerDecorator
+                    IsEnabled="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}">
                 <CheckBox
-                    Checked="OnIsMasterSet"
-                    Unchecked="OnIsMasterSet"
+                    Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}"
+                    Click="OnIsMasterSet"
                     ToolTip="Indicates whether or not this client can control all other clients.  If not checked, then this client cannot control any client, except itself."
                     Content="Is a Master"
-                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsMaster, Mode=TwoWay}" IsEnabled="{Binding ElementName=uc, Path=IsMaster}"/>
-                <CheckBox Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning}" IsEnabled="False"/>
+                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsMaster, Mode=TwoWay}"
+                    IsEnabled="{Binding ElementName=uc, Path=IsMaster}"/>
+                </AdornerDecorator>
+                <CheckBox
+                    Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning}" IsEnabled="False"/>
+                
                 <CheckBox
                     IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsUsingThisAppControlledArtemis}"
                     VerticalContentAlignment="Center" VerticalAlignment="Center" IsEnabled="False" >
@@ -55,14 +62,9 @@
                 <CheckBox
                     IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
                     VerticalAlignment="Center" VerticalContentAlignment="Center"
-                    Checked="OnRemoteAddManagerFromStartup"
-                    Unchecked="OnRemoteRemoveManagerFromStartup">
+                    Click="OnSetManagerInStartup" >
                     <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
                 </CheckBox>
-                <StackPanel Orientation="Horizontal">
-                    <Label Grid.Row="4" Content="Drive Freespace:" />
-                    <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=SelectedTargetPC.FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
-                </StackPanel>
             </StackPanel>
             <DockPanel DockPanel.Dock="Right">
                 <GroupBox
@@ -121,6 +123,21 @@
                             <Image Height="24" Source="/ArtemisManagerUI;component/Resources/update.png" />
                         </Button>
                     </WrapPanel>
+                </GroupBox>
+                <GroupBox
+                    Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}"
+                    Header="Drive Data">
+                <ListBox
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                    ItemsSource="{Binding ElementName=uc, Path=SelectedTargetPC.Drives}">
+                    
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <local:DriveInfoControl Drive="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
                 </GroupBox>
             </DockPanel>
         </DockPanel>

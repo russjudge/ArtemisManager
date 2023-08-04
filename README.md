@@ -36,16 +36,11 @@ To avoid scope creep and creating a monster, Artemis Manager will be limited to 
 since the Mission Editor already.  DMX editing will not be implemented since there is already a tool for this.
 
 Planned for release 0.5 (beta):
-- Adding edit pages and remote management for controls.ini and DMXCommands.xml.
-	This will be kept simple--editing for both will be nothing more than a basic text editor with no validity checking, but will offer ability to create multiple different
-	versions, like for artemis.ini and the engineering presets, and to activate locally and remotely.  Sophisticated DMXCommands.xml editing might be considered AFTER review of 
-	the external tool Artemis Bridge Tools, which claims to have good editing features for DMXCommands.xml.  If developing this editor is deemed necessary, it will be considered for
-	Release 0.6 (beta), with the releases specified below pushed forward one release cycle.
+- UI for building a mod.  The first release for this will include an editor for vesselData.xml, as well as access to the non-localized settings in artemis.ini.
+- Will review external tool Artemis Bridge Tools to determine if better functionality is needed for DMXCommands.xml.  If the functionality is needed, development
+	will be planned, probably for version 0.7 (beta) or after version 1.0 when Artemis Manager leaves beta.
 
 Planned for release 0.6 (beta):
-- UI for building a mod.  The first release for this will include an editor for vesselData.xml, as well as access to the non-localized settings in artemis.ini.
-
-Planned for release 0.7 (beta):
 - Full UI toolkit for pulling in files for building a mod (such as graphics and audio files).
 
 Planned for release 1.0 (which should bring Artemis Manager out of beta):
@@ -55,12 +50,13 @@ Planned for release 1.0 (which should bring Artemis Manager out of beta):
 
 Stuff that will NOT be done:
 -- Mission editor/scripting.  There is already an adaquate tool for this.
--- DMX editor.  There appears to already be an adaquate tool for this, though I have not tested it.
+-- DMX editor, assuming my review of Artemis Bridge Tools shows this to be an adequate tool for DMX editing.
 -- Graphics for Artemis SBS.  No modeling, no meshes, nothing of this.  This isn't where my expertise lies and would be nothing be frustration if I were to even try.
 
 
 Once out of beta, examination of Artemis Cosmos will be performed.  If it is determined that Artemis Cosmos is similar enough to Artemis SBS, then Artemis Manager will be
-modified to offer support for Artemis Cosmos as well--otherwise a new tool might be built to support Artemis Cosmos.
+modified to offer support for Artemis Cosmos as well--otherwise a new tool might be built to support Artemis Cosmos.  Based on preliminary information I've received, I think a new tool
+will be likely as much of the support that Artemis Manager provides for Artemis SBS has been complete re-worked for Artemis Cosmos.
 
 However, before work to support Artemis Cosmos is performed, examination of my application "The Big Red Button of Death" will be performed.  It has been reported that this
 does not work anymore.  Coding for self-destruct is pretty straight-forward, so the plan is to create a new application that is cross-platform (Windows & Android) that will

@@ -11,14 +11,18 @@ namespace AMCommunicator.Messages
     [NetworkMessageCommand(MessageCommand.ClientInfo)]
     internal class ClientInfoMessage : NetworkMessage
     {
-        public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
+        public const short ThisVersion = 1;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 
+        //From version 0 to version 1:
+        // Added Drives array.  This may cause a crash loading to an old version.  Not sure.  Testing may be necessary.
+        //  Code in current state refuses to load the class over network and will alert user of need to apply update to Artemis Manager.
         internal ClientInfoMessage() : base()
         {
             AppVersion = string.Empty;
             InstalledMods = Array.Empty<string>();
             InstalledMissions= Array.Empty<string>();
             AllDrives = Array.Empty<string>();
+            Drives = Array.Empty<DriveData>();
             GeneralSettings = string.Empty;
         }
         public ClientInfoMessage(bool isMaster, bool connectOnStart, string[] installedMods,
@@ -45,18 +49,18 @@ namespace AMCommunicator.Messages
             ArtemisIsRunning = artemisIsRunning;
             IsUsingThisAppControlledArtemis = isUsingThisAppControlledArtemis;
             AppInStartFolder = appInStartFolder;
-           
-            var drives = DriveInfo.GetDrives();
+            Drives = DriveData.GetDriveData();
+
             List<string> dd = new();
-            foreach (var drive in drives)
+            foreach (var drive in Drives)
             {
-                if (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)[..1]))
+                if (drive.IsAppDrive)
                 {
-                    FreeSpaceOnAppDrive = drive.AvailableFreeSpace;
+                    FreeSpaceOnAppDrive = drive.FreeSpace;
                 }
-                if (drive.DriveType == DriveType.Fixed )
+                if (drive.DriveType == DriveType.Fixed)
                 {
-                    dd.Add(drive.Name + ","+ drive.DriveType.ToString()+","+drive.TotalSize.ToString() + ","+drive.AvailableFreeSpace);
+                    dd.Add(drive.Name + ","+ drive.DriveType.ToString()+","+drive.TotalSize.ToString() + ","+drive.FreeSpace);
                 }
 
             }
@@ -87,10 +91,12 @@ namespace AMCommunicator.Messages
 
         public bool AppInStartFolder { get; set; }
 
-
+        [Obsolete]
         public long FreeSpaceOnAppDrive { get; set; }
 
+        [Obsolete]
         public string[] AllDrives { get; set; }
+        public DriveData[] Drives { get; set; }
 
         //This is a catch-all.
         public string GeneralSettings { get; set; }

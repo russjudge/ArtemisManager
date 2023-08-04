@@ -28,7 +28,7 @@ namespace AMCommunicator
         {
             
         }
-
+       
         public static Network? Current { get; private set; }
         public static Network GetNetwork()
         {
@@ -162,6 +162,7 @@ namespace AMCommunicator
             {
                 ChangeAppSettingMessage msg = new(settingName, settingTarget);
 
+                
                 Transmit(connection.Stream, msg);
             }
         }

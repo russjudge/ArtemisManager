@@ -30,24 +30,20 @@ namespace ArtemisManagerUI
         public Main()
         {
             try
-           {
+            {
                 SettingsAction.Touch();
                 ArtemisUpgradeLinks = new();
                 ExternalToolsLinks = new();
-                
+
 
                 Status = new ObservableCollection<string>();
-                ConnectedPCs = new();
-                TakeAction.ConnectedPCs = ConnectedPCs;
-                PCItem thisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback);
-                TakeAction.AddConnection(thisMachine);
-                
-                if (SettingsAction.Current.IsMaster)
+
+                if (TakeAction.ConnectedPCs != null)
                 {
-                    TakeAction.AddConnection(new PCItem("All Connections", IPAddress.Any));
-                };
-                
-                TakeAction.SourcePC = thisMachine;
+                    ConnectedPCs = TakeAction.ConnectedPCs;
+                }
+
+
                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
 
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
@@ -73,7 +69,7 @@ namespace ArtemisManagerUI
             {
                 UpdateStatus("Error starting up: " + ex.Message);
             }
-                
+
 
             InitializeComponent();
 
@@ -103,14 +99,14 @@ namespace ArtemisManagerUI
                         {
                             Header = "Download",
                             CommandParameter = link,
-                            
+
                             Icon = new System.Windows.Controls.Image
                             {
                                 Source = new BitmapImage(new Uri("/ArtemisManagerUI;component/Resources/download (1).png", UriKind.Relative))
                             }
-                    };
+                        };
                         sub.Click += OnDownload;
-                        
+
                         item.Items.Add(sub);
                         sub = new()
                         {
@@ -131,7 +127,7 @@ namespace ArtemisManagerUI
             timer = new DispatcherTimer(DispatcherPriority.Background, this.Dispatcher);
             timer.Interval = new TimeSpan(0, 0, 5);
             timer.Tick += Timer_Tick;
-            
+
             timer.Start();
 
         }
@@ -293,7 +289,7 @@ namespace ArtemisManagerUI
                         }
                     }
 
-                    
+
                     isLoading = false;
                     if (ConnectOnStart)
                     {
@@ -461,7 +457,7 @@ namespace ArtemisManagerUI
             {
                 if (!me.isLoading)
                 {
-                    
+
                     if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString()))
                     {
                         me.ConnectOnStart = SettingsAction.Current.ConnectOnStart;
@@ -662,7 +658,7 @@ namespace ArtemisManagerUI
         }
 
 
-       
+
         private void UpdateStatus(string message)
         {
             try
@@ -820,8 +816,8 @@ namespace ArtemisManagerUI
         {
             this.Dispatcher.Invoke(() =>
             {
-                this.PopupMessage += Environment.NewLine+Environment.NewLine + e.Message;
-                
+                this.PopupMessage += Environment.NewLine + Environment.NewLine + e.Message;
+
             });
         }
 
@@ -967,7 +963,7 @@ namespace ArtemisManagerUI
             UpdateStatus("Sending Updated Client info");
             TakeAction.SendClientInfo(IPAddress.Any);
         }
-
+        
         void LoadClientInfoData(ClientInfoEventArgs e)
         {
             if (Thread.CurrentThread != this.Dispatcher.Thread)
@@ -977,18 +973,22 @@ namespace ArtemisManagerUI
             else
             {
                 bool isMasterFound = false;
+
                 foreach (var item in ConnectedPCs)
                 {
-
-                    if (item.IP != null && e.Source != null)
+                    if (item.IP != null && !TakeAction.IsBroadcast(item.IP))
                     {
-                        if (item.IsMaster)
+                        if (e.Source != null)
                         {
-                            isMasterFound = true;
-                        }
-                        if (item.IP.ToString().Equals(e.Source.ToString()))
-                        {
-                            item.LoadClientInfoData(e);
+                            if (item.IsMaster)
+                            {
+                                isMasterFound = true;
+                            }
+                            if (item.IP.ToString().Equals(e.Source.ToString()))
+                            {
+                                item.LoadClientInfoData(e);
+                                
+                            }
                         }
                     }
                 }
@@ -1025,7 +1025,7 @@ namespace ArtemisManagerUI
             this.Dispatcher.Invoke(new Action(() =>
             {
                 PopupMessage = e.AlertItem.ToString() + Environment.NewLine + e.RelatedData;
-                
+
                 System.Windows.MessageBox.Show("Alert Recieved: " + e.AlertItem.ToString() + "--" + e.RelatedData);
             }));
         }
@@ -1047,7 +1047,7 @@ namespace ArtemisManagerUI
                         this.isLoading = false;
                     }));
                     break;
-                
+
                 case "IsMaster":
                     this.Dispatcher.Invoke(new Action(() =>
                     {
@@ -1069,7 +1069,7 @@ namespace ArtemisManagerUI
             SettingsAction.Current.Save();
         }
 
-        
+
 
         void ConsiderClosing(bool force, IPAddress? source)
         {
@@ -1177,7 +1177,7 @@ namespace ArtemisManagerUI
             }
             else
             {
-                System.Windows.MessageBox.Show("FATAL Exception:\r\n"+ Environment.NewLine + e.Message, "FATAL ERROR!!!", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("FATAL Exception:\r\n" + Environment.NewLine + e.Message, "FATAL ERROR!!!", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
             }
         }
@@ -1318,7 +1318,7 @@ namespace ArtemisManagerUI
                 this.SetValue(IsMasterProperty, value);
             }
         }
-        
+
 
         private void OnPutInStartup(object sender, RoutedEventArgs e)
         {
@@ -1414,7 +1414,7 @@ namespace ArtemisManagerUI
         }
         //@@@@
 
-       
+
         private void OnStartArtemisSBS(object sender, RoutedEventArgs e)
         {
             ArtemisManager.StartArtemis();
@@ -1538,7 +1538,7 @@ namespace ArtemisManagerUI
             win.Show();
         }
 
-       
+
 
         bool isDragging = false;
         private void OnModDragEnter(object sender, System.Windows.DragEventArgs e)
@@ -1810,7 +1810,7 @@ namespace ArtemisManagerUI
         private void OnSettings(object sender, RoutedEventArgs e)
         {
             SettingsWindow win = new();
-            
+
             win.ShowDialog();
             ConnectOnStart = SettingsAction.Current.ConnectOnStart;
         }

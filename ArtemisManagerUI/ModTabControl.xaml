@@ -1,0 +1,65 @@
+﻿<UserControl x:Class="ArtemisManagerUI.ModTabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             mc:Ignorable="d" Name="uc">
+    <UserControl.Resources>
+        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <Style TargetType="ListBox">
+            <Style.Triggers>
+                <DataTrigger
+                    Binding="{Binding ElementName=uc, Path=ShowMods}"
+                    Value="True">
+                    <Setter Property="ItemsSource" Value="{Binding ElementName=uc, Path=SelectedTargetPC.InstalledMods}" />
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding ElementName=uc, Path=ShowMods}"
+                    Value="False">
+                    <Setter Property="ItemsSource" Value="{Binding ElementName=uc, Path=SelectedTargetPC.InstalledMissions}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <TabControl
+        Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
+        SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
+        ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Hostname}" />
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <GroupBox>
+                    <GroupBox.Header>
+                        <StackPanel>
+                            <TextBlock
+                                Text="Mods"
+                                Visibility="{Binding ElementName=uc, Path=ShowMods, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" />
+                            <TextBlock
+                                Visibility="{Binding ElementName=uc, Path=ShowMods, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                                Text="Missions" />
+                        </StackPanel>
+                    </GroupBox.Header>
+                <ListBox
+                    Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
+                    ItemsSource="{Binding ElementName=uc, Path=SelectedTargetPC.InstalledMods}" >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <local:ModItemControl
+                                Source="{Binding Mode=OneWay, Path=(TabControl.SelectedItem), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
+                                IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
+                                Mod="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                </GroupBox>
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+
+    </TabControl>
+</UserControl>

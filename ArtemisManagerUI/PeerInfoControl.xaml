@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:ArtemisManagerUI" Name="ucPeer"
              mc:Ignorable="d" >
     <UserControl.Resources>
-        <converter:HideBroadcastIPConverter x:Key="HideBroadcastIPConverter" />
+        <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
         <converter:DateFormatter x:Key="DateFormatter" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
         <converter:NullToVisibility x:Key="NullToVisibility" />
@@ -23,12 +23,9 @@
         </GroupBox.Header>
 
         <DockPanel>
-            
-            
-            
             <GroupBox DockPanel.Dock="Top" Header="Info" >
                 <DockPanel>
-                    <StackPanel DockPanel.Dock="Left" MaxWidth="250" Visibility="{Binding IP, Converter={StaticResource HideBroadcastIPConverter}}">
+                    <StackPanel DockPanel.Dock="Left" MaxWidth="250" Visibility="{Binding IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}">
                         <StackPanel Orientation="Horizontal">
                             <Label Content="Artemis Manager Version:" />
                             <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=ucPeer, Path=ItemData.AppVersion}" />
@@ -65,10 +62,7 @@
                             Unchecked="OnRemoteRemoveManagerFromStartup">
                             <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
                         </CheckBox>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Grid.Row="4" Content="Drive Freespace:" />
-                            <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=ucPeer, Path=ItemData.FreeSpaceOnAppDrive, Converter={StaticResource ByteFormatter}}" />
-                        </StackPanel>
+                       
                     </StackPanel>
                     <DockPanel DockPanel.Dock="Right">
                         <GroupBox
