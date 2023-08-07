@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="ArtemisManagerUI.EngineeringPresetTabControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
+        <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
+    </UserControl.Resources>
+    <DockPanel>
+        <local:AMPopup
+            DockPanel.Dock="Top"
+            PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+
+        <TabControl
+            Tag="{Binding ElementName=uc, Path=SourcePC, Mode=OneWay}"
+            DockPanel.Dock="Top"
+            ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}"
+            SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter
+                        Property="Visibility"
+                        Value="{Binding IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}" />
+                </Style>
+            </TabControl.ItemContainerStyle>
+
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Connection.Hostname}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <!-- SourcePC="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" -->
+                        <local:StringPackageSenderControl
+                            Tag="{Binding}"
+                            IsForReceive="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
+                            FileRequest="OnSendFileRequest"
+                            TransmissionCompleted="OnTransmissionCompleted"
+                            Prompt="Transmit selected settings file to:"
+                            DockPanel.Dock="Top" />
+                        <local:EngineeringPresetEditControl
+                            TargetClient="{Binding Connection.IP, Mode=OneWay}"
+                            IsRemote="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"/>
+                    </DockPanel>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </DockPanel>
+</UserControl>

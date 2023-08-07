@@ -49,6 +49,13 @@ namespace ArtemisEngineeringPresets
             return false;
         }
         public string SaveFile { get; set; } = string.Empty;
+        public string PackageFile
+        {
+            get
+            {
+                return SaveFile;
+            }
+        }
         private void LoadPresets(string file)
         {
             List<Preset> workPresets = new();

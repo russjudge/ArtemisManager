@@ -82,7 +82,8 @@ namespace ArtemisManagerUI
         }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
-        public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
+
+        public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, string json)
         {
             if (requestSource != null)
             {
@@ -100,7 +101,7 @@ namespace ArtemisManagerUI
                             data.AddRange(buffer2);
                         }
                     }
-                    string json = mod?.GetJSON() ?? string.Empty;
+                    
                     var dataArr = data.ToArray();
                     if (requestSource.ToString() == IPAddress.Any.ToString() && ConnectedPCs != null)
                     {
@@ -119,9 +120,13 @@ namespace ArtemisManagerUI
                     {
                         Network.Current?.SendItem(requestSource, dataArr, json);
                     }
-                        
+
                 }
             }
+        }
+        public static void FulfillModPackageRequest(IPAddress? requestSource, string itemRequestedIdentifier, ModItem? mod)
+        {
+            FulfillModPackageRequest(requestSource, itemRequestedIdentifier, mod?.GetJSON() ?? string.Empty);
         }
         public static bool ProcessPCAction(PCActions action, bool force, IPAddress? source)
         {

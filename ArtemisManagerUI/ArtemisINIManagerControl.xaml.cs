@@ -45,12 +45,12 @@ namespace ArtemisManagerUI
                 //Need to send request for: list of available resolutions.
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfArtemisINIFiles);
-                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfScreenResolutions);
                     if (Network.Current != null)
                     {
                         Network.Current.InfoReceived += OnInfoReceived;
                     }
+                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfArtemisINIFiles);
+                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfScreenResolutions);
                 }
             }
             else

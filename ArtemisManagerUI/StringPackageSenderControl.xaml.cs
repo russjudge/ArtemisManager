@@ -1,5 +1,7 @@
 ﻿using AMCommunicator;
+using AMCommunicator.Messages;
 using ArtemisEngineeringPresets;
+using ArtemisManagerUI.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -155,7 +157,32 @@ namespace ArtemisManagerUI
             remove { RemoveHandler(FileRequestEvent, value); }
         }
 
+        void DoSendPackage(IPAddress address, string data, SendableStringPackageFile fileType, string filename, string packageFile)
+        {
+            switch (fileType)
+            {
+                case SendableStringPackageFile.Mission:
+                case SendableStringPackageFile.Mod:
+                    if (TakeAction.IsLoopback(address))  //Nothing should happen as this should be an already installed local mod
+                    {
+                    }
+                    else
+                    {
+                        TakeAction.FulfillModPackageRequest(address, packageFile, data);
+                    }
+                    break;
+                default:
+                    if (TakeAction.IsLoopback(address)) //Nothing should happen as this will be the source
+                    {
 
+                    }
+                    else
+                    {
+                        Network.Current?.SendStringPackageFile(address, data, fileType, filename);
+                    }
+                    break;
+            }
+        }
         private void OnSendSelectedFile(object sender, RoutedEventArgs e)
         {
             FileRequestRoutedEventArgs eFileRequest = new(FileRequestEvent);
@@ -168,21 +195,75 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null && pcItem.IP.ToString() != IPAddress.Any.ToString())
                         {
-                            Network.Current?.SendStringPackageFile(pcItem.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile);
+                            DoSendPackage(pcItem.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile, eFileRequest.File.PackageFile);
                         }
                     }
                 }
                 else
                 {
-                    Network.Current?.SendStringPackageFile(SelectedTargetPC.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile);
+                    DoSendPackage(SelectedTargetPC.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile, eFileRequest.File.PackageFile);
                 }
                 RaiseEvent(new RoutedEventArgs(TransmissionCompletedEvent));
+            }
+        }
+
+        private void DoRequestPackage(IPAddress sourceIP, SendableStringPackageFile fileType, string data, string packageFile, string saveFile)
+        {
+            switch (fileType)
+            {
+                case SendableStringPackageFile.Mission:
+                case SendableStringPackageFile.Mod:
+                    if (TakeAction.IsLoopback(sourceIP))  //Nothing should happen as this should be an already installed local mod
+                    {
+                    }
+                    else
+                    {
+                        Network.Current?.SendModPackageRequest(sourceIP, data, packageFile);
+                    }
+                    break;
+                default:
+                    if (TakeAction.IsLoopback(sourceIP)) //Nothing should happen as this will be the source
+                    {
+
+                    }
+                    else
+                    {
+                        RequestInformationType requestType;
+
+                        switch (fileType)
+                        {
+                            case SendableStringPackageFile.ArtemisINI:
+                                requestType = RequestInformationType.SpecificArtemisINIFile;
+                                break;
+                            case SendableStringPackageFile.controlsINI:
+                                requestType = RequestInformationType.SpecificControlINIFile;
+                                break;
+                            case SendableStringPackageFile.EngineeringPreset:
+                                requestType = RequestInformationType.SpecificEngineeringPreset;
+                                break;
+                            case SendableStringPackageFile.DMXCommandsXML:
+                                requestType = RequestInformationType.SpecificDMXCommandFile;
+                                break;
+                            default:
+                                requestType = RequestInformationType.None;
+                                break;
+                        }
+                        Network.Current?.SendRequestInformation(sourceIP, requestType, saveFile);
+                    }
+                    break;
             }
         }
 
         private void OnReceiveSelectedFile(object sender, RoutedEventArgs e)
         {
 
+            FileRequestRoutedEventArgs eFileRequest = new(FileRequestEvent);
+            RaiseEvent(eFileRequest);
+            if (eFileRequest.File != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(eFileRequest.File.SaveFile))
+            {
+                DoRequestPackage(SelectedTargetPC.IP, eFileRequest.File.FileType, eFileRequest.File.GetSerializedString(), eFileRequest.File.PackageFile, eFileRequest.File.SaveFile);
+                
+            }
         }
     }
 }

@@ -507,6 +507,7 @@
                         <TextBlock Text="Engineering Presets" TextWrapping="Wrap" />
                     </WrapPanel>
                 </TabItem.Header>
+                <local:EngineeringPresetTabControl />
             </TabItem>
             <TabItem>
                 <TabItem.Header>

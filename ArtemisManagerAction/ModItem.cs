@@ -1,4 +1,6 @@
-﻿using SharpCompress.Common;
+﻿using AMCommunicator;
+using AMCommunicator.Messages;
+using SharpCompress.Common;
 using SharpCompress.Readers;
 using System;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ArtemisManagerAction
 {
-    public class ModItem : INotifyPropertyChanged
+    public class ModItem : INotifyPropertyChanged, ISendableStringFile
     {
         public static readonly string ModInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMods");
         public static readonly string MissionInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMissions");
@@ -286,6 +288,22 @@ namespace ArtemisManagerAction
         }
         public string SaveFile { get; set; } = string.Empty;
 
+        public SendableStringPackageFile FileType
+        {
+            get
+            {
+                if (isMission)
+                {
+                    return SendableStringPackageFile.Mission;
+                }
+                else
+                {
+                    return SendableStringPackageFile.Mod;
+                }
+            }
+        }
+
+
         public event PropertyChangedEventHandler? PropertyChanged;
         void DoChanged([CallerMemberName] string property = "")
         {
@@ -474,6 +492,11 @@ namespace ArtemisManagerAction
         public override int GetHashCode()
         {
             return HashCode.Combine(this.GetSaveFile());
+        }
+
+        public string GetSerializedString()
+        {
+            return GetJSON();
         }
     }
 }

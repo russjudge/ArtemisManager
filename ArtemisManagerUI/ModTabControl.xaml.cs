@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArtemisManagerAction;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -79,6 +80,22 @@ namespace ArtemisManagerUI
                 this.SetValue(IsMasterProperty, value);
             }
         }
+        public static readonly DependencyProperty SelectedModProperty =
+           DependencyProperty.Register(nameof(SelectedMod), typeof(ModItem),
+          typeof(ModTabControl));
+
+        public ModItem SelectedMod
+        {
+            get
+            {
+                return (ModItem)this.GetValue(SelectedModProperty);
+
+            }
+            set
+            {
+                this.SetValue(SelectedModProperty, value);
+            }
+        }
 
         public static readonly DependencyProperty ShowModsProperty =
            DependencyProperty.Register(nameof(ShowMods), typeof(bool),
@@ -95,6 +112,16 @@ namespace ArtemisManagerUI
             {
                 this.SetValue(ShowModsProperty, value);
             }
+        }
+
+        private void OnSendFileRequest(object sender, FileRequestRoutedEventArgs e)
+        {
+            e.File = SelectedMod;
+        }
+
+        private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

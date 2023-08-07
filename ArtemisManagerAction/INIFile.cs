@@ -152,6 +152,13 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
+        public string PackageFile
+        {
+            get
+            {
+                return SaveFile;
+            }
+        }
         protected void SetSetting(ArtemisINISetting value, [CallerMemberName] string? key = null)
         {
             if (!string.IsNullOrEmpty(key))

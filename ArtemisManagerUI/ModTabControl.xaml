@@ -7,6 +7,8 @@
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
+        <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
+        <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
         <Style TargetType="ListBox">
             <Style.Triggers>
@@ -45,18 +47,29 @@
                                 Text="Missions" />
                         </StackPanel>
                     </GroupBox.Header>
+                    <DockPanel>
+                        <local:StringPackageSenderControl
+                            SourcePC="{Binding ElementName=uc, Path=SourcePC}"
+                            SelectedTargetPC="{Binding ElementName=uc, Path=SelectedTargetPC}"
+                            IsForReceive="{Binding SelectedTargetPC.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
+                            FileRequest="OnSendFileRequest"
+                            TransmissionCompleted="OnTransmissionCompleted"
+                            Prompt="Transmit selected settings file to:"
+                            DockPanel.Dock="Top" />
                 <ListBox
-                    Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
-                    ItemsSource="{Binding ElementName=uc, Path=SelectedTargetPC.InstalledMods}" >
+                    SelectedItem="{Binding ElementName=uc, Path=SelectedMod, Mode=TwoWay}"
+                    Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}" >
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <local:ModItemControl
+                                IsRemote="{Binding SelectedTargetPC.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
                                 Source="{Binding Mode=OneWay, Path=(TabControl.SelectedItem), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
                                 IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
                                 Mod="{Binding}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+                    </DockPanel>
                 </GroupBox>
             </DataTemplate>
         </TabControl.ContentTemplate>

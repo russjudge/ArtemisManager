@@ -11,5 +11,6 @@ namespace AMCommunicator
         Messages.SendableStringPackageFile FileType { get; }
         string GetSerializedString();
         string SaveFile { get; set; }
+        string PackageFile { get; }
     }
 }

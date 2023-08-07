@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -39,6 +40,44 @@ namespace ArtemisManagerUI
             watcher.Deleted += Watcher_Deleted;
             watcher.EnableRaisingEvents = true;
         }
+
+        public static readonly DependencyProperty IsRemoteProperty =
+           DependencyProperty.Register(nameof(IsRemote), typeof(bool),
+           typeof(EngineeringPresetEditControl));
+
+        public bool IsRemote
+        {
+            get
+            {
+                return (bool)this.GetValue(IsRemoteProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsRemoteProperty, value);
+            }
+        }
+
+
+        public static readonly DependencyProperty TargetClientProperty =
+           DependencyProperty.Register(nameof(TargetClient), typeof(IPAddress),
+           typeof(EngineeringPresetEditControl));
+
+
+        public IPAddress? TargetClient
+        {
+            get
+            {
+                return (IPAddress?)this.GetValue(TargetClientProperty);
+
+            }
+            set
+            {
+                this.SetValue(TargetClientProperty, value);
+
+            }
+        }
+
         private void Watcher_Deleted(object sender, FileSystemEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.DATFileExtension))

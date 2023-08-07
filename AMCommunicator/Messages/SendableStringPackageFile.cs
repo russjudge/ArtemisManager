@@ -13,6 +13,8 @@ namespace AMCommunicator.Messages
         ArtemisINI,
         controlsINI,
         vesselDataXML,
-        DMXCommandsXML
+        DMXCommandsXML,
+        Mod,
+        Mission
     }
 }
