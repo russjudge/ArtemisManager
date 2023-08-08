@@ -7,7 +7,8 @@ Enhancements:
 	- Added local/remote editing (text editor) and management for controls.ini and DMXControls.xml.
 Other changes:
 	- Significant change to the layout of the UI to handle remote management of Artemis.ini and engineering presets.  A lot of stuff got moved
-		around because of this.
+		around because of this.  Some resizing to keep the window height down to 700 pixels high. This height is to account
+		for smaller screen PCs.
 
 ------------------------------
 Version 0.3 (beta) 07/30/2023:

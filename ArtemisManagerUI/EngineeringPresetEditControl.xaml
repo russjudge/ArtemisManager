@@ -13,7 +13,7 @@
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
     <DockPanel>
-        <Menu DockPanel.Dock="Top" >
+        <!--<Menu DockPanel.Dock="Top" >
             <MenuItem Header="File">
                 <MenuItem
                     Click="OnAddPresetFile"
@@ -65,7 +65,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-        </Menu>
+        </Menu>-->
         <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
         <DockPanel
             DockPanel.Dock="Left" Width="200">
@@ -75,26 +75,27 @@
                 Click="OnAddPresetFile"
                 HorizontalAlignment="Left" >
                     <StackPanel Orientation="Horizontal" >
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
                     </StackPanel>
                 </Button>
                 <Button
                     Click="OnRestoreToDefault"
-                    Margin="5,0,0,0" ToolTip="Restore Active Engineering presets in Active folder to defaults">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/restore.png" />
+                     ToolTip="Restore Active Engineering presets in Active folder to defaults">
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
+                </Button>
+                <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
             </StackPanel>
-            <local:StringPackageSenderControl
+            <!--<local:StringPackageSenderControl
                 FileRequest="OnSendFileRequest"
                 TransmissionCompleted="OnTransmissionCompleted"
                 Prompt="Transmit selected presets file to:"
                 IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=SelectedPresetFile}"
-                DockPanel.Dock="Top" />
+                DockPanel.Dock="Top" />-->
 
 
-            <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/import.png" />
-            </Button>
+           
             <ListBox
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
                 Grid.IsSharedSizeScope="True"
@@ -171,10 +172,11 @@
             </ListBox>
         </DockPanel>
         <engineering:PresetSettingsControl
+            FontSize="10"
             Saved="OnSaved"
             Activate="OnActivate"
             Delete="OnDelete"
-            File="{Binding ElementName=uc, Path=SelectedFile, Mode=OneWay}" />
+            File="{Binding ElementName=uc, Path=SelectedPresetFile.SettingsFile, Mode=OneWay}" />
 
     </DockPanel>
 </UserControl>

@@ -10,30 +10,31 @@
     </UserControl.Resources>
     <DockPanel IsEnabled="{Binding ElementName=uc, Mode=OneWay, Converter={StaticResource NullToBoolConverter}, Path=File}">
         <DockPanel DockPanel.Dock="Top" >
-            <Button Margin="25,0,25,0" DockPanel.Dock="Left"
+            <Button  DockPanel.Dock="Left"
                 
                 Click="OnActivate" CommandParameter="{Binding}" ToolTip="Activate this presets file" >
                 <StackPanel>
-                    <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/activate.png" />
-                    <TextBlock Text="Activate" />
+                    <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/activate.png" />
                 </StackPanel>
             </Button>
             
-            <Button Margin="5,0,10,0" HorizontalAlignment="left" DockPanel.Dock="Left"  Click="OnSave">
+            <Button
+                ToolTip="Save"
+                 HorizontalAlignment="left" DockPanel.Dock="Left"  Click="OnSave">
             <Button.Content>
                 <StackPanel>
-                    <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/save.png" />
-                    <TextBlock Text="Save" />
+                    <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/save.png" />
                 </StackPanel>
 
             </Button.Content>
         </Button>
-            <Button Margin="25,0,25,0" DockPanel.Dock="Right"
+            <Button
+                DockPanel.Dock="Right"
                 HorizontalAlignment="Right"
                 Click="OnDelete" ToolTip="Delete Engineering Presets file" >
                 <StackPanel>
-                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/trash.png" />
-                    <TextBlock Text="Delete" />
+                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/trash.png" />
+                    
                 </StackPanel>
             </Button>
         </DockPanel>
@@ -47,7 +48,7 @@
             <DataTemplate>
                     <StackPanel>
                         <TextBlock Text="Preset" />
-                        <TextBlock Padding="10,2,10,10" FontWeight="Bold" Text="{Binding Index}" />
+                        <TextBlock Padding="10,0,10,3" FontWeight="Bold" Text="{Binding Index}" />
                     </StackPanel>
                     <!--<TextBlock FontWeight="Bold" FontFamily="Comic Sans MS" FontSize="20" VerticalAlignment="Center" >
                     <TextBlock.Text>

@@ -97,6 +97,7 @@ namespace ArtemisManagerUI
         {
             if (d is ArtemisINIControl me)
             {
+
                 var x = me.SettingsFile;
             }
         }

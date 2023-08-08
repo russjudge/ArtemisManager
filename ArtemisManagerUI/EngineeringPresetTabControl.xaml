@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
         <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
@@ -46,6 +45,9 @@
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />
                         <local:EngineeringPresetEditControl
+                            
+                            PresetFiles="{Binding EngineeringPresetsFiles}"
+                            SelectedPresetFile="{Binding SelectedSettingsFile, Mode=TwoWay}"
                             TargetClient="{Binding Connection.IP, Mode=OneWay}"
                             IsRemote="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"/>
                     </DockPanel>

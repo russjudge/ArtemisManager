@@ -45,6 +45,8 @@
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />
                         <local:ArtemisINIManagerControl
+                            ArtemisSettingsFiles="{Binding ArtemisSettingsFiles}"
+                            SelectedArtemisSettingsFile="{Binding SelectedSettingsFile, Mode=TwoWay}"
                             TargetClient="{Binding Connection.IP, Mode=OneWay}"
                             IsRemote="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"/>
                     </DockPanel>

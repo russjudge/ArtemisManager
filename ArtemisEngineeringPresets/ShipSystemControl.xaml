@@ -4,14 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisEngineeringPresets"
-             Name="uc"
-             mc:Ignorable="d" MinHeight="300">
-    <GroupBox
-        BorderBrush="Green" BorderThickness="3"
-        >
+             Name="uc" 
+             mc:Ignorable="d" MinHeight="270">
+    <GroupBox Margin="-6,0,-6,0"
+        BorderBrush="Green" BorderThickness="2">
         <GroupBox.Header>
-            <TextBlock
-                FontWeight="Bold" Foreground="Maroon" FontSize="14"
+            <TextBlock FontSize="12"
+                FontWeight="Bold" Foreground="Maroon"
                 Text="{Binding Levels.SystemName, Mode=OneWay, ElementName=uc}" HorizontalAlignment="Center"/>
         </GroupBox.Header>
         <Grid>
@@ -21,24 +20,29 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition Height="4*" />
-                <RowDefinition />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Grid.Column="0" Padding="0,3,0,0" HorizontalAlignment="Center" Margin="10,50,0,0" Text="Energy" >
+            <TextBlock
+                FontSize="10"
+                Grid.Row="0" Grid.Column="0" Padding="0,3,0,0" HorizontalAlignment="Center" Margin="0,40,0,0" Text="Energy" >
                 <TextBlock.RenderTransform>
                     <RotateTransform Angle="270" />
                 </TextBlock.RenderTransform>
             </TextBlock>
-            <TextBlock Grid.Row="0" Grid.Column="1" Padding="0,7,0,0" Margin="5,50,0,0" HorizontalAlignment="Center" Text="Coolant" >
+            <TextBlock
+                FontSize="10"
+                Grid.Row="0" Grid.Column="1" Padding="0,7,0,0" Margin="0,40,0,0" HorizontalAlignment="Center" Text="Coolant" >
                 <TextBlock.RenderTransform>
                     <RotateTransform Angle="270" />
                 </TextBlock.RenderTransform>
             </TextBlock>
             <TextBlock 
-            ToolTip="This is the amount of coolant needed to prevent overheating"
-            Grid.Row="0" Grid.Column="3" Margin="0,50,0,0" TextWrapping="Wrap" HorizontalAlignment="Center" MaxWidth="50" Text="Coolant Needed" >
+                FontSize="10"
+                ToolTip="This is the amount of coolant needed to prevent overheating"
+                Grid.Row="0" Grid.Column="3" Margin="0,40,0,0" TextWrapping="Wrap" HorizontalAlignment="Center" MaxWidth="50" Text="Coolant Needed" >
                 <TextBlock.RenderTransform>
                     <RotateTransform Angle="270" />
                 </TextBlock.RenderTransform>
@@ -47,6 +51,7 @@
                 Grid.Row="1" Grid.Column="0"
                 Orientation="Horizontal">
                 <TextBlock
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center" Margin="4,0,0,0"
                     Text="{Binding Levels.EnergyLevel, Mode=OneWay, ElementName=uc}"/>
                 <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center" Text="%" />
@@ -54,21 +59,25 @@
             <StackPanel
                 Grid.Row="1" Grid.Column="1"
                 Orientation="Horizontal">
-                <TextBlock HorizontalAlignment="Center" 
+                <TextBlock
+                    Margin="15,0,0,0"
+                    HorizontalAlignment="Center" 
                     VerticalAlignment="Center"
                     Text="{Binding Levels.CoolantLevel, Mode=OneWay, ElementName=uc}"/>
             </StackPanel>
             <StackPanel
                 Grid.Row="1" Grid.Column="2"
                 Orientation="Horizontal">
-                <TextBlock HorizontalAlignment="Center" 
+                <TextBlock
+                    Margin="15,0,0,0"
+                    HorizontalAlignment="Center" 
                     VerticalAlignment="Center"
                     Text="{Binding Levels.CoolantNeed, Mode=OneWay, ElementName=uc}"/>
             </StackPanel>
             <Slider
-            HorizontalAlignment="Center"
-            Orientation="Vertical" 
-            Grid.Row="2" Grid.Column="0" Maximum="300" Minimum="0" Value="{Binding Path=Levels.EnergyLevel, Mode=TwoWay, ElementName=uc}" />
+                HorizontalAlignment="Center"
+                Orientation="Vertical"
+                Grid.Row="2" Grid.Column="0" Maximum="300" Minimum="0" Value="{Binding Path=Levels.EnergyLevel, Mode=TwoWay, ElementName=uc}" />
 
             <ProgressBar
                 Background="Transparent"
@@ -76,11 +85,11 @@
                 Value="{Binding Levels.CoolantLevel, Mode=OneWay, ElementName=uc}"
                 Orientation="Vertical" />
             <Slider
-            TickFrequency="1"
-            TickPlacement="Both" SnapsToDevicePixels="True" 
-            HorizontalAlignment="Center"
-            Orientation="Vertical"
-            Grid.Row="2" Grid.Column="1" Maximum="8" Minimum="0" Value="{Binding Path=Levels.CoolantLevel, Mode=TwoWay, ElementName=uc}" />
+                TickFrequency="1"
+                TickPlacement="Both" SnapsToDevicePixels="True"
+                HorizontalAlignment="Center"
+                Orientation="Vertical"
+                Grid.Row="2" Grid.Column="1" Maximum="8" Minimum="0" Value="{Binding Path=Levels.CoolantLevel, Mode=TwoWay, ElementName=uc}" />
             <ProgressBar
                 Foreground="Red"
                 Background="Transparent"
@@ -88,21 +97,22 @@
                 Value="{Binding Levels.CoolantNeed, Mode=OneWay, ElementName=uc}"
                 Orientation="Vertical" />
             <Slider
-            IsEnabled="False"
-            TickFrequency="1"
-            TickPlacement="Both" SnapsToDevicePixels="True" 
-            HorizontalAlignment="Center"
-            Orientation="Vertical"
-            Foreground="Salmon"
-            Grid.Row="2" Grid.Column="2" Maximum="8" Minimum="0" Value="{Binding Levels.CoolantNeed, Mode=OneWay, ElementName=uc}" />
-            <Button Grid.Row="3" Grid.Column="0" ToolTip="Max Energy setting" Click="OnSetMaxEnergy">
-                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/max.png" />
+                IsEnabled="False"
+                TickFrequency="1"
+                TickPlacement="Both" SnapsToDevicePixels="True"
+                HorizontalAlignment="Center"
+                Orientation="Vertical"
+                Foreground="Salmon"
+                Grid.Row="2" Grid.Column="2" Maximum="8" Minimum="0" Value="{Binding Levels.CoolantNeed, Mode=OneWay, ElementName=uc}" />
+            <Button
+                Grid.Row="3" Grid.Column="0" ToolTip="Max Energy setting" Click="OnSetMaxEnergy">
+                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/max.png" />
             </Button>
             <Button Grid.Row="3" Grid.Column="1" ToolTip="Normal Energy setting" Click="OnSetNormalEnergy">
-                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/normal.png" />
+                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/normal.png" />
             </Button>
             <Button Grid.Row="3" Grid.Column="2" ToolTip="Minimum Energy setting" Click="OnSetMinimumEnergy">
-                <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/min.png" />
+                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/min.png" />
             </Button>
         </Grid>
     </GroupBox>

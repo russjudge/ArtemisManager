@@ -23,12 +23,38 @@ namespace ArtemisManagerUI
     {
         public EngineeringPresetTabControl()
         {
+            ConnectedPCs = new();
             if (TakeAction.ConnectedPCs != null)
             {
-                ConnectedPCs = TakeAction.ConnectedPCs;
+                foreach (var PC in TakeAction.ConnectedPCs)
+                {
+                    if (PC.IP != null && !TakeAction.IsBroadcast(PC.IP))
+                    {
+                        ConnectedPCs.Add(new(PC));
+                    }
+
+                }
             }
+            TakeAction.ConnectionAdded += TakeAction_ConnectionAdded;
+            TakeAction.ConnectionRemoved += TakeAction_ConnectionRemoved;
+            if (TakeAction.SourcePC != null)
+            {
+                SourcePC = TakeAction.SourcePC;
+            }
+           
             InitializeComponent();
         }
+
+        private void TakeAction_ConnectionRemoved(object? sender, ConnectionEventArgs e)
+        {
+            
+        }
+
+        private void TakeAction_ConnectionAdded(object? sender, ConnectionEventArgs e)
+        {
+            
+        }
+
         public static readonly DependencyProperty PopupMessageProperty =
         DependencyProperty.Register(nameof(PopupMessage), typeof(string),
             typeof(EngineeringPresetTabControl));
@@ -80,14 +106,14 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty SelectedTargetPCProperty =
-        DependencyProperty.Register(nameof(SelectedTargetPC), typeof(PCItem),
+        DependencyProperty.Register(nameof(SelectedTargetPC), typeof(EngineeringPresetsPCItem),
         typeof(EngineeringPresetTabControl));
 
-        public PCItem SelectedTargetPC
+        public EngineeringPresetsPCItem SelectedTargetPC
         {
             get
             {
-                return (PCItem)this.GetValue(SelectedTargetPCProperty);
+                return (EngineeringPresetsPCItem)this.GetValue(SelectedTargetPCProperty);
             }
             set
             {
@@ -96,14 +122,14 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty ConnectedPCsProperty =
-          DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
+          DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<EngineeringPresetsPCItem>),
           typeof(EngineeringPresetTabControl));
 
-        public ObservableCollection<PCItem> ConnectedPCs
+        public ObservableCollection<EngineeringPresetsPCItem> ConnectedPCs
         {
             get
             {
-                return (ObservableCollection<PCItem>)this.GetValue(ConnectedPCsProperty);
+                return (ObservableCollection<EngineeringPresetsPCItem>)this.GetValue(ConnectedPCsProperty);
             }
             set
             {

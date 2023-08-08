@@ -118,6 +118,6 @@
             SettingsSaved="OnSettingsSaved"
             Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
             AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
-            SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettings, Mode=TwoWay}" />
+            SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile.INIFile, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

@@ -57,7 +57,7 @@ namespace ArtemisManagerUI
             {
                 foreach (var ini in ArtemisManager.GetArtemisINIFileList())
                 {
-                    ArtemisSettingsFiles.Add(new FileListItem(ini.Substring(0, ini.Length - 4)));
+                    ArtemisSettingsFiles.Add(new ArtemisINIFileListItem(ini.Substring(0, ini.Length - 4)));
                 }
                 fsw = new FileSystemWatcher(ArtemisManager.ArtemisINIFolder);
                 fsw.Created += OnINIFileCreated;
@@ -106,7 +106,7 @@ namespace ArtemisManagerUI
                 {
                     newnm = nm.Substring(0, nm.Length - 4);
                 }
-                ArtemisSettingsFiles.Add(new FileListItem(newnm));
+                ArtemisSettingsFiles.Add(new ArtemisINIFileListItem(newnm));
             }
         }
         private void ProcessSpecificArtemisINIFile(string filename, string data)
@@ -132,7 +132,7 @@ namespace ArtemisManagerUI
                 {
 
                     string match = e.Name.Substring(0, e.Name.Length - 4);
-                    FileListItem? remover = null;
+                    ArtemisINIFileListItem? remover = null;
                     foreach (var item in ArtemisSettingsFiles)
                     {
                         if (item.Name == match)
@@ -237,14 +237,14 @@ namespace ArtemisManagerUI
 
 
         public static readonly DependencyProperty ArtemisSettingsFilesProperty =
-            DependencyProperty.Register(nameof(ArtemisSettingsFiles), typeof(ObservableCollection<FileListItem>),
+            DependencyProperty.Register(nameof(ArtemisSettingsFiles), typeof(ObservableCollection<ArtemisINIFileListItem>),
                 typeof(ArtemisINIManagerControl));
 
-        public ObservableCollection<FileListItem> ArtemisSettingsFiles
+        public ObservableCollection<ArtemisINIFileListItem> ArtemisSettingsFiles
         {
             get
             {
-                return (ObservableCollection<FileListItem>)this.GetValue(ArtemisSettingsFilesProperty);
+                return (ObservableCollection<ArtemisINIFileListItem>)this.GetValue(ArtemisSettingsFilesProperty);
 
             }
             set
@@ -254,22 +254,22 @@ namespace ArtemisManagerUI
             }
         }
         public static readonly DependencyProperty SelectedArtemisSettingsFileProperty =
-            DependencyProperty.Register(nameof(SelectedArtemisSettingsFile), typeof(FileListItem),
+            DependencyProperty.Register(nameof(SelectedArtemisSettingsFile), typeof(ArtemisINIFileListItem),
              typeof(ArtemisINIManagerControl), new PropertyMetadata(OnSelectedArtemisSettingsFileChanged));
 
         private static void OnSelectedArtemisSettingsFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ArtemisINIManagerControl me && me.SelectedArtemisSettingsFile != null)
             {
-                me.SelectedArtemisSettings = ArtemisManager.GetArtemisINI(me.SelectedArtemisSettingsFile.Name);
+                me.SelectedArtemisSettingsFile.INIFile = ArtemisManager.GetArtemisINI(me.SelectedArtemisSettingsFile.Name);
             }
         }
 
-        public FileListItem? SelectedArtemisSettingsFile
+        public ArtemisINIFileListItem? SelectedArtemisSettingsFile
         {
             get
             {
-                return (FileListItem?)this.GetValue(SelectedArtemisSettingsFileProperty);
+                return (ArtemisINIFileListItem?)this.GetValue(SelectedArtemisSettingsFileProperty);
 
             }
             set
@@ -295,23 +295,23 @@ namespace ArtemisManagerUI
 
             }
         }
-        public static readonly DependencyProperty SelectedArtemisSettingsProperty =
-            DependencyProperty.Register(nameof(SelectedArtemisSettings), typeof(ArtemisINI),
-             typeof(ArtemisINIManagerControl));
+        //public static readonly DependencyProperty SelectedArtemisSettingsProperty =
+        //    DependencyProperty.Register(nameof(SelectedArtemisSettings), typeof(ArtemisINI),
+        //     typeof(ArtemisINIManagerControl));
 
-        public ArtemisINI? SelectedArtemisSettings
-        {
-            get
-            {
-                return (ArtemisINI?)this.GetValue(SelectedArtemisSettingsProperty);
+        //public ArtemisINI? SelectedArtemisSettings
+        //{
+        //    get
+        //    {
+        //        return (ArtemisINI?)this.GetValue(SelectedArtemisSettingsProperty);
 
-            }
-            set
-            {
-                this.SetValue(SelectedArtemisSettingsProperty, value);
+        //    }
+        //    set
+        //    {
+        //        this.SetValue(SelectedArtemisSettingsProperty, value);
 
-            }
-        }
+        //    }
+        //}
         public static readonly DependencyProperty RestoreOriginalToolTipProperty =
            DependencyProperty.Register(nameof(RestoreOriginalToolTip), typeof(string),
             typeof(ArtemisINIManagerControl));
@@ -427,7 +427,7 @@ namespace ArtemisManagerUI
 
         private void OnSendFileRequest(object sender, FileRequestRoutedEventArgs e)
         {
-            e.File = SelectedArtemisSettings;
+            e.File = SelectedArtemisSettingsFile?.SettingsFile;
         }
 
         private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
@@ -459,9 +459,9 @@ namespace ArtemisManagerUI
                                 File.Move(source, target, true);
                                 selectedFile.OriginalName = selectedFile.Name;
 
-                                if (SelectedArtemisSettings != null && SelectedArtemisSettings.SaveFile == selectedFile.OriginalName + ArtemisManager.INIFileExtension)
+                                if (SelectedArtemisSettingsFile != null && SelectedArtemisSettingsFile.SettingsFile?.SaveFile == selectedFile.OriginalName + ArtemisManager.INIFileExtension)
                                 {
-                                    SelectedArtemisSettings.SaveFile = selectedFile.Name + ArtemisManager.INIFileExtension;
+                                    SelectedArtemisSettingsFile.SettingsFile.SaveFile = selectedFile.Name + ArtemisManager.INIFileExtension;
                                 }
                             }
                         }
@@ -505,7 +505,7 @@ namespace ArtemisManagerUI
         {
             if (sender is MenuItem me)
             {
-                if (me.CommandParameter is FileListItem selectedFile)
+                if (me.CommandParameter is ArtemisINIFileListItem selectedFile)
                 {
                     if (!string.IsNullOrEmpty(selectedFile.Name))
                     {
@@ -525,9 +525,9 @@ namespace ArtemisManagerUI
                                 {
                                     ArtemisSettingsFiles.Remove(selectedFile);
                                 }
-                                if (SelectedArtemisSettings != null && SelectedArtemisSettings.SaveFile == selectedFile.Name + ArtemisManager.INIFileExtension)
+                                if (SelectedArtemisSettingsFile != null && SelectedArtemisSettingsFile.INIFile?.SaveFile == selectedFile.Name + ArtemisManager.INIFileExtension)
                                 {
-                                    SelectedArtemisSettings = null;
+                                    SelectedArtemisSettingsFile = null;
                                 }
                                 if (SelectedArtemisSettingsFile == selectedFile)
                                 {
