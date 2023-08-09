@@ -537,6 +537,7 @@
                         <TextBlock Text="controls.ini" />
                     </WrapPanel>
                 </TabItem.Header>
+                <local:TextFileTabControl FileType="controlsINI" />
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -544,6 +545,7 @@
                         <TextBlock Text="DMXCommands.xml" />
                     </WrapPanel>
                 </TabItem.Header>
+                <local:TextFileTabControl FileType="DMXCommandsXML" />
             </TabItem>
             <TabItem Tag="Chat">
                 <TabItem.Header>

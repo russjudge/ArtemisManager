@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="ArtemisManagerUI.TextEditorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             mc:Ignorable="d" Name="uc">
+    <DockPanel>
+        <local:AMPopup DockPanel.Dock="Top"  PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
+            <Button ToolTip="Activate settings." Click="OnActivate">
+                <StackPanel>
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                    <!--<TextBlock Text="Activate" />-->
+                </StackPanel>
+            </Button>
+            <Button ToolTip="Save" Click="OnSave">
+                <StackPanel>
+                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/save.png" />
+                    <!--<TextBlock Text="Save" />-->
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        <TextBox
+            VerticalScrollBarVisibility="Auto"
+            ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto"
+            DockPanel.Dock="Top" AcceptsReturn="True" AcceptsTab="True" />
+    </DockPanel>
+</UserControl>

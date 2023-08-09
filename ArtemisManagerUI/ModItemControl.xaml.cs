@@ -121,28 +121,28 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnInstallMod(object sender, RoutedEventArgs e)
-        {
-            if (IsRemote)
-            {
-                if (Source != null)
-                {
-                    Network.Current?.SendModPackageRequest(Source, Mod.GetJSON(), Mod.PackageFile);
-                }
-            }
-            else
-            {
+        //private void OnInstallMod(object sender, RoutedEventArgs e)
+        //{
+        //    if (IsRemote)
+        //    {
+        //        if (Source != null)
+        //        {
+        //            Network.Current?.SendModPackageRequest(Source, Mod.GetJSON(), Mod.PackageFile);
+        //        }
+        //    }
+        //    else
+        //    {
                
-            }
-        }
+        //    }
+        //}
 
-        private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
-        {
-            if (!IsRemote)
-            {
-                RaiseRemoteInstallModEvent();
-            }
-        }
+        //private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
+        //{
+        //    if (!IsRemote)
+        //    {
+        //        RaiseRemoteInstallModEvent();
+        //    }
+        //}
 
         private void OnUninstallMod(object sender, RoutedEventArgs e)
         {

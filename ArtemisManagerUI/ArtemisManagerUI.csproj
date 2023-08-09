@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <FileVersion>0.4.0.877</FileVersion>
-    <AssemblyVersion>0.4.0.877</AssemblyVersion>
+    <FileVersion>0.4.0.890</FileVersion>
+    <AssemblyVersion>0.4.0.890</AssemblyVersion>
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>

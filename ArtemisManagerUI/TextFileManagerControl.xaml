@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="ArtemisManagerUI.ArtemisINIManagerControl"
+﻿<UserControl x:Class="ArtemisManagerUI.TextFileManagerControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
-             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
@@ -38,12 +38,12 @@
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
             </StackPanel>
-          
+
             <ListBox
                 HorizontalAlignment="Stretch"
                 SelectionMode="Single"
-                ItemsSource="{Binding ElementName=uc, Path=ArtemisSettingsFiles, Mode=TwoWay}"
-                SelectedItem="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                ItemsSource="{Binding ElementName=uc, Path=DataFileList, Mode=TwoWay}"
+                SelectedItem="{Binding ElementName=uc, Path=SelectedDataFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -110,13 +110,6 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <local:ArtemisINIControl
-            TargetClient="{Binding ElementName=uc, Path=TargetClient, Mode=OneWay}"
-            IsRemote="{Binding ElementName=uc, Path=IsRemote, Mode=OneWay}"
-            SavingSettings="OnSavingSettings"
-            SettingsSaved="OnSettingsSaved"
-            Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
-            AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
-            SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile.INIFile, Mode=TwoWay}" />
+        <local:TextEditorControl />
     </DockPanel>
 </UserControl>

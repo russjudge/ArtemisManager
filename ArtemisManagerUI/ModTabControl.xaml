@@ -56,6 +56,14 @@
                             TransmissionCompleted="OnTransmissionCompleted"
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />
+                        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                            <Button
+                                Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                                HorizontalAlignment="Left" Click="OnImport" ToolTip="Import Mod">
+                                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
+                            </Button>
+
+                        </StackPanel>
                 <ListBox
                     SelectedItem="{Binding ElementName=uc, Path=SelectedMod, Mode=TwoWay}"
                     Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}" >

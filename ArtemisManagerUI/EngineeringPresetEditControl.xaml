@@ -83,7 +83,9 @@
                      ToolTip="Restore Active Engineering presets in Active folder to defaults">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
-                <Button HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
+                <Button
+                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
             </StackPanel>
