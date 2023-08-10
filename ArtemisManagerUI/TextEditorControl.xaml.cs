@@ -42,14 +42,43 @@ namespace ArtemisManagerUI
 
             }
         }
+        public static readonly DependencyProperty DataProperty =
+        DependencyProperty.Register(nameof(Data), typeof(TextDataFile),
+            typeof(TextEditorControl));
+
+        public TextDataFile Data
+        {
+            get
+            {
+                return (TextDataFile)this.GetValue(DataProperty);
+
+            }
+            set
+            {
+                this.SetValue(DataProperty, value);
+
+            }
+        }
         private void OnSave(object sender, RoutedEventArgs e)
         {
-
+            switch (Data.FileType)
+            {
+                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                    break;
+            }
         }
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {
-
+            switch (Data.FileType)
+            {
+                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                    break;
+            }
         }
     }
 }

@@ -22,6 +22,7 @@
             </Button>
         </StackPanel>
         <TextBox
+            Text="{Binding ElementName=uc, Path=Data.Data, Mode=TwoWay}"
             VerticalScrollBarVisibility="Auto"
             ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto"
             DockPanel.Dock="Top" AcceptsReturn="True" AcceptsTab="True" />
