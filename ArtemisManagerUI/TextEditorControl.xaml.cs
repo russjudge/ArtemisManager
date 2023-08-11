@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,6 +43,26 @@ namespace ArtemisManagerUI
 
             }
         }
+
+
+        public static readonly DependencyProperty TargetClientProperty =
+           DependencyProperty.Register(nameof(TargetClient), typeof(IPAddress),
+           typeof(TextEditorControl));
+
+
+        public IPAddress? TargetClient
+        {
+            get
+            {
+                return (IPAddress?)this.GetValue(TargetClientProperty);
+
+            }
+            set
+            {
+                this.SetValue(TargetClientProperty, value);
+
+            }
+        }
         public static readonly DependencyProperty DataProperty =
         DependencyProperty.Register(nameof(Data), typeof(TextDataFile),
             typeof(TextEditorControl));
@@ -61,23 +82,37 @@ namespace ArtemisManagerUI
         }
         private void OnSave(object sender, RoutedEventArgs e)
         {
-            switch (Data.FileType)
+            if (TakeAction.IsLoopback(TargetClient))
             {
-                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
-                    break;
-                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
-                    break;
+                switch (Data.FileType)
+                {
+                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                        break;
+                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                        break;
+                }
+            }
+            else
+            {
+
             }
         }
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {
-            switch (Data.FileType)
+            if (TakeAction.IsLoopback(TargetClient))
             {
-                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
-                    break;
-                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
-                    break;
+                switch (Data.FileType)
+                {
+                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                        break;
+                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                        break;
+                }
+            }
+            else
+            {
+
             }
         }
     }

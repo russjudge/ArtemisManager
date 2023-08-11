@@ -110,6 +110,8 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <local:TextEditorControl Data="{Binding ElementName=uc, Path=SelectedDataFile}" />
+        <local:TextEditorControl
+            TargetClient="{Binding ElementName=uc, Path=TargetClient}"
+            Data="{Binding ElementName=uc, Path=SelectedDataFile}" />
     </DockPanel>
 </UserControl>
