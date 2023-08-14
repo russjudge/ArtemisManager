@@ -151,6 +151,22 @@ namespace ArtemisManagerUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ; -------------------------------------------------------------------------------------
+        ///; this is the control indirection file for the PC Artemis exe.
+        ///; this file contains modifiable settings for how the keyboard and joystick interface with the game.
+        ///; as such, it&apos;s really only applicable to clients, not servers.
+        ///; at the end of this file, you&apos;ll find a list of the acceptable labels for each keyboard key.
+        ///; -------------------------------------------------------------------------------------
+        ///
+        ///; this is a co [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string controls {
+            get {
+                return ResourceManager.GetString("controls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap deactivate {
@@ -167,6 +183,28 @@ namespace ArtemisManagerUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("disconnect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///
+        ///&lt;DMX_CONTROL version=&quot;2.00&quot;&gt;
+        ///
+        ///  &lt;!-- ********************************************************************************************* --&gt;
+        ///  &lt;event type=&quot;NORMAL_CONDITION_1&quot; continuous=&quot;yes&quot;&gt;
+        ///
+        ///    &lt;!-- steady soft white light --&gt;
+        ///    &lt;timeblock mseconds=&quot;1000&quot;&gt;
+        ///      &lt;setvalue index=&quot;0&quot; value=&quot;100&quot; change=&quot;0&quot;/&gt;
+        ///      &lt;!-- red   value of first light box --&gt;
+        ///      &lt;setvalue index=&quot;1&quot; value=&quot;100&quot; change=&quot;0&quot;/&gt;
+        ///      &lt;!-- green value of first light box --&gt;
+        ///      &lt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string DMXcommands {
+            get {
+                return ResourceManager.GetString("DMXcommands", resourceCulture);
             }
         }
         

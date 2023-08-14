@@ -39,8 +39,9 @@
                         <!-- SourcePC="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" -->
                         <local:StringPackageSenderControl
                             Tag="{Binding}"
+                            SelectedTargetPC="{Binding Connection}"
+                            SelectedFile="{Binding SelectedSettingsFile}"
                             IsForReceive="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
-                            FileRequest="OnSendFileRequest"
                             TransmissionCompleted="OnTransmissionCompleted"
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />

@@ -49,10 +49,9 @@
                     </GroupBox.Header>
                     <DockPanel>
                         <local:StringPackageSenderControl
-                            SourcePC="{Binding ElementName=uc, Path=SourcePC}"
                             SelectedTargetPC="{Binding ElementName=uc, Path=SelectedTargetPC}"
                             IsForReceive="{Binding SelectedTargetPC.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
-                            FileRequest="OnSendFileRequest"
+                            SelectedFile="{Binding ElementName=uc, Path=SelectedMod}"
                             TransmissionCompleted="OnTransmissionCompleted"
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />

@@ -37,23 +37,9 @@ namespace ArtemisManagerUI
         }
         public static readonly DependencyProperty IsForReceiveProperty =
            DependencyProperty.Register(nameof(IsForReceive), typeof(bool),
-           typeof(StringPackageSenderControl), new PropertyMetadata(OnIsForReceiveChanged));
+           typeof(StringPackageSenderControl));
 
-        private static void OnIsForReceiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is StringPackageSenderControl me)
-            {
-                //if (me.IsForReceive)
-                //{
-                //    me.SelectedTargetPC = me.ConnectedPCs[0];
-                //}
-                //else
-                //{
-                //    me.SelectedTargetPC = me.ConnectedPCs[1];
-                //}
-            }
-        }
-
+       
         public bool IsForReceive
         {
             get
@@ -82,21 +68,24 @@ namespace ArtemisManagerUI
                 this.SetValue(PromptProperty, value);
             }
         }
-        public static readonly DependencyProperty SourcePCProperty =
-        DependencyProperty.Register(nameof(SourcePC), typeof(PCItem),
-        typeof(StringPackageSenderControl));
+       
+        //ISendableStringFile
+        public static readonly DependencyProperty SelectedFileProperty =
+            DependencyProperty.Register(nameof(SelectedFile), typeof(ISendableStringFile),
+            typeof(StringPackageSenderControl));
 
-        public PCItem SourcePC
+        public ISendableStringFile? SelectedFile
         {
             get
             {
-                return (PCItem)this.GetValue(SourcePCProperty);
+                return (ISendableStringFile?)this.GetValue(SelectedFileProperty);
             }
             set
             {
-                this.SetValue(SourcePCProperty, value);
+                this.SetValue(SelectedFileProperty, value);
             }
         }
+
 
         public static readonly DependencyProperty SelectedTargetPCProperty =
         DependencyProperty.Register(nameof(SelectedTargetPC), typeof(PCItem),
@@ -185,9 +174,11 @@ namespace ArtemisManagerUI
         }
         private void OnSendSelectedFile(object sender, RoutedEventArgs e)
         {
+            /*
             FileRequestRoutedEventArgs eFileRequest = new(FileRequestEvent);
             RaiseEvent(eFileRequest);
-            if (eFileRequest.File != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(eFileRequest.File.SaveFile))
+            */
+            if (SelectedFile != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(SelectedFile.SaveFile))
             {
                 if (SelectedTargetPC.IP.ToString() == IPAddress.Any.ToString())
                 {
@@ -195,13 +186,13 @@ namespace ArtemisManagerUI
                     {
                         if (pcItem.IP != null && pcItem.IP.ToString() != IPAddress.Any.ToString())
                         {
-                            DoSendPackage(pcItem.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile, eFileRequest.File.PackageFile);
+                            DoSendPackage(pcItem.IP, SelectedFile.GetSerializedString(), SelectedFile.FileType, SelectedFile.SaveFile, SelectedFile.PackageFile);
                         }
                     }
                 }
                 else
                 {
-                    DoSendPackage(SelectedTargetPC.IP, eFileRequest.File.GetSerializedString(), eFileRequest.File.FileType, eFileRequest.File.SaveFile, eFileRequest.File.PackageFile);
+                    DoSendPackage(SelectedTargetPC.IP, SelectedFile.GetSerializedString(), SelectedFile.FileType, SelectedFile.SaveFile, SelectedFile.PackageFile);
                 }
                 RaiseEvent(new RoutedEventArgs(TransmissionCompletedEvent));
             }
@@ -256,13 +247,11 @@ namespace ArtemisManagerUI
 
         private void OnReceiveSelectedFile(object sender, RoutedEventArgs e)
         {
-
-            FileRequestRoutedEventArgs eFileRequest = new(FileRequestEvent);
-            RaiseEvent(eFileRequest);
-            if (eFileRequest.File != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(eFileRequest.File.SaveFile))
+            //FileRequestRoutedEventArgs eFileRequest = new(FileRequestEvent);
+            //RaiseEvent(eFileRequest);
+            if (SelectedFile != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(SelectedFile.SaveFile))
             {
-                DoRequestPackage(SelectedTargetPC.IP, eFileRequest.File.FileType, eFileRequest.File.GetSerializedString(), eFileRequest.File.PackageFile, eFileRequest.File.SaveFile);
-                
+                DoRequestPackage(SelectedTargetPC.IP, SelectedFile.FileType, SelectedFile.GetSerializedString(), SelectedFile.PackageFile, SelectedFile.SaveFile);
             }
         }
     }

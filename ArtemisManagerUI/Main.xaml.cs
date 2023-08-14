@@ -1534,8 +1534,8 @@ namespace ArtemisManagerUI
             //    sb.AppendLine(sz.Width.ToString() + "x" + sz.Height.ToString());
             //}
             //PopupMessage = sb.ToString();
-            TestClientManagerWindow win = new TestClientManagerWindow();
-            win.Show();
+            //TestClientManagerWindow win = new TestClientManagerWindow();
+            //win.Show();
         }
 
 

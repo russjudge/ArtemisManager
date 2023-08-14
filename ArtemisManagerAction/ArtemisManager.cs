@@ -143,7 +143,7 @@ namespace ArtemisManagerAction
             List<string> list = new();
             foreach (var fle in new DirectoryInfo(DMXCommandsFolder).GetFiles("*" + XMLFileExtension))
             {
-                list.Add(fle.Name);
+                list.Add(fle.FullName);
             }
             return list.ToArray();
         }
@@ -162,7 +162,7 @@ namespace ArtemisManagerAction
             List<string> list = new();
             foreach (var fle in new DirectoryInfo(ControlsINIFolder).GetFiles("*" + INIFileExtension))
             {
-                list.Add(fle.Name);
+                list.Add(fle.FullName);
             }
             return list.ToArray();
         }

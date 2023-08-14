@@ -40,12 +40,12 @@
                         <local:StringPackageSenderControl
                             Tag="{Binding}"
                             IsForReceive="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
-                            FileRequest="OnSendFileRequest"
+                            SelectedTargetPC="{Binding Connection}"
+                            SelectedFile="{Binding SelectedSettingsFile}"
                             TransmissionCompleted="OnTransmissionCompleted"
                             Prompt="Transmit selected settings file to:"
                             DockPanel.Dock="Top" />
                         <local:EngineeringPresetEditControl
-                            
                             PresetFiles="{Binding EngineeringPresetsFiles}"
                             SelectedPresetFile="{Binding SelectedSettingsFile, Mode=TwoWay}"
                             TargetClient="{Binding Connection.IP, Mode=OneWay}"

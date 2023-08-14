@@ -13,21 +13,44 @@ namespace ArtemisManagerUI
 {
     public class TextDataFile : ISendableStringFile, INotifyPropertyChanged
     {
-        public TextDataFile(SendableStringPackageFile fileType, string name)
+        public TextDataFile(SendableStringPackageFile fileType, string name, string saveFile)
         {
             FileType = fileType;
             Name = name;
+            OriginalName = name;
+            SaveFile = saveFile;
         }
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void DoChanged([CallerMemberName] string property = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
-
+        private bool isEditMode = false;
+        public bool IsEditMode
+        {
+            get { return isEditMode; }
+            set
+            {
+                isEditMode = value;
+                DoChanged();
+            }
+        }
         public SendableStringPackageFile FileType { get; set; }
 
 
-        public string SaveFile { get; set; } = string.Empty;
+        private string saveFile = string.Empty;
+        public string SaveFile
+        { 
+            get
+            {
+                return saveFile;
+            }
+            set
+            {
+                saveFile = value;
+                DoChanged();
+            }
+        }
 
         public string PackageFile
         {
@@ -38,6 +61,7 @@ namespace ArtemisManagerUI
             set
             {
                 SaveFile = value;
+                DoChanged();
             }
         }
         public string data = string.Empty;
@@ -68,7 +92,20 @@ namespace ArtemisManagerUI
                 DoChanged();
             }
         }
+        public string originalname = string.Empty;
+        public string OriginalName
+        {
+            get
+            {
+                return originalname;
 
+            }
+            set
+            {
+                originalname = value;
+                DoChanged();
+            }
+        }
         public string GetSerializedString()
         {
             return GetJSON();

@@ -21,7 +21,7 @@
                 </StackPanel>
             </Button>
         </StackPanel>
-        <TextBox
+        <TextBox FontFamily="Courier New"
             Text="{Binding ElementName=uc, Path=Data.Data, Mode=TwoWay}"
             VerticalScrollBarVisibility="Auto"
             ScrollViewer.CanContentScroll="True" HorizontalScrollBarVisibility="Auto"
