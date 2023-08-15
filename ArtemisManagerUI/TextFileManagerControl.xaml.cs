@@ -56,7 +56,12 @@ namespace ArtemisManagerUI
                 if (fsw != null)
                 {
                     fsw.EnableRaisingEvents = false;
+                    fsw.Changed -= Fsw_Changed;
+                    fsw.Created -= Fsw_Created;
+                    fsw.Deleted -= Fsw_Deleted;
+                    fsw.Renamed -= Fsw_Renamed;
                     fsw.Dispose();
+                    fsw = null;
                 }
             }
             else
@@ -74,9 +79,10 @@ namespace ArtemisManagerUI
                 {
                     fsw.EnableRaisingEvents = false;
                     fsw.Dispose();
+                    fsw = null;
                 }
                 fsw = new FileSystemWatcher(GetTargetFolder());
-                
+
                 fsw.Changed += Fsw_Changed;
                 fsw.Created += Fsw_Created;
                 fsw.Deleted += Fsw_Deleted;
@@ -171,7 +177,7 @@ namespace ArtemisManagerUI
                             }
                         }
                     }
-                    SelectedDataFile = new(FileType,GetNameOfFile(fle.Name), fle.FullName);
+                    SelectedDataFile = new(FileType, GetNameOfFile(fle.Name), fle.FullName);
                 }
             }
         }
@@ -212,7 +218,7 @@ namespace ArtemisManagerUI
                     }
                 }
             });
-            
+
         }
 
 
@@ -333,9 +339,16 @@ namespace ArtemisManagerUI
             {
                 if (string.IsNullOrEmpty(me.SelectedDataFile.Data))
                 {
-                    using (StreamReader sr = new StreamReader(me.SelectedDataFile.SaveFile))
+                    if (me.IsRemote)
                     {
-                        me.SelectedDataFile.Data = sr.ReadToEnd();
+                        //TODO: get remote data.
+                    }
+                    else
+                    {
+                        using (StreamReader sr = new StreamReader(me.SelectedDataFile.SaveFile))
+                        {
+                            me.SelectedDataFile.Data = sr.ReadToEnd();
+                        }
                     }
                 }
 
@@ -369,16 +382,41 @@ namespace ArtemisManagerUI
             }
             return fle;
         }
-        
+
 
         private void OnRestoreToDefault(object sender, RoutedEventArgs e)
         {
             if (IsRemote)
             {
-                //TODO: Send file.
+                //TODO: Send file (restore default).
             }
             else
             {
+                switch (FileType)
+                {
+                    case SendableStringPackageFile.controlsINI:
+                        if (System.IO.File.Exists(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI)))
+                        {
+                            File.Delete(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI));
+                        }
+                        using (StreamWriter sw = new(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI)))
+                        {
+                            sw.Write(Properties.Resources.controls);
+                        }
+                        break;
+                    case SendableStringPackageFile.DMXCommandsXML:
+                        if (System.IO.File.Exists(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands)))
+                        {
+                            File.Delete(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands));
+                        }
+                        using (StreamWriter sw = new(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands)))
+                        {
+                            sw.Write(Properties.Resources.DMXcommands);
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         private string GetExtension()
@@ -387,7 +425,7 @@ namespace ArtemisManagerUI
             {
                 case SendableStringPackageFile.controlsINI:
                     return "ini";
-                    
+
                 case SendableStringPackageFile.DMXCommandsXML:
                     return "xml";
                 default:
@@ -432,7 +470,7 @@ namespace ArtemisManagerUI
         }
         private void OnImportFile(object sender, RoutedEventArgs e)
         {
-
+            //For local only
             string ext = GetExtension();
             string targetFolder = GetTargetFolder();
             Microsoft.Win32.OpenFileDialog ofd = new()
@@ -448,20 +486,15 @@ namespace ArtemisManagerUI
             {
 
                 FileInfo source = new(ofd.FileName);
-                if (IsRemote)
+
+                string target = System.IO.Path.Combine(targetFolder, source.Name);
+                int i = 0;
+                while (File.Exists(target))
                 {
-                    //TODO: send file
+                    target = System.IO.Path.Combine(targetFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
                 }
-                else
-                {
-                    string target = System.IO.Path.Combine(targetFolder, source.Name);
-                    int i = 0;
-                    while (File.Exists(target))
-                    {
-                        target = System.IO.Path.Combine(targetFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
-                    }
-                    source.CopyTo(target, true);
-                }
+                source.CopyTo(target, true);
+
             }
 
         }
@@ -483,25 +516,17 @@ namespace ArtemisManagerUI
 
         private void OnSettingsFileRename(object sender, RoutedEventArgs e)
         {
-            if (IsRemote)
+            if (sender is MenuItem me)
             {
-                //TODO: Send file.
-            }
-            else
-            {
-                if (sender is MenuItem me)
+                if (me.CommandParameter is TextDataFile selectedFile)
                 {
-                    if (me.CommandParameter is TextDataFile selectedFile)
-                    {
-                        selectedFile.IsEditMode = true;
-                    }
+                    selectedFile.IsEditMode = true;
                 }
             }
         }
 
         private void OnDeleteSettingsFile(object sender, RoutedEventArgs e)
         {
-
             if (sender is MenuItem me)
             {
                 if (me.CommandParameter is TextDataFile selectedFile)
@@ -512,6 +537,7 @@ namespace ArtemisManagerUI
                         {
                             if (TargetClient != null)
                             {
+                                //TODO: remote delete.
                                 //Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.DeleteArtemisINIFile, Guid.Empty, selectedFile.Name);
                             }
                         }
@@ -544,30 +570,28 @@ namespace ArtemisManagerUI
         private void OnExportSettingsFile(object sender, RoutedEventArgs e)
         {
             //Cannot export a remote file--must first make it local.
-            if (!IsRemote)
+
+            if (e.OriginalSource is ArtemisINI presetsFile)
             {
-                if (e.OriginalSource is ArtemisINI presetsFile)
+                Microsoft.Win32.SaveFileDialog dialg = new()
                 {
-                    Microsoft.Win32.SaveFileDialog dialg = new()
+                    CheckPathExists = true,
+                    Filter = GetExtension() + " settings files (*." + GetExtension() + ")|*." + GetExtension(),
+                    DefaultExt = GetExtension(),
+                    InitialDirectory = GetTargetFolder(),
+                    Title = "Select new settings filename"
+                };
+                if (dialg.ShowDialog() == true)
+                {
+                    bool OkayToSave = true;
+                    if (File.Exists(dialg.FileName))
                     {
-                        CheckPathExists = true,
-                        Filter = GetExtension() + " settings files (*." + GetExtension() + ")|*." + GetExtension(),
-                        DefaultExt = GetExtension(),
-                        InitialDirectory = GetTargetFolder(),
-                        Title = "Select new settings filename"
-                    };
-                    if (dialg.ShowDialog() == true)
+                        OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
+                            "Settings", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
+                    }
+                    if (OkayToSave)
                     {
-                        bool OkayToSave = true;
-                        if (File.Exists(dialg.FileName))
-                        {
-                            OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
-                                "Settings", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
-                        }
-                        if (OkayToSave)
-                        {
-                            File.Copy(presetsFile.SaveFile, dialg.FileName, true);
-                        }
+                        File.Copy(presetsFile.SaveFile, dialg.FileName, true);
                     }
                 }
             }
@@ -581,17 +605,24 @@ namespace ArtemisManagerUI
                 {
                     if (!string.IsNullOrEmpty(selectedFile.Name) && !string.IsNullOrEmpty(selectedFile.OriginalName) && selectedFile.Name != selectedFile.OriginalName)
                     {
-                        string source = System.IO.Path.Combine(GetTargetFolder(), selectedFile.OriginalName + "." + GetExtension());
-                        string target = System.IO.Path.Combine(GetTargetFolder(), selectedFile.Name + "." +  GetExtension());
-                        if (File.Exists(target))
+                        if (IsRemote)
                         {
-                            MessageBox.Show("Cannot rename--new name already exists.", "Rename file", MessageBoxButton.OK, MessageBoxImage.Error);
+                            //TODO: rename remote file.
                         }
                         else
                         {
-                            File.Move(source, target, true);
-                            selectedFile.OriginalName = selectedFile.Name;
-                            selectedFile.SaveFile = System.IO.Path.Combine(GetTargetFolder(), selectedFile.Name + "." + GetExtension());
+                            string source = System.IO.Path.Combine(GetTargetFolder(), selectedFile.OriginalName + "." + GetExtension());
+                            string target = System.IO.Path.Combine(GetTargetFolder(), selectedFile.Name + "." + GetExtension());
+                            if (File.Exists(target))
+                            {
+                                MessageBox.Show("Cannot rename--new name already exists.", "Rename file", MessageBoxButton.OK, MessageBoxImage.Error);
+                            }
+                            else
+                            {
+                                File.Move(source, target, true);
+                                selectedFile.OriginalName = selectedFile.Name;
+                                selectedFile.SaveFile = System.IO.Path.Combine(GetTargetFolder(), selectedFile.Name + "." + GetExtension());
+                            }
                         }
                     }
                 }

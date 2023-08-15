@@ -70,10 +70,10 @@
         <DockPanel
             DockPanel.Dock="Left" Width="200">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Button 
+                <Button
                     ToolTip="Create new presets file"
-                Click="OnAddPresetFile"
-                HorizontalAlignment="Left" >
+                    Click="OnAddPresetFile"
+                    HorizontalAlignment="Left" >
                     <StackPanel Orientation="Horizontal" >
                         <Image Height="16" Source="/ArtemisManagerUI;component/Resources/newfile.png" />
                     </StackPanel>
@@ -84,6 +84,7 @@
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
                 <Button
+                    
                     Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                     HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
@@ -149,6 +150,7 @@
                                     </MenuItem>
                                     <Separator />
                                     <MenuItem
+                                        Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
                                         CommandParameter="{Binding}"
                                         Header="_Export" Click="OnExportPresets" >
                                         <MenuItem.Icon>

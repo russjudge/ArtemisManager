@@ -335,7 +335,7 @@ namespace ArtemisManagerUI
         {
             if (IsRemote)
             {
-
+                //TODO: Send to target to create a new ArtemisINI file.
             }
             else
             {
@@ -378,7 +378,7 @@ namespace ArtemisManagerUI
         {
             if (IsRemote)
             {
-
+                //TODO: Send to restore original INI file.
             }
             else
             {
@@ -390,10 +390,11 @@ namespace ArtemisManagerUI
             }
         }
 
-       
+
 
         private void OnImportFile(object sender, RoutedEventArgs e)
         {
+            //Not valid for remote.
             Microsoft.Win32.OpenFileDialog ofd = new()
             {
                 Title = "Select Artemis.ini file to import",
@@ -406,21 +407,16 @@ namespace ArtemisManagerUI
             if (ofd.ShowDialog() == true)
             {
 
-                FileInfo source =new(ofd.FileName);
-                if (IsRemote)
-                {
+                FileInfo source = new(ofd.FileName);
 
-                }
-                else
+                string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, source.Name);
+                int i = 0;
+                while (File.Exists(target))
                 {
-                    string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, source.Name);
-                    int i = 0;
-                    while (File.Exists(target))
-                    {
-                        target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
-                    }
-                    source.CopyTo(target, true);
+                    target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
                 }
+                source.CopyTo(target, true);
+
             }
         }
 
@@ -443,6 +439,7 @@ namespace ArtemisManagerUI
                 {
                     if (IsRemote)
                     {
+                        //TODO: Send filename change
                     }
                     else
                     {

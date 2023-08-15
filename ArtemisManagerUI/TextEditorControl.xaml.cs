@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ArtemisManagerAction;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -84,16 +86,14 @@ namespace ArtemisManagerUI
         {
             if (TakeAction.IsLoopback(TargetClient))
             {
-                switch (Data.FileType)
+                using (StreamWriter sw = new StreamWriter(Data.SaveFile))
                 {
-                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
-                        break;
-                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
-                        break;
+                    sw.Write(Data.data);
                 }
             }
             else
             {
+                //TODO: Remotely save
 
             }
         }
@@ -102,17 +102,21 @@ namespace ArtemisManagerUI
         {
             if (TakeAction.IsLoopback(TargetClient))
             {
+                string target = string.Empty;
                 switch (Data.FileType)
                 {
                     case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                        target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands);
                         break;
                     case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                        target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI);
                         break;
                 }
+                System.IO.File.Copy(Data.SaveFile, target, true);
             }
             else
             {
-
+                //TODO: Remotely activate
             }
         }
     }

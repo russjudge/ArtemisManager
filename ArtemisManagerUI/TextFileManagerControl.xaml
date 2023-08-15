@@ -29,7 +29,7 @@
                 </Button>
                 <Button
                     Click="OnRestoreToDefault"
-                    ToolTip="Restore Original artemis.ini file ({0}) to defaults">
+                    ToolTip="Restore Original to defaults">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
                 <Button
