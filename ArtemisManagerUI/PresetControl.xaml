@@ -1,12 +1,14 @@
-﻿<UserControl x:Class="ArtemisEngineeringPresets.PresetControl"
+﻿<UserControl x:Class="ArtemisManagerUI.PresetControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ArtemisEngineeringPresets" Name="uc"
+             xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             Name="uc"
              mc:Ignorable="d" >
     <UserControl.Resources>
-        <local:GreaterThanBrushConverter x:Key="GreaterThanBrushConverter" />
+        <converter:GreaterThanBrushConverter x:Key="GreaterThanBrushConverter" />
         <Style x:Key="{x:Type ListBoxItem}" TargetType="{x:Type ListBoxItem}">
             <!-- Possibly other setters -->
             <Setter Property="Focusable" Value="False" />
@@ -31,7 +33,7 @@
                 ToolTip="Gives coolant first to the setting requiring the most coolant, and continues until no more coolant is left."
                 Margin="30,0,0,0" Click="AutoAdjust_Click" >
                 <StackPanel Orientation="Horizontal">
-                    <Image Height="24" Source="/ArtemisEngineeringPresets;component/Resources/automatic.png" />
+                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/automatic.png" />
                     <TextBlock Text="Automatically adjust coolant levels" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>

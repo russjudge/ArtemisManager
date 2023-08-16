@@ -5,10 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
-             xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
-        <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
+        <converter:NullToBoolConverter x:Key="NullToBoolConverter" />
         <converter:NullToVisibility x:Key="NullToVisibility" />
         <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />

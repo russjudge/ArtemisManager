@@ -1,8 +1,6 @@
 ﻿using AMCommunicator;
-using ArtemisEngineeringPresets;
 using ArtemisManagerAction;
-using Lnk;
-using SharpCompress.Common;
+using ArtemisManagerAction.ArtemisEngineeringPresets;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -16,9 +14,6 @@ using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Media.Imaging;
-using static System.Windows.Forms.Design.AxImporter;
 
 namespace ArtemisManagerUI
 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace ArtemisEngineeringPresets
+namespace ArtemisManagerUI.Converters
 {
     [ValueConversion(typeof(int), typeof(Brush))]
     public class GreaterThanBrushConverter : IValueConverter

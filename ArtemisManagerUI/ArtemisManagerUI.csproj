@@ -4,8 +4,8 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <FileVersion>0.4.0.915</FileVersion>
-    <AssemblyVersion>0.4.0.915</AssemblyVersion>
+    <FileVersion>0.4.0.927</FileVersion>
+    <AssemblyVersion>0.4.0.927</AssemblyVersion>
     <Title>Artemis Manager UI</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>
@@ -28,6 +28,7 @@
     <None Remove="Resources\amBanner.jpg" />
     <None Remove="Resources\artemis1.png" />
     <None Remove="Resources\artemissbs.png" />
+    <None Remove="Resources\automatic.png" />
     <None Remove="Resources\backup.png" />
     <None Remove="Resources\broadcast.png" />
     <None Remove="Resources\close.png" />
@@ -42,8 +43,11 @@
     <None Remove="Resources\generate.png" />
     <None Remove="Resources\import.png" />
     <None Remove="Resources\install.png" />
+    <None Remove="Resources\max.png" />
+    <None Remove="Resources\min.png" />
     <None Remove="Resources\newfile.png" />
     <None Remove="Resources\no.png" />
+    <None Remove="Resources\normal.png" />
     <None Remove="Resources\ok.png" />
     <None Remove="Resources\Patreon-logo.png" />
     <None Remove="Resources\peer-to-peer.png" />
@@ -87,7 +91,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AMCommunicator\AMCommunicator.csproj" />
-    <ProjectReference Include="..\ArtemisEngineeringPresets\ArtemisEngineeringPresets.csproj" />
     <ProjectReference Include="..\ArtemisManagerAction\ArtemisManagerAction.csproj" />
   </ItemGroup>
 
@@ -108,6 +111,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\artemissbs.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\automatic.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\backup.png">
@@ -152,10 +158,19 @@
     <Resource Include="Resources\install.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\max.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\min.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\newfile.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\no.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\normal.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\ok.png">

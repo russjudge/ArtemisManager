@@ -17,10 +17,8 @@ namespace AMCommunicator
 {
     public class Network
     {
-        //const int udpPort = 2012;
         const int tcpPort = 2011;
 
-        //TODO: Master/slave relationship?  --later.
         public static string Password { get; set; }
         private readonly ManualResetEvent mreSender = new(false);
         

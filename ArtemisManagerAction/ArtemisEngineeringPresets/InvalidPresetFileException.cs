@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArtemisEngineeringPresets
+namespace ArtemisManagerAction.ArtemisEngineeringPresets
 {
     [Serializable]
     public class InvalidPresetFileException : Exception

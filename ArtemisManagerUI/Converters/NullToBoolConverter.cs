@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace ArtemisEngineeringPresets
+namespace ArtemisManagerUI.Converters
 {
     public class NullToBoolConverter : IValueConverter
     {

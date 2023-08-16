@@ -1,5 +1,80 @@
 Change History
 ===============================
+TODO Tests:
+Artemis INI--
+	Import local
+	Export local
+	Rename local
+	Rename remote
+	Save local
+	save remote
+	Delete local
+	Delete remote
+	Activate local
+	Activate remote
+	Restore to default local
+	Restore to default remote
+
+Engineering presets--
+	Import local
+	Export local
+	Rename local
+	Rename remote
+	Save local
+	save remote
+	Delete local
+	Delete remote
+	Activate local
+	Activate remote
+	Restore to default local
+	Restore to default remote
+
+controls ini--
+	Import local
+	export local
+	Rename local
+	Rename remote
+	Save local
+	save remote
+	Delete local
+	Delete remote
+	Activate local
+	Activate remote
+	Restore to default local
+	Restore to default remote
+
+DMX Commands--
+	import local
+	export local
+	Rename local
+	Rename remote
+	Save local
+	save remote
+	Delete local
+	Delete remote
+	Activate local
+	Activate remote
+	Restore to default local
+	Restore to default remote
+
+Mod -
+	Install local
+	Install remote
+	Activate local
+	Activate remote
+	Uninstall local
+	uninstall remote
+
+Mission - 
+	Install local
+	Install remote
+	Activate local
+	Activate remote
+	Uninstall local
+	uninstall remote
+
+Development enhancemet TODO: snapshot for mission (similar to mod)
+
 Version 0.4 (beta) 08/xx/2023:
 Enhancements:
 	- Improved interface for working with remote engineering presets and artemis.ini settings.

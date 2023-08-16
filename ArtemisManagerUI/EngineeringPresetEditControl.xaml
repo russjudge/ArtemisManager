@@ -4,12 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
-        xmlns:engineering="clr-namespace:ArtemisEngineeringPresets;assembly=ArtemisEngineeringPresets"
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" 
              Name="uc">
     <UserControl.Resources>
-        <engineering:NullToBoolConverter x:Key="NullToBoolConverter" />
+        <converter:NullToBoolConverter x:Key="NullToBoolConverter" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
     <DockPanel>
@@ -175,7 +174,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <engineering:PresetSettingsControl
+        <local:PresetSettingsControl
             FontSize="10"
             Saved="OnSaved"
             Activate="OnActivate"

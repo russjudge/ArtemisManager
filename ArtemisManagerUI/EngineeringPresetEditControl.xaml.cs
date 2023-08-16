@@ -1,5 +1,6 @@
-﻿using ArtemisEngineeringPresets;
+﻿using AMCommunicator;
 using ArtemisManagerAction;
+using ArtemisManagerAction.ArtemisEngineeringPresets;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -250,8 +251,8 @@ namespace ArtemisManagerUI
         }
 
         public static readonly DependencyProperty SelectedPresetFileProperty =
-         DependencyProperty.Register(nameof(SelectedPresetFile), typeof(EngineeringPresetFileListItem),
-         typeof(EngineeringPresetEditControl), new PropertyMetadata(OnSelectedPresetFileChanged));
+            DependencyProperty.Register(nameof(SelectedPresetFile), typeof(EngineeringPresetFileListItem),
+            typeof(EngineeringPresetEditControl), new PropertyMetadata(OnSelectedPresetFileChanged));
 
         private static void OnSelectedPresetFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -269,7 +270,10 @@ namespace ArtemisManagerUI
                             case MessageBoxResult.Yes:
                                 if (me.IsRemote)
                                 {
-                                    //TODO: Save file remotely.
+                                    if (me.TargetClient != null)
+                                    {
+                                        Network.Current?.SendArtemisAction(me.TargetClient, AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets, Guid.Empty, me.SelectedPresetFile.INIFile.GetSerializedString());
+                                    }
                                 }
                                 else
                                 {
@@ -292,7 +296,7 @@ namespace ArtemisManagerUI
                         {
                             if (me.IsRemote)
                             {
-                                //TODO: get updated file.
+                                
                             }
                             else
                             {
@@ -306,7 +310,7 @@ namespace ArtemisManagerUI
                         {
                             if (me.IsRemote)
                             {
-                                //TODO: get restored file.
+                               
                             }
                             else
                             {
@@ -330,37 +334,43 @@ namespace ArtemisManagerUI
                 this.SetValue(SelectedPresetFileProperty, value);
             }
         }
-
+        string GetNewFilename()
+        {
+            string newFile = "NewPresets";
+            string baseName = newFile;
+            int i = 0;
+            bool isOkay = true;
+            do
+            {
+                isOkay = true;
+                foreach (var preset in PresetFiles)
+                {
+                    if (preset.Name == newFile)
+                    {
+                        isOkay = false;
+                        newFile = baseName + "(" + (++i).ToString() + ")";
+                    }
+                }
+            } while (!isOkay);
+            return newFile;
+        }
 
         private void OnAddPresetFile(object sender, RoutedEventArgs e)
         {
+            string newFile = GetNewFilename();
+            PresetsFile f = new()
+            {
+                SaveFile = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, newFile + ArtemisManager.DATFileExtension)
+            };
             if (IsRemote)
             {
-                //TODO: Send to create new presets file.
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets, Guid.Empty, f.GetSerializedString());
+                }
             }
             else
             {
-                string newFile = "NewPresets";
-                int i = 0;
-                bool mustretry = true;
-                while (mustretry)
-                {
-                    mustretry = false;
-                    foreach (var item in PresetFiles)
-                    {
-                        if (item.Name == newFile)
-                        {
-                            newFile = "NewPresets(" + (++i).ToString() + ")";
-                            mustretry = true;
-                            break;
-                        }
-                    }
-                }
-
-                PresetsFile f = new()
-                {
-                    SaveFile = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, newFile + ArtemisManager.DATFileExtension)
-                };
                 f.Save();
             }
         }

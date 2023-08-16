@@ -2,44 +2,36 @@
 using AMCommunicator.Messages;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Automation.Provider;
-using System.Windows.Media;
 
-namespace ArtemisEngineeringPresets
+namespace ArtemisManagerAction.ArtemisEngineeringPresets
 {
-    public class PresetsFile : DependencyObject, ISendableStringFile
+    public class PresetsFile : INotifyPropertyChanged, ISendableStringFile
     {
         public const int MaxPresets = 10;
-        public const int MaxStations = 8;
         public const byte HeaderByte = 0xfe;
         public PresetsFile()
         {
             Presets = new Preset[MaxPresets];
             for (int i = 0; i < MaxPresets; i++)
             {
-                for (int j = 0; j < MaxStations; j++)
-                {
-                    Presets[i] = new Preset();
-                    Presets[i].SystemLevels[j] = new();
-                }
+                Presets[i] = new Preset();
             }
         }
-        public PresetsFile(string file) 
+        public PresetsFile(string file)
         {
             LoadPresets(file);
         }
-        
+
         public bool HasChanges()
         {
-            foreach (var preset in Presets) 
+            foreach (var preset in Presets)
             {
                 if (preset.Changed)
                 {
@@ -74,11 +66,11 @@ namespace ArtemisEngineeringPresets
                     {
                         List<int> energyLevels = new();
                         List<int> coolantLevels = new();
-                        for (int j = 0; j < MaxStations; j++)
+                        for (int j = 0; j < Preset.MaxStations; j++)
                         {
                             energyLevels.Add((int)Math.Round(br.ReadSingle() * 300));
                         }
-                        for (int j = 0; j < MaxStations; j++)
+                        for (int j = 0; j < Preset.MaxStations; j++)
                         {
                             coolantLevels.Add(Convert.ToInt32(br.ReadByte()));
                         }
@@ -133,11 +125,11 @@ namespace ArtemisEngineeringPresets
                     bw.Write(new byte[] { HeaderByte, HeaderByte });
                     for (int j = 0; j < MaxPresets; j++)
                     {
-                        for (int i = 0; i < MaxStations; i++)
+                        for (int i = 0; i < Preset.MaxStations; i++)
                         {
                             bw.Write((float)Presets[j].SystemLevels[i].EnergyLevel / 300);
                         }
-                        for (int i = 0; i < MaxStations; i++)
+                        for (int i = 0; i < Preset.MaxStations; i++)
                         {
                             byte b = (byte)Presets[j].SystemLevels[i].CoolantLevel;
                             bw.Write(b);
@@ -151,23 +143,21 @@ namespace ArtemisEngineeringPresets
             SaveFile = file;
             Save();
         }
-        public static readonly DependencyProperty PresetsProperty =
-         DependencyProperty.Register(nameof(Presets), typeof(Preset[]),
-        typeof(PresetsFile));
+       
 
-        public Preset[] Presets
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public Preset[] Presets { get; private set; } = new Preset[MaxPresets];
+
+        protected void DoChanged([CallerMemberName] string property = "")
         {
-            get
-            {
-                return (Preset[])this.GetValue(PresetsProperty);
+            //if (property != nameof(Changed))
+            //{
+            //    Changed = true;
+            //}
 
-            }
-            private set
-            {
-                this.SetValue(PresetsProperty, value);
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
-
 
         public SendableStringPackageFile FileType
         {

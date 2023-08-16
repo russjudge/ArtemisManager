@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="ArtemisEngineeringPresets.ShipSystemControl"
+﻿<UserControl x:Class="ArtemisManagerUI.ShipSystemControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ArtemisEngineeringPresets"
+             xmlns:local="clr-namespace:ArtemisManagerUI"
              Name="uc" 
              mc:Ignorable="d" MinHeight="270">
     <GroupBox Margin="-6,0,-6,0"
@@ -106,13 +106,13 @@
                 Grid.Row="2" Grid.Column="2" Maximum="8" Minimum="0" Value="{Binding Levels.CoolantNeed, Mode=OneWay, ElementName=uc}" />
             <Button
                 Grid.Row="3" Grid.Column="0" ToolTip="Max Energy setting" Click="OnSetMaxEnergy">
-                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/max.png" />
+                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/max.png" />
             </Button>
             <Button Grid.Row="3" Grid.Column="1" ToolTip="Normal Energy setting" Click="OnSetNormalEnergy">
-                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/normal.png" />
+                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/normal.png" />
             </Button>
             <Button Grid.Row="3" Grid.Column="2" ToolTip="Minimum Energy setting" Click="OnSetMinimumEnergy">
-                <Image Height="16" Source="/ArtemisEngineeringPresets;component/Resources/min.png" />
+                <Image Height="16" Source="/ArtemisManagerUI;component/Resources/min.png" />
             </Button>
         </Grid>
     </GroupBox>

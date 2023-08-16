@@ -75,7 +75,7 @@ namespace ArtemisManagerAction
             }
             using (StreamWriter sw = new(ActiveLocallSettingsArtemisINIFileMarker))
             {
-                sw.WriteLine(file);
+                sw.Write(file);
             }
             ActivateLocalArtemisINISettings();
         }
@@ -371,7 +371,41 @@ namespace ArtemisManagerAction
             }
             return baseArtemis;
         }
-        public static void DeleteAll(string target)
+        public static bool RenameArtemisINIFile(string oldName, string newName)
+        {
+            if (!string.IsNullOrEmpty(newName) && !string.IsNullOrEmpty(oldName) && newName != oldName)
+            {
+                string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, oldName + ArtemisManager.INIFileExtension);
+                string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, newName + ArtemisManager.INIFileExtension);
+                if (File.Exists(target))
+                {
+                    return false;
+                }
+                else
+                {
+                    File.Move(source, target, true);
+                    return true;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public static bool DeleteArtemisINIFile(string name)
+        {
+            string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, name + ArtemisManager.INIFileExtension);
+            if (File.Exists(target))
+            {
+                File.Delete(target);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+            public static void DeleteAll(string target)
         {
             if (Directory.Exists(target))
             {
@@ -537,6 +571,19 @@ namespace ArtemisManagerAction
             else
             {
                 return string.Empty;
+            }
+        }
+        public static bool RestoreArtemisINIToDefault()
+        {
+            string originalINI = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
+            if (!string.IsNullOrEmpty(originalINI) && File.Exists(originalINI))
+            {
+                File.Copy(originalINI, ArtemisManager.ArtemisINIFolder);
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
         public static void VerifyArtemisINIBackup()

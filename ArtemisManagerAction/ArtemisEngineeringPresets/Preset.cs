@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Windows;
 
-namespace ArtemisEngineeringPresets
+namespace ArtemisManagerAction.ArtemisEngineeringPresets
 {
-    public class Preset : DependencyObject
+    public class Preset : INotifyPropertyChanged
     {
+        public const int MaxStations = 8;
         public Preset()
         {
             Initialize(false);
@@ -20,7 +22,7 @@ namespace ArtemisEngineeringPresets
             Index = index;
             if (energyLevels != null && coolantLevels != null)
             {
-                for (int i = 0; i < PresetsFile.MaxStations; i++)
+                for (int i = 0; i < MaxStations; i++)
                 {
                     SystemLevels[i].EnergyLevel = energyLevels[i];
                     SystemLevels[i].CoolantLevel = coolantLevels[i];
@@ -29,23 +31,24 @@ namespace ArtemisEngineeringPresets
             }
             AcceptChanges();
         }
-        
+
         private Preset(bool isForOriginal)
         {
             Initialize(isForOriginal);
         }
         void Initialize(bool isForOriginal)
         {
-            SystemLevels = new SystemLevel[PresetsFile.MaxStations];
+            
 
             TotalCoolantLevel = 0;
-            for (int i = 0; i < PresetsFile.MaxStations; i++)
+            for (int i = 0; i < MaxStations; i++)
             {
                 SystemLevel s = new(100, 0)
                 {
                     Index = (Systems)i
                 };
-                s.ValueChanged += new RoutedEventHandler(ValueChanged);
+                s.EnergyChanged += S_EnergyChanged;
+                s.CoolantChanged += S_CoolantChanged;
 
                 SystemLevels[i] = s;
             }
@@ -59,8 +62,8 @@ namespace ArtemisEngineeringPresets
             }
 
         }
-        readonly object lockObject = new();
-        void ValueChanged(object sender, RoutedEventArgs e)
+
+        private void S_CoolantChanged(object? sender, EventArgs e)
         {
             lock (lockObject)
             {
@@ -71,24 +74,18 @@ namespace ArtemisEngineeringPresets
                     TotalCoolantLevel += coolant.CoolantLevel;
                 }
             }
-
         }
-        public static int CoolantLevelToPreventOverheat(int energyLevel)
+
+        private void S_EnergyChanged(object? sender, EventArgs e)
         {
-
-            if (energyLevel <= 100)
-                return 0;
-            else if (energyLevel <= 150)
-                return 0 + (energyLevel - 100) / 25;
-            else if (energyLevel <= 190.0)
-                return 2 + (energyLevel - 150) / 20;
-            else if (energyLevel <= 220.0)
-                return 4 + (energyLevel - 190) / 15;
-            else if (energyLevel <= 250)
-                return 6 + (energyLevel - 220) / 15;
-            else
-                return 8;
+            lock (lockObject)
+            {
+                Changed = true;
+            }
         }
+
+        readonly object lockObject = new();
+        
 
         void SetOriginal()
         {
@@ -97,7 +94,6 @@ namespace ArtemisEngineeringPresets
             {
                 Original.SystemLevels[i].EnergyLevel = this.SystemLevels[i].EnergyLevel;
                 Original.SystemLevels[i].CoolantLevel = this.SystemLevels[i].CoolantLevel;
-
             }
         }
         public void AcceptChanges()
@@ -109,7 +105,7 @@ namespace ArtemisEngineeringPresets
         {
             if (Original == null)
             {
-                for (int i = 0; i < PresetsFile.MaxStations; i++)
+                for (int i = 0; i < MaxStations; i++)
                 {
                     this.SystemLevels[i].EnergyLevel = 0;
                     this.SystemLevels[i].CoolantLevel = 0;
@@ -117,7 +113,7 @@ namespace ArtemisEngineeringPresets
             }
             else
             {
-                for (int i = 0; i < PresetsFile.MaxStations; i++)
+                for (int i = 0; i < MaxStations; i++)
                 {
                     this.SystemLevels[i].EnergyLevel = Original.SystemLevels[i].EnergyLevel;
                     this.SystemLevels[i].CoolantLevel = Original.SystemLevels[i].CoolantLevel;
@@ -125,77 +121,65 @@ namespace ArtemisEngineeringPresets
             }
             Changed = false;
         }
-       
+
 
         public Preset? Original { get; private set; } = null;
 
-
-        public static readonly DependencyProperty IndexProperty =
-          DependencyProperty.Register(nameof(Index), typeof(int),
-          typeof(Preset));
+        int _index = 0;
 
         public int Index
         {
             get
             {
-                return (int)this.GetValue(IndexProperty);
+                return _index;
             }
             set
             {
-                this.SetValue(IndexProperty, value);
+                _index = value;
+                DoChanged();
             }
         }
 
-        public static readonly DependencyProperty ChangedProperty =
-          DependencyProperty.Register("Changed", typeof(bool),
-          typeof(Preset));
+        bool _changed = false;
 
         public bool Changed
         {
             get
             {
-                return (bool)this.GetValue(ChangedProperty);
+                return _changed;
             }
             set
             {
-                this.SetValue(ChangedProperty, value);
+                _changed = value;
+                DoChanged();
             }
         }
 
-
-
-        public static readonly DependencyProperty SystemLevelsProperty =
-          DependencyProperty.Register(nameof(SystemLevels), typeof(SystemLevel[]),
-          typeof(Preset));
-
-        public SystemLevel[] SystemLevels
-        {
-            get
-            {
-                return (SystemLevel[])this.GetValue(SystemLevelsProperty);
-            }
-            private set
-            {
-                this.SetValue(SystemLevelsProperty, value);
-            }
-        }
-
-
-
-        public static readonly DependencyProperty TotalCoolantLevelProperty =
-            DependencyProperty.Register(nameof(TotalCoolantLevel), typeof(int),
-            typeof(Preset));
+        public SystemLevel[] SystemLevels { get; private set; } = new SystemLevel[MaxStations];
+        int _totalCoolant = 0;
 
         public int TotalCoolantLevel
         {
             get
             {
-                return (int)this.GetValue(TotalCoolantLevelProperty);
+                return _totalCoolant;
             }
             set
             {
-                this.SetValue(TotalCoolantLevelProperty, value);
+                _totalCoolant = value;
+                DoChanged();
             }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void DoChanged([CallerMemberName] string property = "")
+        {
+            if (property != nameof(Changed))
+            {
+                Changed = true;
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }
 }

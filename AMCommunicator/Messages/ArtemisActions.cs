@@ -10,17 +10,41 @@ namespace AMCommunicator.Messages
     {
         StartArtemis,
         StopArtemis,
+
         ActivateMod,
         InstallMod,
+
         ResetToVanilla,
+
         InstallMission,
         ActivateMission,
+
         UninstallMod,
+
         ActivateArtemisINIFile,
         RenameArtemisINIFile,
-        DeleteArtemisINIFile,
+        DeleteArtemisINIFile
+            ,
         ActivateEngineeringPresetsFile,
         RenameEngineeringPresetsFile,
-        DeleteEngineeringPresetsFile
+        DeleteEngineeringPresetsFile,
+
+        InstallArtemisINI,
+        InstallEngineeringPresets,
+
+        InstallControlsINI,
+        RenameControlsINI,
+        ActivateControlsINI,
+        DeleteControlsINI,
+
+        InstallDMXCommands,
+        RenameDMXCommands,
+        ActivateDMXCommands,
+        DeleteDMXCommands,
+
+        RestoreArtemisINIToDefault,
+        RestoreControlINIToDefault,
+        RestoreDMXCommandsToDefault,
+        RestoreEngineeringPresetsToDefault,
     }
 }
