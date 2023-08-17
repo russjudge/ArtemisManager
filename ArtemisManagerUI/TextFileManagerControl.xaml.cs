@@ -1,4 +1,5 @@
-﻿using AMCommunicator.Messages;
+﻿using AMCommunicator;
+using AMCommunicator.Messages;
 using ArtemisManagerAction;
 using System;
 using System.Collections.Generic;
@@ -129,11 +130,49 @@ namespace ArtemisManagerUI
                 }
             });
         }
+        private string GetNewFilename(string baseName)
+        {
+            int i = 0;
+            bool matched = false;
+            string workName = baseName;
+            do
+            {
+                matched = false;
+                foreach (var name in DataFileList)
+                {
+                    if (name.Name == baseName)
+                    {
+                        matched = true;
+                        break;
+                    }
+                }
+                if (matched)
+                {
+                    workName = baseName + "(" + (++i).ToString() + ")";
+                }
+
+            } while (matched);
+            return workName;
+        }
+        
+
         private void OnAddSettingsFile(object sender, RoutedEventArgs e)
         {
             if (IsRemote)
             {
-                //TODO: Send file.
+                if (TargetClient != null)
+                {
+                    switch (FileType)
+                    {
+                        case SendableStringPackageFile.controlsINI:
+                            Network.Current?.SendStringPackageFile(TargetClient, Properties.Resources.controls, FileType, GetNewFilename(FileType.ToString()));
+                            break;
+                        case SendableStringPackageFile.DMXCommandsXML:
+                            Network.Current?.SendStringPackageFile(TargetClient, Properties.Resources.DMXcommands, FileType, GetNewFilename(FileType.ToString()));
+                            break;
+                    }
+                    
+                }
             }
             else
             {
@@ -388,35 +427,33 @@ namespace ArtemisManagerUI
         {
             if (IsRemote)
             {
-                //TODO: Send file (restore default).
+                if (TargetClient != null)
+                {
+                    switch (FileType)
+                    {
+                        case SendableStringPackageFile.controlsINI:
+                            Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.RestoreControlINIToDefault, Guid.Empty, Properties.Resources.controls);
+                            break;
+                        case SendableStringPackageFile.DMXCommandsXML:
+                            Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.RestoreDMXCommandsToDefault, Guid.Empty, Properties.Resources.DMXcommands);
+                            break;
+                    }
+                }
             }
             else
             {
+                string data = string.Empty;
                 switch (FileType)
                 {
                     case SendableStringPackageFile.controlsINI:
-                        if (System.IO.File.Exists(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI)))
-                        {
-                            File.Delete(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI));
-                        }
-                        using (StreamWriter sw = new(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI)))
-                        {
-                            sw.Write(Properties.Resources.controls);
-                        }
+                        data = Properties.Resources.controls;
                         break;
                     case SendableStringPackageFile.DMXCommandsXML:
-                        if (System.IO.File.Exists(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands)))
-                        {
-                            File.Delete(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands));
-                        }
-                        using (StreamWriter sw = new(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands)))
-                        {
-                            sw.Write(Properties.Resources.DMXcommands);
-                        }
-                        break;
-                    default:
+                        data = Properties.Resources.DMXcommands;
                         break;
                 }
+                ArtemisManager.RestoreDefaultOtherSettingsFile(FileType, data);
+                
             }
         }
         private string GetExtension()
@@ -498,16 +535,28 @@ namespace ArtemisManagerUI
             }
 
         }
+      
 
         private void OnActivateSettingsFile(object sender, RoutedEventArgs e)
         {
-            if (IsRemote)
+            if (SelectedDataFile != null)
             {
-                //TODO: Send file.
-            }
-            else
-            {
-                if (SelectedDataFile != null)
+                if (IsRemote)
+                {
+                    if (TargetClient != null)
+                    {
+                        switch (FileType)
+                        {
+                            case SendableStringPackageFile.controlsINI:
+                                Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.ActivateControlsINI, Guid.Empty, new FileInfo(SelectedDataFile.SaveFile).Name);
+                                break;
+                            case SendableStringPackageFile.DMXCommandsXML:
+                                Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.ActivateDMXCommands, Guid.Empty, new FileInfo(SelectedDataFile.SaveFile).Name);
+                                break;
+                        }
+                    }
+                }
+                else
                 {
                     System.IO.File.Copy(SelectedDataFile.SaveFile, GetActivatedFilename());
                 }
@@ -524,7 +573,7 @@ namespace ArtemisManagerUI
                 }
             }
         }
-
+        
         private void OnDeleteSettingsFile(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem me)
@@ -537,12 +586,20 @@ namespace ArtemisManagerUI
                         {
                             if (TargetClient != null)
                             {
-                                //TODO: remote delete.
-                                //Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.DeleteArtemisINIFile, Guid.Empty, selectedFile.Name);
+                                switch (FileType)
+                                {
+                                    case SendableStringPackageFile.controlsINI:
+                                        Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.DeleteControlsINI, Guid.Empty, selectedFile.Name);
+                                        break;
+                                    case SendableStringPackageFile.DMXCommandsXML:
+                                        Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.DeleteDMXCommands, Guid.Empty, selectedFile.Name);
+                                        break;
+                                }
                             }
                         }
                         else
                         {
+                            
                             if (File.Exists(selectedFile.SaveFile))
                             {
                                 File.Delete(selectedFile.SaveFile);
@@ -596,7 +653,7 @@ namespace ArtemisManagerUI
                 }
             }
         }
-
+       
         private void OnSettingsFilenameChanged(object sender, RoutedEventArgs e)
         {
             if (sender is TextBlockEditControl me)
@@ -607,7 +664,18 @@ namespace ArtemisManagerUI
                     {
                         if (IsRemote)
                         {
-                            //TODO: rename remote file.
+                            if (TargetClient != null)
+                            {
+                                switch (FileType)
+                                {
+                                    case SendableStringPackageFile.controlsINI:
+                                        Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.RenameControlsINI, Guid.Empty, selectedFile.OriginalName + ":" + selectedFile.Name);
+                                        break;
+                                    case SendableStringPackageFile.DMXCommandsXML:
+                                        Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.RenameDMXCommands, Guid.Empty, selectedFile.OriginalName + ":" + selectedFile.Name);
+                                        break;
+                                }
+                            }
                         }
                         else
                         {

@@ -1,4 +1,5 @@
-﻿using ArtemisManagerAction;
+﻿using AMCommunicator;
+using ArtemisManagerAction;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -93,8 +94,10 @@ namespace ArtemisManagerUI
             }
             else
             {
-                //TODO: Remotely save
-
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendStringPackageFile(TargetClient, Data.GetSerializedString(), Data.FileType, Data.SaveFile);
+                }
             }
         }
 
@@ -102,21 +105,22 @@ namespace ArtemisManagerUI
         {
             if (TakeAction.IsLoopback(TargetClient))
             {
-                string target = string.Empty;
-                switch (Data.FileType)
-                {
-                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
-                        target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands);
-                        break;
-                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
-                        target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI);
-                        break;
-                }
-                System.IO.File.Copy(Data.SaveFile, target, true);
+                ArtemisManager.ActivateOtherSettingsFile(Data.FileType, Data.SaveFile);
             }
             else
             {
-                //TODO: Remotely activate
+                if (TargetClient != null)
+                {
+                    switch (Data.FileType)
+                    {
+                        case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                            Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateDMXCommands, Guid.Empty, new FileInfo(Data.SaveFile).Name);
+                            break;
+                        case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                            Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateControlsINI, Guid.Empty, new FileInfo(Data.SaveFile).Name);
+                            break;
+                    }
+                }
             }
         }
     }

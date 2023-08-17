@@ -1,9 +1,13 @@
-﻿using Microsoft.Win32;
+﻿using AMCommunicator.Messages;
+using ArtemisManagerAction.ArtemisEngineeringPresets;
+using Microsoft.VisualBasic.FileIO;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -14,6 +18,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ArtemisManagerAction
 {
@@ -371,12 +376,12 @@ namespace ArtemisManagerAction
             }
             return baseArtemis;
         }
-        public static bool RenameArtemisINIFile(string oldName, string newName)
+        public static bool RenameSettingsFile(string folder, string extension, string oldName, string newName)
         {
             if (!string.IsNullOrEmpty(newName) && !string.IsNullOrEmpty(oldName) && newName != oldName)
             {
-                string source = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, oldName + ArtemisManager.INIFileExtension);
-                string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, newName + ArtemisManager.INIFileExtension);
+                string source = ResolveFilename(folder, oldName, extension);
+                string target = ResolveFilename(folder, newName, extension);
                 if (File.Exists(target))
                 {
                     return false;
@@ -392,9 +397,55 @@ namespace ArtemisManagerAction
                 return false;
             }
         }
+        public static bool RestoreDefaultOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile fileType, string data)
+        {
+            string targetFile = string.Empty;
+            switch (fileType)
+            {
+                case SendableStringPackageFile.controlsINI:
+                    targetFile = ResolveFilename(ModItem.ActivatedFolder, controlsINI, INIFileExtension);
+                   
+                    break;
+                case SendableStringPackageFile.DMXCommandsXML:
+                    targetFile = ResolveFilename(Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder), DMXCommands, XMLFileExtension);
+                    break;
+                default:
+                    break;
+            }
+            if (System.IO.File.Exists(targetFile))
+            {
+                File.Delete(targetFile);
+            }
+            using (StreamWriter sw = new(targetFile))
+            {
+                sw.Write(data);
+            }
+            return true;
+        }
+        public static bool RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile fileType, string oldName, string newName)
+        {
+            switch (fileType)
+            {
+                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                    return RenameSettingsFile(ControlsINIFolder, INIFileExtension, oldName, newName);
+                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                    return RenameSettingsFile(DMXCommandsFolder, XMLFileExtension, oldName, newName);
+
+                default:
+                    return RenameSettingsFile(DMXCommandsFolder, XMLFileExtension, oldName, newName);
+            }
+        }
+        public static bool RenameArtemisINIFile(string oldName, string newName)
+        {
+            return RenameSettingsFile(ArtemisINIFolder, INIFileExtension, oldName, newName);
+        }
+        public static bool RenameEngineeringPresetsFile(string oldName, string newName)
+        {
+            return RenameSettingsFile(EngineeringPresetsFolder, DATFileExtension, oldName, newName);
+        }
         public static bool DeleteArtemisINIFile(string name)
         {
-            string target = System.IO.Path.Combine(ArtemisManager.ArtemisINIFolder, name + ArtemisManager.INIFileExtension);
+            string target = ResolveFilename(ArtemisINIFolder, name, INIFileExtension);
             if (File.Exists(target))
             {
                 File.Delete(target);
@@ -534,6 +585,61 @@ namespace ArtemisManagerAction
             return retVal;
         
         }
+        public static bool RestoreEngineeringPresetsToDefault()
+        {
+            System.IO.FileInfo fle = new(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile));
+            if (fle.Exists)
+            {
+                fle.Delete();
+            }
+            return true;
+        }
+        public static bool DeleteOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile fileType, string name)
+        {
+            string sourceFolder = string.Empty;
+            string souceExtension = string.Empty;
+            switch (fileType)
+            {
+                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                    sourceFolder = ControlsINIFolder;
+                    souceExtension = INIFileExtension;
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                    sourceFolder = DMXCommandsFolder;
+                    souceExtension = XMLFileExtension;
+                    break;
+            }
+            string source = ResolveFilename(sourceFolder, name, souceExtension);
+            if (File.Exists(source))
+            {
+                File.Delete(source);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public static bool ActivateOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile fileType, string name)
+        {
+            string target = string.Empty;
+            string source = string.Empty;
+            switch (fileType)
+            {
+                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                    source = ResolveFilename(DMXCommandsFolder, name, XMLFileExtension);
+                    target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands);
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                    source = ResolveFilename(ControlsINIFolder, name, INIFileExtension);
+                    target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.controlsINI);
+                    break;
+                default:
+                    return false;
+            }
+            System.IO.File.Copy(source, target, true);
+            return true;
+        }
         public static bool ActivateArtemisINIFile(string name)
         {
             
@@ -546,6 +652,48 @@ namespace ArtemisManagerAction
             if (System.IO.File.Exists(source))
             {
                 File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisINI), true);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public static bool ActivateEngineeringPresetFile(string name)
+        {
+            string source = ResolveFilename(EngineeringPresetsFolder, name, DATFileExtension);
+            if (System.IO.File.Exists(source))
+            {
+                File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private static string ResolveFilename(string sourceFolder, string name, string extension)
+        {
+            string sourceName = name;
+            if (!sourceName.Contains('.'))
+            {
+                sourceName += extension;
+            }
+            if (sourceName.Contains("\\") || sourceName.Contains("/"))
+            {
+                sourceName = new FileInfo(sourceName).Name;
+            }
+
+            string source = System.IO.Path.Combine(sourceFolder, sourceName);
+            return source;
+        }
+       
+        public static bool DeleteEngineeringPresetsFile(string name)
+        {
+            string source = ResolveFilename(EngineeringPresetsFolder, name, DATFileExtension);
+            if (File.Exists(source))
+            {
+                File.Delete(source);
                 return true;
             }
             else

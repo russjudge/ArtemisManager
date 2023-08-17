@@ -1,7 +1,9 @@
-﻿using ArtemisManagerAction.ArtemisEngineeringPresets;
+﻿using AMCommunicator;
+using ArtemisManagerAction.ArtemisEngineeringPresets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,6 +26,46 @@ namespace ArtemisManagerUI
         public PresetSettingsControl()
         {
             InitializeComponent();
+        }
+
+        public static readonly DependencyProperty TargetClientProperty =
+           DependencyProperty.Register(nameof(TargetClient), typeof(IPAddress),
+           typeof(PresetSettingsControl));
+
+        public IPAddress? TargetClient
+        {
+            get
+            {
+                return (IPAddress?)this.GetValue(TargetClientProperty);
+            }
+            set
+            {
+                this.SetValue(TargetClientProperty, value);
+            }
+        }
+        public static readonly DependencyProperty IsRemoteProperty =
+          DependencyProperty.Register(nameof(IsRemote), typeof(bool),
+          typeof(PresetSettingsControl), new PropertyMetadata(OnIsRemoteChanged));
+
+        private static void OnIsRemoteChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is EngineeringPresetEditControl me)
+            {
+                //me.Initialize();
+            }
+        }
+
+        public bool IsRemote
+        {
+            get
+            {
+                return (bool)this.GetValue(IsRemoteProperty);
+
+            }
+            set
+            {
+                this.SetValue(IsRemoteProperty, value);
+            }
         }
 
         public static readonly DependencyProperty SelectedIItemProperty =
@@ -88,7 +130,17 @@ namespace ArtemisManagerUI
 
         private void OnSave(object sender, RoutedEventArgs e)
         {
-            File.Save();
+            if (IsRemote)
+            {
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendStringPackageFile(TargetClient, File.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset, new System.IO.FileInfo(File.SaveFile).Name);
+                }
+            }
+            else
+            {
+                File.Save();
+            }
             RaiseSavedEvent();
         }
 
@@ -133,6 +185,7 @@ namespace ArtemisManagerUI
 
         private void OnDelete(object sender, RoutedEventArgs e)
         {
+
             RaiseDeleteEvent();
         }
         void RaiseDeleteEvent()

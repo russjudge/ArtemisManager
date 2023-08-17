@@ -140,6 +140,9 @@ namespace ArtemisManagerAction
             }
         }
         private string _saveFile = string.Empty;
+        /// <summary>
+        /// The full path.
+        /// </summary>
         public string SaveFile
         {
             get

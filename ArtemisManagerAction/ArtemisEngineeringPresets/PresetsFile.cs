@@ -40,6 +40,9 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             }
             return false;
         }
+        /// <summary>
+        /// The full path
+        /// </summary>
         public string SaveFile { get; set; } = string.Empty;
         public string PackageFile
         {

@@ -29,6 +29,13 @@
         Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
         SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
         ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="TabItem">
+                <Setter
+                        Property="Visibility"
+                        Value="{Binding IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}" />
+            </Style>
+        </TabControl.ItemContainerStyle>
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <TextBlock Text="{Binding Hostname}" />

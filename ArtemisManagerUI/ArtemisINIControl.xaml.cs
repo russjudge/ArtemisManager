@@ -120,7 +120,7 @@ namespace ArtemisManagerUI
             {
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty, SettingsFile.SaveFile);
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty, new System.IO.FileInfo(SettingsFile.SaveFile).Name);
                 }
             }
             else
@@ -190,7 +190,8 @@ namespace ArtemisManagerUI
             {
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendInformation(TargetClient, RequestInformationType.SaveSpecificArtemisINIFile, SettingsFile.SaveFile, new string[] { SettingsFile.ToString() });
+                    //Network.Current?.SendInformation(TargetClient, RequestInformationType.SaveSpecificArtemisINIFile, new System.IO.FileInfo(SettingsFile.SaveFile).Name, new string[] { SettingsFile.ToString() });
+                    Network.Current?.SendStringPackageFile(TargetClient, SettingsFile.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.ArtemisINI, new System.IO.FileInfo(SettingsFile.SaveFile).Name);
                 }
             }
             else

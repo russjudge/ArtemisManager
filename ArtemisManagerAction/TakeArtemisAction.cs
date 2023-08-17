@@ -2,6 +2,7 @@
 using ArtemisManagerAction.ArtemisEngineeringPresets;
 using System.Net;
 using System.Text.Json.Nodes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ArtemisManagerAction
 {
@@ -97,12 +98,24 @@ namespace ArtemisManagerAction
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateControlsINI:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        WasProcessed = ArtemisManager.ActivateOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateMission:
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateDMXCommands:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        WasProcessed = ArtemisManager.ActivateOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML, modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.ActivateEngineeringPresetsFile:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        WasProcessed = ArtemisManager.ActivateEngineeringPresetFile(modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteArtemisINIFile:
                     if (!string.IsNullOrEmpty(modJSON))
@@ -111,10 +124,22 @@ namespace ArtemisManagerAction
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteControlsINI:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        WasProcessed = ArtemisManager.DeleteOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteDMXCommands:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        WasProcessed = ArtemisManager.DeleteOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML, modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteEngineeringPresetsFile:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        WasProcessed = ArtemisManager.DeleteEngineeringPresetsFile(modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallMission:
                     break;
@@ -151,19 +176,52 @@ namespace ArtemisManagerAction
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RenameControlsINI:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        string[] names = modJSON.Split(':');
+                        if (names.Length > 1)
+                        {
+                            WasProcessed = ArtemisManager.RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, names[0], names[1]);
+                        }
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RenameDMXCommands:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        string[] names = modJSON.Split(':');
+                        if (names.Length > 1)
+                        {
+                            WasProcessed = ArtemisManager.RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML, names[0], names[1]);
+                        }
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RenameEngineeringPresetsFile:
+                    if (!string.IsNullOrEmpty(modJSON))
+                    {
+                        string[] names = modJSON.Split(':');
+                        if (names.Length > 1)
+                        {
+                            WasProcessed = ArtemisManager.RenameEngineeringPresetsFile(names[0], names[1]);
+                        }
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RestoreArtemisINIToDefault:
                     WasProcessed = ArtemisManager.RestoreArtemisINIToDefault();
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RestoreControlINIToDefault:
+                    if (modJSON != null)
+                    {
+                        WasProcessed = ArtemisManager.RestoreDefaultOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RestoreDMXCommandsToDefault:
+                    if (modJSON != null)
+                    {
+                        WasProcessed = ArtemisManager.RestoreDefaultOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML, modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RestoreEngineeringPresetsToDefault:
+                    WasProcessed = ArtemisManager.RestoreEngineeringPresetsToDefault();
                     break;
             }
             return new Tuple<bool, ModItem?> (WasProcessed, mod);

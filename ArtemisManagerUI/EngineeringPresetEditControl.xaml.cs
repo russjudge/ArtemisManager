@@ -3,22 +3,11 @@ using ArtemisManagerAction;
 using ArtemisManagerAction.ArtemisEngineeringPresets;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ArtemisManagerUI
 {
@@ -382,7 +371,10 @@ namespace ArtemisManagerUI
             {
                 if (IsRemote)
                 {
-                    //TODO: Send to delete
+                    if (TargetClient != null)
+                    {
+                        Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.DeleteEngineeringPresetsFile, Guid.Empty, new FileInfo(presetsFile.SaveFile).Name);
+                    }
                 }
                 else
                 {
@@ -418,15 +410,19 @@ namespace ArtemisManagerUI
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {
-            if (IsRemote)
+            if (e.OriginalSource is PresetsFile presetsFile && !string.IsNullOrEmpty(presetsFile?.SaveFile) && System.IO.File.Exists(presetsFile?.SaveFile))
             {
-                //TODO: send to activate
-            }
-            else
-            {
-                if (e.OriginalSource is PresetsFile presetsFile && !string.IsNullOrEmpty(presetsFile?.SaveFile) && System.IO.File.Exists(presetsFile?.SaveFile))
+                if (IsRemote)
                 {
-                    File.Copy(presetsFile.SaveFile, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
+                    if (TargetClient != null)
+                    {
+                        Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateEngineeringPresetsFile, Guid.Empty, new FileInfo(presetsFile.SaveFile).Name);
+                    }
+                }
+                else
+                {
+                    ArtemisManager.ActivateEngineeringPresetFile(presetsFile.SaveFile);
+                    //File.Copy(presetsFile.SaveFile, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
                 }
             }
         }
@@ -435,15 +431,14 @@ namespace ArtemisManagerUI
         {
             if (IsRemote)
             {
-                //TODO: send to restore defaults
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.RestoreEngineeringPresetsToDefault, Guid.Empty, string.Empty);
+                }
             }
             else
             {
-                System.IO.FileInfo fle = new(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile));
-                if (fle.Exists)
-                {
-                    fle.Delete();
-                }
+                ArtemisManager.RestoreEngineeringPresetsToDefault();
                 System.Windows.MessageBox.Show("Engieering Presets restored to defaults.");
             }
         }
@@ -534,17 +529,23 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnSaveSelectedPresets(object sender, RoutedEventArgs e)
-        {
-            if (IsRemote)
-            {
-                //TODO: Remotely save the changes
-            }
-            else
-            {
-                SelectedPresetFile?.INIFile?.Save();
-            }
-        }
+        ////private void OnSaveSelectedPresets(object sender, RoutedEventArgs e)
+        ////{
+        ////    if (IsRemote)
+        ////    {
+        ////        //TODO: Remotely save the changes
+        ////        if (TargetClient != null)
+        ////        {
+        ////            //Same as send file to target.
+        ////            //                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets, Guid.Empty, );
+        ////            Network.Current?.SendStringPackageFile(TargetClient, SelectedPresetFile.SettingsFile.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset, SelectedPresetFile.);
+        ////        }
+        ////    }
+        ////    else
+        ////    {
+        ////        SelectedPresetFile?.INIFile?.Save();
+        ////    }
+        ////}
 
         private void OnActivateSelectedPresets(object sender, RoutedEventArgs e)
         {
@@ -556,7 +557,10 @@ namespace ArtemisManagerUI
                     {
                         if (IsRemote)
                         {
-                            //TODO: Activate remotely.
+                            if (TargetClient != null )
+                            {
+                                Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateEngineeringPresetsFile, Guid.Empty, selectedFile.Name );
+                            }
                         }
                         else
                         {
@@ -582,24 +586,26 @@ namespace ArtemisManagerUI
                     {
                         if (IsRemote)
                         {
-                            //TODO: remote delete.
+                            if (TargetClient != null)
+                            {
+                                Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.DeleteEngineeringPresetsFile, Guid.Empty, selectedFile.Name);
+                            }
                         }
                         else
                         {
-                            PresetsFile pf = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.DATFileExtension));
-                            pf.Delete();
-                            if (PresetFiles.Contains(selectedFile))
-                            {
-                                PresetFiles.Remove(selectedFile);
-                            }
-                            if (SelectedPresetFile != null && SelectedPresetFile.INIFile != null && SelectedPresetFile.INIFile.SaveFile == selectedFile.Name + ArtemisManager.DATFileExtension)
-                            {
-                                SelectedPresetFile = null;
-                            }
-                            if (SelectedPresetFile == selectedFile)
-                            {
-                                SelectedPresetFile = null;
-                            }
+                            ArtemisManager.DeleteEngineeringPresetsFile(selectedFile.Name);
+                            //if (PresetFiles.Contains(selectedFile))
+                            //{
+                            //    PresetFiles.Remove(selectedFile);
+                            //}
+                            //if (SelectedPresetFile != null && SelectedPresetFile.INIFile != null && SelectedPresetFile.INIFile.SaveFile == selectedFile.Name + ArtemisManager.DATFileExtension)
+                            //{
+                            //    SelectedPresetFile = null;
+                            //}
+                            //if (SelectedPresetFile == selectedFile)
+                            //{
+                            //    SelectedPresetFile = null;
+                            //}
                         }
                     }
                 }
@@ -609,10 +615,7 @@ namespace ArtemisManagerUI
         private void OnSaved(object sender, RoutedEventArgs e)
         {
             PopupMessage = "Presets Saved.";
-
         }
-
-      
         private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
         {
             PopupMessage = "Transmission completed.";
@@ -639,7 +642,14 @@ namespace ArtemisManagerUI
                     {
                         if (IsRemote)
                         {
-                            //TODO: Send remote file rename.
+                            if (TargetClient != null)
+                            {
+                                Network.Current?.SendArtemisAction(
+                                    TargetClient,
+                                    AMCommunicator.Messages.ArtemisActions.RenameEngineeringPresetsFile,
+                                    Guid.Empty,
+                                    selectedFile.OriginalName + ":"  + selectedFile.Name);
+                            }
                         }
                         else
                         {

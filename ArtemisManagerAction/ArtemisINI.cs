@@ -704,7 +704,9 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(38, ClientServerType.ClientOnly)]
+#pragma warning disable IDE1006 // Naming Styles
         public ArtemisINISetting damageEffectType
+#pragma warning restore IDE1006 // Naming Styles
         {
             get
             {

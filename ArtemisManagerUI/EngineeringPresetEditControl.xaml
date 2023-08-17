@@ -175,6 +175,8 @@
             </ListBox>
         </DockPanel>
         <local:PresetSettingsControl
+            IsRemote="{Binding ElementName=uc, Path=IsRemote}"
+            TargetClient="{Binding ElementName=uc, Path=TargetClient}"
             FontSize="10"
             Saved="OnSaved"
             Activate="OnActivate"
