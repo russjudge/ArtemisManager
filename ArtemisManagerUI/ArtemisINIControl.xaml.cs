@@ -125,6 +125,7 @@ namespace ArtemisManagerUI
             }
             else
             {
+                
                 ArtemisManager.SetActiveLocalArtemisINISettings(SettingsFile.SaveFile);
                 PopupMessage = "Settings file activated.";
             }

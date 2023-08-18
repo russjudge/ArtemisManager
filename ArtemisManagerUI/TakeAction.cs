@@ -67,6 +67,7 @@ namespace ArtemisManagerUI
             ConnectedPCs?.Add(item);
             ConnectionAdded?.Invoke(null, new ConnectionEventArgs(item));
             SetAllConnectionsInfo();
+            SetMainScreenServerIP();
 
         }
         public static void RemoveConnection(PCItem item)
@@ -74,6 +75,7 @@ namespace ArtemisManagerUI
             ConnectedPCs?.Remove(item);
             ConnectionRemoved?.Invoke(null, new ConnectionEventArgs(item));
             SetAllConnectionsInfo();
+            SetMainScreenServerIP();
         }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
@@ -187,10 +189,48 @@ namespace ArtemisManagerUI
                     break;
                 case PCActions.AddAppToStartup:
                     CreateShortcutInStartup();
+                    SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
                     break;
                 case PCActions.RemoveAppFromStartup:
                     RemoveShortcutFromStartup();
+                    SendClientInfo(IPAddress.Any);
+                    WasProcessed = true;
+                    break;
+                case PCActions.SetAsMainScreenServer:
+                    var ip = Network.GetMyIP();
+                    if (ip == null)
+                    {
+                        ArtemisManager.SetServerIP(IPAddress.Loopback);
+                    }
+                    else
+                    {
+                        ArtemisManager.SetServerIP(ip);
+                    }
+                    SendClientInfo(IPAddress.Any);
+                    WasProcessed = true;
+                    break;
+                case PCActions.RemoveAsMainScreenServer:
+                    IPAddress? ipx = Network.GetMyIP();
+                    string me = IPAddress.Loopback.ToString();
+                    if (ipx != null)
+                    {
+                        me = ipx.ToString();
+                    }
+                    ipx = null;
+                    if (ConnectedPCs != null)
+                    {
+                        foreach (var pc in ConnectedPCs)
+                        {
+                            if (pc.IsMainScreenServer && !TakeAction.IsBroadcast(pc.IP) && !TakeAction.IsLoopback(pc.IP) && pc.IP != null && pc.IP.ToString() != me)
+                            {
+                                ipx = pc.IP;
+                                break;
+                            }
+                        }
+                    }
+                    ArtemisManager.SetServerIP(ipx);
+                    SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
                     break;
                 
@@ -200,6 +240,28 @@ namespace ArtemisManagerUI
 
             }
             return WasProcessed;
+        }
+        public static void SetMainScreenServerIP()
+        {
+            var ip = GetMainScreenServerIP();
+            ArtemisManager.SetServerIP(ip);
+        }
+        public static IPAddress? GetMainScreenServerIP()
+        {
+            IPAddress? ipx = Network.GetMyIP();
+            
+            if (ConnectedPCs != null)
+            {
+                foreach (var pc in ConnectedPCs)
+                {
+                    if (pc.IsMainScreenServer && !TakeAction.IsBroadcast(pc.IP) && pc.IP != null)
+                    {
+                        ipx = pc.IP;
+                        break;
+                    }
+                }
+            }
+            return ipx;
         }
 
         /// <summary>
@@ -270,6 +332,7 @@ namespace ArtemisManagerUI
                 var modsArray = jsonMods.ToArray();
                 var missionsArray = jsonMissions.ToArray();
                 bool InStartup = IsThisAppInStartup();
+                bool isMainScreenServer = ArtemisManager.GetIsMainScreenServer();
                 if (source.ToString() == IPAddress.Any.ToString() && ConnectedPCs != null)
                 {
                     foreach (var client in ConnectedPCs)
@@ -282,7 +345,7 @@ namespace ArtemisManagerUI
                                missionsArray,
                                AretmisIsRunning,
                                IsRunningUnderMyControl,
-                               InStartup);
+                               InStartup, isMainScreenServer);
                         }
                     }
                 }
@@ -294,7 +357,7 @@ namespace ArtemisManagerUI
                         missionsArray,
                         AretmisIsRunning,
                         IsRunningUnderMyControl,
-                        InStartup);
+                        InStartup, isMainScreenServer);
                 }
             }
         }

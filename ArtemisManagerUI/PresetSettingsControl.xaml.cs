@@ -108,8 +108,7 @@ namespace ArtemisManagerUI
         {
             if (d is PresetSettingsControl me)
             {
-                //me.SelectedIndex = 0;
-                if (me.File.Presets.Length > 0)
+                if (me.File?.Presets.Length > 0)
                 {
                     me.SelectedIItem = me.File.Presets[0];
                 }

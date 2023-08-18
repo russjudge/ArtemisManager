@@ -99,6 +99,7 @@ namespace ArtemisManagerUI
                     Network.Current?.SendStringPackageFile(TargetClient, Data.GetSerializedString(), Data.FileType, Data.SaveFile);
                 }
             }
+            PopupMessage = "File Saved";
         }
 
         private void OnActivate(object sender, RoutedEventArgs e)

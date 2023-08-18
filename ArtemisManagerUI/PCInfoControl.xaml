@@ -60,10 +60,19 @@
                         Text="Artemis is under Manager control" ToolTip="Indicates if the version of Artemis is running is running due the the Artemis Manager" TextWrapping="Wrap"/>
                 </CheckBox>
                 <CheckBox
+                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.AppInStartFolder}"
                     IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
                     VerticalAlignment="Center" VerticalContentAlignment="Center"
                     Click="OnSetManagerInStartup" >
                     <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
+                </CheckBox>
+                <CheckBox
+                    IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsMainScreenServer}"
+                    Margin="0,10,0,0"
+                    IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
+                    VerticalAlignment="Center" VerticalContentAlignment="Center"
+                    Click="OnSetIsMainScreenServer">
+                    <TextBlock Text="Is Main Screen Artemis Server" TextWrapping="Wrap" />
                 </CheckBox>
             </StackPanel>
             <DockPanel DockPanel.Dock="Right">

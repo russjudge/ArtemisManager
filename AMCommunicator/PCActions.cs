@@ -17,5 +17,7 @@ namespace AMCommunicator
         SendClientInformation,
         AddAppToStartup,
         RemoveAppFromStartup,
+        SetAsMainScreenServer,
+        RemoveAsMainScreenServer,
     }
 }

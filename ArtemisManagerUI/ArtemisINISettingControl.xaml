@@ -58,7 +58,7 @@
             MinValue="{Binding ElementName=uc, Path=IntMinValue, Mode=OneWay}"
             IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
             Visibility="{Binding ElementName=uc, Path=IsInt, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-            Value="{Binding ElementName=uc, Path=Setting.IntValue}"
+            Value="{Binding ElementName=uc, Path=Setting.IntValue, Mode=TwoWay}"
             />
         <local:NumericDoubleTextBox
             Grid.Column="1"
@@ -66,12 +66,12 @@
             MinValue="{Binding ElementName=uc, Path=DoubleMinValue, Mode=OneWay}"
             IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
             Visibility="{Binding ElementName=uc, Path=IsDouble, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-            Value="{Binding ElementName=uc, Path=Setting.DoubleValue}" />
+            Value="{Binding ElementName=uc, Path=Setting.DoubleValue, Mode=TwoWay}" />
 
         <TextBox
             Grid.Column="1"
             IsEnabled="{Binding ElementName=uc, Path=Setting.UsingDefault, Converter={StaticResource OppositeBoolConverter}}"
             Visibility="{Binding ElementName=uc, Path=IsString, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-            Text="{Binding ElementName=uc, Path=Setting.FileValue}" />
+            Text="{Binding ElementName=uc, Path=Setting.FileValue, Mode=TwoWay}" />
     </Grid>
 </UserControl>

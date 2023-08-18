@@ -1,4 +1,5 @@
-﻿using AMCommunicator.Messages;
+﻿using AMCommunicator;
+using AMCommunicator.Messages;
 using ArtemisManagerAction.ArtemisEngineeringPresets;
 using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
@@ -111,7 +113,10 @@ namespace ArtemisManagerAction
                     {
                         ArtemisINI remote = new(target);
                         result = ArtemisManagerAction.ArtemisINI.Merge(local, remote);
-
+                    }
+                    else
+                    {
+                        result = local;
                     }
                     if (result != null)
                     {
@@ -629,6 +634,7 @@ namespace ArtemisManagerAction
                 case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
                     source = ResolveFilename(DMXCommandsFolder, name, XMLFileExtension);
                     target = System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder, ArtemisManager.DMXCommands);
+                    ModManager.CreateFolder(System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisDATSubfolder));
                     break;
                 case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
                     source = ResolveFilename(ControlsINIFolder, name, INIFileExtension);
@@ -797,6 +803,80 @@ namespace ArtemisManagerAction
                 }
             }
             retVal ??= SteamInfo.GetArtemisGameFolder();
+            return retVal;
+        }
+        [SupportedOSPlatform("windows")]
+        public static void SetServerIP(IPAddress? address)
+        {
+            var wrkKey1 = Registry.CurrentUser.OpenSubKey("Software");
+            if (wrkKey1 != null)
+            {
+                try
+                {
+                    var wrkKey = wrkKey1.OpenSubKey("ArtemisSBS", true);
+                    if (wrkKey == null)
+                    {
+                        wrkKey = wrkKey1.CreateSubKey("ArtemisSBS", true);
+                    }
+
+                    if (address == null)
+                    {
+                        wrkKey.SetValue("IPAddress", string.Empty);
+                    }
+                    else
+                    {
+                        wrkKey.SetValue("IPAddress", address.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+        }
+        public static bool GetIsMainScreenServer()
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                var address = GetServerIP();
+                if (address == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    if (address.ToString() == IPAddress.Loopback.ToString())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return (address.ToString() == Network.GetMyIP()?.ToString());
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        [SupportedOSPlatform("windows")]
+        public static IPAddress? GetServerIP()
+        {
+            IPAddress? retVal = null;
+            var wrkKey = Registry.CurrentUser.OpenSubKey("Software");
+            if (wrkKey != null)
+            {
+                wrkKey = wrkKey.OpenSubKey("ArtemisSBS", true);
+                if (wrkKey != null)
+                {
+                    var result = wrkKey.GetValue("IPAddress", null);
+                    if (result != null)
+                    {
+                        IPAddress.TryParse(result.ToString(), out retVal);
+                    }
+                }
+            }
             return retVal;
         }
         /// <summary>

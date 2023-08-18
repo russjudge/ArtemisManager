@@ -103,7 +103,12 @@ namespace ArtemisManagerUI
                         f.SaveFile = e.FullPath;
                         if (e.Name != null)
                         {
-                            f.Name = e.Name;
+                            int i = e.Name.IndexOf('.');
+                            if (i < 0)
+                            {
+                                i = e.Name.Length;
+                            }
+                            f.Name = e.Name.Substring(0,i);
                         }
                         break;
                     }
@@ -526,12 +531,16 @@ namespace ArtemisManagerUI
 
                 string target = System.IO.Path.Combine(targetFolder, source.Name);
                 int i = 0;
-                while (File.Exists(target))
+                bool OkayToSave = true;
+                if (File.Exists(target))
                 {
-                    target = System.IO.Path.Combine(targetFolder, string.Format("{0} ({1})", source.Name, (++i).ToString()));
+                    OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + source.Name + "?",
+                              "Import File", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
                 }
-                source.CopyTo(target, true);
-
+                if (OkayToSave)
+                {
+                    source.CopyTo(target, true);
+                }
             }
 
         }
@@ -627,28 +636,30 @@ namespace ArtemisManagerUI
         private void OnExportSettingsFile(object sender, RoutedEventArgs e)
         {
             //Cannot export a remote file--must first make it local.
-
-            if (e.OriginalSource is ArtemisINI presetsFile)
+            if (sender is MenuItem m)
             {
-                Microsoft.Win32.SaveFileDialog dialg = new()
+                if (m.CommandParameter is TextDataFile presetsFile)
                 {
-                    CheckPathExists = true,
-                    Filter = GetExtension() + " settings files (*." + GetExtension() + ")|*." + GetExtension(),
-                    DefaultExt = GetExtension(),
-                    InitialDirectory = GetTargetFolder(),
-                    Title = "Select new settings filename"
-                };
-                if (dialg.ShowDialog() == true)
-                {
-                    bool OkayToSave = true;
-                    if (File.Exists(dialg.FileName))
+                    Microsoft.Win32.SaveFileDialog dialg = new()
                     {
-                        OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
-                            "Settings", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
-                    }
-                    if (OkayToSave)
+                        CheckPathExists = true,
+                        Filter = GetExtension() + " settings files (*." + GetExtension() + ")|*." + GetExtension(),
+                        DefaultExt = GetExtension(),
+                        InitialDirectory = GetTargetFolder(),
+                        Title = "Select new settings filename"
+                    };
+                    if (dialg.ShowDialog() == true)
                     {
-                        File.Copy(presetsFile.SaveFile, dialg.FileName, true);
+                        bool OkayToSave = true;
+                        if (File.Exists(dialg.FileName))
+                        {
+                            OkayToSave = (System.Windows.MessageBox.Show("Do you want to overwrite " + new FileInfo(dialg.FileName).Name + "?",
+                                "Settings", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes);
+                        }
+                        if (OkayToSave)
+                        {
+                            File.Copy(presetsFile.SaveFile, dialg.FileName, true);
+                        }
                     }
                 }
             }
@@ -660,7 +671,19 @@ namespace ArtemisManagerUI
             {
                 if (me.Tag is TextDataFile selectedFile)
                 {
-                    if (!string.IsNullOrEmpty(selectedFile.Name) && !string.IsNullOrEmpty(selectedFile.OriginalName) && selectedFile.Name != selectedFile.OriginalName)
+                    bool isOkay = true;
+                    foreach (var file in this.DataFileList)
+                    {
+                        if (selectedFile != file)
+                        {
+                            if (file.Name == selectedFile.Name)
+                            {
+                                isOkay = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (isOkay)
                     {
                         if (IsRemote)
                         {
@@ -669,29 +692,32 @@ namespace ArtemisManagerUI
                                 switch (FileType)
                                 {
                                     case SendableStringPackageFile.controlsINI:
-                                        Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.RenameControlsINI, Guid.Empty, selectedFile.OriginalName + ":" + selectedFile.Name);
+                                        Network.Current?.SendArtemisAction(
+                                            TargetClient,
+                                            ArtemisActions.RenameControlsINI,
+                                            Guid.Empty,
+                                            selectedFile.OriginalName + ":" + selectedFile.Name);
                                         break;
                                     case SendableStringPackageFile.DMXCommandsXML:
-                                        Network.Current?.SendArtemisAction(TargetClient, ArtemisActions.RenameDMXCommands, Guid.Empty, selectedFile.OriginalName + ":" + selectedFile.Name);
+                                        Network.Current?.SendArtemisAction(
+                                            TargetClient,
+                                            ArtemisActions.RenameDMXCommands,
+                                            Guid.Empty,
+                                            selectedFile.OriginalName + ":" + selectedFile.Name);
                                         break;
                                 }
                             }
                         }
                         else
                         {
-                            string source = System.IO.Path.Combine(GetTargetFolder(), selectedFile.OriginalName + "." + GetExtension());
-                            string target = System.IO.Path.Combine(GetTargetFolder(), selectedFile.Name + "." + GetExtension());
-                            if (File.Exists(target))
-                            {
-                                MessageBox.Show("Cannot rename--new name already exists.", "Rename file", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                            else
-                            {
-                                File.Move(source, target, true);
-                                selectedFile.OriginalName = selectedFile.Name;
-                                selectedFile.SaveFile = System.IO.Path.Combine(GetTargetFolder(), selectedFile.Name + "." + GetExtension());
-                            }
+                            ArtemisManager.RenameOtherSettingsFile(FileType, selectedFile.OriginalName, selectedFile.Name);
                         }
+                        selectedFile.OriginalName = selectedFile.Name;
+                    }
+                    else
+                    {
+                        selectedFile.Name = selectedFile.OriginalName;
+                        System.Windows.MessageBox.Show("Cannot rename--new name already exists.", "Rename settings file", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }

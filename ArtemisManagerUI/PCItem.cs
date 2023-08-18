@@ -60,7 +60,7 @@ namespace ArtemisManagerUI
             ArtemisIsRunning = info.ArtemisIsRunning;
             IsUsingThisAppControlledArtemis = info.IsUsingThisAppControlledArtemis;
             AppInStartFolder= info.AppInStartFolder;
-            
+            IsMainScreenServer = info.IsMainScreenServer;
             GeneralSettings= info.GeneralSettings;
             TakeAction.SetAllConnectionsInfo();
         }
@@ -155,7 +155,19 @@ namespace ArtemisManagerUI
 
         public ObservableCollection<DriveData> Drives { get; set; }
 
-
+        private bool isMainScreenServer = false;
+        public bool IsMainScreenServer
+        {
+            get
+            {
+                return isMainScreenServer;
+            }
+            set
+            {
+                isMainScreenServer = value;
+                DoChanged();
+            }
+        }
         //This is a catch-all.
         private string generalSettings = string.Empty;
         public string GeneralSettings

@@ -65,18 +65,7 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SelectedSettingsFileProperty =
            DependencyProperty.Register(nameof(SelectedSettingsFile), typeof(EngineeringPresetFileListItem),
-           typeof(EngineeringPresetsPCItem), new PropertyMetadata(OnSelectedSettingsFileChanged));
-
-        private static void OnSelectedSettingsFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is EngineeringPresetsPCItem me)
-            {
-                if (me.SelectedSettingsFile.INIFile == null)
-                {
-
-                }
-            }
-        }
+           typeof(EngineeringPresetsPCItem));
 
         public EngineeringPresetFileListItem SelectedSettingsFile
         {

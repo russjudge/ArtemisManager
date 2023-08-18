@@ -131,5 +131,17 @@ namespace ArtemisManagerUI
                 TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.RemoveAppFromStartup);
             }
         }
+
+        private void OnSetIsMainScreenServer(object sender, RoutedEventArgs e)
+        {
+            if (SelectedTargetPC?.IsMainScreenServer == true)
+            {
+                TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.SetAsMainScreenServer);
+            }
+            else
+            {
+                TakeAction.SendPCAction(SelectedTargetPC?.IP, PCActions.RemoveAsMainScreenServer);
+            }
+        }
     }
 }

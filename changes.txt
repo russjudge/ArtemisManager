@@ -1,60 +1,71 @@
 Change History
 ===============================
 TODO Tests:
+Verify all PC Info settigns
+	- manager in startup folder
+		local
+		remote
+	- is main screen artemis server (test with Artemis SBS installed--might not be able to write to registry???)
+		local
+		remote
+
 Artemis INI--
-	Import local
-	Export local
-	Rename local
+	Local to remote update:
+		- new/imported local
+		- renamed local
+		- saved local
+		- deleted local
+	new remote
 	Rename remote
-	Save local
+		- rename to existing filename
 	save remote
-	Delete local
 	Delete remote
-	Activate local
 	Activate remote
 	Restore to default local
 	Restore to default remote
 
 Engineering presets--
-	Import local
-	Export local
-	Rename local
+	Need to confirm activated location is correct.
+	Local to remote update:
+		- new/imported local
+		- renamed local
+		- saved local
+		- deleted local
+	new remote
 	Rename remote
-	Save local
+		- rename to existing filename
 	save remote
-	Delete local
 	Delete remote
-	Activate local
 	Activate remote
-	Restore to default local
 	Restore to default remote
 
 controls ini--
-	Import local
-	export local
-	Rename local
+	verify correct location for activation file.
+	Local to remote update:
+		- new/imported local
+		- renamed local
+		- saved local
+		- deleted local
+	new remote
 	Rename remote
-	Save local
+		- rename to existing filename
 	save remote
-	Delete local
 	Delete remote
-	Activate local
 	Activate remote
-	Restore to default local
 	Restore to default remote
 
 DMX Commands--
-	import local
-	export local
-	Rename local
+	Local to remote update:
+		- new/imported local
+		- renamed local
+		- saved local
+		- deleted local
+	new remote
 	Rename remote
-	Save local
+		- rename to existing filename
 	save remote
-	Delete local
 	Delete remote
-	Activate local
 	Activate remote
-	Restore to default local
 	Restore to default remote
 
 Mod -
@@ -80,6 +91,12 @@ Enhancements:
 	- Improved interface for working with remote engineering presets and artemis.ini settings.
 	- Reworked the settings, mods, and missions interface for remote control.
 	- Added local/remote editing (text editor) and management for controls.ini and DMXControls.xml.
+	- Added setting to specify the IP Address of the Artemis main screen server so that when Artemis is started, this IP address will be used for
+		connecting clients to the server.  This setting is overridden by the setting in artemis.ini--in other words, this setting
+		is only useful if the matching setting in artemis.ini is set to using the default.  It should be noted that
+		all connected clients can be set as the main screen server.  If this is done, the setting is meaningless as every client
+		will be pointing to itself as the main screen server.  Only one client should be set as the server, but there is nothing
+		to prevent this being set on any multiple of clients.
 Other changes:
 	- Significant change to the layout of the UI to handle remote management of Artemis.ini and engineering presets.  A lot of stuff got moved
 		around because of this.  Some resizing to keep the window height down to 700 pixels high. This height is to account

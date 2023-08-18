@@ -24,9 +24,8 @@ namespace AMCommunicator
             ArtemisIsRunning= message.ArtemisIsRunning;
             IsUsingThisAppControlledArtemis = message.IsUsingThisAppControlledArtemis;
             AppInStartFolder = message.AppInStartFolder;
-            FreeSpaceOnAppSrive = message.FreeSpaceOnAppDrive;
-            AllDrives = message.AllDrives;
             Drives = message.Drives;
+            IsMainScreenServer = message.IsMainScreenServer;
             GeneralSettings = message.GeneralSettings;
         }
         public IPAddress? Source { get; private set; }
@@ -39,10 +38,11 @@ namespace AMCommunicator
         public bool IsUsingThisAppControlledArtemis { get; private set; }
         public bool AppInStartFolder { get; private set; }
         [Obsolete]
-        public long FreeSpaceOnAppSrive { get; private set; }
+        public long FreeSpaceOnAppSrive { get; private set; } = 0;
         [Obsolete]
-        public string[] AllDrives { get; private set; }
+        public string[] AllDrives { get; private set; } = Array.Empty<string>();
         public DriveData[] Drives { get; private set; }
+        public bool IsMainScreenServer { get; private set; }
         public string GeneralSettings { get; private set; }
     }
 }

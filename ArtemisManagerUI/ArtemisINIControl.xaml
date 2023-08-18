@@ -28,7 +28,8 @@
                         <!--<TextBlock Text="Activate" />-->
                     </StackPanel>
                 </Button>
-                <Button ToolTip="Save" Click="OnSave">
+                <Button
+                    ToolTip="Save" Click="OnSave">
                     <StackPanel>
                         <Image Height="16" Source="/ArtemisManagerUI;component/Resources/save.png" />
                         <!--<TextBlock Text="Save" />-->
@@ -59,7 +60,7 @@
                         ForLocalSettings="True"
                         IsInt="True"
                         IntMaxValue="65535"
-                        IntMinValue="100"
+                        IntMinValue="0"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.networkPort, Mode=TwoWay}"
                     />
                     <local:ArtemisINISettingControl

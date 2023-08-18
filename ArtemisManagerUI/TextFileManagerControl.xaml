@@ -33,7 +33,7 @@
                 </Button>
                 <Button
                     Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                    HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
+                    HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import settings file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
             </StackPanel>

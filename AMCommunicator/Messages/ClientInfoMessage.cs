@@ -21,12 +21,18 @@ namespace AMCommunicator.Messages
             AppVersion = string.Empty;
             InstalledMods = Array.Empty<string>();
             InstalledMissions= Array.Empty<string>();
-            AllDrives = Array.Empty<string>();
             Drives = Array.Empty<DriveData>();
             GeneralSettings = string.Empty;
         }
-        public ClientInfoMessage(bool isMaster, bool connectOnStart, string[] installedMods,
-            string[] installedMissions, bool artemisIsRunning, bool isUsingThisAppControlledArtemis, bool appInStartFolder) : base()
+        public ClientInfoMessage(
+            bool isMaster,
+            bool connectOnStart,
+            string[] installedMods,
+            string[] installedMissions,
+            bool artemisIsRunning,
+            bool isUsingThisAppControlledArtemis,
+            bool appInStartFolder,
+            bool isMainScreenServer = false) : base()
         {
             IsMaster = isMaster;
 
@@ -54,18 +60,12 @@ namespace AMCommunicator.Messages
             List<string> dd = new();
             foreach (var drive in Drives)
             {
-                if (drive.IsAppDrive)
-                {
-                    FreeSpaceOnAppDrive = drive.FreeSpace;
-                }
                 if (drive.DriveType == DriveType.Fixed)
                 {
                     dd.Add(drive.Name + ","+ drive.DriveType.ToString()+","+drive.TotalSize.ToString() + ","+drive.FreeSpace);
                 }
-
             }
-            AllDrives = dd.ToArray();
-
+            IsMainScreenServer = isMainScreenServer;
             GeneralSettings = string.Empty;
         }
         protected override void SetMessageVersion()
@@ -92,11 +92,12 @@ namespace AMCommunicator.Messages
         public bool AppInStartFolder { get; set; }
 
         [Obsolete]
-        public long FreeSpaceOnAppDrive { get; set; }
+        public long FreeSpaceOnAppDrive { get; set; } = 0;
 
         [Obsolete]
-        public string[] AllDrives { get; set; }
+        public string[] AllDrives { get; set; } = Array.Empty<string>();
         public DriveData[] Drives { get; set; }
+        public bool IsMainScreenServer { get; set; }
 
         //This is a catch-all.
         public string GeneralSettings { get; set; }

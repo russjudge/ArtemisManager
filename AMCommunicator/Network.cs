@@ -182,12 +182,20 @@ namespace AMCommunicator
                 Transmit(connection.Stream, msg);
             }
         }
-        public void SendClientInfo(IPAddress target, bool isMaster, bool connectOnStart, string[] installedMods,
-            string[] installedMissions, bool artemisIsRunning, bool isUsingThisAppControlledArtemis, bool appInStartFolder)
+        public void SendClientInfo(
+            IPAddress target,
+            bool isMaster,
+            bool connectOnStart,
+            string[] installedMods,
+            string[] installedMissions,
+            bool artemisIsRunning,
+            bool isUsingThisAppControlledArtemis,
+            bool appInStartFolder,
+            bool isMainScreenServer)
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                ClientInfoMessage msg = new(isMaster, connectOnStart, installedMods, installedMissions, artemisIsRunning, isUsingThisAppControlledArtemis, appInStartFolder);
+                ClientInfoMessage msg = new(isMaster, connectOnStart, installedMods, installedMissions, artemisIsRunning, isUsingThisAppControlledArtemis, appInStartFolder, isMainScreenServer);
 
                 Transmit(connection.Stream, msg);
             }
