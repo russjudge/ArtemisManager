@@ -1,5 +1,6 @@
 ﻿using AMCommunicator;
 using ArtemisManagerAction.ArtemisEngineeringPresets;
+using System.ComponentModel;
 using System.Net;
 using System.Text.Json.Nodes;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -206,7 +207,10 @@ namespace ArtemisManagerAction
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RestoreArtemisINIToDefault:
-                    WasProcessed = ArtemisManager.RestoreArtemisINIToDefault();
+                    if (modJSON != null)
+                    {
+                        WasProcessed = ArtemisManager.RestoreArtemisINIToDefault(modJSON);
+                    }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RestoreControlINIToDefault:
                     if (modJSON != null)

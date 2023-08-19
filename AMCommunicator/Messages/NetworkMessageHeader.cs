@@ -15,58 +15,80 @@ namespace AMCommunicator.Messages
         public const int JSONDefinitionLengthPosition = 0;
         public NetworkMessageHeader(NetworkMessage message)
         {
-            if (message.GetType() == typeof(AlertMessage))
+
+            string typeParse = message.GetType().Name;
+            typeParse = typeParse.Substring(0,typeParse.Length - 7);
+            MessageCommand cmd;
+            if (Enum.TryParse<MessageCommand>(typeParse, out cmd))
             {
-                Command = MessageCommand.Alert;
-            }
-            else if (message.GetType() == typeof(ArtemisActionMessage))
-            {
-                Command = MessageCommand.AretmisAction;
-            }
-            else if (message.GetType() == typeof(ChangeAppSettingMessage))
-            {
-                Command = MessageCommand.ChangeAppSetting;
-            }
-            else if (message.GetType() == typeof(ChangePasswordMessage))
-            {
-                Command = MessageCommand.ChangePassword;
-            }
-            else if (message.GetType() == typeof(ClientInfoMessage))
-            {
-                Command= MessageCommand.ClientInfo;
-            }
-            else if (message.GetType() == typeof(CommunicationMessage))
-            {
-                Command = MessageCommand.Communication;
-            }
-            else if (message.GetType() == typeof(HandshakeMessage))
-            {
-                Command = MessageCommand.Handshake;
-            }
-            else if (message.GetType() == typeof(ModPackageMessage))
-            {
-                Command = MessageCommand.ModPackage;
-            }
-            else if (message.GetType() == typeof(PCActionMessage))
-            {
-                Command= MessageCommand.PCAction;
-            }
-            else if (message.GetType() == typeof(PingMessage))
-            {
-                Command= MessageCommand.Ping;
-            }
-            else if (message.GetType() == typeof(RequestModPackageMessage))
-            {
-                Command= MessageCommand.RequestModPackage;
-            }
-            else if (message.GetType() == typeof(StringPackageMessage))
-            {
-                Command = MessageCommand.StringPackage;
+                Command = cmd;
             }
             else
             {
                 Command = MessageCommand.UndefinedPackage;
-            }
+            }    
+            //Command = Enum.Parse <MessageCommand>(typeParse);
+
+            //if (message.GetType() == typeof(AlertMessage))
+            //{
+            //    Command = MessageCommand.Alert;
+            //}
+            //else if (message.GetType() == typeof(ArtemisActionMessage))
+            //{
+            //    Command = MessageCommand.AretmisAction;
+            //}
+            //else if (message.GetType() == typeof(ChangeAppSettingMessage))
+            //{
+            //    Command = MessageCommand.ChangeAppSetting;
+            //}
+            //else if (message.GetType() == typeof(ChangePasswordMessage))
+            //{
+            //    Command = MessageCommand.ChangePassword;
+            //}
+            //else if (message.GetType() == typeof(ClientInfoMessage))
+            //{
+            //    Command= MessageCommand.ClientInfo;
+            //}
+            //else if (message.GetType() == typeof(CommunicationMessage))
+            //{
+            //    Command = MessageCommand.Communication;
+            //}
+            //else if (message.GetType() == typeof(HandshakeMessage))
+            //{
+            //    Command = MessageCommand.Handshake;
+            //}
+            //else if (message.GetType() == typeof(ModPackageMessage))
+            //{
+            //    Command = MessageCommand.ModPackage;
+            //}
+            //else if (message.GetType() == typeof(PCActionMessage))
+            //{
+            //    Command = MessageCommand.PCAction;
+            //}
+            //else if (message.GetType() == typeof(PingMessage))
+            //{
+            //    Command = MessageCommand.Ping;
+            //}
+            //else if (message.GetType() == typeof(RequestModPackageMessage))
+            //{
+            //    Command = MessageCommand.RequestModPackage;
+            //}
+            //else if (message.GetType() == typeof(StringPackageMessage))
+            //{
+            //    Command = MessageCommand.StringPackage;
+            //}
+            //else if (message.GetType() == typeof(RequestInformationMessage))
+            //{
+            //    Command = MessageCommand.RequestInformation;
+            //}
+            //else if (message.GetType() == typeof(InformationMessage))
+            //{
+            //    Command = MessageCommand.Information;
+            //}
+            //else
+            //{
+            //    Command = MessageCommand.UndefinedPackage;
+            //}
             Version = message.MessageVersion;
             JSON = message.GetJSON();
             Length = JSON.Length;
@@ -99,7 +121,11 @@ namespace AMCommunicator.Messages
         }
         public T? GetItem<T>()
         {
-            return JsonSerializer.Deserialize<T>(JSON);
+            
+            JsonSerializerOptions options = new();
+            
+            return JsonSerializer.Deserialize<T>(JSON, options);
+
         }
     }
 }

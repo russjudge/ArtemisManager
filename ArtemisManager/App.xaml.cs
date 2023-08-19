@@ -76,7 +76,7 @@ namespace ArtemisManager
 
         private void OnError(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            //TODO: Handle error here.
+           
             try
             {
                 string workFile = Path.GetTempFileName() + ".txt";

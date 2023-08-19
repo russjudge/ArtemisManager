@@ -131,7 +131,7 @@ namespace ArtemisManagerUI
             if (SynchronizeEnabled && IsSynchronizable(name))
             {
                 //var result = TakeAction.DoChangeSetting(name, value);
-                if (TakeAction.DoChangeSetting(name, value))
+                if (TakeAction.DoChangeSetting(name, value, false))
                 {
                     this.Save();
                 }

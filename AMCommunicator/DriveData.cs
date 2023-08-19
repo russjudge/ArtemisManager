@@ -8,6 +8,7 @@ namespace AMCommunicator
 {
     public class DriveData
     {
+        public DriveData() { }
         public DriveData(DriveInfo drive)
         {
             Name = drive.Name;
@@ -36,12 +37,12 @@ namespace AMCommunicator
             catch { }
             IsAppDrive = (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)[..1]));
         }
-        public string Name { get; private set; }
-        public long FreeSpace { get; private set; }
-        public bool IsAppDrive { get; private set; }
-        public long TotalSize { get; private set; }
-        public string DriveFormat { get; private set; }
-        public DriveType DriveType { get; private set; }
+        public string Name { get; set; } = string.Empty;
+        public long FreeSpace { get;  set; }
+        public bool IsAppDrive { get;  set; }
+        public long TotalSize { get;  set; }
+        public string DriveFormat { get; set; } = string.Empty;
+        public DriveType DriveType { get;  set; }
 
         public static DriveData[] GetDriveData()
         {

@@ -23,6 +23,6 @@ namespace AMCommunicator
         StringPackage = 12,
         UndefinedPackage = 13,
         RequestInformation = 14,
-        Information = 15
+        Information = 15,
     }
 }

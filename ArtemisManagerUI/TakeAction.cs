@@ -10,6 +10,7 @@ using System.Linq;
 using System.Management;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -41,19 +42,27 @@ namespace ArtemisManagerUI
         public static ObservableCollection<PCItem>? ConnectedPCs { get; set; }
         public static event EventHandler<ConnectionEventArgs>? ConnectionAdded;
         public static event EventHandler<ConnectionEventArgs>? ConnectionRemoved;
-
+        public static PCItem thisMachine { get; private set; }
         static TakeAction()
         {
             ConnectedPCs = new();
-            PCItem thisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback);
-            thisMachine.AppVersion = GetAppVersion();
-            thisMachine.IsMaster = SettingsAction.Current.IsMaster;
-            thisMachine.AppInStartFolder = IsThisAppInStartup();
-            thisMachine.InstalledMissions = new(ArtemisManager.GetInstalledMissions());
-            thisMachine.InstalledMods = new(ArtemisManager.GetInstalledMods());
-            thisMachine.ArtemisIsRunning = ArtemisManager.IsArtemisRunning();
+            thisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback)
+            {
+                AppVersion = GetAppVersion(),
+                IsMaster = SettingsAction.Current.IsMaster,
+                AppInStartFolder = IsThisAppInStartup(),
+                InstalledMissions = new(ArtemisManager.GetInstalledMissions()),
+                InstalledMods = new(ArtemisManager.GetInstalledMods()),
+                ArtemisIsRunning = ArtemisManager.IsArtemisRunning(),
 
-            thisMachine.Drives = new(DriveData.GetDriveData());
+                Drives = new(DriveData.GetDriveData()),
+
+                ConnectOnstart = SettingsAction.Current.ConnectOnStart,
+                IsMainScreenServer = ArtemisManager.GetIsMainScreenServer(),
+                IsRemote = false,
+                IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl()
+            };
+
 
             AddConnection(thisMachine);
             TakeAction.SourcePC = thisMachine;
@@ -66,16 +75,15 @@ namespace ArtemisManagerUI
         {
             ConnectedPCs?.Add(item);
             ConnectionAdded?.Invoke(null, new ConnectionEventArgs(item));
-            SetAllConnectionsInfo();
-            SetMainScreenServerIP();
-
+            //SetAllConnectionsInfo();
+           
         }
         public static void RemoveConnection(PCItem item)
         {
             ConnectedPCs?.Remove(item);
             ConnectionRemoved?.Invoke(null, new ConnectionEventArgs(item));
             SetAllConnectionsInfo();
-            SetMainScreenServerIP();
+            //SetMainScreenServerIP();
         }
 
         public static readonly string StartupFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup));
@@ -189,26 +197,34 @@ namespace ArtemisManagerUI
                     break;
                 case PCActions.AddAppToStartup:
                     CreateShortcutInStartup();
+                    thisMachine.AppInStartFolder = true;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
+                    
+                    
                     break;
                 case PCActions.RemoveAppFromStartup:
                     RemoveShortcutFromStartup();
+                    thisMachine.AppInStartFolder = false;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
+                    
                     break;
                 case PCActions.SetAsMainScreenServer:
                     var ip = Network.GetMyIP();
                     if (ip == null)
                     {
                         ArtemisManager.SetServerIP(IPAddress.Loopback);
+
                     }
                     else
                     {
                         ArtemisManager.SetServerIP(ip);
                     }
+                    thisMachine.IsMainScreenServer = true;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
+                    
                     break;
                 case PCActions.RemoveAsMainScreenServer:
                     IPAddress? ipx = Network.GetMyIP();
@@ -230,8 +246,10 @@ namespace ArtemisManagerUI
                         }
                     }
                     ArtemisManager.SetServerIP(ipx);
+                    thisMachine.IsMainScreenServer = false;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
+                    
                     break;
                 
                 default:
@@ -241,10 +259,16 @@ namespace ArtemisManagerUI
             }
             return WasProcessed;
         }
+        
         public static void SetMainScreenServerIP()
         {
             var ip = GetMainScreenServerIP();
+
             ArtemisManager.SetServerIP(ip);
+            if (ip != null)
+            {
+                thisMachine.IsMainScreenServer = (ip.Equals(Network.MyIP) || ip.Equals(IPAddress.Loopback));
+            }
         }
         public static IPAddress? GetMainScreenServerIP()
         {
@@ -257,7 +281,6 @@ namespace ArtemisManagerUI
                     if (pc.IsMainScreenServer && !TakeAction.IsBroadcast(pc.IP) && pc.IP != null)
                     {
                         ipx = pc.IP;
-                        break;
                     }
                 }
             }
@@ -340,8 +363,8 @@ namespace ArtemisManagerUI
                         if (client.IP != null)
                         {
                             Network.Current?.SendClientInfo(
-                               client.IP, Properties.Settings.Default.IsAMaster,
-                               Properties.Settings.Default.ConnectOnStart, modsArray,
+                               client.IP, SettingsAction.Current.IsMaster,
+                               SettingsAction.Current.ConnectOnStart, modsArray,
                                missionsArray,
                                AretmisIsRunning,
                                IsRunningUnderMyControl,
@@ -352,8 +375,8 @@ namespace ArtemisManagerUI
                 else
                 {
                     Network.Current?.SendClientInfo(
-                        source, Properties.Settings.Default.IsAMaster,
-                        Properties.Settings.Default.ConnectOnStart, modsArray,
+                        source, SettingsAction.Current.IsMaster,
+                        SettingsAction.Current.ConnectOnStart, modsArray,
                         missionsArray,
                         AretmisIsRunning,
                         IsRunningUnderMyControl,
@@ -704,7 +727,7 @@ oLink.Save
             }
             return success;
         }
-        public static bool DoChangeSetting(string setting, string? value)
+        public static bool DoChangeSetting(string setting, string? value, bool fromRemote)
         {
             if (setting == "NetworkPassword" || setting == "Password")
             {
@@ -712,30 +735,38 @@ oLink.Save
             }
             else
             {
-                bool success = false;
-                switch (System.Windows.MessageBox.Show("Do you want to change this setting on all connected peers?", "Change setting on peer-to-peer network", MessageBoxButton.YesNoCancel))
-                {
-                    case MessageBoxResult.Cancel:
-                        success = false;
-                        break;
-                    case MessageBoxResult.Yes:
-                        success = true;
-                        if (ConnectedPCs != null)
-                        {
-                            foreach (var pc in ConnectedPCs)
-                            {
-                                if (pc.IP != null && value != null)
-                                {
-                                    Network.Current?.SendChangeSetting(pc.IP, setting, value);
-                                }
-                            }
-                        }
-                        break;
-                    case MessageBoxResult.No:
-                        success = true;
-                        break;
-                }
+                bool success = true;
+                //if (fromRemote)
+                //{
+                //    success = true;
+                //}
+                //else
+                //{
 
+
+                //    switch (System.Windows.MessageBox.Show("Do you want to change this setting on all connected peers?", "Change setting on peer-to-peer network", MessageBoxButton.YesNoCancel))
+                //    {
+                //        case MessageBoxResult.Cancel:
+                //            success = false;
+                //            break;
+                //        case MessageBoxResult.Yes:
+                //            success = true;
+                //            if (ConnectedPCs != null)
+                //            {
+                //                foreach (var pc in ConnectedPCs)
+                //                {
+                //                    if (pc.IP != null && value != null)
+                //                    {
+                //                        Network.Current?.SendChangeSetting(pc.IP, setting, value);
+                //                    }
+                //                }
+                //            }
+                //            break;
+                //        case MessageBoxResult.No:
+                //            success = true;
+                //            break;
+                //    }
+                //}
                 return success;
             }
         }
@@ -849,6 +880,10 @@ oLink.Save
                 ConnectedPCs[AllConnectionsElement].IsUsingThisAppControlledArtemis = allIsUsingThisApp;
                 ConnectedPCs[AllConnectionsElement].AppInStartFolder = allInStartFolder;
                 ConnectedPCs[AllConnectionsElement].AppVersion = allAppVersion;
+                if (ConnectedPCs?.Count > 2)
+                {
+                    SetMainScreenServerIP();
+                }
             }
         }
         private static void DoSendPing(IPAddress address)

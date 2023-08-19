@@ -71,7 +71,7 @@ namespace ArtemisManagerUI
 
         private void OnIsMasterSet(object sender, RoutedEventArgs e)
         {
-            TakeAction.SendChangeSetting(SelectedTargetPC?.IP, "IsMaster", SelectedTargetPC?.ConnectOnstart?.ToString());
+            TakeAction.SendChangeSetting(SelectedTargetPC?.IP, "IsMaster", SelectedTargetPC?.IsMaster.ToString());
         }
 
         private void OnStartArtemisRemote(object sender, RoutedEventArgs e)

@@ -57,14 +57,14 @@ namespace AMCommunicator.Messages
             AppInStartFolder = appInStartFolder;
             Drives = DriveData.GetDriveData();
 
-            List<string> dd = new();
-            foreach (var drive in Drives)
-            {
-                if (drive.DriveType == DriveType.Fixed)
-                {
-                    dd.Add(drive.Name + ","+ drive.DriveType.ToString()+","+drive.TotalSize.ToString() + ","+drive.FreeSpace);
-                }
-            }
+            //List<string> dd = new();
+            //foreach (var drive in Drives)
+            //{
+            //    if (drive.DriveType == DriveType.Fixed)
+            //    {
+            //        dd.Add(drive.Name + ","+ drive.DriveType.ToString()+","+drive.TotalSize.ToString() + ","+drive.FreeSpace);
+            //    }
+            //}
             IsMainScreenServer = isMainScreenServer;
             GeneralSettings = string.Empty;
         }

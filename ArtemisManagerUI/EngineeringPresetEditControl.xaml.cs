@@ -533,23 +533,6 @@ namespace ArtemisManagerUI
             }
         }
 
-        ////private void OnSaveSelectedPresets(object sender, RoutedEventArgs e)
-        ////{
-        ////    if (IsRemote)
-        ////    {
-        ////        //TODO: Remotely save the changes
-        ////        if (TargetClient != null)
-        ////        {
-        ////            //Same as send file to target.
-        ////            //                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets, Guid.Empty, );
-        ////            Network.Current?.SendStringPackageFile(TargetClient, SelectedPresetFile.SettingsFile.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset, SelectedPresetFile.);
-        ////        }
-        ////    }
-        ////    else
-        ////    {
-        ////        SelectedPresetFile?.INIFile?.Save();
-        ////    }
-        ////}
 
         private void OnActivateSelectedPresets(object sender, RoutedEventArgs e)
         {

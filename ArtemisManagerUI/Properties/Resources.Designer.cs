@@ -101,6 +101,22 @@ namespace ArtemisManagerUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ; -------------------------------------------------------------------------------------
+        ///; this is the main initialization file for the PC Artemis exe.
+        ///; this contains modifiable settings for the game
+        ///; -------------------------------------------------------------------------------------
+        ///
+        ///; this is a comment because it starts with a semicolon.  You can type anything on this line. The INI parser will ignore it.
+        ///
+        ///; REMEMBER! no spaces around the equal sign!  Yes: cameraPitch=0.0    No: cameraPitch = 0.0 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string artemis {
+            get {
+                return ResourceManager.GetString("artemis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap artemis1 {
@@ -168,7 +184,7 @@ namespace ArtemisManagerUI.Properties {
         ///; at the end of this file, you&apos;ll find a list of the acceptable labels for each keyboard key.
         ///; -------------------------------------------------------------------------------------
         ///
-        ///; this is a co [rest of string was truncated]&quot;;.
+        ///; this  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string controls {
             get {

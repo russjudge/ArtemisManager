@@ -458,7 +458,7 @@ namespace ArtemisManagerUI
                 if (!me.isLoading)
                 {
 
-                    if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString()))
+                    if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString(), true))
                     {
                         me.ConnectOnStart = SettingsAction.Current.ConnectOnStart;
                     }
@@ -770,6 +770,7 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_InfoRequestReceived(object? sender, InformationRequestEventArgs e)
         {
+            //TODO: meet request requirements
             if (e.Source != null)
             {
                 switch (e.RequestType)
@@ -782,18 +783,28 @@ namespace ArtemisManagerUI
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
                         break;
                     case RequestInformationType.ListOfEngineeringPresets:
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetEngineeringPresetFiles());
                         break;
                     case RequestInformationType.SpecificEngineeringPreset:
+                        //string data = ArtemisManager.
                         break;
                     case RequestInformationType.ListOfDMXCommandfiles:
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetDMXCommandsFileList());
                         break;
                     case RequestInformationType.SpecificDMXCommandFile:
                         break;
                     case RequestInformationType.ListOfControLINIFiles:
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetControlsINIFileList());
                         break;
                     case RequestInformationType.SpecificControlINIFile:
                         break;
                     case RequestInformationType.ListOfScreenResolutions:
+                        List<string> items = new();
+                        foreach (var sz in TakeAction.GetAvailableScreenResolutions())
+                        {
+                            items.Add(sz.Width.ToString() + "x" + sz.Height.ToString());
+                        }
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, items.ToArray());
                         break;
                 }
             }
@@ -1044,6 +1055,7 @@ namespace ArtemisManagerUI
                         this.isLoading = true;
                         this.ConnectOnStart = bool.Parse(e.SettingValue);
                         UpdateAutoStart(this.ConnectOnStart);
+                        TakeAction.thisMachine.ConnectOnstart = this.ConnectOnStart;
                         this.isLoading = false;
                     }));
                     break;
@@ -1052,9 +1064,13 @@ namespace ArtemisManagerUI
                     this.Dispatcher.Invoke(new Action(() =>
                     {
                         this.IsMaster = bool.Parse(e.SettingValue);
+                        TakeAction.thisMachine.IsMaster = this.IsMaster;
+                        PopupMessage = "Is Master changed to: " + e.SettingValue;
+                        
                     }));
                     break;
             }
+            TakeAction.SendClientInfo(IPAddress.Any);
         }
 
         private void OnStartServer(object sender, RoutedEventArgs? e)
@@ -1127,8 +1143,16 @@ namespace ArtemisManagerUI
                             this.Dispatcher.Invoke(new Action(() =>
                             {
                                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
+                                
                             }));
                             break;
+                        //case PCActions.SetAsMainScreenServer:
+                        //case PCActions.RemoveAsMainScreenServer:
+                        //    this.Dispatcher.Invoke(new Action(() =>
+                        //    {
+                                
+                        //    }));
+                        //    break;
                     }
                 }
             }
@@ -1152,7 +1176,7 @@ namespace ArtemisManagerUI
                     PCItem? remover = null;
                     foreach (var pc in ConnectedPCs)
                     {
-                        if (pc.IP == address)
+                        if (pc != null && pc.IP != null && pc.IP.Equals(address))
                         {
                             remover = pc;
                             break;
@@ -1171,15 +1195,15 @@ namespace ArtemisManagerUI
         }
         private void ThrowFatal(Exception e)
         {
-            if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
-            {
-                this.Dispatcher.Invoke(new Action<Exception>(ThrowFatal), e);
-            }
-            else
-            {
+            //if (this.Dispatcher != System.Windows.Threading.Dispatcher.CurrentDispatcher)
+            //{
+            //    this.Dispatcher.Invoke(new Action<Exception>(ThrowFatal), e);
+            //}
+            //else
+            //{
                 System.Windows.MessageBox.Show("FATAL Exception:\r\n" + Environment.NewLine + e.Message, "FATAL ERROR!!!", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
-            }
+            //}
         }
         private void MyNetwork_FatalExceptionEncountered(object? sender, FatalExceptionEncounteredEventArgs e)
         {

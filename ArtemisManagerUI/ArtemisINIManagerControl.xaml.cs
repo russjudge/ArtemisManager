@@ -100,21 +100,22 @@ namespace ArtemisManagerUI
 
         private void Fsw_Changed(object sender, FileSystemEventArgs e)
         {
-            Dispatcher.Invoke(() => { 
-            if (SelectedArtemisSettingsFile != null && SelectedArtemisSettingsFile.INIFile?.SaveFile == e.Name)
+            Dispatcher.Invoke(() =>
             {
-                SelectedArtemisSettingsFile.INIFile = new ArtemisINI(e.FullPath);
-            }
-            else
-            {
-                foreach (var file in ArtemisSettingsFiles)
+                if (SelectedArtemisSettingsFile != null && SelectedArtemisSettingsFile.INIFile?.SaveFile == e.Name)
                 {
-                    if (file.INIFile?.SaveFile == e.Name)
+                    SelectedArtemisSettingsFile.INIFile = new ArtemisINI(e.FullPath);
+                }
+                else
+                {
+                    foreach (var file in ArtemisSettingsFiles)
                     {
-                        file.INIFile = new(e.FullPath);
+                        if (file.INIFile?.SaveFile == e.Name)
+                        {
+                            file.INIFile = new(e.FullPath);
+                        }
                     }
                 }
-            }
             });
         }
 
@@ -122,26 +123,30 @@ namespace ArtemisManagerUI
         {
             if (!e.Handled)
             {
-                if (e.Source != null && TargetClient != null)
+                //TODO: handle all info received
+                Dispatcher.Invoke(() =>
                 {
-                    if (e.Source.ToString() == TargetClient.ToString())
+                    if (e.Source != null && TargetClient != null)
                     {
-                        switch (e.RequestType)
+                        if (e.Source.ToString() == TargetClient.ToString())
                         {
-                            case RequestInformationType.ListOfArtemisINIFiles:
-                                ProcessListOfArtemisINIFiles(e.Data);
-                                e.Handled = true;
-                                break;
-                            case RequestInformationType.SpecificArtemisINIFile:
-                                if (e.Data.Length > 0)
-                                {
-                                    ProcessSpecificArtemisINIFile(e.Identifier, e.Data[0]);
-                                }
-                                e.Handled = true;
-                                break;
+                            switch (e.RequestType)
+                            {
+                                case RequestInformationType.ListOfArtemisINIFiles:
+                                    ProcessListOfArtemisINIFiles(e.Data);
+                                    e.Handled = true;
+                                    break;
+                                case RequestInformationType.SpecificArtemisINIFile:
+                                    if (e.Data.Length > 0)
+                                    {
+                                        ProcessSpecificArtemisINIFile(e.Identifier, e.Data[0]);
+                                    }
+                                    e.Handled = true;
+                                    break;
+                            }
                         }
                     }
-                }
+                });
             }
         }
         private void ProcessListOfArtemisINIFiles(string[] names)
@@ -385,10 +390,9 @@ namespace ArtemisManagerUI
         {
             if (IsRemote)
             {
-                if (TargetClient != null && SelectedArtemisSettingsFile?.INIFile != null)
+                if (TargetClient != null)
                 {
-                    //TODO: For Adding settings file, send the stored version 2.8.0 artemis ini file in resources: Load into INIFile, then send GetJSON for it.
-                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.InstallArtemisINI, Guid.Empty, SelectedArtemisSettingsFile.INIFile.GetJSON());
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.InstallArtemisINI, Guid.Empty, Properties.Resources.artemis);
                 }
             }
             else
@@ -434,12 +438,12 @@ namespace ArtemisManagerUI
             {
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.RestoreArtemisINIToDefault, Guid.Empty, string.Empty);
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.RestoreArtemisINIToDefault, Guid.Empty, Properties.Resources.artemis);
                 }
             }
             else
             {
-                ArtemisManager.RestoreArtemisINIToDefault();
+                ArtemisManager.RestoreArtemisINIToDefault(Properties.Resources.artemis);
                 //string originalINI = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
                 //if (!string.IsNullOrEmpty(originalINI) && File.Exists(originalINI))
                 //{

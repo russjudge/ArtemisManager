@@ -524,6 +524,7 @@ namespace AMCommunicator
                 case MessageCommand.Information:
                     disconnect = ProcessInformationMessage(stream, message?.GetItem<InformationMessage>());
                     break;
+              
                 default:
                     RaiseStatusUpdate("Invalid Message command.  Ignored.  Check for software update to Artemis Manager.");
                     return false;
@@ -531,6 +532,9 @@ namespace AMCommunicator
            
             return disconnect;
         }
+
+        
+
         public event EventHandler<ChangeSettingEventArgs>? ChangeSetting;
         public event EventHandler<StatusUpdateEventArgs>? StatusUpdated;
         public event EventHandler<StatusUpdateEventArgs>? PopupMessageEvent;
@@ -569,6 +573,34 @@ namespace AMCommunicator
                 stream.Write(bytes, 0, bytes.Length);
             }
         }
+        //private bool ProcessSendableStringPackage(NetworkStream stream, SendableStringPackageFile? msg)
+        //{
+        //    if (msg != null)
+        //    {
+        //        if (msg.MessageVersion != RequestInformationMessage.ThisVersion)
+        //        {
+        //            if (msg.Source == null)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                //We might be unattended here, so we need to alert the sender of an issue.
+        //                SendAlert(IPAddress.Parse(msg.Source), AlertItems.MessageVersionMismatch,
+        //                    string.Format("RequestInformationMessage: Expected version={0}, Actual version={1}.{2}Update recommended. Settings cannot be changed.",
+        //                    RequestInformationMessage.ThisVersion, msg.MessageVersion, Environment.NewLine));
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (!string.IsNullOrEmpty(msg.Source))
+        //            {
+        //                InfoRequestReceived?.Invoke(this, new InformationRequestEventArgs(IPAddress.Parse(msg.Source), msg.RequestType, msg.Identifier));
+        //            }
+        //        }
+        //    }
+        //    return false;
+        //}
         private bool ProcessInformationRequestMessage(NetworkStream? stream, RequestInformationMessage? msg)
         {
             if (msg != null)
@@ -623,7 +655,7 @@ namespace AMCommunicator
                     }
                     else
                     {
-                        InfoRequestReceived?.Invoke(this, new InformationEventArgs(IPAddress.Parse(msg.Source), msg.RequestType, msg.Identifier, msg.Data));
+                        InfoReceived?.Invoke(this, new InformationEventArgs(IPAddress.Parse(msg.Source), msg.RequestType, msg.Identifier, msg.Data));
                     }
                 }
             }

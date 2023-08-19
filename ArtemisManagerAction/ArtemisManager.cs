@@ -727,18 +727,13 @@ namespace ArtemisManagerAction
                 return string.Empty;
             }
         }
-        public static bool RestoreArtemisINIToDefault()
+        public static bool RestoreArtemisINIToDefault(string data)
         {
-            string originalINI = ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder);
-            if (!string.IsNullOrEmpty(originalINI) && File.Exists(originalINI))
+            using (StreamWriter sw = new(Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisINI)))
             {
-                File.Copy(originalINI, ArtemisManager.ArtemisINIFolder);
-                return true;
+                sw.Write(data);
             }
-            else
-            {
-                return false;
-            }
+            return true;
         }
         public static void VerifyArtemisINIBackup()
         {
@@ -833,6 +828,7 @@ namespace ArtemisManagerAction
 
                 }
             }
+            
         }
         public static bool GetIsMainScreenServer()
         {

@@ -61,6 +61,10 @@ namespace ArtemisManagerUI
             IsUsingThisAppControlledArtemis = info.IsUsingThisAppControlledArtemis;
             AppInStartFolder= info.AppInStartFolder;
             IsMainScreenServer = info.IsMainScreenServer;
+            foreach (var drive in info.Drives)
+            {
+                Drives.Add(drive);
+            }
             GeneralSettings= info.GeneralSettings;
             TakeAction.SetAllConnectionsInfo();
         }

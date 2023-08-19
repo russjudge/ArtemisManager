@@ -67,6 +67,7 @@
                     <TextBlock Text="Manager in Startup Folder" TextWrapping="Wrap"/>
                 </CheckBox>
                 <CheckBox
+                    Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}"
                     IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsMainScreenServer}"
                     Margin="0,10,0,0"
                     IsEnabled="{Binding ElementName=uc, Path=IsMaster}"
