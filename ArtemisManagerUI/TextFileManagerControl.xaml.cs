@@ -385,7 +385,6 @@ namespace ArtemisManagerUI
                 {
                     if (me.IsRemote)
                     {
-                        //TODO: get remote data. (specific file)
                         if (me.TargetClient != null)
                         {
                             RequestInformationType request;
