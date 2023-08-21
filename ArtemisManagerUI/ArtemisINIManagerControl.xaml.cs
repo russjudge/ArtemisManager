@@ -19,7 +19,6 @@ namespace ArtemisManagerUI
         public ArtemisINIManagerControl()
         {
             ArtemisSettingsFiles = new();
-            AvailableResolutions = new();
 
             RestoreOriginalToolTip = string.Format("Restore Original artemis.ini file ({0}) to defaults.",  ArtemisManager.GetOriginalArtemisINIFile(ModItem.ActivatedFolder));
             
@@ -29,7 +28,7 @@ namespace ArtemisManagerUI
         void InitializeFileList()
         {
             ArtemisSettingsFiles.Clear();
-            AvailableResolutions.Clear();
+            
             if (IsRemote)
             {
                 if (fsw != null)
@@ -52,7 +51,7 @@ namespace ArtemisManagerUI
                         Network.Current.InfoReceived += OnInfoReceived;
                     }
                     Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfArtemisINIFiles);
-                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfScreenResolutions);
+                    
                 }
             }
             else
@@ -68,11 +67,6 @@ namespace ArtemisManagerUI
                 fsw.Changed += Fsw_Changed;
                 fsw.Renamed += Fsw_Renamed;
                 fsw.EnableRaisingEvents = true;
-                
-                foreach (var resolution in TakeAction.GetAvailableScreenResolutions())
-                {
-                    AvailableResolutions.Add(resolution);
-                }
             }
         }
 
@@ -123,7 +117,6 @@ namespace ArtemisManagerUI
         {
             if (!e.Handled)
             {
-                //TODO: handle all info received
                 Dispatcher.Invoke(() =>
                 {
                     if (e.Source != null && TargetClient != null)
@@ -316,7 +309,19 @@ namespace ArtemisManagerUI
         {
             if (d is ArtemisINIManagerControl me && me.SelectedArtemisSettingsFile != null)
             {
-                me.SelectedArtemisSettingsFile.INIFile = ArtemisManager.GetArtemisINI(me.SelectedArtemisSettingsFile.Name);
+                
+                if (me.IsRemote)
+                {
+                    if (me.TargetClient != null)
+                    {
+                        Network.Current?.SendRequestInformation(me.TargetClient, RequestInformationType.SpecificArtemisINIFile, me.SelectedArtemisSettingsFile.Name);
+                    }
+                }
+                else
+                {
+                    me.SelectedArtemisSettingsFile.INIFile = ArtemisManager.GetArtemisINI(me.SelectedArtemisSettingsFile.Name);
+                }
+                
             }
         }
 

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
+
 using System.Windows.Input;
 
 namespace ArtemisManagerUI
@@ -16,12 +17,81 @@ namespace ArtemisManagerUI
     {
         public ArtemisINIControl()
         {
+            AvailableResolutions = new ObservableCollection<System.Drawing.Size>();
             ArtemisFolder = ModItem.ActivatedFolder;
             InitializeComponent();
+            InitializeResolutions();
         }
         public static readonly DependencyProperty IsRemoteProperty =
             DependencyProperty.Register(nameof(IsRemote), typeof(bool),
-            typeof(ArtemisINIControl));
+            typeof(ArtemisINIControl), new PropertyMetadata(OnIsRemoteChanged));
+        private void InitializeResolutions()
+        {
+            AvailableResolutions.Clear();
+            if (IsRemote)
+            {
+                if (TargetClient != null)
+                {
+                    if (Network.Current != null)
+                    {
+                        Network.Current.InfoReceived += OnInfoReceived;
+                    }
+                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfScreenResolutions);
+                }
+            }
+            else
+            {
+                foreach (var resolution in TakeAction.GetAvailableScreenResolutions())
+                {
+                    AvailableResolutions.Add(resolution);
+                }
+            }
+        }
+        private static void OnIsRemoteChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ArtemisINIControl control)
+            {
+                control.InitializeResolutions();
+            }
+        }
+        private void OnInfoReceived(object? sender, InformationEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (e.Source != null && TargetClient != null)
+                    {
+                        if (e.Source.ToString() == TargetClient.ToString())
+                        {
+                            switch (e.RequestType)
+                            {
+                                case RequestInformationType.ListOfScreenResolutions:
+                                    foreach (var resolution in e.Data)
+                                    {
+                                        var sz = resolution.Split('x');
+                                        if (sz.Length > 1)
+                                        {
+                                            int w = 0;
+                                            int h = 0;
+                                            if (int.TryParse(sz[0], out w))
+                                            {
+                                                if (int.TryParse(sz[1], out h))
+                                                {
+                                                    System.Drawing.Size size = new(w, h);
+                                                    AvailableResolutions.Add(size);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    e.Handled = true;
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+        }
 
         public bool IsRemote
         {

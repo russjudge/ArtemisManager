@@ -786,17 +786,19 @@ namespace ArtemisManagerUI
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetEngineeringPresetFiles());
                         break;
                     case RequestInformationType.SpecificEngineeringPreset:
-                        //string data = ArtemisManager.
+                        //TODO: return specific engineerign preset
                         break;
                     case RequestInformationType.ListOfDMXCommandfiles:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetDMXCommandsFileList());
                         break;
                     case RequestInformationType.SpecificDMXCommandFile:
+                        //TODO: RETURN DMX file
                         break;
                     case RequestInformationType.ListOfControLINIFiles:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetControlsINIFileList());
                         break;
                     case RequestInformationType.SpecificControlINIFile:
+                        //TODO: RETURN controls.ini file.
                         break;
                     case RequestInformationType.ListOfScreenResolutions:
                         List<string> items = new();

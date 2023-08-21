@@ -6,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -42,6 +43,14 @@ namespace ArtemisManagerUI
                     watcher.Dispose();
                     watcher = null;
                 }
+                if (TargetClient != null)
+                {
+                    if (Network.Current != null)
+                    {
+                        Network.Current.InfoReceived += OnInfoReceived;
+                    }
+                    Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfEngineeringPresets);
+                }
             }
             else
             {
@@ -59,7 +68,60 @@ namespace ArtemisManagerUI
                 watcher.EnableRaisingEvents = true;
             }
         }
-
+        private void OnInfoReceived(object? sender, InformationEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                //TODO: handle all info received
+                Dispatcher.Invoke(() =>
+                {
+                    if (e.Source != null && TargetClient != null)
+                    {
+                        if (e.Source.ToString() == TargetClient.ToString())
+                        {
+                            switch (e.RequestType)
+                            {
+                                case RequestInformationType.ListOfEngineeringPresets:
+                                    ProcessListOfINIFiles(e.Data);
+                                    e.Handled = true;
+                                    break;
+                                case RequestInformationType.SpecificEngineeringPreset:
+                                    if (e.Data.Length > 0)
+                                    {
+                                        ProcessSpecificINIFile(e.Identifier, e.Data[0]);
+                                    }
+                                    e.Handled = true;
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        private void ProcessListOfINIFiles(string[] names)
+        {
+            foreach (var nm in names)
+            {
+                string newnm = nm;
+                if (nm.Contains('.'))
+                {
+                    newnm = nm.Substring(0, nm.Length - 4);
+                }
+                PresetFiles.Add(new EngineeringPresetFileListItem(newnm));
+            }
+        }
+        private void ProcessSpecificINIFile(string filename, string data)
+        {
+            foreach (var item in PresetFiles)
+            {
+                if (item.Name == filename)
+                {
+                    var ini =JsonSerializer.Deserialize<PresetsFile>(data);
+                    
+                    item.SettingsFile = ini;
+                }
+            }
+        }
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.DATFileExtension))
@@ -280,12 +342,18 @@ namespace ArtemisManagerUI
                     }
                     if (IsOkay)
                     {
+                        //Load new file
                         //me.SelectedPresetFile = new EngineeringPresetFileListItem()
                         if (me.SelectedPresetFile != null)
                         {
                             if (me.IsRemote)
                             {
-                                
+                                if (me.TargetClient != null)
+                                {
+                                    Network.Current?.SendRequestInformation(me.TargetClient,
+                                        RequestInformationType.SpecificEngineeringPreset,
+                                        me.SelectedPresetFile.Name);
+                                }
                             }
                             else
                             {
@@ -295,18 +363,19 @@ namespace ArtemisManagerUI
                     }
                     else
                     {
-                        if (me.SelectedPresetFile != null && me.SelectedPresetFile.INIFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.INIFile.SaveFile))
-                        {
-                            if (me.IsRemote)
-                            {
+                        //TODO: cancel change of selected preset file.
+                        //if (me.SelectedPresetFile != null && me.SelectedPresetFile.INIFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.INIFile.SaveFile))
+                        //{
+                        //    if (me.IsRemote)
+                        //    {
                                
-                            }
-                            else
-                            {
-                                var fle = new System.IO.FileInfo(me.SelectedPresetFile.INIFile.SaveFile);
-                                me.SelectedPresetFile = new(fle.Name.Substring(0, fle.Name.Length - 4));
-                            }
-                        }
+                        //    }
+                        //    else
+                        //    {
+                        //        var fle = new System.IO.FileInfo(me.SelectedPresetFile.INIFile.SaveFile);
+                        //        me.SelectedPresetFile = new(fle.Name.Substring(0, fle.Name.Length - 4));
+                        //    }
+                        //}
                     }
                 }
             }

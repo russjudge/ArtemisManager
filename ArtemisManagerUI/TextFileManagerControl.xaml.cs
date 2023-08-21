@@ -375,9 +375,9 @@ namespace ArtemisManagerUI
         }
         public static readonly DependencyProperty SelectedDataFileProperty =
             DependencyProperty.Register(nameof(SelectedDataFile), typeof(TextDataFile),
-             typeof(TextFileManagerControl), new PropertyMetadata(OnSelectedArtemisSettingsFileChanged));
+             typeof(TextFileManagerControl), new PropertyMetadata(OnSelectedSettingsFileChanged));
 
-        private static void OnSelectedArtemisSettingsFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnSelectedSettingsFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TextFileManagerControl me && me.SelectedDataFile != null)
             {
@@ -386,6 +386,23 @@ namespace ArtemisManagerUI
                     if (me.IsRemote)
                     {
                         //TODO: get remote data. (specific file)
+                        if (me.TargetClient != null)
+                        {
+                            RequestInformationType request;
+                            switch (me.FileType)
+                            {
+                                case SendableStringPackageFile.controlsINI:
+                                    request = RequestInformationType.SpecificControlINIFile;
+                                    break;
+                                case SendableStringPackageFile.DMXCommandsXML:
+                                    request = RequestInformationType.SpecificDMXCommandFile;
+                                    break;
+                                default:
+                                    request = RequestInformationType.None;
+                                    break;
+                            }
+                            Network.Current?.SendRequestInformation(me.TargetClient, request, me.SelectedDataFile.Name);
+                        }
                     }
                     else
                     {
