@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    [NetworkMessageCommand(MessageCommand.AretmisAction)]
+    [NetworkMessageCommand(MessageCommand.ArtemisAction)]
     internal class ArtemisActionMessage : NetworkMessage
     {
-        public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
+        public const short ThisVersion = 1;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 
         public ArtemisActionMessage() : base()
         {
@@ -17,12 +17,13 @@ namespace AMCommunicator.Messages
             Mod = string.Empty;
             MissionScript = string.Empty;
         }
-        public ArtemisActionMessage(ArtemisActions action, Guid itemIdentifier, string mod)
+        public ArtemisActionMessage(ArtemisActions action, Guid itemIdentifier, string mod, string saveName = "")
         {
             Action = action;
             ItemIdentifier = itemIdentifier.ToString();
             Mod = mod;
             MissionScript = string.Empty;
+            SaveName= saveName;
         }
         
         
@@ -32,6 +33,8 @@ namespace AMCommunicator.Messages
         
         public string Mod { get; set; }
         public string MissionScript { get; set; }
+
+        public string SaveName { get; set; } = string.Empty;
 
         protected override void SetMessageVersion()
         {

@@ -15,7 +15,7 @@ namespace AMCommunicator
         ChangePassword = 4,
         PCAction = 5,
         UpdateCheck = 6,
-        AretmisAction = 7,
+        ArtemisAction = 7,
         Communication = 8,
         Ping = 9,
         ChangeAppSetting = 10,

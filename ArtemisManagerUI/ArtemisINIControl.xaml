@@ -35,6 +35,13 @@
                         <!--<TextBlock Text="Save" />-->
                     </StackPanel>
                 </Button>
+                <Button
+                    ToolTip="Test" Click="OnTest">
+                    <StackPanel>
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/worksonmymachine.png" />
+                        <!--<TextBlock Text="Save" />-->
+                    </StackPanel>
+                </Button>
             </StackPanel>
             <Grid DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>

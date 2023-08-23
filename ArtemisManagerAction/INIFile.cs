@@ -85,21 +85,20 @@ namespace ArtemisManagerAction
         }
         public void Save()
         {
-            if (!string.IsNullOrEmpty(SaveFile))
-            {
-                if (File.Exists(SaveFile))
-                {
-                    File.Delete(SaveFile);
-                }
-                string data = ToString();
-                using StreamWriter sw = new(SaveFile);
-                
-                sw.WriteLine(data);
-            }
-            else
+            if (string.IsNullOrEmpty(SaveFile))
             {
                 throw new InvalidOperationException("Cannot save: save file not set.");
             }
+
+            SaveFile = ArtemisManager.ResolveFilename(ArtemisManager.ArtemisINIFolder, SaveFile, ArtemisManager.INIFileExtension);
+            if (File.Exists(SaveFile))
+            {
+                File.Delete(SaveFile);
+            }
+            string data = ToString();
+            using StreamWriter sw = new(SaveFile);
+
+            sw.WriteLine(data);
         }
         public override string ToString()
         {

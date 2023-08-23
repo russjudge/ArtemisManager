@@ -36,6 +36,14 @@
                     HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
+
+                <Button
+                    ToolTip="Test" Click="OnTest">
+                    <StackPanel>
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/worksonmymachine.png" />
+                        <!--<TextBlock Text="Save" />-->
+                    </StackPanel>
+                </Button>
             </StackPanel>
           
             <ListBox
@@ -115,7 +123,7 @@
             SavingSettings="OnSavingSettings"
             SettingsSaved="OnSettingsSaved"
             Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
-            AvailableResolutions="{Binding ElementName=uc, Path=AvailableResolutions}"
-            SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile.INIFile, Mode=TwoWay}" />
+            
+            SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile.SettingsFile, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

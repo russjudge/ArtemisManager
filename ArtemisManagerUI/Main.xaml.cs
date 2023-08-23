@@ -758,7 +758,17 @@ namespace ArtemisManagerUI
             MyNetwork.PopupMessageEvent += MyNetwork_PopupMessageEvent;
             MyNetwork.PackageFileReceived += MyNetwork_PackageFileReceived;
             MyNetwork.InfoRequestReceived += MyNetwork_InfoRequestReceived;
+            TakeArtemisAction.CommunicationMessageReceived += TakeArtemisAction_CommunicationMessageReceived;
         }
+
+        private void TakeArtemisAction_CommunicationMessageReceived(object? sender, CommunicationMessageEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                PopupMessage = e.Message;
+            });
+        }
+
         void DoStartServer()
         {
             UpdateStatus("Starting Connection Service");
@@ -874,7 +884,7 @@ namespace ArtemisManagerUI
 
         private void MyNetwork_ArtemisActionReceived(object? sender, ArtemisActionEventArgs e)
         {
-            var wasProcessed = TakeArtemisAction.ProcessArtemisAction(e.Source, e.Action, e.Mod);
+            var wasProcessed = TakeArtemisAction.ProcessArtemisAction(e.Source, e.Action, e.Mod, e.SaveName);
             if (wasProcessed.Item1)
             {
                 switch (e.Action)

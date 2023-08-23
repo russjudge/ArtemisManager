@@ -137,11 +137,11 @@ namespace AMCommunicator
                 Transmit(connection.Stream, msg);
             }
         }
-        public void SendArtemisAction(IPAddress target, ArtemisActions action, Guid identifier, string modJSON)
+        public void SendArtemisAction(IPAddress target, ArtemisActions action, Guid identifier, string modJSON, string saveName = "")
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                ArtemisActionMessage msg = new(action, identifier, modJSON);
+                ArtemisActionMessage msg = new(action, identifier, modJSON, saveName);
                 Transmit(connection.Stream, msg);
             }
         }
@@ -497,7 +497,7 @@ namespace AMCommunicator
                     break;
                 case MessageCommand.UpdateCheck:
                     break;
-                case MessageCommand.AretmisAction:
+                case MessageCommand.ArtemisAction:
                     ProcessArtemisAction(stream, message?.GetItem<ArtemisActionMessage>());
                     break;
                 case MessageCommand.Communication:
@@ -761,7 +761,7 @@ namespace AMCommunicator
                 {
                     if (msg.Source != null)
                     {
-                        ArtemisActionReceived?.Invoke(this, new ArtemisActionEventArgs(IPAddress.Parse(msg.Source), msg.Action, msg.ItemIdentifier, msg.Mod));
+                        ArtemisActionReceived?.Invoke(this, new ArtemisActionEventArgs(IPAddress.Parse(msg.Source), msg.Action, msg.ItemIdentifier, msg.Mod, msg.SaveName));
                     }
                     else
                     {

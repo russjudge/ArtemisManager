@@ -273,5 +273,10 @@ namespace ArtemisManagerUI
                 RaiseSettingsSavedEvent();
             }
         }
+
+        private void OnTest(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

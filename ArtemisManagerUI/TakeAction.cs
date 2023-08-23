@@ -652,22 +652,7 @@ oLink.Save
             if (file != null)
             {
                 string target = Path.Combine(ArtemisManager.EngineeringPresetsFolder, filename);
-                if (File.Exists(target))
-                {
-                    int i = 1;
-                    FileInfo n = new(target);
-                    if (!string.IsNullOrEmpty(n.DirectoryName))
-                    {
-                        FileInfo x = new (target);
-                        var wrk = Path.GetFileNameWithoutExtension(n.Name);
-                        while (x.Exists)
-                        {
-                            x = new(Path.Combine(n.DirectoryName, wrk + "(" + (i++).ToString() + ")" + n.Extension));
-                        }
-                        target = x.FullName;
-                    }
-
-                }
+              
                 file.Save(target);
             }
         }
@@ -676,19 +661,7 @@ oLink.Save
             string target = Path.Combine(ArtemisManager.ArtemisINIFolder, filename);
             if (File.Exists(target))
             {
-                int i = 1;
-                FileInfo n = new(target);
-                if (!string.IsNullOrEmpty(n.DirectoryName))
-                {
-                    FileInfo x = new(target);
-                    var wrk = Path.GetFileNameWithoutExtension(n.Name);
-                    while (x.Exists)
-                    {
-
-                        x = new(Path.Combine(n.DirectoryName, wrk + "(" + (i++).ToString() + ")" + n.Extension));
-                    }
-                    target = x.FullName;
-                }
+                File.Delete(target);
             }
             using StreamWriter sw = new(target);
             sw.WriteLine(stringData);

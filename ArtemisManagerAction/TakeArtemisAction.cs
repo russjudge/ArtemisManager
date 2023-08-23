@@ -2,16 +2,19 @@
 using ArtemisManagerAction.ArtemisEngineeringPresets;
 using System.ComponentModel;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ArtemisManagerAction
 {
     public static class TakeArtemisAction
     {
+        public static event EventHandler<CommunicationMessageEventArgs>? CommunicationMessageReceived;
         public static ModItem? StagedModItemToActivateOnceInstalled { get; set; } = null;
        
-        public static Tuple<bool, ModItem?> ProcessArtemisAction(IPAddress? target, AMCommunicator.Messages.ArtemisActions action, string? modJSON)
+        public static Tuple<bool, ModItem?> ProcessArtemisAction(IPAddress? target, AMCommunicator.Messages.ArtemisActions action, string? modJSON, string? saveName = null)
         {
             bool WasProcessed = false;
             ModItem? mod = null;
@@ -122,6 +125,16 @@ namespace ArtemisManagerAction
                     if (!string.IsNullOrEmpty(modJSON))
                     {
                         WasProcessed = ArtemisManager.DeleteArtemisINIFile(modJSON);
+                        if (WasProcessed)
+                        {
+                            CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Artemis INI " + modJSON + " Deleted"));
+                            
+                        }
+                        else
+                        {
+                            //string tar = ArtemisManager.ResolveFilename(ArtemisManager.ArtemisINIFolder, modJSON, ArtemisManager.INIFileExtension);
+                            //CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Request to delete Artemis INI Failed: file=" +tar));
+                        }
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteControlsINI:
@@ -147,9 +160,14 @@ namespace ArtemisManagerAction
                 case AMCommunicator.Messages.ArtemisActions.InstallArtemisINI:
                     if (!string.IsNullOrEmpty(modJSON))
                     {
-                        ArtemisINI ini = new();
+                        ArtemisINI? ini = new();
                         ini.Deserialize(modJSON);
+                        if (saveName != null)
+                        {
+                            ini.SaveFile = saveName;
+                        }
                         ini.Save();
+
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets:

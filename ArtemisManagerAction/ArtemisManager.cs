@@ -678,10 +678,10 @@ namespace ArtemisManagerAction
                 return false;
             }
         }
-        private static string ResolveFilename(string sourceFolder, string name, string extension)
+        public static string ResolveFilename(string sourceFolder, string name, string extension)
         {
             string sourceName = name;
-            if (!sourceName.Contains('.'))
+            if (!sourceName.EndsWith(extension))
             {
                 sourceName += extension;
             }
