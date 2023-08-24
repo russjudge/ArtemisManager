@@ -118,6 +118,7 @@ namespace ArtemisManagerUI
         {
             if (!e.Handled)
             {
+                Network.Current?.RaiseStatusUpdate("ArtemisINIManagerControl InfoReceive processing...");
                 Dispatcher.Invoke(() =>
                 {
                     if (e.Source != null && TargetClient != null)
@@ -128,6 +129,7 @@ namespace ArtemisManagerUI
                             {
                                 case RequestInformationType.ListOfArtemisINIFiles:
                                     ProcessListOfArtemisINIFiles(e.Data);
+                                    Network.Current?.RaiseStatusUpdate("ArtemisINIManagerControl InfoReceive - ListOfArtemisINIFiles...");
                                     e.Handled = true;
                                     break;
                                 case RequestInformationType.SpecificArtemisINIFile:
@@ -135,6 +137,7 @@ namespace ArtemisManagerUI
                                     {
                                         ProcessSpecificArtemisINIFile(e.Identifier, e.Data[0]);
                                     }
+                                    Network.Current?.RaiseStatusUpdate("ArtemisINIManagerControl InfoReceive - SpecificArtemisINIFile...");
                                     e.Handled = true;
                                     break;
                             }
@@ -142,9 +145,14 @@ namespace ArtemisManagerUI
                     }
                 });
             }
+            else
+            {
+                Network.Current?.RaiseStatusUpdate("ArtemisINIManagerControl InfoReceive processing---already handled, nothing done.");
+            }
         }
         private void ProcessListOfArtemisINIFiles(string[] names)
         {
+            ArtemisSettingsFiles.Clear();
             foreach (var nm in names)
             {
                 string newnm = nm;

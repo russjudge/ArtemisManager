@@ -562,7 +562,19 @@ namespace AMCommunicator
         {
             if (stream == null)
             {
-                RaiseStatusUpdate("in Transmit, but stream is null.  Cannot transmit {0}", msg.GetType().Name);
+                //Assuming that this is intended for ALL connections.
+                foreach (var connection in activeConnections.Values)
+                {
+                    if (connection.Address.Equals(MyIP) || connection.Address.Equals(IPAddress.Any) || connection.Stream == null)
+                    {
+
+                    }
+                    else
+                    {
+                        Transmit(connection.Stream, msg);
+                    }
+                }
+                //RaiseStatusUpdate("in Transmit, but stream is null.  Cannot transmit {0}", msg.GetType().Name);
             }
             else
             {
@@ -655,6 +667,7 @@ namespace AMCommunicator
                     }
                     else
                     {
+                        RaiseStatusUpdate("Raising InfoReceived event, requestType={0}, identifier={1}", msg.RequestType, msg.Identifier);
                         InfoReceived?.Invoke(this, new InformationEventArgs(IPAddress.Parse(msg.Source), msg.RequestType, msg.Identifier, msg.Data));
                     }
                 }
@@ -1201,7 +1214,7 @@ namespace AMCommunicator
         {
             ConnectionRequested?.Invoke(this, new ConnectionRequestEventArgs(address, host));
         }
-        private void RaiseStatusUpdate(string message, params object[] parameters)
+        public void RaiseStatusUpdate(string message, params object[] parameters)
         {
             StatusUpdated?.Invoke(this, new StatusUpdateEventArgs(message, parameters));
         }

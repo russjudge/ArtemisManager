@@ -29,6 +29,8 @@ namespace ArtemisManagerUI
         public TextFileManagerControl()
         {
             DataFileList = new ObservableCollection<TextDataFile>();
+            
+
             InitializeComponent();
         }
         FileSystemWatcher? fsw = null;
@@ -64,6 +66,10 @@ namespace ArtemisManagerUI
                     fsw.Dispose();
                     fsw = null;
                 }
+                if (Network.Current != null)
+                {
+                    Network.Current.InfoReceived += OnInfoReceived;
+                }
             }
             else
             {
@@ -91,7 +97,80 @@ namespace ArtemisManagerUI
                 fsw.EnableRaisingEvents = true;
             }
         }
-
+        private void OnInfoReceived(object? sender, InformationEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                Network.Current?.RaiseStatusUpdate("TextFileManagerControl InfoReceive processing...");
+                Dispatcher.Invoke(() =>
+                {
+                    if (e.Source != null && TargetClient != null)
+                    {
+                        if (e.Source.ToString() == TargetClient.ToString())
+                        {
+                            switch (e.RequestType)
+                            {
+                                case RequestInformationType.ListOfControLINIFiles:
+                                case RequestInformationType.ListOfDMXCommandfiles:
+                                    ProcessListOfArtemisINIFiles(e.Data);
+                                    Network.Current?.RaiseStatusUpdate("TextFileManagerControl InfoReceive - {0}...", e.RequestType.ToString());
+                                    e.Handled = true;
+                                    break;
+                                case RequestInformationType.SpecificControlINIFile:
+                                case RequestInformationType.SpecificDMXCommandFile:
+                                    if (e.Data.Length > 0)
+                                    {
+                                        ProcessSpecificArtemisINIFile(e.Identifier, e.Data[0]);
+                                    }
+                                    Network.Current?.RaiseStatusUpdate("TextFileManagerControl InfoReceive - {0}...", e.RequestType.ToString());
+                                    e.Handled = true;
+                                    break;
+                            }
+                        }
+                    }
+                });
+            }
+            else
+            {
+                Network.Current?.RaiseStatusUpdate("TextFileManagerControl InfoReceive processing---already handled, nothing done.");
+            }
+        }
+        private void ProcessListOfArtemisINIFiles(string[] names)
+        {
+            DataFileList.Clear();
+            foreach (var nm in names)
+            {
+                string newnm = nm;
+                if (nm.Contains('.'))
+                {
+                    newnm = nm.Substring(0, nm.Length - 4);
+                }
+                string ext = string.Empty;
+                string folder = string.Empty;
+                switch (FileType)
+                {
+                    case SendableStringPackageFile.DMXCommandsXML:
+                        folder = ArtemisManager.DMXCommandsFolder;
+                        ext = ArtemisManager.XMLFileExtension;
+                        break;
+                    case SendableStringPackageFile.controlsINI:
+                        folder = ArtemisManager.ControlsINIFolder;
+                        ext = ArtemisManager.INIFileExtension;
+                        break;
+                }
+                DataFileList.Add(new TextDataFile(FileType, newnm, ArtemisManager.ResolveFilename(folder,newnm,ext)));
+            }
+        }
+        private void ProcessSpecificArtemisINIFile(string filename, string data)
+        {
+            foreach (var item in DataFileList)
+            {
+                if (item.Name == filename)
+                {
+                    item.data = data;
+                }
+            }
+        }
         private void Fsw_Renamed(object sender, RenamedEventArgs e)
         {
             Dispatcher.BeginInvoke(() =>
@@ -264,10 +343,6 @@ namespace ArtemisManagerUI
             });
 
         }
-
-
-
-
 
         public static readonly DependencyProperty FileTypeProperty =
         DependencyProperty.Register(nameof(FileType), typeof(SendableStringPackageFile),

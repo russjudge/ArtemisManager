@@ -58,6 +58,7 @@ namespace ArtemisManagerUI
         {
             if (!e.Handled)
             {
+                Network.Current?.RaiseStatusUpdate("ArtemisINIControl InfoReceive processing...");
                 Dispatcher.Invoke(() =>
                 {
                     if (e.Source != null && TargetClient != null)
@@ -84,12 +85,17 @@ namespace ArtemisManagerUI
                                             }
                                         }
                                     }
+                                    Network.Current?.RaiseStatusUpdate("ArtemisINIControl InfoReceive - ListOfScreenResolutions...");
                                     e.Handled = true;
                                     break;
                             }
                         }
                     }
                 });
+            }
+            else
+            {
+                Network.Current?.RaiseStatusUpdate("ArtemisINIControl InfoReceive processing---already handled, nothing done.");
             }
         }
 

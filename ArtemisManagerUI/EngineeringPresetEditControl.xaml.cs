@@ -72,7 +72,7 @@ namespace ArtemisManagerUI
         {
             if (!e.Handled)
             {
-                //TODO: handle all info received
+                Network.Current?.RaiseStatusUpdate("EngineeringPresetEditControl InfoReceive processing...");
                 Dispatcher.Invoke(() =>
                 {
                     if (e.Source != null && TargetClient != null)
@@ -83,6 +83,7 @@ namespace ArtemisManagerUI
                             {
                                 case RequestInformationType.ListOfEngineeringPresets:
                                     ProcessListOfINIFiles(e.Data);
+                                    Network.Current?.RaiseStatusUpdate("EngineeringPresetEditControl InfoReceive - ListOfEngineeringPresets...");
                                     e.Handled = true;
                                     break;
                                 case RequestInformationType.SpecificEngineeringPreset:
@@ -90,6 +91,7 @@ namespace ArtemisManagerUI
                                     {
                                         ProcessSpecificINIFile(e.Identifier, e.Data[0]);
                                     }
+                                    Network.Current?.RaiseStatusUpdate("EngineeringPresetEditControl InfoReceive - SpecificEngineeringPreset...");
                                     e.Handled = true;
                                     break;
                             }
@@ -97,9 +99,14 @@ namespace ArtemisManagerUI
                     }
                 });
             }
+            else
+            {
+                Network.Current?.RaiseStatusUpdate("EngineeringPresetEditControl InfoReceive processing---already handled, nothing done.");
+            }
         }
         private void ProcessListOfINIFiles(string[] names)
         {
+            PresetFiles.Clear();
             foreach (var nm in names)
             {
                 string newnm = nm;

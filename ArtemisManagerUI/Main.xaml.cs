@@ -891,9 +891,13 @@ namespace ArtemisManagerUI
                 {
                     case AMCommunicator.Messages.ArtemisActions.ResetToVanilla:
                         this.Dispatcher.Invoke(new Action<Guid?>(DeactivateAllButBase), wasProcessed.Item2?.LocalIdentifier);
+                        UpdateStatus("Sending Updated Client info");
+                        TakeAction.SendClientInfo(IPAddress.Any);
                         break;
                     case AMCommunicator.Messages.ArtemisActions.StopArtemis:
                         this.Dispatcher.Invoke(new Action(() => { this.IsArtemisRunning = false; }));
+                        UpdateStatus("Sending Updated Client info");
+                        TakeAction.SendClientInfo(IPAddress.Any);
                         break;
                     case AMCommunicator.Messages.ArtemisActions.StartArtemis:
                         this.Dispatcher.Invoke(new Action(() =>
@@ -901,7 +905,8 @@ namespace ArtemisManagerUI
                             this.IsArtemisRunning = wasProcessed.Item1;
                             IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
                         }));
-
+                        UpdateStatus("Sending Updated Client info");
+                        TakeAction.SendClientInfo(IPAddress.Any);
                         break;
                     case AMCommunicator.Messages.ArtemisActions.InstallMod:
 
@@ -922,7 +927,8 @@ namespace ArtemisManagerUI
                                 }
                             }));
                         }
-
+                        UpdateStatus("Sending Updated Client info");
+                        TakeAction.SendClientInfo(IPAddress.Any);
                         break;
                     case AMCommunicator.Messages.ArtemisActions.UninstallMod:
                         if (wasProcessed.Item1)
@@ -950,7 +956,8 @@ namespace ArtemisManagerUI
                                 }
                             }));
                         }
-
+                        UpdateStatus("Sending Updated Client info");
+                        TakeAction.SendClientInfo(IPAddress.Any);
                         break;
                     case AMCommunicator.Messages.ArtemisActions.ActivateMod:
 
@@ -979,12 +986,12 @@ namespace ArtemisManagerUI
                                 }
                             }
                         }));
-
+                        UpdateStatus("Sending Updated Client info");
+                        TakeAction.SendClientInfo(IPAddress.Any);
                         break;
                 }
             }
-            UpdateStatus("Sending Updated Client info");
-            TakeAction.SendClientInfo(IPAddress.Any);
+           
         }
         
         void LoadClientInfoData(ClientInfoEventArgs e)
