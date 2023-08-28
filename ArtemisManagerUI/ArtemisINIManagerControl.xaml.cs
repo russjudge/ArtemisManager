@@ -76,15 +76,17 @@ namespace ArtemisManagerUI
             {
                 if (!string.IsNullOrEmpty(e.Name))
                 {
+                    string nm = e.Name.Substring(0,e.Name.Length - 4); 
+                    
                     foreach (var file in ArtemisSettingsFiles)
                     {
-                        if (file.OriginalName == e.OldName)
+                        if (file.OriginalName + ArtemisManager.INIFileExtension == e.OldName)
                         {
-                            file.Name = e.Name;
-                            file.OriginalName = e.Name;
+                            file.Name = nm;
+                            file.OriginalName = nm;
                             if (file.INIFile != null)
                             {
-                                file.INIFile.SaveFile = e.Name;
+                                file.INIFile.SaveFile = e.FullPath;
                             }
                         }
                     }
@@ -205,6 +207,7 @@ namespace ArtemisManagerUI
                         }
                     }
                 });
+                
             }
             Network.Current?.SendInformation(TakeAction.AllConnections, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
         }

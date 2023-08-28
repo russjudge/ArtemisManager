@@ -108,6 +108,7 @@ namespace ArtemisManagerUI
         {
             if (e.Key == Key.Enter)
             {
+                EditMode = false;
                 if (sender is TextBox myTextBox)
                 {
                     // If there is no other focusable element, you can choose to leave the focus on the TextBox.

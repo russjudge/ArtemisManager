@@ -133,7 +133,11 @@ namespace ArtemisManagerUI
             {
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendStringPackageFile(TargetClient, File.GetSerializedString(), AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset, new System.IO.FileInfo(File.SaveFile).Name);
+                    string fileData = File.GetSerializedString();
+                    Network.Current?.SendStringPackageFile(TargetClient,
+                        fileData, 
+                        AMCommunicator.Messages.SendableStringPackageFile.EngineeringPreset,
+                        new System.IO.FileInfo(File.SaveFile).Name);
                 }
             }
             else

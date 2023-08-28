@@ -22,6 +22,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             for (int i = 0; i < MaxPresets; i++)
             {
                 Presets[i] = new Preset();
+                Presets[i].Index = i + 1;
             }
         }
         public PresetsFile(string file)
@@ -150,15 +151,10 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Preset[] Presets { get; private set; } = new Preset[MaxPresets];
+        public Preset[] Presets { get; set; } = new Preset[MaxPresets];
 
         protected void DoChanged([CallerMemberName] string property = "")
         {
-            //if (property != nameof(Changed))
-            //{
-            //    Changed = true;
-            //}
-
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
@@ -174,7 +170,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
         {
             var options = new JsonSerializerOptions
             {
-                WriteIndented = false
+                WriteIndented = true
             };
             return JsonSerializer.Serialize(this, options);
         }

@@ -159,6 +159,7 @@
 
                                 </ContextMenu>
                             </StackPanel.ContextMenu>
+                            
                             <local:TextBlockEditControl
                                 Tag="{Binding}"
                                 EditMode="{Binding Path=IsEditMode, Mode=TwoWay}"

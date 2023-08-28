@@ -1,26 +1,11 @@
 ﻿using AMCommunicator;
 using AMCommunicator.Messages;
 using ArtemisManagerAction.ArtemisEngineeringPresets;
-using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Diagnostics.Tracing;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ArtemisManagerAction
 {
@@ -63,8 +48,11 @@ namespace ArtemisManagerAction
 
         public const string ChangesTXT = "changes" + TXTFileExtension;
         static System.Diagnostics.Process? runningArtemisProcess = null;
-
-
+        public static event EventHandler<CommunicationMessageEventArgs>? ActivatePopupMessage;
+        public static void RaiseStatusUpdated(string? host, string message)
+        {
+            ActivatePopupMessage?.Invoke(null, new CommunicationMessageEventArgs(host, message));
+        }
         static ArtemisManager()
         {
             //Fixing Artemis versions to specific Guids.  Same thing will be done to mods eventually.
@@ -429,24 +417,50 @@ namespace ArtemisManagerAction
         }
         public static bool RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile fileType, string oldName, string newName)
         {
+            bool retVal = false;
             switch (fileType)
             {
                 case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
-                    return RenameSettingsFile(ControlsINIFolder, INIFileExtension, oldName, newName);
+                    retVal = RenameSettingsFile(ControlsINIFolder, INIFileExtension, oldName, newName);
+                    if (retVal)
+                    {
+                        Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                    }
+                    break;
                 case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
-                    return RenameSettingsFile(DMXCommandsFolder, XMLFileExtension, oldName, newName);
-
+                    retVal = RenameSettingsFile(DMXCommandsFolder, XMLFileExtension, oldName, newName);
+                    if (retVal)
+                    {
+                        Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                    }
+                    break;
                 default:
-                    return RenameSettingsFile(DMXCommandsFolder, XMLFileExtension, oldName, newName);
+                    retVal = RenameSettingsFile(DMXCommandsFolder, XMLFileExtension, oldName, newName);
+                    if (retVal)
+                    {
+                        Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                    }
+                    break;
             }
+            return retVal;
         }
         public static bool RenameArtemisINIFile(string oldName, string newName)
         {
-            return RenameSettingsFile(ArtemisINIFolder, INIFileExtension, oldName, newName);
+            var retVal = RenameSettingsFile(ArtemisINIFolder, INIFileExtension, oldName, newName);
+            if (retVal)
+            {
+                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
+            }
+            return retVal;
         }
         public static bool RenameEngineeringPresetsFile(string oldName, string newName)
         {
-            return RenameSettingsFile(EngineeringPresetsFolder, DATFileExtension, oldName, newName);
+            var retVal = RenameSettingsFile(EngineeringPresetsFolder, DATFileExtension, oldName, newName);
+            if (retVal)
+            {
+                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+            }
+            return retVal;
         }
         public static bool DeleteArtemisINIFile(string name)
         {
@@ -454,6 +468,7 @@ namespace ArtemisManagerAction
             if (File.Exists(target))
             {
                 File.Delete(target);
+                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
                 return true;
             }
             else
@@ -461,7 +476,7 @@ namespace ArtemisManagerAction
                 return false;
             }
         }
-            public static void DeleteAll(string target)
+        public static void DeleteAll(string target)
         {
             if (Directory.Exists(target))
             {
@@ -472,6 +487,7 @@ namespace ArtemisManagerAction
                     //{
                     //    dir.Delete();
                     //}
+
                 }
                 foreach (var fle in new DirectoryInfo(target).GetFiles())
                 {
@@ -539,6 +555,52 @@ namespace ArtemisManagerAction
                 if (File.Exists(source))
                 {
                     using (var data =  new StreamReader(source))
+                    {
+                        retVal = data.ReadToEnd();
+                    }
+                }
+            }
+            return retVal;
+        }
+        public static string GetEngineeringPresetData(string name)
+        {
+            string retVal = string.Empty;
+            if (!string.IsNullOrEmpty(name))
+            {
+                string source = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, name + ArtemisManager.DATFileExtension);
+                if (File.Exists(source))
+                {
+                    PresetsFile file = new(source);
+                    retVal = file.GetSerializedString();
+                }
+            }
+            return retVal;
+        }
+        public static string GetControlsINIData(string name)
+        {
+            string retVal = string.Empty;
+            if (!string.IsNullOrEmpty(name))
+            {
+                string source = System.IO.Path.Combine(ArtemisManager.ControlsINIFolder, name + ArtemisManager.INIFileExtension);
+                if (File.Exists(source))
+                {
+                    using (var data = new StreamReader(source))
+                    {
+                        retVal = data.ReadToEnd();
+                    }
+                }
+            }
+            return retVal;
+        }
+        public static string GetDMXCommandsData(string name)
+        {
+            string retVal = string.Empty;
+            if (!string.IsNullOrEmpty(name))
+            {
+                string source = System.IO.Path.Combine(ArtemisManager.DMXCommandsFolder, name + ArtemisManager.XMLFileExtension);
+                if (File.Exists(source))
+                {
+                    using (var data = new StreamReader(source))
                     {
                         retVal = data.ReadToEnd();
                     }
@@ -618,6 +680,16 @@ namespace ArtemisManagerAction
             if (File.Exists(source))
             {
                 File.Delete(source);
+                switch (fileType)
+                {
+                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                        Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                        break;
+                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                        Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                        break;
+                }
+
                 return true;
             }
             else
@@ -658,10 +730,13 @@ namespace ArtemisManagerAction
             if (System.IO.File.Exists(source))
             {
                 File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisINI), true);
+                RaiseStatusUpdated(null, "Activated artemis.ini file");
+                //Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
                 return true;
             }
             else
             {
+                RaiseStatusUpdated(null, string.Format("Unable to activate file.  {0} not found", source));
                 return false;
             }
         }

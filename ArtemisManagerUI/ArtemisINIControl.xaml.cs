@@ -196,7 +196,9 @@ namespace ArtemisManagerUI
             {
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty, new System.IO.FileInfo(SettingsFile.SaveFile).Name);
+                    string nm = new System.IO.FileInfo(SettingsFile.SaveFile).Name;
+                    nm = nm.Substring(0, nm.Length - 4);
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty,nm);
                 }
             }
             else

@@ -47,12 +47,30 @@ namespace ArtemisManagerUI
 
         private void TakeAction_ConnectionRemoved(object? sender, ConnectionEventArgs e)
         {
-            
+            this.Dispatcher.Invoke(() =>
+            {
+                EngineeringPresetsPCItem? remover = null;
+                foreach (var item in ConnectedPCs)
+                {
+                    if (item.Connection?.IP?.ToString() == e.Connection?.IP?.ToString())
+                    {
+                        remover = item;
+                        break;
+                    }
+                }
+                if (remover != null)
+                {
+                    ConnectedPCs.Remove(remover);
+                }
+            });
         }
 
         private void TakeAction_ConnectionAdded(object? sender, ConnectionEventArgs e)
         {
-            
+            this.Dispatcher.Invoke(() =>
+            {
+                ConnectedPCs.Add(new(e.Connection));
+            });
         }
 
         public static readonly DependencyProperty PopupMessageProperty =

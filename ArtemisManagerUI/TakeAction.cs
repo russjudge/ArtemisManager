@@ -654,6 +654,7 @@ oLink.Save
                 string target = Path.Combine(ArtemisManager.EngineeringPresetsFolder, filename);
               
                 file.Save(target);
+                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
             }
         }
         public static void SaveArtemisINISettingsFile(string filename, string stringData)
@@ -665,6 +666,29 @@ oLink.Save
             }
             using StreamWriter sw = new(target);
             sw.WriteLine(stringData);
+            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
+        }
+        public static void SaveControlsINISettingsFile(string filename, string data)
+        {
+            string target = Path.Combine(ArtemisManager.ControlsINIFolder, filename);
+            if (File.Exists(target))
+            {
+                File.Delete(target);
+            }
+            using StreamWriter sw = new(target);
+            sw.WriteLine(data);
+            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+        }
+        public static void SaveDMXCommandsSettingsFile(string filename, string data)
+        {
+            string target = Path.Combine(ArtemisManager.DMXCommands, filename);
+            if (File.Exists(target))
+            {
+                File.Delete(target);
+            }
+            using StreamWriter sw = new(target);
+            sw.WriteLine(data);
+            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
         }
         public static bool DoChangePassword(string? password)
         {

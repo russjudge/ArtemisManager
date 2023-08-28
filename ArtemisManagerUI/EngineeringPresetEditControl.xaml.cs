@@ -316,73 +316,20 @@ namespace ArtemisManagerUI
         {
             if (d is EngineeringPresetEditControl me)
             {
-                if (me.SelectedPresetFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.Name)
-                    && System.IO.File.Exists(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension)))
+                if (me.SelectedPresetFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.Name))
                 {
-                    bool IsOkay = true;
-
-                    if (me.SelectedPresetFile != null && me.SelectedPresetFile.INIFile != null && me.SelectedPresetFile.INIFile.HasChanges())
+                    if (me.IsRemote)
                     {
-                        switch (System.Windows.MessageBox.Show("Save changes to current Presets File?", "Presets File changed", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
+                        if (me.TargetClient != null)
                         {
-                            case MessageBoxResult.Yes:
-                                if (me.IsRemote)
-                                {
-                                    if (me.TargetClient != null)
-                                    {
-                                        Network.Current?.SendArtemisAction(me.TargetClient, AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets, Guid.Empty, me.SelectedPresetFile.INIFile.GetSerializedString());
-                                    }
-                                }
-                                else
-                                {
-                                    me.SelectedPresetFile.INIFile.Save();
-                                }
-                                IsOkay = true;
-                                break;
-                            case MessageBoxResult.No:
-                                IsOkay = true;
-                                break;
-                            case MessageBoxResult.Cancel:
-                                IsOkay = false;
-                                break;
-                        }
-                    }
-                    if (IsOkay)
-                    {
-                        //Load new file
-                        //me.SelectedPresetFile = new EngineeringPresetFileListItem()
-                        if (me.SelectedPresetFile != null)
-                        {
-                            if (me.IsRemote)
-                            {
-                                if (me.TargetClient != null)
-                                {
-                                    Network.Current?.SendRequestInformation(me.TargetClient,
-                                        RequestInformationType.SpecificEngineeringPreset,
-                                        me.SelectedPresetFile.Name);
-                                }
-                            }
-                            else
-                            {
-                                me.SelectedPresetFile.INIFile = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension));
-                            }
+                            Network.Current?.SendRequestInformation(me.TargetClient,
+                                RequestInformationType.SpecificEngineeringPreset,
+                                me.SelectedPresetFile.Name);
                         }
                     }
                     else
                     {
-                        //TODO: cancel change of selected preset file.
-                        //if (me.SelectedPresetFile != null && me.SelectedPresetFile.INIFile != null && !string.IsNullOrEmpty(me.SelectedPresetFile.INIFile.SaveFile))
-                        //{
-                        //    if (me.IsRemote)
-                        //    {
-                               
-                        //    }
-                        //    else
-                        //    {
-                        //        var fle = new System.IO.FileInfo(me.SelectedPresetFile.INIFile.SaveFile);
-                        //        me.SelectedPresetFile = new(fle.Name.Substring(0, fle.Name.Length - 4));
-                        //    }
-                        //}
+                        me.SelectedPresetFile.INIFile = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension));
                     }
                 }
             }
@@ -697,6 +644,7 @@ namespace ArtemisManagerUI
 
         private void OnSelectedFilenameTextChanged(object sender, RoutedEventArgs e)
         {
+            
             if (sender is TextBlockEditControl me)
             {
                 if (me.Tag is FileListItem selectedFile)

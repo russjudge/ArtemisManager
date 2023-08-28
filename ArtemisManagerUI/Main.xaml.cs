@@ -1,5 +1,6 @@
 ﻿using AMCommunicator;
 using ArtemisManagerAction;
+using ArtemisManagerAction.ArtemisEngineeringPresets;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -759,6 +760,7 @@ namespace ArtemisManagerUI
             MyNetwork.PackageFileReceived += MyNetwork_PackageFileReceived;
             MyNetwork.InfoRequestReceived += MyNetwork_InfoRequestReceived;
             TakeArtemisAction.CommunicationMessageReceived += TakeArtemisAction_CommunicationMessageReceived;
+            ArtemisManager.ActivatePopupMessage += TakeArtemisAction_CommunicationMessageReceived;
         }
 
         private void TakeArtemisAction_CommunicationMessageReceived(object? sender, CommunicationMessageEventArgs e)
@@ -796,19 +798,22 @@ namespace ArtemisManagerUI
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetEngineeringPresetFiles());
                         break;
                     case RequestInformationType.SpecificEngineeringPreset:
-                        //TODO: return specific engineerign preset
+                        data = ArtemisManager.GetEngineeringPresetData(e.Identifier);
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
                         break;
                     case RequestInformationType.ListOfDMXCommandfiles:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetDMXCommandsFileList());
                         break;
                     case RequestInformationType.SpecificDMXCommandFile:
-                        //TODO: RETURN DMX file
+                        data = ArtemisManager.GetDMXCommandsData(e.Identifier);
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
                         break;
                     case RequestInformationType.ListOfControLINIFiles:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetControlsINIFileList());
                         break;
                     case RequestInformationType.SpecificControlINIFile:
-                        //TODO: RETURN controls.ini file.
+                        data = ArtemisManager.GetControlsINIData(e.Identifier);
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
                         break;
                     case RequestInformationType.ListOfScreenResolutions:
                         List<string> items = new();
@@ -831,6 +836,12 @@ namespace ArtemisManagerUI
                     break;
                 case AMCommunicator.Messages.SendableStringPackageFile.ArtemisINI:
                     TakeAction.SaveArtemisINISettingsFile(e.Filename, e.SerializedString);
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                    TakeAction.SaveControlsINISettingsFile(e.Filename, e.SerializedString);
+                    break;
+                case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                    TakeAction.SaveDMXCommandsSettingsFile(e.Filename, e.SerializedString);
                     break;
             }
         }

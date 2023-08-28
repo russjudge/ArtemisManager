@@ -128,31 +128,42 @@ namespace ArtemisManagerAction
                         if (WasProcessed)
                         {
                             CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Artemis INI " + modJSON + " Deleted"));
-                            
+                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
                         }
-                        else
-                        {
-                            //string tar = ArtemisManager.ResolveFilename(ArtemisManager.ArtemisINIFolder, modJSON, ArtemisManager.INIFileExtension);
-                            //CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Request to delete Artemis INI Failed: file=" +tar));
-                        }
+                       
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteControlsINI:
                     if (!string.IsNullOrEmpty(modJSON))
                     {
                         WasProcessed = ArtemisManager.DeleteOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, modJSON);
+                        if (WasProcessed)
+                        {
+                            CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Controls INI " + modJSON + " Deleted"));
+                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                        }
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteDMXCommands:
                     if (!string.IsNullOrEmpty(modJSON))
                     {
                         WasProcessed = ArtemisManager.DeleteOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML, modJSON);
+                        if (WasProcessed)
+                        {
+                            CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "DMX Commands " + modJSON + " Deleted"));
+                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                        }
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteEngineeringPresetsFile:
                     if (!string.IsNullOrEmpty(modJSON))
                     {
                         WasProcessed = ArtemisManager.DeleteEngineeringPresetsFile(modJSON);
+                        if (WasProcessed)
+                        {
+                            CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Engineering Presets " + modJSON + " Deleted"));
+                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+                        }
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallMission:
@@ -168,21 +179,30 @@ namespace ArtemisManagerAction
                         }
                         ini.Save();
 
+                        Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
+
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallEngineeringPresets:
                     if (!string.IsNullOrEmpty(modJSON))
                     {
-                        PresetsFile ini = new();
-                        /*
-                        ini.Deserialize(modJSON);
-                        ini.Save();
-                        */
+                        PresetsFile? ini = JsonSerializer.Deserialize<PresetsFile>(modJSON);
+                        if (ini != null)
+                        {
+                            if (string.IsNullOrEmpty(modJSON)  && ! string.IsNullOrEmpty(saveName))
+                            {
+                                ini.SaveFile = saveName;
+                            }
+                            ini.Save();
+                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+                        }
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallControlsINI:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
                     break;
                 case AMCommunicator.Messages.ArtemisActions.InstallDMXCommands:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
                     break;
                 case AMCommunicator.Messages.ArtemisActions.RenameArtemisINIFile:
                     if (!string.IsNullOrEmpty(modJSON))
@@ -191,6 +211,10 @@ namespace ArtemisManagerAction
                         if (names.Length > 1)
                         {
                             WasProcessed = ArtemisManager.RenameArtemisINIFile(names[0], names[1]);
+                            if (WasProcessed)
+                            {
+                                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
+                            }
                         }
                     }
                     break;
@@ -201,6 +225,10 @@ namespace ArtemisManagerAction
                         if (names.Length > 1)
                         {
                             WasProcessed = ArtemisManager.RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, names[0], names[1]);
+                            if (WasProcessed)
+                            {
+                                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                            }
                         }
                     }
                     break;
@@ -211,6 +239,10 @@ namespace ArtemisManagerAction
                         if (names.Length > 1)
                         {
                             WasProcessed = ArtemisManager.RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML, names[0], names[1]);
+                            if (WasProcessed)
+                            {
+                                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                            }
                         }
                     }
                     break;
@@ -221,6 +253,10 @@ namespace ArtemisManagerAction
                         if (names.Length > 1)
                         {
                             WasProcessed = ArtemisManager.RenameEngineeringPresetsFile(names[0], names[1]);
+                            if (WasProcessed)
+                            {
+                                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+                            }
                         }
                     }
                     break;

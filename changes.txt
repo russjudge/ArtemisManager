@@ -9,20 +9,6 @@ Verify all PC Info settigns
 		local
 		remote
 
-Artemis INI--
-	Local to remote update:
-		- new/imported local
-		- renamed local
-		- saved local
-		- deleted local
-	new remote
-	Rename remote
-		- rename to existing filename
-	save remote
-	Delete remote
-	Activate remote
-	Restore to default local
-	Restore to default remote
 
 Engineering presets--
 	Need to confirm activated location is correct.
