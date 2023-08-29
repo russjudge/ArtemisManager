@@ -88,6 +88,13 @@
                     HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportPresets" ToolTip="Import Engineering Presets file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
+                <Button
+                    ToolTip="Test" Click="OnTest">
+                    <StackPanel>
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/worksonmymachine.png" />
+                        <!--<TextBlock Text="Save" />-->
+                    </StackPanel>
+                </Button>
             </StackPanel>
             <!--<local:StringPackageSenderControl
                 FileRequest="OnSendFileRequest"
@@ -100,14 +107,12 @@
            
             <ListBox
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                Grid.IsSharedSizeScope="True"
                 SelectionMode="Single"
-                ItemsSource="{Binding ElementName=uc, Path=PresetFiles}"
+                ItemsSource="{Binding ElementName=uc, Path=PresetFiles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 SelectedItem="{Binding ElementName=uc, Path=SelectedPresetFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 Width="200">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-
                         <StackPanel>
                             <StackPanel.ContextMenu>
                                 <ContextMenu>

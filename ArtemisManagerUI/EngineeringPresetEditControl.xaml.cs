@@ -19,11 +19,8 @@ namespace ArtemisManagerUI
     {
         public EngineeringPresetEditControl()
         {
+            //
             PresetFiles = new ObservableCollection<EngineeringPresetFileListItem>();
-            foreach (var name in ArtemisManagerAction.ArtemisManager.GetEngineeringPresetFiles())
-            {
-                PresetFiles.Add(new EngineeringPresetFileListItem(name.Substring(0, name.Length - 4)));
-            }
             InitializeComponent();
             ModManager.CreateFolder(ArtemisManager.EngineeringPresetsFolder);
             Initialize();
@@ -60,6 +57,7 @@ namespace ArtemisManagerUI
                     watcher.Dispose();
                     watcher = null;
                 }
+                ProcessListOfINIFiles(ArtemisManager.GetEngineeringPresetFiles());
                 watcher = new FileSystemWatcher(ArtemisManager.EngineeringPresetsFolder);
                 watcher.Created += Watcher_Created;
                 watcher.Deleted += Watcher_Deleted;
@@ -293,7 +291,8 @@ namespace ArtemisManagerUI
 
 
         public static readonly DependencyProperty PresetFilesProperty =
-          DependencyProperty.Register(nameof(PresetFiles), typeof(ObservableCollection<EngineeringPresetFileListItem>),
+          DependencyProperty.Register(nameof(PresetFiles), 
+              typeof(ObservableCollection<EngineeringPresetFileListItem>),
           typeof(EngineeringPresetEditControl));
 
         public ObservableCollection<EngineeringPresetFileListItem> PresetFiles
@@ -329,7 +328,7 @@ namespace ArtemisManagerUI
                     }
                     else
                     {
-                        me.SelectedPresetFile.INIFile = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension));
+                        me.SelectedPresetFile.SettingsFile = new PresetsFile(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, me.SelectedPresetFile.Name + ArtemisManager.DATFileExtension));
                     }
                 }
             }
@@ -374,6 +373,7 @@ namespace ArtemisManagerUI
             {
                 SaveFile = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, newFile + ArtemisManager.DATFileExtension)
             };
+            f.Initialize();
             if (IsRemote)
             {
                 if (TargetClient != null)
@@ -689,6 +689,11 @@ namespace ArtemisManagerUI
                     }
                 }
             }
+        }
+
+        private void OnTest(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

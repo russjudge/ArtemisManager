@@ -45,15 +45,9 @@ namespace ArtemisManagerUI
         }
         public static readonly DependencyProperty IsRemoteProperty =
           DependencyProperty.Register(nameof(IsRemote), typeof(bool),
-          typeof(PresetSettingsControl), new PropertyMetadata(OnIsRemoteChanged));
+          typeof(PresetSettingsControl));
 
-        private static void OnIsRemoteChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is EngineeringPresetEditControl me)
-            {
-                //me.Initialize();
-            }
-        }
+      
 
         public bool IsRemote
         {
@@ -108,7 +102,7 @@ namespace ArtemisManagerUI
         {
             if (d is PresetSettingsControl me)
             {
-                if (me.File?.Presets.Length > 0)
+                if (me.File?.Presets.Count > 0)
                 {
                     me.SelectedIItem = me.File.Presets[0];
                 }

@@ -52,14 +52,14 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
 
                 SystemLevels[i] = s;
             }
-            if (!isForOriginal)
-            {
-                Original = new Preset(true);
-            }
-            else
-            {
-                Original = null;
-            }
+            //if (!isForOriginal)
+            //{
+            //    Original = new Preset(true);
+            //}
+            //else
+            //{
+            //    Original = null;
+            //}
 
         }
 
@@ -89,41 +89,41 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
 
         void SetOriginal()
         {
-            Original = new Preset(true);
-            for (int i = 0; i < 8; i++)
-            {
-                Original.SystemLevels[i].EnergyLevel = this.SystemLevels[i].EnergyLevel;
-                Original.SystemLevels[i].CoolantLevel = this.SystemLevels[i].CoolantLevel;
-            }
+            //Original = new Preset(true);
+            //for (int i = 0; i < 8; i++)
+            //{
+            //    Original.SystemLevels[i].EnergyLevel = this.SystemLevels[i].EnergyLevel;
+            //    Original.SystemLevels[i].CoolantLevel = this.SystemLevels[i].CoolantLevel;
+            //}
         }
         public void AcceptChanges()
         {
             Changed = false;
             SetOriginal();
         }
-        public void RejectChanges()
-        {
-            if (Original == null)
-            {
-                for (int i = 0; i < MaxStations; i++)
-                {
-                    this.SystemLevels[i].EnergyLevel = 0;
-                    this.SystemLevels[i].CoolantLevel = 0;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < MaxStations; i++)
-                {
-                    this.SystemLevels[i].EnergyLevel = Original.SystemLevels[i].EnergyLevel;
-                    this.SystemLevels[i].CoolantLevel = Original.SystemLevels[i].CoolantLevel;
-                }
-            }
-            Changed = false;
-        }
+        //public void RejectChanges()
+        //{
+        //    if (Original == null)
+        //    {
+        //        for (int i = 0; i < MaxStations; i++)
+        //        {
+        //            this.SystemLevels[i].EnergyLevel = 0;
+        //            this.SystemLevels[i].CoolantLevel = 0;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        for (int i = 0; i < MaxStations; i++)
+        //        {
+        //            this.SystemLevels[i].EnergyLevel = Original.SystemLevels[i].EnergyLevel;
+        //            this.SystemLevels[i].CoolantLevel = Original.SystemLevels[i].CoolantLevel;
+        //        }
+        //    }
+        //    Changed = false;
+        //}
 
 
-        public Preset? Original { get; private set; } = null;
+        //public Preset? Original { get; private set; } = null;
 
         int _index = 0;
 
@@ -155,7 +155,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             }
         }
 
-        public SystemLevel[] SystemLevels { get; private set; } = new SystemLevel[MaxStations];
+        public SystemLevel[] SystemLevels { get;  set; } = new SystemLevel[MaxStations];
         int _totalCoolant = 0;
 
         public int TotalCoolantLevel

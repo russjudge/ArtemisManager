@@ -210,6 +210,7 @@ namespace ArtemisManagerUI
             {
                 SaveFile = System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, newFile + ArtemisManager.DATFileExtension)
             };
+            f.Initialize();
             f.Save();
         }
 

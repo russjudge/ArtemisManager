@@ -2,29 +2,36 @@
 using AMCommunicator.Messages;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ArtemisManagerAction.ArtemisEngineeringPresets
 {
+    [JsonSerializable(typeof(PresetsFile))]
     public class PresetsFile : INotifyPropertyChanged, ISendableStringFile
     {
         public const int MaxPresets = 10;
         public const byte HeaderByte = 0xfe;
         public PresetsFile()
         {
-            Presets = new Preset[MaxPresets];
+            
+        }
+        public void Initialize()
+        {
             for (int i = 0; i < MaxPresets; i++)
             {
-                Presets[i] = new Preset();
+                Presets.Add(new Preset());
                 Presets[i].Index = i + 1;
             }
         }
+
         public PresetsFile(string file)
         {
             LoadPresets(file);
@@ -54,6 +61,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
         }
         private void LoadPresets(string file)
         {
+            Presets.Clear();
             List<Preset> workPresets = new();
             if (File.Exists(file))
             {
@@ -97,10 +105,10 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
                     workPresets.Add(p);
                 }
             }
-            Presets = new Preset[MaxPresets];
+            
             for (int i = 0; i < MaxPresets; i++)
             {
-                Presets[i] = workPresets[i];
+                Presets.Add(workPresets[i]);
             }
             SaveFile = file;
         }
@@ -119,7 +127,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             }
             else
             {
-                if (Presets == null || Presets.Length != MaxPresets)
+                if (Presets == null || Presets.Count != MaxPresets)
                 {
                     throw new InvalidPresetFileException("There must be EXACTLY 10 presets");
                 }
@@ -150,8 +158,9 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
        
 
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        public Preset[] Presets { get; set; } = new Preset[MaxPresets];
+        
+        [JsonInclude()]
+        public ObservableCollection<Preset> Presets { get; set; } = new ObservableCollection<Preset>();
 
         protected void DoChanged([CallerMemberName] string property = "")
         {
