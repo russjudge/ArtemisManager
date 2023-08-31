@@ -681,7 +681,7 @@ oLink.Save
         }
         public static void SaveDMXCommandsSettingsFile(string filename, string data)
         {
-            string target = Path.Combine(ArtemisManager.DMXCommands, filename);
+            string target = Path.Combine(ArtemisManager.DMXCommandsFolder, filename);
             if (File.Exists(target))
             {
                 File.Delete(target);

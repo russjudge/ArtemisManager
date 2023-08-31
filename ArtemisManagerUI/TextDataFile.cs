@@ -17,7 +17,15 @@ namespace ArtemisManagerUI
         {
             FileType = fileType;
             Name = name;
-            OriginalName = name;
+            if (Name.Contains('/') || Name.Contains('\\'))
+            {
+                Name = new System.IO.FileInfo(Name).Name;
+            }
+            if (Name.Contains('.'))
+            {
+                Name = Name.Substring(0, Name.Length - 4);
+            }
+            OriginalName = Name;
             SaveFile = saveFile;
         }
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -64,7 +72,7 @@ namespace ArtemisManagerUI
                 DoChanged();
             }
         }
-        public string data = string.Empty;
+        private string data = string.Empty;
         public string Data
         {
             get
@@ -78,7 +86,7 @@ namespace ArtemisManagerUI
                 DoChanged();
             }
         }
-        public string name = string.Empty;
+        private string name = string.Empty;
         public string Name
         {
             get
@@ -92,7 +100,7 @@ namespace ArtemisManagerUI
                 DoChanged();
             }
         }
-        public string originalname = string.Empty;
+        private string originalname = string.Empty;
         public string OriginalName
         {
             get

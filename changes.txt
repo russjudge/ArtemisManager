@@ -13,36 +13,6 @@ Verify all PC Info settigns
 Engineering presets--
 	Need to confirm activated location is correct.
 
-	
-
-controls ini--
-	verify correct location for activation file.
-	Local to remote update:
-		- new/imported local
-		- renamed local
-		- saved local
-		- deleted local
-	new remote
-	Rename remote
-		- rename to existing filename
-	save remote
-	Delete remote
-	Activate remote
-	Restore to default remote
-
-DMX Commands--
-	Local to remote update:
-		- new/imported local
-		- renamed local
-		- saved local
-		- deleted local
-	new remote
-	Rename remote
-		- rename to existing filename
-	save remote
-	Delete remote
-	Activate remote
-	Restore to default remote
 
 Mod -
 	Install local
@@ -62,7 +32,7 @@ Mission -
 
 Development enhancement TODO: snapshot for mission (similar to mod)
 
-Version 0.4 (beta) 08/xx/2023:
+Version 0.4 (beta) 09/xx/2023:
 Enhancements:
 	- Improved interface for working with remote engineering presets and artemis.ini settings.
 	- Reworked the settings, mods, and missions interface for remote control.

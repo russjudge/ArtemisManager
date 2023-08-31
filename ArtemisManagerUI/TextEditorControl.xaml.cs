@@ -87,16 +87,30 @@ namespace ArtemisManagerUI
         {
             if (TakeAction.IsLoopback(TargetClient))
             {
-                using (StreamWriter sw = new StreamWriter(Data.SaveFile))
+                using (StreamWriter sw = new(Data.SaveFile))
                 {
-                    sw.Write(Data.data);
+                    sw.Write(Data.Data);
                 }
+
+                RequestInformationType tp = RequestInformationType.None;
+                switch (Data.FileType)
+                {
+                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                        tp = RequestInformationType.SpecificDMXCommandFile;
+                        break;
+                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                        tp = RequestInformationType.SpecificControlINIFile;
+                        break;
+                }
+                Network.Current?.SendInformation(IPAddress.Any, tp, Data.Name, new string[] { Data.Data });
+
             }
             else
             {
+
                 if (TargetClient != null)
                 {
-                    Network.Current?.SendStringPackageFile(TargetClient, Data.GetSerializedString(), Data.FileType, Data.SaveFile);
+                    Network.Current?.SendStringPackageFile(TargetClient, Data.Data, Data.FileType, Data.SaveFile);
                 }
             }
             PopupMessage = "File Saved";

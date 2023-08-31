@@ -340,7 +340,7 @@
         <TabControl
             SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}"
             TabStripPlacement="Bottom">
-            <TabItem>
+            <TabItem Visibility="Collapsed">
                 <TabItem.Header>
                     <WrapPanel>
                         <Image Height="16" Source="/ArtemisManagerUI;component/Resources/wrench.png" />
