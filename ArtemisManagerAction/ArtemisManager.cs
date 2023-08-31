@@ -746,6 +746,7 @@ namespace ArtemisManagerAction
             if (System.IO.File.Exists(source))
             {
                 File.Copy(source, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
+                RaiseStatusUpdated(null, "Activated Engineering Presets file");
                 return true;
             }
             else

@@ -70,6 +70,18 @@ namespace ArtemisManagerUI
                 {
                     Network.Current.InfoReceived += OnInfoReceived;
                 }
+                if (TargetClient != null)
+                {
+                    switch (FileType)
+                    {
+                        case SendableStringPackageFile.controlsINI:
+                            Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfControLINIFiles);
+                            break;
+                        case SendableStringPackageFile.DMXCommandsXML:
+                            Network.Current?.SendRequestInformation(TargetClient, RequestInformationType.ListOfDMXCommandfiles);
+                            break;
+                    }
+                }
             }
             else
             {
@@ -111,10 +123,16 @@ namespace ArtemisManagerUI
                             switch (e.RequestType)
                             {
                                 case RequestInformationType.ListOfControLINIFiles:
+                                    ProcessListOfArtemisINIFiles(e.Data);
+                                    Network.Current?.RaiseStatusUpdate("TextFileManagerControl InfoReceive - {0}...", e.RequestType.ToString());
+                                    e.Handled = true;
+                                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                                    break;
                                 case RequestInformationType.ListOfDMXCommandfiles:
                                     ProcessListOfArtemisINIFiles(e.Data);
                                     Network.Current?.RaiseStatusUpdate("TextFileManagerControl InfoReceive - {0}...", e.RequestType.ToString());
                                     e.Handled = true;
+                                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
                                     break;
                                 case RequestInformationType.SpecificControlINIFile:
                                 case RequestInformationType.SpecificDMXCommandFile:
@@ -193,6 +211,16 @@ namespace ArtemisManagerUI
                     }
                 }
             });
+            switch (FileType)
+            {
+                case SendableStringPackageFile.controlsINI:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                    break;
+                case SendableStringPackageFile.DMXCommandsXML:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                    break;
+            }
+            
         }
 
         private void Fsw_Deleted(object sender, FileSystemEventArgs e)
@@ -213,6 +241,15 @@ namespace ArtemisManagerUI
                     DataFileList.Remove(remover);
                 }
             });
+            switch (FileType)
+            {
+                case SendableStringPackageFile.controlsINI:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                    break;
+                case SendableStringPackageFile.DMXCommandsXML:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                    break;
+            }
         }
         private string GetNewFilename(string baseName)
         {
@@ -249,10 +286,10 @@ namespace ArtemisManagerUI
                     switch (FileType)
                     {
                         case SendableStringPackageFile.controlsINI:
-                            Network.Current?.SendStringPackageFile(TargetClient, Properties.Resources.controls, FileType, GetNewFilename(FileType.ToString()));
+                            Network.Current?.SendStringPackageFile(TargetClient, Properties.Resources.controls, FileType, GetNewFilename(FileType.ToString()) + ArtemisManager.INIFileExtension);
                             break;
                         case SendableStringPackageFile.DMXCommandsXML:
-                            Network.Current?.SendStringPackageFile(TargetClient, Properties.Resources.DMXcommands, FileType, GetNewFilename(FileType.ToString()));
+                            Network.Current?.SendStringPackageFile(TargetClient, Properties.Resources.DMXcommands, FileType, GetNewFilename(FileType.ToString()) + ArtemisManager.XMLFileExtension);
                             break;
                     }
                     
@@ -323,6 +360,16 @@ namespace ArtemisManagerUI
                     DataFileList.Add(txt);
                 }
             });
+            switch (FileType)
+            {
+                case SendableStringPackageFile.controlsINI:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
+                    break;
+                case SendableStringPackageFile.DMXCommandsXML:
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
+                    break;
+            }
+
         }
 
         private void Fsw_Changed(object sender, FileSystemEventArgs e)

@@ -134,18 +134,13 @@ namespace ArtemisManagerUI
                 Dispatcher.Invoke(() =>
                 {
                     string match = e.Name.Substring(0, e.Name.Length - 4);
-                    EngineeringPresetFileListItem? remover = null;
                     foreach (var item in PresetFiles)
                     {
                         if (item.Name == match)
                         {
-                            remover = item;
+                            item.SettingsFile = new PresetsFile(e.FullPath);
                             break;
                         }
-                    }
-                    if (remover != null)
-                    {
-                        remover.INIFile = new(e.FullPath);
                     }
                 });
             }
@@ -153,26 +148,32 @@ namespace ArtemisManagerUI
 
         private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Name) && e.Name.EndsWith(ArtemisManager.DATFileExtension))
+            if (!string.IsNullOrEmpty(e.Name) 
+                && !string.IsNullOrEmpty(e.OldName)
+                && e.Name.EndsWith(ArtemisManager.DATFileExtension))
             {
                 Dispatcher.Invoke(() =>
                 {
-                    string match = e.Name.Substring(0, e.Name.Length - 4);
-                    EngineeringPresetFileListItem? remover = null;
+                    string match = e.OldName.Substring(0, e.OldName.Length - 4);
                     foreach (var item in PresetFiles)
                     {
                         if (item.Name == match)
                         {
-                            remover = item;
+                            if (item.SettingsFile != null)
+                            {
+                                item.SettingsFile.SaveFile = e.FullPath;
+                            }
+                            item.Name = e.Name.Substring(0,e.Name.Length - 4);
+                            item.OriginalName = item.Name;
+                            
                             break;
                         }
                     }
-                    if (remover != null && remover.SettingsFile != null)
-                    {
-                        remover.SettingsFile.SaveFile = e.FullPath;
-                        
-                    }
                 });
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+                }
             }
         }
 
@@ -242,6 +243,10 @@ namespace ArtemisManagerUI
                         PresetFiles.Remove(remover);
                     }
                 });
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+                }
             }
         }
 
@@ -284,6 +289,10 @@ namespace ArtemisManagerUI
                     }
                     
                 });
+                if (TargetClient != null)
+                {
+                    Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
+                }
             }
         }
 
@@ -434,20 +443,26 @@ namespace ArtemisManagerUI
 
         private void OnActivate(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is PresetsFile presetsFile && !string.IsNullOrEmpty(presetsFile?.SaveFile) && System.IO.File.Exists(presetsFile?.SaveFile))
+            if (e.OriginalSource is PresetsFile presetsFile && !string.IsNullOrEmpty(presetsFile?.SaveFile))
             {
                 if (IsRemote)
                 {
                     if (TargetClient != null)
                     {
                         Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateEngineeringPresetsFile, Guid.Empty, new FileInfo(presetsFile.SaveFile).Name);
+                        PopupMessage = "Engineering Presets file activated.";
                     }
                 }
                 else
                 {
-                    ArtemisManager.ActivateEngineeringPresetFile(presetsFile.SaveFile);
+                    if (System.IO.File.Exists(presetsFile?.SaveFile))
+                    {
+                        ArtemisManager.ActivateEngineeringPresetFile(presetsFile.SaveFile);
+                        
+                    }
                     //File.Copy(presetsFile.SaveFile, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
                 }
+                
             }
         }
 

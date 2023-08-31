@@ -140,7 +140,6 @@ namespace ArtemisManagerAction
                         if (WasProcessed)
                         {
                             CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Controls INI " + modJSON + " Deleted"));
-                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
                         }
                     }
                     break;
@@ -151,7 +150,6 @@ namespace ArtemisManagerAction
                         if (WasProcessed)
                         {
                             CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "DMX Commands " + modJSON + " Deleted"));
-                            Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfDMXCommandfiles, string.Empty, ArtemisManager.GetDMXCommandsFileList());
                         }
                     }
                     break;
@@ -225,10 +223,6 @@ namespace ArtemisManagerAction
                         if (names.Length > 1)
                         {
                             WasProcessed = ArtemisManager.RenameOtherSettingsFile(AMCommunicator.Messages.SendableStringPackageFile.controlsINI, names[0], names[1]);
-                            if (WasProcessed)
-                            {
-                                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfControLINIFiles, string.Empty, ArtemisManager.GetControlsINIFileList());
-                            }
                         }
                     }
                     break;
@@ -253,10 +247,6 @@ namespace ArtemisManagerAction
                         if (names.Length > 1)
                         {
                             WasProcessed = ArtemisManager.RenameEngineeringPresetsFile(names[0], names[1]);
-                            if (WasProcessed)
-                            {
-                                Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
-                            }
                         }
                     }
                     break;
