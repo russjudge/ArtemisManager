@@ -161,8 +161,12 @@ namespace ArtemisManagerUI
         {
             if (!hasLoaded)
             {
-                SelectedTargetPC = ConnectedPCs[TakeAction.AllConnectionsElement];
-                hasLoaded = true;
+                try
+                {
+                    SelectedTargetPC = ConnectedPCs[TakeAction.AllConnectionsElement];
+                    hasLoaded = true;
+                }
+                catch { }
             }
         }
     }

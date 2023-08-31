@@ -160,7 +160,7 @@
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+        <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" Loaded="AMPopup_Loaded" />
         <DockPanel DockPanel.Dock="Top">
             <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
@@ -488,8 +488,6 @@
                         <TextBlock Text="PC Actions &amp; Settings" />
                     </WrapPanel>
                 </TabItem.Header>
-                <local:PCInfoTabControl
-                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=TwoWay}"/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -601,6 +599,8 @@
                     VerticalAlignment="Top"
                     local:ListBoxBehavior.AutoScroll="True" />
             </TabItem>
+            <local:PCInfoTabControl
+                    IsMaster="{Binding IsMaster, ElementName=uc, Mode=TwoWay}" Height="524" Width="819"/>
         </TabControl>
     </DockPanel>
 </Window>

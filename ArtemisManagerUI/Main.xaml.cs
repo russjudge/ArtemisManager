@@ -1879,5 +1879,10 @@ namespace ArtemisManagerUI
                 }
             }
         }
+
+        private void AMPopup_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
