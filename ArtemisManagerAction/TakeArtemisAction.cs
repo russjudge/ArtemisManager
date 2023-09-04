@@ -13,7 +13,7 @@ namespace ArtemisManagerAction
     {
         public static event EventHandler<CommunicationMessageEventArgs>? CommunicationMessageReceived;
         public static ModItem? StagedModItemToActivateOnceInstalled { get; set; } = null;
-       
+
         public static Tuple<bool, ModItem?> ProcessArtemisAction(IPAddress? target, AMCommunicator.Messages.ArtemisActions action, string? modJSON, string? saveName = null)
         {
             bool WasProcessed = false;
@@ -89,6 +89,7 @@ namespace ArtemisManagerAction
                                 {
                                     receivedMod.Activate();
                                     mod = receivedMod;
+                                    
                                     WasProcessed = true;
                                 }
                             }
@@ -130,7 +131,7 @@ namespace ArtemisManagerAction
                             CommunicationMessageReceived?.Invoke(null, new CommunicationMessageEventArgs(null, "Artemis INI " + modJSON + " Deleted"));
                             Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfArtemisINIFiles, string.Empty, ArtemisManager.GetArtemisINIFileList());
                         }
-                       
+
                     }
                     break;
                 case AMCommunicator.Messages.ArtemisActions.DeleteControlsINI:
@@ -187,7 +188,7 @@ namespace ArtemisManagerAction
                         PresetsFile? ini = JsonSerializer.Deserialize<PresetsFile>(modJSON);
                         if (ini != null)
                         {
-                            if (string.IsNullOrEmpty(modJSON)  && ! string.IsNullOrEmpty(saveName))
+                            if (string.IsNullOrEmpty(modJSON) && !string.IsNullOrEmpty(saveName))
                             {
                                 ini.SaveFile = saveName;
                             }
@@ -271,9 +272,11 @@ namespace ArtemisManagerAction
                 case AMCommunicator.Messages.ArtemisActions.RestoreEngineeringPresetsToDefault:
                     WasProcessed = ArtemisManager.RestoreEngineeringPresetsToDefault();
                     break;
+               
             }
-            return new Tuple<bool, ModItem?> (WasProcessed, mod);
+            return new Tuple<bool, ModItem?>(WasProcessed, mod);
         }
+      
 
         private static bool RequestInstallMod(ModItem receivedMod, IPAddress? target)
         {
@@ -303,6 +306,6 @@ namespace ArtemisManagerAction
             }
             return ActionCompleted;
         }
-        
+
     }
 }

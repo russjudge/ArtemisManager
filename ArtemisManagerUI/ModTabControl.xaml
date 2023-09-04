@@ -10,21 +10,8 @@
         <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
         <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <Style TargetType="ListBox">
-            <Style.Triggers>
-                <DataTrigger
-                    Binding="{Binding ElementName=uc, Path=ShowMods}"
-                    Value="True">
-                    <Setter Property="ItemsSource" Value="{Binding ElementName=uc, Path=SelectedTargetPC.InstalledMods}" />
-                </DataTrigger>
-                <DataTrigger
-                    Binding="{Binding ElementName=uc, Path=ShowMods}"
-                    Value="False">
-                    <Setter Property="ItemsSource" Value="{Binding ElementName=uc, Path=SelectedTargetPC.InstalledMissions}" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
     </UserControl.Resources>
+    
     <TabControl
         Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}"
         SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
@@ -32,8 +19,8 @@
         <TabControl.ItemContainerStyle>
             <Style TargetType="TabItem">
                 <Setter
-                        Property="Visibility"
-                        Value="{Binding IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}" />
+                    Property="Visibility"
+                    Value="{Binding IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}" />
             </Style>
         </TabControl.ItemContainerStyle>
         <TabControl.ItemTemplate>
@@ -45,7 +32,7 @@
             <DataTemplate>
                 <GroupBox>
                     <GroupBox.Header>
-                        <StackPanel>
+                        <StackPanel Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
                             <TextBlock
                                 Text="Mods"
                                 Visibility="{Binding ElementName=uc, Path=ShowMods, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" />
@@ -70,19 +57,12 @@
                             </Button>
 
                         </StackPanel>
-                <ListBox
-                    SelectedItem="{Binding ElementName=uc, Path=SelectedMod, Mode=TwoWay}"
-                    Tag="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay}" >
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <local:ModItemControl
-                                IsRemote="{Binding SelectedTargetPC.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
-                                Source="{Binding Mode=OneWay, Path=(TabControl.SelectedItem), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
-                                IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
-                                Mod="{Binding}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+
+                        <local:ModManagerControl
+                            ShowMods="{Binding ElementName=uc, Path=ShowMods}"
+                            SelectedTargetPC="{Binding ElementName=uc, Path=SelectedTargetPC}"
+                            IsMaster="{Binding ElementName=uc, Path=IsMaster}"
+                            />
                     </DockPanel>
                 </GroupBox>
             </DataTemplate>

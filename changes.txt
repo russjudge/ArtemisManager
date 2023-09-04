@@ -1,32 +1,21 @@
 Change History
 ===============================
 TODO Tests:
-Verify all PC Info settigns
-	- manager in startup folder
-		local
-		remote
-	- is main screen artemis server (test with Artemis SBS installed--might not be able to write to registry???)
-		local
-		remote
 
+Artemis INI -
+	Remote copy from local
 
-Engineering presets--
-	Need to confirm activated location is correct.
+Engineering presets -
+	Remote copy from local
 
+Controls.ini -
+	Remote copy from local
 
 Mod -
-	Install local
-	Install remote
-	Activate local
-	Activate remote
-	Uninstall local
-	uninstall remote
+	Remote Install
 
 Mission - 
-	Install local
-	Install remote
-	Activate local
-	Activate remote
+	Remote Install
 	Uninstall local
 	uninstall remote
 

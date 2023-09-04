@@ -10,98 +10,52 @@
     <UserControl.Resources>
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
     </UserControl.Resources>
-    
+
     <GroupBox
         
         VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" >
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
-            <StackPanel
+                <StackPanel
                 Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 Orientation="Horizontal">
-                    <!--<AdornerDecorator
-                        Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                        
-                    
-                <Button
-                    Click="OnRemoteInstallMod"
-                    Margin="0,2,10,2"
-                    ToolTip="Install mod on currently selected remote Peer."
-                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/remote.png" />
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
-                    </StackPanel>
-                </Button>
-                    </AdornerDecorator>-->
                     <Button
-                    Click="OnActivateMod"
-                    ToolTip="Activate mod."
-                    Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                    <StackPanel Orientation="Horizontal">
-                        <!--<Image
-                            Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                            Height="24" Source="/ArtemisManagerUI;component/Resources/remote.png" />-->
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/activate.png" />
-                    </StackPanel>
-                </Button>
+                        Click="OnActivateMod"
+                        ToolTip="Activate mod."
+                        Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                        </StackPanel>
+                    </Button>
                     <StackPanel
                         Orientation="Horizontal"
                         Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
-                        <AdornerDecorator
-                            Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-
                         <AdornerDecorator
                             Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
                             <Button
                                 Click="OnUninstallMod"
                                 ToolTip="Uninstall mod."
-                                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+                                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
                                 <StackPanel Orientation="Horizontal">
                                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
                                 </StackPanel>
                             </Button>
                         </AdornerDecorator>
-                        </AdornerDecorator>
-                        <AdornerDecorator
-                            Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                        <AdornerDecorator
-                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                            <Button
-                    Click="OnUninstallMod"
-                    ToolTip="Uninstall mod."
-                    Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
-                    </StackPanel>
-                </Button>
-                        </AdornerDecorator>
-                        </AdornerDecorator>
                         <Button
-                    Click="OnUninstallMod"
-                    ToolTip="Uninstall mission."
-                    Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
-                    </StackPanel>
-                </Button>
-                        <!--<Button
-                    Click="OnInstallMod"
-                    Margin="30,2,2,2"
-                    ToolTip="Install mod locally from the remote mod on Peer."
-                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
-                        </StackPanel>
-                    </Button>-->
-
+                            Click="OnUninstallMod"
+                            ToolTip="Uninstall mission."
+                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
                 <Label FontWeight="Bold" Content="{Binding Mod.Name, ElementName=uc, Mode=OneWay}" DockPanel.Dock="Top" />
             </StackPanel>
         </GroupBox.Header>
-    
-    <DockPanel VerticalAlignment="Stretch" >
+
+        <DockPanel VerticalAlignment="Stretch" >
             <StackPanel
                 Orientation="Horizontal" DockPanel.Dock="Top"
                 Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" >
@@ -114,7 +68,7 @@
                 Orientation="Horizontal" 
                 Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
                 DockPanel.Dock="Top">
-                
+
                 <Label
                     FontWeight="Bold" Content="Is Active" Foreground="Green" />
                 <Label
@@ -122,7 +76,7 @@
                 <TextBlock VerticalAlignment="Center"
                     Text="{Binding ElementName=uc, Path=Mod.StackOrder}" />
             </StackPanel>
-            
+
             <StackPanel
                 Orientation="Horizontal" DockPanel.Dock="Top"
                 Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
@@ -131,7 +85,7 @@
                 <Label Content="Requires Artemis Version:" FontWeight="Bold" />
                 <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion}" />
             </StackPanel>
-         
+
 
         </DockPanel>
     </GroupBox>

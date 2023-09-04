@@ -80,22 +80,7 @@ namespace ArtemisManagerUI
                 this.SetValue(IsMasterProperty, value);
             }
         }
-        public static readonly DependencyProperty SelectedModProperty =
-           DependencyProperty.Register(nameof(SelectedMod), typeof(ModItem),
-          typeof(ModTabControl));
-
-        public ModItem SelectedMod
-        {
-            get
-            {
-                return (ModItem)this.GetValue(SelectedModProperty);
-
-            }
-            set
-            {
-                this.SetValue(SelectedModProperty, value);
-            }
-        }
+       
 
         public static readonly DependencyProperty ShowModsProperty =
            DependencyProperty.Register(nameof(ShowMods), typeof(bool),
@@ -114,10 +99,7 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnSendFileRequest(object sender, FileRequestRoutedEventArgs e)
-        {
-            e.File = SelectedMod;
-        }
+       
 
         private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
         {
@@ -126,7 +108,27 @@ namespace ArtemisManagerUI
 
         private void OnImport(object sender, RoutedEventArgs e)
         {
-
+            ModInstallWindow win = new()
+            {
+                
+                ForInstall = true
+            };
+            win.Mod.IsMission = !ShowMods;
+            if (win.ShowDialog() == true)
+            {
+                if (win.Mod.IsMission)
+                {
+                    SelectedTargetPC.InstalledMissions.Add(win.Mod);
+                    
+                }
+                else
+                {
+                    SelectedTargetPC.InstalledMods.Add(win.Mod);
+                }
+                TakeAction.SendClientInfo(TakeAction.AllConnections);
+            }
         }
+
+       
     }
 }

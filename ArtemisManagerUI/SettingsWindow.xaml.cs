@@ -25,9 +25,9 @@ namespace ArtemisManagerUI
         {
             SettingsData = SettingsAction.Current;
             InitializeComponent();
-            isLoading = false;
+            //isLoading = false;
         }
-        private bool isLoading = true;
+        //private bool isLoading = true;
 
         public static readonly DependencyProperty PopupMessageProperty =
          DependencyProperty.Register(nameof(PopupMessage), typeof(string),

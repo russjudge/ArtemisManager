@@ -104,7 +104,7 @@ namespace ArtemisManager
                     //}
                 }
 
-                MessageBox.Show(string.Format("FATAL ERROR: --{0}--" +
+               MessageBox.Show(string.Format("FATAL ERROR: --{0}--" +
                         "{1}{1}Loading debugging information.{1}Please cut and paste this information into the \"Contact Us\" form at:{1}https://russjudge/contact{1}{1}" +
                         "We need to exit now....", e.Exception.Message, Environment.NewLine), "FATAL ERROR", MessageBoxButton.OK, MessageBoxImage.Error
                         );

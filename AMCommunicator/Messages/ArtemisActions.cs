@@ -45,6 +45,6 @@ namespace AMCommunicator.Messages
         RestoreArtemisINIToDefault,
         RestoreControlINIToDefault,
         RestoreDMXCommandsToDefault,
-        RestoreEngineeringPresetsToDefault,
+        RestoreEngineeringPresetsToDefault
     }
 }

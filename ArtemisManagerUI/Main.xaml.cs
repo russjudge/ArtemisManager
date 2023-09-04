@@ -49,8 +49,8 @@ namespace ArtemisManagerUI
 
                 IsArtemisRunning = ArtemisManager.IsArtemisRunning();
                 IsUsingThisAppControlledArtemis = ArtemisManager.IsRunningArtemisUnderMyControl();
-                InstalledMods = new(ArtemisManager.GetInstalledMods());
-                InstalledMissions = new(ArtemisManager.GetInstalledMissions());
+                //InstalledMods = new(ArtemisManager.GetInstalledMods());
+                //InstalledMissions = new(ArtemisManager.GetInstalledMissions());
                 AppVersion = TakeAction.GetAppVersion();
 
                 IsMaster = SettingsAction.Current.IsMaster;
@@ -522,41 +522,41 @@ namespace ArtemisManagerUI
             }
         }
 
-        public static readonly DependencyProperty InstalledMissionsProperty =
-           DependencyProperty.Register(nameof(InstalledMissions), typeof(ObservableCollection<ModItem>),
-               typeof(Main));
+        //public static readonly DependencyProperty InstalledMissionsProperty =
+        //   DependencyProperty.Register(nameof(InstalledMissions), typeof(ObservableCollection<ModItem>),
+        //       typeof(Main));
 
-        public ObservableCollection<ModItem> InstalledMissions
-        {
-            get
-            {
-                return (ObservableCollection<ModItem>)this.GetValue(InstalledMissionsProperty);
+        //public ObservableCollection<ModItem> InstalledMissions
+        //{
+        //    get
+        //    {
+        //        return (ObservableCollection<ModItem>)this.GetValue(InstalledMissionsProperty);
 
-            }
-            set
-            {
-                this.SetValue(InstalledMissionsProperty, value);
+        //    }
+        //    set
+        //    {
+        //        this.SetValue(InstalledMissionsProperty, value);
 
-            }
-        }
+        //    }
+        //}
 
-        public static readonly DependencyProperty InstalledModsProperty =
-           DependencyProperty.Register(nameof(InstalledMods), typeof(ObservableCollection<ModItem>),
-               typeof(Main));
+        //public static readonly DependencyProperty InstalledModsProperty =
+        //   DependencyProperty.Register(nameof(InstalledMods), typeof(ObservableCollection<ModItem>),
+        //       typeof(Main));
 
-        public ObservableCollection<ModItem> InstalledMods
-        {
-            get
-            {
-                return (ObservableCollection<ModItem>)this.GetValue(InstalledModsProperty);
+        //public ObservableCollection<ModItem> InstalledMods
+        //{
+        //    get
+        //    {
+        //        return (ObservableCollection<ModItem>)this.GetValue(InstalledModsProperty);
 
-            }
-            set
-            {
-                this.SetValue(InstalledModsProperty, value);
+        //    }
+        //    set
+        //    {
+        //        this.SetValue(InstalledModsProperty, value);
 
-            }
-        }
+        //    }
+        //}
         public static readonly DependencyProperty ConnectedPCsProperty =
            DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
                typeof(Main));
@@ -873,11 +873,11 @@ namespace ArtemisManagerUI
                     {
                         if (item.IsMission)
                         {
-                            InstalledMissions.Add(item);
+                            TakeAction.thisMachine.InstalledMissions.Add(item);
                         }
                         else
                         {
-                            InstalledMods.Add(item);
+                            TakeAction.thisMachine.InstalledMods.Add(item);
                         }
                     }));
 
@@ -925,16 +925,16 @@ namespace ArtemisManagerUI
                         {
                             this.Dispatcher.Invoke(new Action(() =>
                             {
-                                if (wasProcessed.Item2 != null)
+                                TakeAction.thisMachine.InstalledMods.Clear();
+
+                                foreach (var mod in ArtemisManager.GetInstalledMods())
                                 {
-                                    if (wasProcessed.Item2.IsMission)
-                                    {
-                                        InstalledMissions.Add(wasProcessed.Item2);
-                                    }
-                                    else
-                                    {
-                                        InstalledMods.Add(wasProcessed.Item2);
-                                    }
+                                    TakeAction.thisMachine.InstalledMods.Add(mod);
+                                }
+                                TakeAction.thisMachine.InstalledMissions.Clear();
+                                foreach (var mod in ArtemisManager.GetInstalledMissions())
+                                {
+                                    TakeAction.thisMachine.InstalledMissions.Add(mod);
                                 }
                             }));
                         }
@@ -950,18 +950,18 @@ namespace ArtemisManagerUI
                                 {
                                     if (wasProcessed.Item2.IsMission)
                                     {
-                                        this.InstalledMissions.Clear();
+                                        TakeAction.thisMachine.InstalledMissions.Clear();
                                         foreach (var mod in ArtemisManager.GetInstalledMissions())
                                         {
-                                            InstalledMissions.Add(mod);
+                                            TakeAction.thisMachine.InstalledMissions.Add(mod);
                                         }
                                     }
                                     else
                                     {
-                                        this.InstalledMods.Clear();
+                                        TakeAction.thisMachine.InstalledMods.Clear();
                                         foreach (var mod in ArtemisManager.GetInstalledMods())
                                         {
-                                            InstalledMods.Add(mod);
+                                            TakeAction.thisMachine.InstalledMods.Add(mod);
                                         }
                                     }
                                 }
@@ -978,7 +978,7 @@ namespace ArtemisManagerUI
                             {
                                 if (wasProcessed.Item2.IsMission)
                                 {
-                                    foreach (var mod in InstalledMissions)
+                                    foreach (var mod in TakeAction.thisMachine.InstalledMissions)
                                     {
                                         if (mod.LocalIdentifier == e.Identifier)
                                         {
@@ -988,11 +988,16 @@ namespace ArtemisManagerUI
                                 }
                                 else
                                 {
-                                    this.InstalledMods.Clear();
+                                    TakeAction.thisMachine.InstalledMods.Clear();
 
                                     foreach (var mod in ArtemisManager.GetInstalledMods())
                                     {
-                                        InstalledMods.Add(mod);
+                                        TakeAction.thisMachine.InstalledMods.Add(mod);
+                                    }
+                                    TakeAction.thisMachine.InstalledMissions.Clear();
+                                    foreach (var mod in ArtemisManager.GetInstalledMissions())
+                                    {
+                                        TakeAction.thisMachine.InstalledMissions.Add(mod);
                                     }
                                 }
                             }
@@ -1456,11 +1461,12 @@ namespace ArtemisManagerUI
                 item.Activate();
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    InstalledMods.Clear();
+                    TakeAction.thisMachine.InstalledMods.Clear();
                     foreach (var mod in ArtemisManager.GetInstalledMods())
                     {
-                        InstalledMods.Add(mod);
+                        TakeAction.thisMachine.InstalledMods.Add(mod);
                     }
+                    
                     ArtemisChanged = false;
                 }));
                 TakeAction.SendClientInfo(IPAddress.Any);
@@ -1481,7 +1487,7 @@ namespace ArtemisManagerUI
 
         private void DeactivateAllButBase(Guid? activeIdentifier)
         {
-            foreach (var mod in InstalledMods)
+            foreach (var mod in TakeAction.thisMachine.InstalledMods)
             {
                 if (mod.LocalIdentifier == activeIdentifier)
                 {
@@ -1493,14 +1499,7 @@ namespace ArtemisManagerUI
                 }
             }
         }
-        private void OnDeactivateMods(object sender, RoutedEventArgs e)
-        {
-            var baseItem = ArtemisManager.ClearActiveFolder();
-            DeactivateAllButBase(baseItem?.LocalIdentifier);
-
-            baseItem?.Activate();
-            TakeAction.SendClientInfo(IPAddress.Any);
-        }
+       
 
         private void OnInstallMod(object sender, RoutedEventArgs e)
         {
@@ -1510,7 +1509,7 @@ namespace ArtemisManagerUI
             };
             if (win.ShowDialog() == true)
             {
-                InstalledMods.Add(win.Mod);
+                TakeAction.thisMachine.InstalledMods.Add(win.Mod);
             }
         }
 
@@ -1535,7 +1534,7 @@ namespace ArtemisManagerUI
             };
             if (win.ShowDialog() == true)
             {
-                InstalledMods.Add(win.Mod);
+                TakeAction.thisMachine.InstalledMods.Add(win.Mod);
             }
         }
 
@@ -1594,17 +1593,17 @@ namespace ArtemisManagerUI
 
 
 
-        bool isDragging = false;
+        //bool isDragging = false;
         private void OnModDragEnter(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                isDragging = true;
+                //isDragging = true;
             }
-            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
-            {
-                isDragging = true;
-            }
+            //else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            //{
+            //    isDragging = true;
+            //}
 
         }
 
@@ -1615,15 +1614,15 @@ namespace ArtemisManagerUI
             {
                 e.Effects = System.Windows.DragDropEffects.Copy;
             }
-            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
-            {
-                e.Effects = System.Windows.DragDropEffects.Copy;
-            }
+            //else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            //{
+            //    e.Effects = System.Windows.DragDropEffects.Copy;
+            //}
         }
 
         private void OnModDragLeave(object sender, System.Windows.DragEventArgs e)
         {
-            isDragging = false;
+            //isDragging = false;
         }
 
         private void OnModDrop(object sender, System.Windows.DragEventArgs e)
@@ -1641,21 +1640,21 @@ namespace ArtemisManagerUI
                     };
                     if (win.ShowDialog() == true)
                     {
-                        InstalledMods.Add(win.Mod);
+                        TakeAction.thisMachine.InstalledMods.Add(win.Mod);
                     }
                 }
-                isDragging = false;
+                //isDragging = false;
             }
-            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
-            {
+            //else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            //{
 
-                var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
-                isDragging = false;
-                if (ctl.IsRemote && ctl.Source != null)
-                {
-                    MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
-                }
-            }
+            //    var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
+            //    isDragging = false;
+            //    if (ctl.IsRemote && ctl.Source != null)
+            //    {
+            //        MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
+            //    }
+            //}
 
         }
 
@@ -1663,12 +1662,12 @@ namespace ArtemisManagerUI
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
-                isDragging = true;
+                //isDragging = true;
             }
-            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
-            {
-                isDragging = true;
-            }
+            //else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            //{
+            //    isDragging = true;
+            //}
 
         }
 
@@ -1684,10 +1683,10 @@ namespace ArtemisManagerUI
             {
                 e.Effects = System.Windows.DragDropEffects.Copy;
             }
-            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
-            {
-                e.Effects = System.Windows.DragDropEffects.Copy;
-            }
+            //else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            //{
+            //    e.Effects = System.Windows.DragDropEffects.Copy;
+            //}
         }
 
         private void OnMissionDrop(object sender, System.Windows.DragEventArgs e)
@@ -1706,19 +1705,19 @@ namespace ArtemisManagerUI
                     win.Title = "Install Mission";
                     if (win.ShowDialog() == true)
                     {
-                        InstalledMissions.Add(win.Mod);
+                        TakeAction.thisMachine.InstalledMissions.Add(win.Mod);
                     }
                 }
             }
-            else if (e.Data.GetDataPresent(typeof(ModItemControl)))
-            {
-                var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
+            //else if (e.Data.GetDataPresent(typeof(ModItemControl)))
+            //{
+            //    var ctl = (ModItemControl)e.Data.GetData(typeof(ModItemControl));
 
-                if (ctl.IsRemote && ctl.Source != null)
-                {
-                    MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
-                }
-            }
+            //    if (ctl.IsRemote && ctl.Source != null)
+            //    {
+            //        MyNetwork.SendModPackageRequest(ctl.Source, ctl.Mod.GetJSON(), ctl.Mod.PackageFile);
+            //    }
+            //}
         }
 
         private void OnModUninstalled(object sender, RoutedEventArgs e)
@@ -1729,7 +1728,7 @@ namespace ArtemisManagerUI
                 {
                     if (ctl.DataContext is ModItem mod)
                     {
-                        InstalledMods.Remove(mod);
+                        TakeAction.thisMachine.InstalledMods.Remove(mod);
                     }
                 });
             }
@@ -1743,7 +1742,7 @@ namespace ArtemisManagerUI
                 {
                     if (ctl.DataContext is ModItem mod)
                     {
-                        InstalledMissions.Remove(mod);
+                        TakeAction.thisMachine.InstalledMissions.Remove(mod);
                     }
                 });
             }
@@ -1761,10 +1760,15 @@ namespace ArtemisManagerUI
         {
             Dispatcher.Invoke(() =>
             {
-                InstalledMods.Clear();
+                TakeAction.thisMachine.InstalledMods.Clear();
                 foreach (var mod in ArtemisManager.GetInstalledMods())
                 {
-                    InstalledMods.Add(mod);
+                    TakeAction.thisMachine.InstalledMods.Add(mod);
+                }
+                TakeAction.thisMachine.InstalledMissions.Clear();
+                foreach (var mod in ArtemisManager.GetInstalledMissions())
+                {
+                    TakeAction.thisMachine.InstalledMissions.Add(mod);
                 }
             });
         }

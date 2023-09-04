@@ -340,7 +340,7 @@
         <TabControl
             SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}"
             TabStripPlacement="Bottom">
-            <TabItem Visibility="Collapsed">
+            <!--<TabItem>
                 <TabItem.Header>
                     <WrapPanel>
                         <Image Height="16" Source="/ArtemisManagerUI;component/Resources/wrench.png" />
@@ -481,13 +481,15 @@
                         </TabControl>
                     </GroupBox>
                 </DockPanel>
-            </TabItem>
+            </TabItem>-->
             <TabItem>
                 <TabItem.Header>
                     <WrapPanel>
                         <TextBlock Text="PC Actions &amp; Settings" />
                     </WrapPanel>
                 </TabItem.Header>
+                <local:PCInfoTabControl
+                    IsMaster="{Binding ElementName=uc, Path=IsMaster, Mode=TwoWay}"/>
             </TabItem>
             <TabItem>
                 <TabItem.Header>
@@ -599,8 +601,7 @@
                     VerticalAlignment="Top"
                     local:ListBoxBehavior.AutoScroll="True" />
             </TabItem>
-            <local:PCInfoTabControl
-                    IsMaster="{Binding IsMaster, ElementName=uc, Mode=TwoWay}" Height="524" Width="819"/>
+           
         </TabControl>
     </DockPanel>
 </Window>

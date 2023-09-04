@@ -32,45 +32,6 @@ namespace ArtemisManagerUI
            
         }
 
-
-        public static readonly DependencyProperty SourceProperty =
-         DependencyProperty.Register(nameof(Source), typeof(IPAddress),
-             typeof(ModItemControl));
-
-        public IPAddress? Source
-        {
-            get
-            {
-                return (IPAddress?)this.GetValue(SourceProperty);
-
-            }
-            set
-            {
-                this.SetValue(SourceProperty, value);
-            }
-        }
-
-        public static readonly DependencyProperty IsRemoteProperty =
-         DependencyProperty.Register(nameof(IsRemote), typeof(bool),
-             typeof(ModItemControl));
-
-        public bool IsRemote
-        {
-            get
-            {
-                return (bool)this.GetValue(IsRemoteProperty);
-
-            }
-            set
-            {
-                this.SetValue(IsRemoteProperty, value);
-            }
-        }
-        
-
-
-
-
         public static readonly DependencyProperty IsMasterProperty =
            DependencyProperty.Register(nameof(IsMaster), typeof(bool),
           typeof(ModItemControl));
@@ -106,66 +67,17 @@ namespace ArtemisManagerUI
 
         private void OnActivateMod(object sender, RoutedEventArgs e)
         {
-            if (IsRemote)
-            {
-                if (Source != null)
-                {
-                    Network.Current?.SendArtemisAction(Source, AMCommunicator.Messages.ArtemisActions.ActivateMod, Mod.ModIdentifier, Mod.GetJSON());
-                }
-            }
-            else
-            {
-                Mod.Activate();
-                RaiseModActivatedEvent();
-                TakeAction.SendClientInfo(IPAddress.Any);
-            }
+            RaiseModActivatedEvent();
         }
-
-        //private void OnInstallMod(object sender, RoutedEventArgs e)
-        //{
-        //    if (IsRemote)
-        //    {
-        //        if (Source != null)
-        //        {
-        //            Network.Current?.SendModPackageRequest(Source, Mod.GetJSON(), Mod.PackageFile);
-        //        }
-        //    }
-        //    else
-        //    {
-               
-        //    }
-        //}
-
-        //private void OnRemoteInstallMod(object sender, RoutedEventArgs e)
-        //{
-        //    if (!IsRemote)
-        //    {
-        //        RaiseRemoteInstallModEvent();
-        //    }
-        //}
 
         private void OnUninstallMod(object sender, RoutedEventArgs e)
         {
-            if (IsRemote)
-            {
-                if (Source != null)
-                {
-                    Network.Current?.SendArtemisAction(Source, AMCommunicator.Messages.ArtemisActions.UninstallMod, Mod.ModIdentifier, Mod.GetJSON());
-                }
-            }
-            else
-            {
-                Mod.Uninstall();
-                TakeAction.SendClientInfo(IPAddress.Any);
-                RaiseModUninstalledEvent();
-            }
+            RaiseModUninstalledEvent();
         }
-
-
 
         void RaiseModActivatedEvent()
         {
-            RoutedEventArgs args = new RoutedEventArgs(ModActivatedEvent);
+            RoutedEventArgs args = new(ModActivatedEvent, Mod);
             RaiseEvent(args);
         }
 
@@ -180,12 +92,9 @@ namespace ArtemisManagerUI
             remove { RemoveHandler(ModActivatedEvent, value); }
         }
 
-
-
-
         void RaiseModUninstalledEvent()
         {
-            RoutedEventArgs args = new RoutedEventArgs(ModUninstalledEvent);
+            RoutedEventArgs args = new(ModUninstalledEvent, Mod);
             RaiseEvent(args);
         }
 
@@ -211,22 +120,5 @@ namespace ArtemisManagerUI
             }
         }
 
-
-        void RaiseRemoteInstallModEvent()
-        {
-            RoutedEventArgs args = new(RemoteInstallModEvent, this.Mod);
-            RaiseEvent(args);
-        }
-
-        public static readonly RoutedEvent RemoteInstallModEvent = EventManager.RegisterRoutedEvent(
-            name: nameof(RemoteInstallMod),
-            routingStrategy: RoutingStrategy.Bubble,
-            handlerType: typeof(RoutedEventHandler),
-            ownerType: typeof(ModItemControl));
-        public event RoutedEventHandler RemoteInstallMod
-        {
-            add { AddHandler(RemoteInstallModEvent, value); }
-            remove { RemoveHandler(RemoteInstallModEvent, value); }
-        }
     }
 }

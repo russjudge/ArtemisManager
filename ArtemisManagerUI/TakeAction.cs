@@ -1021,6 +1021,7 @@ oLink.Save
                 if (TakeAction.IsLoopback(address))
                 {
                     TakeArtemisAction.ProcessArtemisAction(address, action, JSON);
+                    
                 }
                 else
                 {
