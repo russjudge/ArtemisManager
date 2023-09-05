@@ -90,6 +90,24 @@ namespace ArtemisManagerUI
             }
         }
 
+        public static readonly DependencyProperty TargetClientProperty =
+        DependencyProperty.Register(nameof(TargetClient), typeof(IPAddress),
+        typeof(StringPackageSenderControl));
+
+        public IPAddress? TargetClient
+        {
+            get
+            {
+                return (IPAddress?)this.GetValue(TargetClientProperty);
+            }
+            set
+            {
+                this.SetValue(TargetClientProperty, value);
+            }
+        }
+
+
+
         public static readonly DependencyProperty ConnectedPCsProperty =
           DependencyProperty.Register(nameof(ConnectedPCs), typeof(ObservableCollection<PCItem>),
           typeof(StringPackageSenderControl));
@@ -121,16 +139,16 @@ namespace ArtemisManagerUI
 
 
 
-        public static readonly RoutedEvent FileRequestEvent = EventManager.RegisterRoutedEvent(
-            name: nameof(FileRequest),
+        public static readonly RoutedEvent SaveLocalEvent = EventManager.RegisterRoutedEvent(
+            name: nameof(SaveLocal),
             routingStrategy: RoutingStrategy.Bubble,
-            handlerType: typeof(EventHandler<FileRequestRoutedEventArgs>),
+            handlerType: typeof(RoutedEventHandler),
             ownerType: typeof(StringPackageSenderControl));
 
-        public event EventHandler<FileRequestRoutedEventArgs> FileRequest
+        public event RoutedEventHandler SaveLocal
         {
-            add { AddHandler(FileRequestEvent, value); }
-            remove { RemoveHandler(FileRequestEvent, value); }
+            add { AddHandler(SaveLocalEvent, value); }
+            remove { RemoveHandler(SaveLocalEvent, value); }
         }
 
         void DoSendPackage(IPAddress address, string data, SendableStringPackageFile fileType, string filename, string packageFile)
@@ -185,60 +203,11 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void DoRequestPackage(IPAddress sourceIP, SendableStringPackageFile fileType, string data, string packageFile, string saveFile)
-        {
-            switch (fileType)
-            {
-                case SendableStringPackageFile.Mission:
-                case SendableStringPackageFile.Mod:
-                    if (TakeAction.IsLoopback(sourceIP))  //Nothing should happen as this should be an already installed local mod
-                    {
-                    }
-                    else
-                    {
-                        Network.Current?.SendModPackageRequest(sourceIP, data, packageFile);
-                    }
-                    break;
-                default:
-                    if (TakeAction.IsLoopback(sourceIP)) //Nothing should happen as this will be the source
-                    {
-
-                    }
-                    else
-                    {
-                        RequestInformationType requestType;
-
-                        switch (fileType)
-                        {
-                            case SendableStringPackageFile.ArtemisINI:
-                                requestType = RequestInformationType.SpecificArtemisINIFile;
-                                break;
-                            case SendableStringPackageFile.controlsINI:
-                                requestType = RequestInformationType.SpecificControlINIFile;
-                                break;
-                            case SendableStringPackageFile.EngineeringPreset:
-                                requestType = RequestInformationType.SpecificEngineeringPreset;
-                                break;
-                            case SendableStringPackageFile.DMXCommandsXML:
-                                requestType = RequestInformationType.SpecificDMXCommandFile;
-                                break;
-                            default:
-                                requestType = RequestInformationType.None;
-                                break;
-                        }
-                        Network.Current?.SendRequestInformation(sourceIP, requestType, saveFile);
-                    }
-                    break;
-            }
-        }
-
         private void OnReceiveSelectedFile(object sender, RoutedEventArgs e)
         {
-            //FileRequestRoutedEventArgs eFileRequest = new(FileRequestEvent);
-            //RaiseEvent(eFileRequest);
-            if (SelectedFile != null && SelectedTargetPC != null && SelectedTargetPC.IP != null && !string.IsNullOrEmpty(SelectedFile.SaveFile))
+            if (SelectedFile != null && !string.IsNullOrEmpty(SelectedFile.SaveFile))
             {
-                DoRequestPackage(SelectedTargetPC.IP, SelectedFile.FileType, SelectedFile.GetSerializedString(), SelectedFile.PackageFile, SelectedFile.SaveFile);
+                RaiseEvent(new RoutedEventArgs(SaveLocalEvent));
             }
         }
     }

@@ -2,22 +2,11 @@
 using AMCommunicator.Messages;
 using ArtemisManagerAction;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ArtemisManagerUI
 {
@@ -29,8 +18,6 @@ namespace ArtemisManagerUI
         public TextFileManagerControl()
         {
             DataFileList = new ObservableCollection<TextDataFile>();
-
-
             InitializeComponent();
         }
         FileSystemWatcher? fsw = null;
@@ -858,6 +845,35 @@ namespace ArtemisManagerUI
                         System.Windows.MessageBox.Show("Cannot rename--new name already exists.", "Rename settings file", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
+            }
+        }
+
+        private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
+        {
+            PopupMessage = "Saved";
+        }
+
+        private void OnSaveLocal(object sender, RoutedEventArgs e)
+        {
+            if (SelectedDataFile != null)
+            {
+                using (StreamWriter sw = new(SelectedDataFile.SaveFile))
+                {
+                    sw.Write(SelectedDataFile.Data);
+                }
+
+                RequestInformationType tp = RequestInformationType.None;
+                switch (SelectedDataFile.FileType)
+                {
+                    case AMCommunicator.Messages.SendableStringPackageFile.DMXCommandsXML:
+                        tp = RequestInformationType.SpecificDMXCommandFile;
+                        break;
+                    case AMCommunicator.Messages.SendableStringPackageFile.controlsINI:
+                        tp = RequestInformationType.SpecificControlINIFile;
+                        break;
+                }
+                Network.Current?.SendInformation(IPAddress.Any, tp, SelectedDataFile.Name, new string[] { SelectedDataFile.Data });
+                PopupMessage = "Saved";
             }
         }
     }

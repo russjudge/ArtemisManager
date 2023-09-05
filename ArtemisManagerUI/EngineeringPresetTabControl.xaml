@@ -35,21 +35,9 @@
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <DockPanel>
-                        <!-- SourcePC="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" -->
-                        <local:StringPackageSenderControl
-                            Tag="{Binding}"
-                            IsForReceive="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
-                            SelectedTargetPC="{Binding Connection}"
-                            SelectedFile="{Binding SelectedSettingsFile}"
-                            TransmissionCompleted="OnTransmissionCompleted"
-                            Prompt="Transmit selected settings file to:"
-                            DockPanel.Dock="Top" />
                         <local:EngineeringPresetEditControl
-                            
                             TargetClient="{Binding Connection.IP, Mode=OneWay}"
                             IsRemote="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"/>
-                    </DockPanel>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>

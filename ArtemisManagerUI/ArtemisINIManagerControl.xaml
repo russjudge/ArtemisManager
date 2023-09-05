@@ -11,10 +11,19 @@
         <converter:NullToVisibility x:Key="NullToVisibility" />
         <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
         <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
     </UserControl.Resources>
 
     <DockPanel>
         <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+        <local:StringPackageSenderControl
+            DockPanel.Dock="Top"
+            SaveLocal="OnSaveLocal"
+            TargetClient="{Binding ElementName=uc, Path=TargetClient}"
+            SelectedFile="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile.SettingsFile}"
+            IsForReceive="{Binding ElementName=uc, Path=IsRemote}"
+            TransmissionCompleted="OnTransmissionCompleted"
+            Prompt="Transmit selected settings file to:" />
         <DockPanel
             DockPanel.Dock="Left" Width="205">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -37,7 +46,7 @@
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
 
-                <Button
+                <Button Visibility="Collapsed"
                     ToolTip="Test" Click="OnTest">
                     <StackPanel>
                         <Image Height="16" Source="/ArtemisManagerUI;component/Resources/worksonmymachine.png" />

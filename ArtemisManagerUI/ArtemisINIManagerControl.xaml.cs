@@ -680,5 +680,14 @@ namespace ArtemisManagerUI
         {
 
         }
+
+        private void OnSaveLocal(object sender, RoutedEventArgs e)
+        {
+            if (SelectedArtemisSettingsFile != null && SelectedArtemisSettingsFile.INIFile != null)
+            {
+                SelectedArtemisSettingsFile.INIFile.Save();
+                PopupMessage = "Settings Saved.";
+            }
+        }
     }
 }

@@ -37,14 +37,7 @@
                 <DataTemplate>
                     <DockPanel>
                         <!-- SourcePC="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" -->
-                        <local:StringPackageSenderControl
-                            Tag="{Binding}"
-                            SelectedTargetPC="{Binding Connection}"
-                            SelectedFile="{Binding SelectedSettingsFile}"
-                            IsForReceive="{Binding Connection.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}"
-                            TransmissionCompleted="OnTransmissionCompleted"
-                            Prompt="Transmit selected settings file to:"
-                            DockPanel.Dock="Top" />
+                        
                         <local:ArtemisINIManagerControl
                             ArtemisSettingsFiles="{Binding ArtemisSettingsFiles}"
                             SelectedArtemisSettingsFile="{Binding SelectedSettingsFile, Mode=TwoWay}"

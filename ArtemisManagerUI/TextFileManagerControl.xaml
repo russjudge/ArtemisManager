@@ -14,7 +14,14 @@
     </UserControl.Resources>
 
     <DockPanel>
-        <local:AMPopup PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+        <local:AMPopup DockPanel.Dock="Top" PopupMessage="{Binding ElementName=uc, Path=PopupMessage, Mode=TwoWay}" />
+        <local:StringPackageSenderControl
+            DockPanel.Dock="Top"
+            SaveLocal="OnSaveLocal"
+            SelectedFile="{Binding ElementName=uc, Path=SelectedDataFile}"
+            IsForReceive="{Binding ElementName=uc, Path=IsRemote}"
+            TransmissionCompleted="OnTransmissionCompleted"
+            Prompt="Transmit selected settings file to:" />
         <DockPanel
             DockPanel.Dock="Left" Width="205">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">

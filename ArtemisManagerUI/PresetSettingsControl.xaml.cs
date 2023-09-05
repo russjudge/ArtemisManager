@@ -137,6 +137,7 @@ namespace ArtemisManagerUI
             else
             {
                 File.Save();
+                
             }
             RaiseSavedEvent();
         }

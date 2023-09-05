@@ -116,7 +116,7 @@ namespace ArtemisManagerUI
         }
         public string GetSerializedString()
         {
-            return GetJSON();
+            return Data;
         }
         public string GetJSON()
         {
