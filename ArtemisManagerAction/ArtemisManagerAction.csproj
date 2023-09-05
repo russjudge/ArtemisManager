@@ -4,8 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <FileVersion>0.4.0.1202</FileVersion>
-    <AssemblyVersion>0.4.0.1202</AssemblyVersion>
+    <FileVersion>0.4.0.1204</FileVersion>
+    <AssemblyVersion>0.4.0.1204</AssemblyVersion>
     <Title>Artemis Manager Action</Title>
     <Authors>Russ Judge</Authors>
     <Company>Confederate In Blue Gaming</Company>

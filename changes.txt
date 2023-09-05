@@ -1,27 +1,6 @@
 Change History
 ===============================
-TODO Tests:
-
-Artemis INI -
-	Remote copy from local
-
-Engineering presets -
-	Remote copy from local
-
-Controls.ini -
-	Remote copy from local
-
-Mod -
-	Remote Install
-
-Mission - 
-	Remote Install
-	Uninstall local
-	uninstall remote
-
-Development enhancement TODO: snapshot for mission (similar to mod)
-
-Version 0.4 (beta) 09/xx/2023:
+Version 0.4 (beta) 09/05/2023:
 Enhancements:
 	- Improved interface for working with remote engineering presets and artemis.ini settings.
 	- Reworked the settings, mods, and missions interface for remote control.

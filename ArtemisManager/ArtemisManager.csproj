@@ -11,8 +11,8 @@
     <Copyright>Copyright (c) 2023 Confederate In Blue Gaming</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/russjudge/ArtemisManager</RepositoryUrl>
-    <FileVersion>0.4.0.1094</FileVersion>
-    <AssemblyVersion>0.4.0.1094</AssemblyVersion>
+    <FileVersion>0.4.0.1096</FileVersion>
+    <AssemblyVersion>0.4.0.1096</AssemblyVersion>
     <ApplicationIcon>am.ico</ApplicationIcon>
   </PropertyGroup>
   
