@@ -216,6 +216,7 @@
                             </StackPanel>
                         </Button>
                     </AdornerDecorator>
+                    
                 </StackPanel>
             </StackPanel>
             <Button DockPanel.Dock="Right" Click="OnOpenArtemisRunFolder" Margin="5,5,5,5" ToolTip="Open activated Artemis folder in Windows Explorer">
@@ -226,7 +227,11 @@
             </Button>
             <Button
                 Visibility="{Binding ElementName=uc, Path=ArtemisChanged, Mode=OneWay,Converter={StaticResource BoolToVisibilityParameterConverter }, ConverterParameter='Visible|Collapsed'}"
-                DockPanel.Dock="Right" Click="OnSnapshotAretmis" Margin="20,5,5,5" ToolTip="Create snapshot of currently installed Artemis">
+                DockPanel.Dock="Right" Click="OnSnapshotAretmis" Margin="5,5,5,5" ToolTip="Create snapshot of currently installed Artemis">
+                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/snapshot.png" />
+            </Button>
+            <Button
+                DockPanel.Dock="Right" Click="OnSnapshotAretmisCosmos" Margin="5,5,5,5" ToolTip="Create snapshot of currently installed Artemis Cosmos (if installed)">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/snapshot.png" />
             </Button>
             <Button

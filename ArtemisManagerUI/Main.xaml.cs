@@ -1405,7 +1405,11 @@ namespace ArtemisManagerUI
                 if (dialog.ShowDialog() == true)
                 {
                     string candidate = System.IO.Path.Combine(dialog.FileName, ArtemisManager.ArtemisEXE);
-                    if (System.IO.File.Exists(candidate))
+                    if (!System.IO.File.Exists(candidate))
+                    {
+                        candidate = ArtemisManager.GetCosmosEXE(dialog.FileName);
+                    }
+                    if (!string.IsNullOrEmpty(candidate) && System.IO.File.Exists(candidate))
                     {
                         ArtemisInstallFolder = dialog.FileName;
                         Properties.Settings.Default.ArtemisInstallFolder = ArtemisInstallFolder;
@@ -1445,6 +1449,36 @@ namespace ArtemisManagerUI
             //ArtemisV#.##
             SnapshotArtemis();
         }
+        void SnapshotArtemisCosmos()
+        {
+            string? CosmosFolder = SteamInfo.GetArtemisCosmosGameFolder();
+            if (string.IsNullOrEmpty(CosmosFolder))
+            {
+                BrowseForArtemis();
+                CosmosFolder = ArtemisInstallFolder;
+            }
+            if (string.IsNullOrEmpty(CosmosFolder))
+            {
+                return;
+            }
+            string artemisEXE = ArtemisManager.GetCosmosEXE(CosmosFolder);
+            bool isArtemisCosmos = (!artemisEXE.ToLowerInvariant().Equals(ArtemisManager.ArtemisEXE));
+
+            ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(CosmosFolder, artemisEXE, isArtemisCosmos);
+            item.Activate();
+            Dispatcher.Invoke(new Action(() =>
+            {
+                TakeAction.thisMachine.InstalledMods.Clear();
+                foreach (var mod in ArtemisManager.GetInstalledMods())
+                {
+                    TakeAction.thisMachine.InstalledMods.Add(mod);
+                }
+
+                ArtemisChanged = false;
+            }));
+            TakeAction.SendClientInfo(IPAddress.Any);
+        }
+       
         void SnapshotArtemis()
         {
             if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
@@ -1457,7 +1491,10 @@ namespace ArtemisManagerUI
             }
             else
             {
-                ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder);
+                string artemisEXE = ArtemisManager.ArtemisEXE;
+                bool isArtemisCosmos = false;
+                artemisEXE = ArtemisManager.GetCosmosEXE(ArtemisInstallFolder);
+                ModItem item = ArtemisManagerAction.ArtemisManager.SnapshotInstalledArtemisVersion(ArtemisInstallFolder, artemisEXE, isArtemisCosmos);
                 item.Activate();
                 Dispatcher.Invoke(new Action(() =>
                 {
@@ -1472,9 +1509,6 @@ namespace ArtemisManagerUI
                 TakeAction.SendClientInfo(IPAddress.Any);
             }
         }
-        //@@@@
-
-
         private void OnStartArtemisSBS(object sender, RoutedEventArgs e)
         {
             ArtemisManager.StartArtemis();
@@ -1887,6 +1921,13 @@ namespace ArtemisManagerUI
         private void AMPopup_Loaded(object sender, RoutedEventArgs e)
         {
 
+        }
+
+       
+
+        private void OnSnapshotAretmisCosmos(object sender, RoutedEventArgs e)
+        {
+            SnapshotArtemisCosmos();
         }
     }
 }

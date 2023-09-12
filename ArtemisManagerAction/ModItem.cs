@@ -205,6 +205,31 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
+
+
+        private bool isAretmisCosmos = false;
+        public bool IsArtemisCosmos
+        {
+            get { return isAretmisCosmos; }
+            set
+            {
+                isAretmisCosmos = value;
+                DoChanged();
+            }
+        }
+
+
+        private string? artemisEXE = string.Empty;
+        public string? ArtemisEXE
+        {
+            get { return artemisEXE; }
+            set
+            {
+                artemisEXE = value;
+                DoChanged();
+            }
+        }
+
         private string installFolder = string.Empty;
         /// <summary>
         /// Just the subfolder name under "InstalledMods"

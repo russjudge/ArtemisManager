@@ -45,6 +45,8 @@ namespace ArtemisManagerAction
         public const string controlsINI = "controls" + INIFileExtension;
         public const string DMXCommands = "DMXcommands" + XMLFileExtension;
         public const string ArtemisINI = "artemis" + INIFileExtension;
+        
+
 
         public const string ChangesTXT = "changes" + TXTFileExtension;
         static System.Diagnostics.Process? runningArtemisProcess = null;
@@ -621,7 +623,7 @@ namespace ArtemisManagerAction
             }
             return retVal;
         }
-        public static ModItem SnapshotInstalledArtemisVersion(string installFolder)
+        public static ModItem SnapshotInstalledArtemisVersion(string installFolder, string artemisEXE = ArtemisManager.ArtemisEXE, bool isArtemisCosmos = false)
         {
             ModItem retVal = new();
             string? version = GetArtemisVersion(installFolder);
@@ -630,7 +632,14 @@ namespace ArtemisManagerAction
             retVal.Author = "Thom Robertson";
             retVal.Version = version;
             retVal.Description = "Base " + Artemis;
+
             retVal.IsArtemisBase = true;
+            retVal.ArtemisEXE = ArtemisManager.ArtemisEXE;
+            retVal.IsArtemisCosmos = isArtemisCosmos;
+            if (retVal.IsArtemisCosmos)
+            {
+                retVal.Description += " Cosmos";
+            }
             //TODO: build hardcoded Guid list based on Artemis version.  Get comprehensive list of versions from the changes.txt file.
             if (version != null)
             {
@@ -874,6 +883,10 @@ namespace ArtemisManagerAction
                 }
             }
             retVal ??= SteamInfo.GetArtemisGameFolder();
+            if (string.IsNullOrEmpty(retVal))
+            {
+                retVal = SteamInfo.GetArtemisCosmosGameFolder();
+            }
             return retVal;
         }
         [SupportedOSPlatform("windows")]
@@ -1008,6 +1021,7 @@ namespace ArtemisManagerAction
         /// <returns>The version of Artemis in the specified path or null if not found/determined</returns>
         public static string? GetArtemisVersion(string installPath)
         {
+            //TODO: Modify to handle Artemis Cosmos.
             string? retVal = null;
             if (installPath != null)
             {
@@ -1066,7 +1080,7 @@ namespace ArtemisManagerAction
             {
                 if (pro.MainModule != null)
                 {
-                    if (pro.MainModule.FileName.Equals(Path.Combine(ModItem.ActivatedFolder, ArtemisEXE)))
+                    if (pro.MainModule.FileName.Equals(GetCosmosEXE(ModItem.ActivatedFolder)))
                     {
                         return true;
                     }
@@ -1074,12 +1088,30 @@ namespace ArtemisManagerAction
             }
             return false;
         }
+        public static string GetCosmosEXE(string folder)
+        {
+            string retVal = string.Empty;
+            foreach (var file in new DirectoryInfo(folder).GetFiles())
+            {
+                if (file.Name.ToLowerInvariant().StartsWith("artemis") && file.Extension.ToLowerInvariant() == ".exe")
+                {
+                    retVal = file.Name;
+                    break;
+                }
+            }
+            return retVal;
+        }
         public static void StartArtemis()
         {
             if (!IsArtemisRunning())
             {
+
                 string target = Path.Combine(ModItem.ActivatedFolder, ArtemisEXE);
-                if (File.Exists(target))
+                if (!File.Exists(target))
+                {
+                    target = GetCosmosEXE(ModItem.ActivatedFolder);
+                }
+                if (!string.IsNullOrEmpty(target) && File.Exists(target))
                 {
                     ProcessStartInfo startInfo = new(target)
                     {

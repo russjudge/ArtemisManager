@@ -15,6 +15,7 @@ namespace ArtemisManagerAction
         const string SteamAppSubfolder1 = "steamapps";
         const string SteamAppCommonFolder = "common";
         const string SteamAppManifestFile = "appmanifest_" + ArtemisAppKey + ".acf";
+        const string SteamAppManifestCosmosFile = "appmanifest_" + ArtemisCosmosAppKey + ".acf";
         const string SteamAppInstallFolderName = "\"installdir\"";  //Example: "installdir"		"Archon" (2 tabs).  Preprocess file by replace tabs with spaces, reducing to 1 space. read lines until installdir found.
         const string ArtemisAppKey = "247350";
         const string ArtemisCosmosAppKey = "2467840";
@@ -73,6 +74,35 @@ namespace ArtemisManagerAction
             foreach (var folder in GetSteamLibraryFolders())
             {
                 string manifestFolder = Path.Combine(folder, SteamAppSubfolder1, SteamAppManifestFile);
+                if (File.Exists(manifestFolder))
+                {
+                    string data;
+                    using (StreamReader sr = new StreamReader(manifestFolder))
+                    {
+                        data = sr.ReadToEnd();
+                    }
+                    var i = data.IndexOf(SteamAppInstallFolderName) + SteamAppInstallFolderName.Length;
+                    i = data.IndexOf("\"", i) + 1;
+                    var j = data.IndexOf("\"", i);
+                    retVal = data.Substring(i, j - i);
+                    if (File.Exists(Path.Combine(retVal, ArtemisManager.ArtemisEXE)))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        retVal = null;
+                    }
+                }
+            }
+            return retVal;
+        }
+        public static string? GetArtemisCosmosGameFolder()
+        {
+            string? retVal = null;
+            foreach (var folder in GetSteamLibraryFolders())
+            {
+                string manifestFolder = Path.Combine(folder, SteamAppSubfolder1, SteamAppManifestCosmosFile);
                 if (File.Exists(manifestFolder))
                 {
                     string data;
