@@ -1,5 +1,10 @@
 Change History
 ===============================
+Version 0.5 (beta) 09/12/2023:
+Enhancements:
+	- Added support for Artemis Cosmos
+
+-------------------------------
 Version 0.4 (beta) 09/05/2023:
 Enhancements:
 	- Improved interface for working with remote engineering presets and artemis.ini settings.
@@ -34,6 +39,7 @@ Enhancements:
 	- Added ability to change settings in artemis.ini that control local settings (such as default screen size and station restriction)--basically
 		any setting that would have nothing to do with a mod.  Remaining settings will to be added as part of new functionality to be used for creating
 		a mod.
+
 ------------------------------
 Version 0.2 (beta) 07/25/2023:
 Bug Fixes:
