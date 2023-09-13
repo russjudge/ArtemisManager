@@ -15,7 +15,7 @@ namespace ArtemisManagerAction
         const string SteamAppSubfolder1 = "steamapps";
         const string SteamAppCommonFolder = "common";
         const string SteamAppManifestFile = "appmanifest_" + ArtemisAppKey + ".acf";
-        const string SteamAppManifestCosmosFile = "appmanifest_" + ArtemisCosmosAppKey + ".acf";
+        const string SteamAppManifestCosmosFile = @"common\Artemis Cosmos";
         const string SteamAppInstallFolderName = "\"installdir\"";  //Example: "installdir"		"Archon" (2 tabs).  Preprocess file by replace tabs with spaces, reducing to 1 space. read lines until installdir found.
         const string ArtemisAppKey = "247350";
         const string ArtemisCosmosAppKey = "2467840";
@@ -103,25 +103,10 @@ namespace ArtemisManagerAction
             foreach (var folder in GetSteamLibraryFolders())
             {
                 string manifestFolder = Path.Combine(folder, SteamAppSubfolder1, SteamAppManifestCosmosFile);
-                if (File.Exists(manifestFolder))
+                if (Directory.Exists(manifestFolder))
                 {
-                    string data;
-                    using (StreamReader sr = new StreamReader(manifestFolder))
-                    {
-                        data = sr.ReadToEnd();
-                    }
-                    var i = data.IndexOf(SteamAppInstallFolderName) + SteamAppInstallFolderName.Length;
-                    i = data.IndexOf("\"", i) + 1;
-                    var j = data.IndexOf("\"", i);
-                    retVal = data.Substring(i, j - i);
-                    if (File.Exists(Path.Combine(retVal, ArtemisManager.ArtemisEXE)))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        retVal = null;
-                    }
+                    retVal = manifestFolder;
+                    break;
                 }
             }
             return retVal;
@@ -166,7 +151,7 @@ namespace ArtemisManagerAction
             {
                 rawData = strm.ReadToEnd();
             }
-            FixRawData();
+            //FixRawData();
 
             ProcessRawData();
         }
@@ -227,40 +212,61 @@ publish_data
                     ObjectName = lines[0].Substring(1, lines[0].Length - 2);
                     if (lines.Length > 2)
                     {
+                        string currentLibrary = string.Empty;
                         for (int i = 2; i < lines.Length - 1; i++)
                         {
                             string line = lines[i].Replace("\t", " ").Trim();
+
+
                             int start = 1;
                             int end = 1;
-                            if (line != "}")
+                            if (!line.Contains("}"))
                             {
                                 do
                                 {
 
-                                } while (line.Substring(++end, 1) != "\"");
-                                string key = line.Substring(start, end - start);
-
-                                start = end + 1;
-                                do
+                                } while (++end < line.Length && line.Substring(end, 1) != "\"");
+                                string key = string.Empty;
+                                if (start < line.Length)
                                 {
-
-                                } while (line.Substring(++start, 1) != "\"");
-                                start++;
-                                end = start;
-                                if (line.Substring(end, 1) != "\"")
+                                    key = line.Substring(start, end - start).Trim();
+                                }
+                                if (int.TryParse(key, out int result))
                                 {
+                                    currentLibrary = key;
+                                }
+
+                                if (key == "path")
+                                {
+                                    start = end + 1;
                                     do
                                     {
 
-                                    } while (line.Substring(++end, 1) != "\"");
+                                    } while ((++start) < line.Length && line.Substring(start, 1) != "\"");
+                                    start++;
+                                    end = start;
+                                    if (end < line.Length && line.Substring(end, 1) != "\"")
+                                    {
+                                        do
+                                        {
+
+                                        } while (++end < line.Length && line.Substring(end, 1) != "\"");
+                                    }
+                                    string value = string.Empty;
+                                    if (end > start)
+                                    {
+                                        value = line.Substring(start, end - start);
+                                        value = value.Replace(@"\\", @"\");
+                                    }
+                                    if (string.IsNullOrEmpty(value))
+                                    {
+                                        
+                                    }
+                                    else
+                                    {
+                                        MainData.Add(currentLibrary, value);
+                                    }
                                 }
-                                string value = string.Empty;
-                                if (end > start)
-                                {
-                                    value = line.Substring(start, end - start);
-                                    value = value.Replace(@"\\", @"\");
-                                }
-                                MainData.Add(key, value);
                             }
 
                         }
