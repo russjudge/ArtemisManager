@@ -38,21 +38,21 @@ namespace AMCommunicator
             IsAppDrive = (drive.Name.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)[..1]));
         }
         public string Name { get; set; } = string.Empty;
-        public long FreeSpace { get;  set; }
-        public bool IsAppDrive { get;  set; }
-        public long TotalSize { get;  set; }
+        public long FreeSpace { get; set; }
+        public bool IsAppDrive { get; set; }
+        public long TotalSize { get; set; }
         public string DriveFormat { get; set; } = string.Empty;
-        public DriveType DriveType { get;  set; }
+        public DriveType DriveType { get; set; }
 
         public static DriveData[] GetDriveData()
         {
-            List<DriveData> retVal = new();
+            List<DriveData> retVal = [];
             var drives = DriveInfo.GetDrives();
             foreach (var drive in drives)
             {
                 retVal.Add(new(drive));
             }
-            return retVal.ToArray();
+            return [.. retVal];
         }
     }
 }

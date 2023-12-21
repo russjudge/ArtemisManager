@@ -10,6 +10,7 @@ namespace AMCommunicator
 {
     internal class ConnectionTracker
     {
+        private ConnectionTracker() { Hostname = string.Empty; Address = IPAddress.Any; throw new NotImplementedException(); }
         public ConnectionTracker(string hostname, IPAddress address, NetworkStream? stream, Socket socket, Thread? thread)
         {
             Hostname = hostname;

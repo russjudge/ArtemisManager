@@ -5,15 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
 
         <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
         <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
-        <converter:DateFormatter x:Key="DateFormatter" />
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <converter:NullToVisibility x:Key="NullToVisibility" />
-        <converter:ByteFormatter x:Key="ByteFormatter" />
+        <russjudge:DateFormatter x:Key="DateFormatter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
+        <russjudge:NullToVisibilityConverter x:Key="NullToVisibility" />
     </UserControl.Resources>
     <GroupBox>
         <GroupBox.Header>
@@ -42,7 +43,7 @@
                 </CheckBox>
                 <AdornerDecorator
                     IsEnabled="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPLoopbackToBoolConverter}, ConverterParameter='False'}">
-                <CheckBox
+                    <CheckBox
                     Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}"
                     Click="OnIsMasterSet"
                     ToolTip="Indicates whether or not this client can control all other clients.  If not checked, then this client cannot control any client, except itself."
@@ -52,7 +53,7 @@
                 </AdornerDecorator>
                 <CheckBox
                     Content="Artemis is Running" IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning}" IsEnabled="False"/>
-                
+
                 <CheckBox
                     IsChecked="{Binding ElementName=uc, Path=SelectedTargetPC.IsUsingThisAppControlledArtemis}"
                     VerticalContentAlignment="Center" VerticalAlignment="Center" IsEnabled="False" >
@@ -78,13 +79,13 @@
             </StackPanel>
             <DockPanel DockPanel.Dock="Right">
                 <GroupBox
-                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     DockPanel.Dock="Top" Header="Artemis SBS Actions">
                     <WrapPanel>
                         <Button
                             Click="OnStartArtemisRemote"
                             ToolTip="Start Artemis SBS on Peer."
-                            Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                            Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning, Converter={StaticResource FalseBoolToVisibilityConverter}}" >
                             <StackPanel Orientation="Horizontal">
                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/start.png" />
                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
@@ -92,7 +93,7 @@
                         </Button>
                         <Button
                             Click="OnStopArtemisRemote"
-                            Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                            Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.ArtemisIsRunning, Converter={StaticResource BoolToVisibilityConverter}}"
                             ToolTip="Stop Artemis SBS on Peer.">
                             <StackPanel Orientation="Horizontal">
                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/stop.png" />
@@ -102,7 +103,7 @@
                     </WrapPanel>
                 </GroupBox>
                 <GroupBox
-                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                     DockPanel.Dock="Top" Header="Peer Actions">
                     <WrapPanel>
                         <Button
@@ -137,17 +138,17 @@
                 <GroupBox
                     Visibility="{Binding ElementName=uc, Path=SelectedTargetPC.IP, Converter={StaticResource IPAnyToVisibility}, ConverterParameter='Collapsed|Visible'}"
                     Header="Drive Data">
-                <ListBox
+                    <ListBox
                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" 
                     ItemsSource="{Binding ElementName=uc, Path=SelectedTargetPC.Drives}">
-                    
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <local:DriveInfoControl Drive="{Binding}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
 
-                </ListBox>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:DriveInfoControl Drive="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>
                 </GroupBox>
             </DockPanel>
         </DockPanel>

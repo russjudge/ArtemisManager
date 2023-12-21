@@ -23,7 +23,7 @@ namespace ArtemisManagerUI
     {
         public EngineeringPresetTabControl()
         {
-            ConnectedPCs = new();
+            ConnectedPCs = [];
             if (TakeAction.ConnectedPCs != null)
             {
                 foreach (var PC in TakeAction.ConnectedPCs)
@@ -41,7 +41,7 @@ namespace ArtemisManagerUI
             {
                 SourcePC = TakeAction.SourcePC;
             }
-           
+
             InitializeComponent();
         }
 

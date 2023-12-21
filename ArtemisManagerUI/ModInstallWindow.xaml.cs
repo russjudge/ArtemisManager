@@ -70,7 +70,7 @@ namespace ArtemisManagerUI
         {
             if (d is ModInstallWindow me)
             {
-                
+
                 if (me.ForInstall)
                 {
                     bool IsMission = true;
@@ -87,10 +87,10 @@ namespace ArtemisManagerUI
                             }
                             if (!reader.Entry.IsDirectory && reader.Entry.Key.EndsWith(ArtemisManager.SaveFileExtension))
                             {
-                               
+
                                 int bytesRead = 0;
                                 byte[] buffer = new byte[1024];
-                                List<byte> bufList = new();
+                                List<byte> bufList = [];
 
                                 using EntryStream entryStream = reader.OpenEntryStream();
                                 if (entryStream != null)
@@ -120,7 +120,7 @@ namespace ArtemisManagerUI
                                                 me.Mod.RequiredArtemisVersion = mod.RequiredArtemisVersion;
                                                 // me.Mod.SaveFile = mod.SaveFile;
                                                 me.Mod.Version = mod.Version;
-                                                
+
                                                 break;
                                             }
                                         }

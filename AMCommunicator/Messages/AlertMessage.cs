@@ -10,7 +10,7 @@ namespace AMCommunicator.Messages
     internal class AlertMessage : NetworkMessage
     {
         public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
-
+        private AlertMessage() : base() { throw new NotImplementedException(); }
         public AlertMessage(AlertItems alert, string relatedData) : base()
         {
             AlertItem = alert;
@@ -20,7 +20,7 @@ namespace AMCommunicator.Messages
         {
             MessageVersion = ThisVersion;
         }
-        
+
         //WARNING!!! There is no version check on this NetworkMessage, so be sure to only add properties, keeping the current sequence.
         //   If a property is needed to be referenced that didn't exist in an older version, be sure to account
         //   for the possibility that the new property will have a default and meaningless value.
@@ -29,6 +29,6 @@ namespace AMCommunicator.Messages
         public AlertItems AlertItem { get; set; }
         public string RelatedData { get; set; }
 
-      
+
     }
 }

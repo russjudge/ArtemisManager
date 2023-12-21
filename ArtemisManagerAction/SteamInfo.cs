@@ -13,12 +13,12 @@ namespace ArtemisManagerAction
     public class SteamInfo
     {
         const string SteamAppSubfolder1 = "steamapps";
-        const string SteamAppCommonFolder = "common";
+        //const string SteamAppCommonFolder = "common";
         const string SteamAppManifestFile = "appmanifest_" + ArtemisAppKey + ".acf";
         const string SteamAppManifestCosmosFile = @"common\Artemis Cosmos";
         const string SteamAppInstallFolderName = "\"installdir\"";  //Example: "installdir"		"Archon" (2 tabs).  Preprocess file by replace tabs with spaces, reducing to 1 space. read lines until installdir found.
         const string ArtemisAppKey = "247350";
-        const string ArtemisCosmosAppKey = "2467840";
+        //const string ArtemisCosmosAppKey = "2467840";
         const string SteamRegistryKey = @"SOFTWARE\Valve\Steam";
         const string SteamRegistrySteamPathValue = "SteamPath";
         const string SteamAppsRelativeFolder = "steamApps";
@@ -60,7 +60,7 @@ namespace ArtemisManagerAction
                     retVal = steamPath as string;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 retVal = null;
                 //LastErrorMessage = ex.Message;
@@ -77,13 +77,13 @@ namespace ArtemisManagerAction
                 if (File.Exists(manifestFolder))
                 {
                     string data;
-                    using (StreamReader sr = new StreamReader(manifestFolder))
+                    using (StreamReader sr = new(manifestFolder))
                     {
                         data = sr.ReadToEnd();
                     }
                     var i = data.IndexOf(SteamAppInstallFolderName) + SteamAppInstallFolderName.Length;
-                    i = data.IndexOf("\"", i) + 1;
-                    var j = data.IndexOf("\"", i);
+                    i = data.IndexOf('"', i) + 1;
+                    var j = data.IndexOf('"', i);
                     retVal = data.Substring(i, j - i);
                     if (File.Exists(Path.Combine(retVal, ArtemisManager.ArtemisEXE)))
                     {
@@ -111,10 +111,10 @@ namespace ArtemisManagerAction
             }
             return retVal;
         }
-        
+
         private static string[] GetSteamLibraryFolders()
         {
-            List<string> retVal = new();
+            List<string> retVal = [];
 
             var steamFolder = GetSteamInstallFolder();
             if (steamFolder != null)
@@ -165,7 +165,7 @@ namespace ArtemisManagerAction
                 foreach (var line in rawData.Split('\n'))
                 {
                     sb.Append(line);
-                    if (line.EndsWith("\"") || line == "{" || line == "}")
+                    if (line.EndsWith('"') || line == "{" || line == "}")
                     {
                         sb.Append('\n');
                     }
@@ -220,7 +220,7 @@ publish_data
 
                             int start = 1;
                             int end = 1;
-                            if (!line.Contains("}"))
+                            if (!line.Contains('}'))
                             {
                                 do
                                 {
@@ -231,10 +231,12 @@ publish_data
                                 {
                                     key = line.Substring(start, end - start).Trim();
                                 }
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
                                 if (int.TryParse(key, out int result))
                                 {
                                     currentLibrary = key;
                                 }
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
                                 if (key == "path")
                                 {
@@ -260,7 +262,7 @@ publish_data
                                     }
                                     if (string.IsNullOrEmpty(value))
                                     {
-                                        
+
                                     }
                                     else
                                     {
@@ -274,7 +276,7 @@ publish_data
                 }
             }
         }
-        readonly Dictionary<string, string> MainData = new();
+        readonly Dictionary<string, string> MainData = [];
         string? rawData = null;
         public string Filename
         {
@@ -284,19 +286,15 @@ publish_data
         public string? GetValue(string key)
         {
             string? retVal = null;
-            if (MainData.ContainsKey(key))
+            if (MainData.TryGetValue(key, out string? value))
             {
-                retVal = MainData[key];
+                retVal = value;
             }
             return retVal;
         }
         public string[] GetKeys()
         {
-            List<string> retVal = new();
-            foreach (var key in MainData.Keys)
-            {
-                retVal.Add(key);
-            }
+            List<string> retVal = [.. MainData.Keys];
             return retVal.ToArray();
         }
         public bool HasKey(string key)

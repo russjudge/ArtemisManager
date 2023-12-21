@@ -5,12 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <converter:NullToBoolConverter x:Key="NullToBoolConverter" />
-        <converter:NullToVisibility x:Key="NullToVisibility" />
+        <russjudge:NullToVisibilityConverter x:Key="NullToVisibility" />
         <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
     </UserControl.Resources>
 
     <DockPanel>
@@ -39,7 +41,7 @@
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
                 <Button
-                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                     HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import settings file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
@@ -93,7 +95,7 @@
                                     </MenuItem>
                                     <Separator />
                                     <MenuItem
-                                        Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                                        Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                                         CommandParameter="{Binding}"
                                         Header="_Export" Click="OnExportSettingsFile" >
                                         <MenuItem.Icon>

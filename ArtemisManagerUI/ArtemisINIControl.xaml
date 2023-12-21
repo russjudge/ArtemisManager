@@ -4,19 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
-             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              mc:Ignorable="d" Name="uc"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <converter:FilenameToNameConverter x:Key="FilenameToNameConverter" />
+        <russjudge:FullFilePathToNameConverter x:Key="FullFilePathToNameConverter" />
     </UserControl.Resources>
 
     <GroupBox>
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Localized Settings: "/>
-                <TextBlock Text="{Binding ElementName=uc, Path=SettingsFile.SaveFile, Mode=OneWay, Converter={StaticResource FilenameToNameConverter}}"   />
+                <TextBlock Text="{Binding ElementName=uc, Path=SettingsFile.SaveFile, Mode=OneWay, Converter={StaticResource FullFilePathToNameConverter}}"   />
             </StackPanel>
         </GroupBox.Header>
         <DockPanel>
@@ -24,7 +23,7 @@
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" >
                 <Button ToolTip="Activate settings." Click="OnActivate">
                     <StackPanel>
-                    <Image Height="16" Source="/ArtemisManagerUI;component/Resources/activate.png" />
+                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/activate.png" />
                         <!--<TextBlock Text="Activate" />-->
                     </StackPanel>
                 </Button>
@@ -187,7 +186,7 @@
                         ForLocalSettings="True"
                         IsInt="True"
                         Setting="{Binding ElementName=uc, Path=SettingsFile.operatorLogoImageY, Mode=TwoWay}" />
-                    
+
                     <local:ArtemisINISettingControl
                         ForLocalSettings="True"
                         IsBool="True" MouseDown="OnAllowOptionMouseDown"

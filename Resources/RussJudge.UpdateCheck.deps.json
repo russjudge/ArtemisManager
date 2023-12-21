@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "RussJudge.UpdateCheck/1.0.0": {
+        "runtime": {
+          "RussJudge.UpdateCheck.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RussJudge.UpdateCheck/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

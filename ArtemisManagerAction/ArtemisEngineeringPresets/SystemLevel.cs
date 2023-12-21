@@ -26,7 +26,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
         {
             Changed = false;
         }
-        static readonly string[] systems = { "Beam", "Torpedo", "Sensors", "Maneuvering", "Impulse", "Warp/Jump", "Front Shield", "Rear Shield" };
+        static readonly string[] systems = ["Beam", "Torpedo", "Sensors", "Maneuvering", "Impulse", "Warp/Jump", "Front Shield", "Rear Shield"];
         public string SystemName
         {
             get
@@ -124,7 +124,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             }
             set
             {
-                changed= value;
+                changed = value;
                 DoChanged();
             }
 
@@ -135,7 +135,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             {
                 Changed = true;
             }
-            
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
     }

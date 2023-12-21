@@ -14,7 +14,7 @@ namespace ArtemisManagerUI
     {
         public ChatControl()
         {
-            Chat = new();
+            Chat = [];
             InitializeComponent();
             if (Network.Current != null)
             {

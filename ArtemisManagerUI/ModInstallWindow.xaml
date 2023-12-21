@@ -4,11 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArtemisManagerUI"
-        xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+        xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
         mc:Ignorable="d" Name="uc"
         Title="Install Mod" SizeToContent="Height" Width="600">
     <Window.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
         <Style TargetType="Label">
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -53,10 +54,10 @@
         <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding ElementName=uc, Path=Mod.RequiredArtemisVersion, Mode=TwoWay}" Margin="0,0,0,32" Grid.RowSpan="2" />
         <Button Grid.Row="7" Grid.Column="0" Content="Cancel" Click="OnCancel" IsCancel="True" Grid.ColumnSpan="2" Margin="2,2,2,2" />
         <Button
-            Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+            Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
             Grid.Row="7" Grid.Column="2" Content="Install" Click="OnInstallMod" IsDefault="True" Margin="2,2,2,2" />
         <Button
-            Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+            Visibility="{Binding ElementName=uc, Path=ForInstall, Mode=OneWay, Converter={StaticResource FalseBoolToVisibilityConverter}}"
             Grid.Row="7" Grid.Column="2" Content="Generate Mod" Click="OnGenerateMod" IsDefault="True" Margin="2,2,2,2" />
     </Grid>
 </Window>

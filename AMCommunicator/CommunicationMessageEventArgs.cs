@@ -8,7 +8,8 @@ namespace AMCommunicator
 {
     public class CommunicationMessageEventArgs : EventArgs
     {
-        public CommunicationMessageEventArgs(string? host, string message) 
+        private CommunicationMessageEventArgs() { Message = string.Empty; }
+        public CommunicationMessageEventArgs(string? host, string message)
         {
             Host = host;
             Message = message;

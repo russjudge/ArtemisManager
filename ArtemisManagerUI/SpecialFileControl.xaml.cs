@@ -159,11 +159,11 @@ namespace ArtemisManagerUI
                     // Also, need to process for "/" 
                     // Also, validate RelativeFolderPath.  ONLY starting with "art" or "dat" is valid.
                     //  
-                    while (me.RelativeFolderPath.StartsWith("\\"))
+                    while (me.RelativeFolderPath.StartsWith('\\'))
                     {
                         me.RelativeFolderPath = me.RelativeFolderPath.Substring(1);
                     }
-                    while(me.RelativeFolderPath.EndsWith("\\"))
+                    while (me.RelativeFolderPath.EndsWith('\\'))
                     {
                         me.RelativeFolderPath = me.RelativeFolderPath.Substring(0, me.RelativeFolderPath.Length - 1);
                     }
@@ -196,11 +196,11 @@ namespace ArtemisManagerUI
                 if (!me.IsSetting)
                 {
                     me.IsSetting = true;
-                    while (!string.IsNullOrEmpty(me.FileFolderPrefix) && me.FileFolderPrefix.EndsWith("\\"))
+                    while (!string.IsNullOrEmpty(me.FileFolderPrefix) && me.FileFolderPrefix.EndsWith('\\'))
                     {
                         me.FileFolderPrefix = me.FileFolderPrefix.Substring(0, me.FileFolderPrefix.Length - 1);
                     }
-                    if (!string.IsNullOrEmpty(me.RelativeFolderPath) && me.RelativeFolderPath.Contains(":"))
+                    if (!string.IsNullOrEmpty(me.RelativeFolderPath) && me.RelativeFolderPath.Contains(':'))
                     {
                         me.RelativeFolderPath = me.RelativeFolderPath.Replace(me.FileFolderPrefix, string.Empty);
                     }
@@ -284,10 +284,10 @@ namespace ArtemisManagerUI
                     me.IsSetting = true;
                     if (!string.IsNullOrEmpty(me.Value))
                     {
-                        int i = me.Value.LastIndexOf(@"\");
+                        int i = me.Value.LastIndexOf('\\');
                         if (i < 0)
                         {
-                            i = me.Value.LastIndexOf("/");
+                            i = me.Value.LastIndexOf('/');
                         }
                         if (i >= 0)
                         {
@@ -310,7 +310,7 @@ namespace ArtemisManagerUI
                 }
             }
         }
-        
+
         public string Value
         {
             get
@@ -347,7 +347,7 @@ namespace ArtemisManagerUI
             {
                 if (!string.IsNullOrEmpty(me.Filename))
                 {
-                    FileInfo f = new FileInfo(me.Filename);
+                    FileInfo f = new(me.Filename);
                     if (!me.IsSetting)
                     {
                         me.IsSetting = true;
@@ -395,8 +395,10 @@ namespace ArtemisManagerUI
 
         private void OnShowImage(object sender, RoutedEventArgs e)
         {
-            ProcessStartInfo startInfo = new(this.Filename);
-            startInfo.UseShellExecute = true;
+            ProcessStartInfo startInfo = new(Filename)
+            {
+                UseShellExecute = true
+            };
             Process.Start(startInfo);
         }
         System.Media.SoundPlayer? player = null;
@@ -412,8 +414,10 @@ namespace ArtemisManagerUI
                 }
                 else
                 {
-                    player = new System.Media.SoundPlayer();  //Can only play *.wav files.
-                    player.SoundLocation = Filename;
+                    player = new System.Media.SoundPlayer
+                    {
+                        SoundLocation = Filename
+                    };  //Can only play *.wav files.
                     player.Load();
                     player.Play();
                 }
@@ -426,7 +430,7 @@ namespace ArtemisManagerUI
         public static bool IsAudioFile(string filePath)
         {
             string ext = System.IO.Path.GetExtension(filePath);
-            string[] audioExtensions = { ".mp3", ".wav", ".ogg", ".flac", ".aac", ".wma", ".m4a" }; // Add more if needed
+            string[] audioExtensions = [".mp3", ".wav", ".ogg", ".flac", ".aac", ".wma", ".m4a"]; // Add more if needed
 
             return audioExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase);
         }

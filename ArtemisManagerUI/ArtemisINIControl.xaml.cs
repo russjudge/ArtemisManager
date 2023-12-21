@@ -17,7 +17,7 @@ namespace ArtemisManagerUI
     {
         public ArtemisINIControl()
         {
-            AvailableResolutions = new ObservableCollection<System.Drawing.Size>();
+            AvailableResolutions = [];
             ArtemisFolder = ModItem.ActivatedFolder;
             InitializeComponent();
             InitializeResolutions();
@@ -73,11 +73,9 @@ namespace ArtemisManagerUI
                                         var sz = resolution.Split('x');
                                         if (sz.Length > 1)
                                         {
-                                            int w = 0;
-                                            int h = 0;
-                                            if (int.TryParse(sz[0], out w))
+                                            if (int.TryParse(sz[0], out int w))
                                             {
-                                                if (int.TryParse(sz[1], out h))
+                                                if (int.TryParse(sz[1], out int h))
                                                 {
                                                     System.Drawing.Size size = new(w, h);
                                                     AvailableResolutions.Add(size);
@@ -166,16 +164,9 @@ namespace ArtemisManagerUI
 
         public static readonly DependencyProperty SettingsFileProperty =
           DependencyProperty.Register(nameof(SettingsFile), typeof(ArtemisINI),
-         typeof(ArtemisINIControl), new PropertyMetadata(OnSettingsFileChanged));
+         typeof(ArtemisINIControl));
 
-        private static void OnSettingsFileChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is ArtemisINIControl me)
-            {
 
-                var x = me.SettingsFile;
-            }
-        }
 
         public ArtemisINI SettingsFile
         {
@@ -198,12 +189,12 @@ namespace ArtemisManagerUI
                 {
                     string nm = new System.IO.FileInfo(SettingsFile.SaveFile).Name;
                     nm = nm.Substring(0, nm.Length - 4);
-                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty,nm);
+                    Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateArtemisINIFile, Guid.Empty, nm);
                 }
             }
             else
             {
-                
+
                 ArtemisManager.SetActiveLocalArtemisINISettings(SettingsFile.SaveFile);
                 PopupMessage = "Settings file activated.";
             }

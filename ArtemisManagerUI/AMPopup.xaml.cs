@@ -58,11 +58,7 @@ namespace ArtemisManagerUI
 
             }
         }
-        void DoPopup(string message)
-        {
-            PopupMessage = message;
-            ShowPopup = true;
-        }
+
         public bool ShowPopup
         {
             get

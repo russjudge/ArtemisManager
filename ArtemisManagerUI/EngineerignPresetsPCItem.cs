@@ -23,9 +23,9 @@ namespace ArtemisManagerUI
         {
             Connection = pc;
             IsRemote = (pc.IP?.ToString() == IPAddress.Loopback.ToString());
-            EngineeringPresetsFiles = new ObservableCollection<EngineeringPresetFileListItem>();
+            EngineeringPresetsFiles = [];
         }
-        
+
         public static readonly DependencyProperty IsRemoteProperty =
           DependencyProperty.Register(nameof(IsRemote), typeof(bool),
           typeof(EngineeringPresetsPCItem));

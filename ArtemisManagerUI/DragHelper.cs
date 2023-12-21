@@ -243,7 +243,7 @@ namespace ArtemisManagerUI
         {
             if (source != null)
             {
-                source.PreviewMouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(source_PreviewMouseLeftButtonDown);
+                source.PreviewMouseLeftButtonDown += new System.Windows.Input.MouseButtonEventHandler(Source_PreviewMouseLeftButtonDown);
                 source.PreviewMouseMove += new System.Windows.Input.MouseEventHandler(Source_PreviewMouseMove);
 
                 source.Dispatcher.Invoke(new Action(() =>
@@ -309,7 +309,7 @@ namespace ArtemisManagerUI
         }
         public static void InitializeDragging(this UIElement source)
         {
-            
+
             source.InitializeDragging(source as FrameworkElement);
         }
 
@@ -403,15 +403,15 @@ namespace ArtemisManagerUI
                 // Let's wire our usual events.. 
                 // GiveFeedback just tells it to use no standard cursors..  
 
-                GiveFeedbackEventHandler feedbackhandler = new GiveFeedbackEventHandler(Source_GiveFeedback);
+                GiveFeedbackEventHandler feedbackhandler = new(Source_GiveFeedback);
                 DragScope.GiveFeedback += feedbackhandler;
 
                 // The DragOver event ... 
-                DragEventHandler draghandler = new DragEventHandler(DragOver);
+                DragEventHandler draghandler = new(DragOver);
                 DragScope.PreviewDragOver += draghandler;
 
                 // Drag Leave is optional, but write up explains why I like it .. 
-                DragEventHandler dragleavehandler = new DragEventHandler(DragScope_DragLeave);
+                DragEventHandler dragleavehandler = new(DragScope_DragLeave);
                 DragScope.DragLeave += dragleavehandler;
 
                 // QueryContinue Drag goes with drag leave... 
@@ -502,7 +502,7 @@ namespace ArtemisManagerUI
         }
 
 
-        static void source_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        static void Source_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             SetStartPoint((DependencyObject)sender, e.GetPosition(null));
         }
@@ -512,7 +512,7 @@ namespace ArtemisManagerUI
         {
             if (source != null)
             {
-                source.PreviewMouseLeftButtonDown -= new System.Windows.Input.MouseButtonEventHandler(source_PreviewMouseLeftButtonDown);
+                source.PreviewMouseLeftButtonDown -= new System.Windows.Input.MouseButtonEventHandler(Source_PreviewMouseLeftButtonDown);
                 source.PreviewMouseMove -= new System.Windows.Input.MouseEventHandler(Source_PreviewMouseMove);
             }
         }

@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <converter:IPLoopbackToBoolConverter x:Key="IPLoopbackToBoolConverter" />
         <converter:IPAnyToVisibility x:Key="IPAnyToVisibility" />
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
         <Style TargetType="ListBox">
             <Style.Triggers>
                 <DataTrigger
@@ -29,7 +29,7 @@
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" >
             <Button
-                Visibility="{Binding ElementName=uc, Path=ShowMods, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=ShowMods, Converter={StaticResource BoolToVisibilityConverter}}"
                 Click="OnDeactivateAllMods" Content="Deactivate All Mods" />
         </StackPanel>
         <ListBox

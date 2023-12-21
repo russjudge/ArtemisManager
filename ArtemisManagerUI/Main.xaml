@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArtemisManagerUI" FontSize="14"
         xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+        xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
         mc:Ignorable="d" Name="uc" Loaded="OnLoaded" Closed="OnClosed"
         
         Title="Artemis Manager" Height="700" Width="900" >
@@ -12,18 +13,19 @@
     <DockPanel>
 
         <DockPanel.Resources>
-            <converter:ByteFormatter x:Key="ByteFormatter" />
-            <converter:DateFormatter x:Key="DateFormatter" />
-            <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-            <converter:NullToVisibility x:Key="NullToVisibility" />
-            <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
+            <russjudge:BytesToMBFormatter x:Key="ByteFormatter" />
+            <russjudge:DateFormatter x:Key="DateFormatter" />
+            <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
+            <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <russjudge:NullToVisibilityConverter x:Key="NullToVisibility" />
+            <russjudge:OppositeBoolConverter x:Key="OppositeBoolConverter" />
             <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
         </DockPanel.Resources>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Artemis SBS" >
                 <MenuItem
                     Click="OnStartArtemisSBS"
-                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                     Header="_Start Artemis SBS" >
                     <MenuItem.Icon>
                         <Image Source="/ArtemisManagerUI;component/Resources/start.png" />
@@ -31,7 +33,7 @@
                 </MenuItem>
                 <MenuItem
                     Click="OnStopArtemisSBS"
-                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityConverter}}"
                     Header="_Stop Artemis SBS" >
                     <MenuItem.Icon>
                         <Image Source="/ArtemisManagerUI;component/Resources/stop.png" />
@@ -87,7 +89,7 @@
             <MenuItem Header="_Tools">
                 <MenuItem
                     Click="OnStartServer"
-                    Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                     Header="_Start Peer-to-Peer network" >
                     <MenuItem.Icon>
                         <Image Source="/ArtemisManagerUI;component/Resources/peer-to-peer.png" />
@@ -95,7 +97,7 @@
                 </MenuItem>
                 <MenuItem
                     Click="OnRebroadcast"
-                    Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityConverter}}"
                     Header="_Re-broadcast announcement packet" >
                     <MenuItem.Icon>
                         <Image Source="/ArtemisManagerUI;component/Resources/broadcast.png" />
@@ -173,12 +175,12 @@
                 DockPanel.Dock="Right"
                 Click="OnStartServer"
                 ToolTip="Initiates the peer-to-peer network and broadcasts itself to any other active peers."
-                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource FalseBoolToVisibilityConverter}}" >
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/peer-to-peer.png" />
             </Button>
             <Button
                 DockPanel.Dock="Right"
-                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityConverter}}"
                 Click="OnRebroadcast"
                 ToolTip="Re-Broadcast on entire subnet to let all other Artemis Manager PCs know of this PC, and have those PCs create a connection to this one, if not already connected.">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/broadcast.png" />
@@ -206,7 +208,7 @@
                         Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
                         Text="Artemis Install Not Found." />
                     <AdornerDecorator
-                        Visibility="{Binding ElementName=uc, Path=IsWindows, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+                        Visibility="{Binding ElementName=uc, Path=IsWindows, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Button
                             Click="OnBrowseForArtemis"
                             Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
@@ -216,7 +218,7 @@
                             </StackPanel>
                         </Button>
                     </AdornerDecorator>
-                    
+
                 </StackPanel>
             </StackPanel>
             <Button DockPanel.Dock="Right" Click="OnOpenArtemisRunFolder" Margin="5,5,5,5" ToolTip="Open activated Artemis folder in Windows Explorer">
@@ -226,7 +228,7 @@
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/generate.png" />
             </Button>
             <Button
-                Visibility="{Binding ElementName=uc, Path=ArtemisChanged, Mode=OneWay,Converter={StaticResource BoolToVisibilityParameterConverter }, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=ArtemisChanged, Mode=OneWay,Converter={StaticResource BoolToVisibilityConverter }}"
                 DockPanel.Dock="Right" Click="OnSnapshotAretmis" Margin="5,5,5,5" ToolTip="Create snapshot of currently installed Artemis">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/snapshot.png" />
             </Button>
@@ -267,226 +269,13 @@
         </WrapPanel>
         <WrapPanel DockPanel.Dock="Top">
 
-            <!--<TextBlock
-                Foreground="Red" FontWeight="Bold"
-                Margin="5,0,5,0" VerticalAlignment="Center"
-                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
-                Text="Artemis Install Not Found." />
-            <AdornerDecorator
-                Visibility="{Binding ElementName=uc, Path=IsWindows, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-                <Button
-                Click="OnBrowseForArtemis"
-                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Visible|Collapsed'}"
-                ToolTip="Browse to Artemis Install Folder" >
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/search.png" />
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
-                    </StackPanel>
-                </Button>
-            </AdornerDecorator>-->
-            <!--<AdornerDecorator
-                Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
-                <Button
-                    Click="OnStartArtemisSBS"
-                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                    ToolTip="Start Artemis SBS. Note: this does not tell the peers to start Artemis SBS" >
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/start.png" />
-                        <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
-                    </StackPanel>
-                </Button>
-            </AdornerDecorator>
-            <AdornerDecorator Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
-                <Button
-                    Click="OnStopArtemisSBS"
-                    Visibility="{Binding ElementName=uc, Path=IsArtemisRunning, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                    ToolTip="Stop Artemis SBS. Note: this does not tell the peers to start Artemis SBS" >
-                    <StackPanel>
-                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/stop.png" />
-                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/artemis1.png" />
-                        </StackPanel>
-                        <CheckBox IsChecked="{Binding ElementName=uc, Path=IsUsingThisAppControlledArtemis}" VerticalContentAlignment="Center" VerticalAlignment="Center" IsEnabled="False" >
-                            <TextBlock Text="Artemis is under Manager control" ToolTip="Indicates if the version of Artemis is running is running due the the Artemis Manager" TextWrapping="Wrap"/>
-                        </CheckBox>
-                    </StackPanel>
-                </Button>
-            </AdornerDecorator>-->
-
-            <!--<Button
-                Click="OnPutInStartup"
-                Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
-                ToolTip="Add Manager to Windows Startup" >
-                <StackPanel Orientation="Horizontal">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/add1.png" />
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
-                </StackPanel>
-            </Button>
-            <Button
-                Click="OnRemoveFromStartup"
-                Visibility="{Binding ElementName=uc, Path=InWindowsStartupFolder, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
-                ToolTip="Remove Manger from Windows Startup" >
-                <StackPanel Orientation="Horizontal">
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/no.png" />
-                    <Image Height="24" Source="/ArtemisManagerUI;component/Resources/startup.png" />
-                </StackPanel>
-            </Button>-->
-
-
 
         </WrapPanel>
-
-        <!--<StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem Content="{Binding ElementName=uc, Path=LastStatus, Mode=OneWay}" />
-        </StatusBar>-->
-
-
 
         <TabControl
             SelectedItem="{Binding ElementName=uc, Path=SelectedTabItem}"
             TabStripPlacement="Bottom">
-            <!--<TabItem>
-                <TabItem.Header>
-                    <WrapPanel>
-                        <Image Height="16" Source="/ArtemisManagerUI;component/Resources/wrench.png" />
-                        <TextBlock Text="Mods &amp; Missions" />
-                    </WrapPanel>
-                </TabItem.Header>
-                <DockPanel
-                    local:DragHelper.DragScopeId="DragScope1">
-                    <DockPanel
-                        DockPanel.Dock="Right" >
-                        <TabControl
-                            Tag="{Binding ElementName=uc, Mode=OneWay, Path=SelectedPeer}"
-                            Width="400">
-                            <TabItem
-                                AllowDrop="True"
-                                DragEnter="OnModDragEnter"
-                                DragLeave="OnModDragLeave"
-                                DragOver="OnModDragOver"
-                                Drop="OnModDrop"
-                                Tag="InstalledMods" >
-                                <TabItem.Header>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label VerticalAlignment="Center"  Content="Installed Mods" />
-                                    </StackPanel>
 
-                                </TabItem.Header>
-                                <DockPanel>
-                                    <DockPanel DockPanel.Dock="Top" >
-                                        <Button
-                                            Click="OnInstallMod" ToolTip="Install a Mod or Mission"
-                                            Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
-                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
-                                            </StackPanel>
-                                        </Button>
-                                        <Button
-                                            DockPanel.Dock="Top"
-                                            HorizontalAlignment="Left"
-                                            Click="OnDeactivateMods"
-                                            Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}"
-                                            ToolTip="Deactivate All Mods by reseting activated Artemis folder to base Artemis" >
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/deactivate.png" />
-                                                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png" />
-                                            </StackPanel>
-                                        </Button>
-                                    </DockPanel>
-                                    <ListBox
-                                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
-                                        ItemsSource="{Binding ElementName=uc, Path=InstalledMods, Mode=OneWay}">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-
-                                                <local:ModItemControl
-                                                    ModActivated="OnModActivated"
-                                                    RemoteInstallMod="OnRemoteInstallMod"
-                                                    ModUninstalled="OnModUninstalled"
-                                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
-                                                    IsRemote="False"
-                                                    Mod="{Binding}" />
-
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </DockPanel>
-                            </TabItem>
-                            <TabItem
-                                AllowDrop="True"
-                                DragEnter="OnMissionDragEnter"
-                                DragLeave="OnMissionDragLeave"
-                                DragOver="OnMissionDragOver"
-                                Drop="OnMissionDrop"
-                                Tag="InstalledMissions" >
-                                <TabItem.Header>
-                                    <Label Content="Installed Missions" />
-                                </TabItem.Header>
-                                <DockPanel>
-                                    <Button
-                                        DockPanel.Dock="Top" HorizontalAlignment="Left"
-                                        Click="OnInstallMod" ToolTip="Install a Mod or Mission"
-                                        Visibility="{Binding ElementName=uc, Path=ArtemisInstallFolder, Converter={StaticResource NullToVisibility},ConverterParameter='Collapsed|Visible'}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/install.png" />
-                                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/tool-and-utensils.png"  />
-                                        </StackPanel>
-                                    </Button>
-
-                                    <ListBox
-                                        Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
-                                        ItemsSource="{Binding ElementName=uc, Path=InstalledMissions, Mode=OneWay}">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <local:ModItemControl
-                                                    RemoteInstallMod="OnRemoteInstallMod"
-                                                    ModUninstalled="OnMissionUninstalled"
-                                                    IsMaster="{Binding Mode=OneWay, Path=(ListBox.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"
-                                                    IsRemote="False"
-                                                    Mod="{Binding}" />
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </DockPanel>
-                            </TabItem>
-                        </TabControl>
-                    </DockPanel>
-                    <GroupBox
-                        Header="Connected Peers"
-                        BorderThickness="2,2,2,2"
-                        BorderBrush="CadetBlue"
-                        Visibility="{Binding IsStarted, ElementName=uc, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
-                        <TabControl
-                            SelectedValue="{Binding ElementName=uc, Mode=TwoWay, Path=SelectedPeer}"
-                            Tag="{Binding ElementName=uc, Mode=OneWay, Path=IsMaster}"
-                            ItemsSource="{Binding ConnectedPCs, Mode=OneWay, ElementName=uc}">
-
-                            <TabControl.ItemContainerStyle>
-                                <Style TargetType="TabItem">
-                                    <Setter
-                                        Property="Visibility"
-                                        Value="{Binding IP, Converter={StaticResource IPLoopbackToVisibility}, ConverterParameter='Collapsed|Visible'}" />
-                                </Style>
-                            </TabControl.ItemContainerStyle>
-                            <TabControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Hostname}" />
-                                </DataTemplate>
-                            </TabControl.ItemTemplate>
-                            <TabControl.ContentTemplate>
-                                <DataTemplate>
-                                    <local:PeerInfoControl
-                                        IsMaster="{Binding Mode=OneWay, Path=(TabControl.Tag), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}"
-                                        ItemData="{Binding}"
-                                        ConnectedPCs="{Binding Mode=OneWay, Path=(TabControl.ItemsSource), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type TabControl}}}" >
-                                    </local:PeerInfoControl>
-                                </DataTemplate>
-                            </TabControl.ContentTemplate>
-                        </TabControl>
-                    </GroupBox>
-                </DockPanel>
-            </TabItem>-->
             <TabItem>
                 <TabItem.Header>
                     <WrapPanel>
@@ -606,7 +395,7 @@
                     VerticalAlignment="Top"
                     local:ListBoxBehavior.AutoScroll="True" />
             </TabItem>
-           
+
         </TabControl>
     </DockPanel>
 </Window>

@@ -20,7 +20,7 @@ namespace Deploy
         /// <param name="targetPath"></param>
         public static void BuildDataFile(string version, string appTitle, string setupFileNameFullPath, string sourceOutDir, string targetPath)
         {
-            FileInfo setupFile = new FileInfo(setupFileNameFullPath);
+            FileInfo setupFile = new(setupFileNameFullPath);
             if (setupFile.Exists)
             {
                 string versionFile = Path.Combine(targetPath, appTitle.Replace(" ", string.Empty).ToLowerInvariant() + ".version");
@@ -28,7 +28,7 @@ namespace Deploy
                 {
                     File.Delete(versionFile);
                 }
-                using (StreamWriter sw = new StreamWriter(versionFile))
+                using (StreamWriter sw = new(versionFile))
                 {
                     sw.WriteLine(version);
                     sw.WriteLine(setupFile.Name.ToLowerInvariant());
@@ -37,7 +37,7 @@ namespace Deploy
             }
             //CopyFolder(sourceOutDir, Path.Combine(targetPath, appTitle.Replace(" ", string.Empty)));
         }
-        
+
         public static void CopyFolder(string sourceFolder, string targetFolder)
         {
             if (!Directory.Exists(targetFolder))
@@ -56,14 +56,14 @@ namespace Deploy
                 }
             }
         }
-        
-        public static Tuple<string,string> GetVersion(string projectFile)
+
+        public static Tuple<string, string> GetVersion(string projectFile)
         {
-            
+
             string projectData;
-            using (StreamReader sr = new StreamReader(projectFile))
+            using (StreamReader sr = new(projectFile))
             {
-                projectData= sr.ReadToEnd();
+                projectData = sr.ReadToEnd();
             }
 
             return ProcessProjectData(projectData);
@@ -80,7 +80,7 @@ namespace Deploy
                 int j = projectData.IndexOf('<', i);
                 string ver = projectData.Substring(i, j - i);
                 var parts = ver.Split('.');
-                
+
                 if (int.TryParse(parts[3], out int piece))
                 {
                     piece--;

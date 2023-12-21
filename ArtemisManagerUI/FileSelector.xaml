@@ -3,15 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ArtemisManagerUI"
-             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
     </UserControl.Resources>
     <DockPanel>
         <Label
-            Visibility="{Binding ElementName=uc, Path=ShowButtonOnly, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+            Visibility="{Binding ElementName=uc, Path=ShowButtonOnly, Converter={StaticResource FalseBoolToVisibilityConverter}}"
             VerticalAlignment="Center" Content="{Binding Title, ElementName=uc}" Padding="5,0,5,0" />
 
         <Button
@@ -20,7 +19,7 @@
             <Image Width="16" Height="16" Source="/ArtemisManagerUI;component/Resources/fileexplore.png" />
         </Button>
         <TextBox
-            Visibility="{Binding ElementName=uc, Path=ShowButtonOnly, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+            Visibility="{Binding ElementName=uc, Path=ShowButtonOnly, Converter={StaticResource FalseBoolToVisibilityConverter}}"
             VerticalContentAlignment="Center"  Text="{Binding Path=SelectedItem, ElementName=uc, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

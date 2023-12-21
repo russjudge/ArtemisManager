@@ -20,9 +20,9 @@ namespace ArtemisManagerUI
             Hostname = hostname;
             IP = ip;
             IsRemote = !TakeAction.IsLoopback(IP);
-            InstalledMods = new ObservableCollection<ModItem>();
-            InstalledMissions = new ObservableCollection<ModItem>();
-            Drives = new();
+            InstalledMods = [];
+            InstalledMissions = [];
+            Drives = [];
         }
         public void LoadClientInfoData(ClientInfoEventArgs info)
         {
@@ -32,7 +32,7 @@ namespace ArtemisManagerUI
             InstalledMissions.Clear();
             Drives.Clear();
             IsMaster = info.IsMaster;
-            AppVersion= info.AppVersion;
+            AppVersion = info.AppVersion;
             ConnectOnstart = info.ConnectOnStart;
             foreach (var item in info.InstalledMods)
             {
@@ -59,13 +59,13 @@ namespace ArtemisManagerUI
             }
             ArtemisIsRunning = info.ArtemisIsRunning;
             IsUsingThisAppControlledArtemis = info.IsUsingThisAppControlledArtemis;
-            AppInStartFolder= info.AppInStartFolder;
+            AppInStartFolder = info.AppInStartFolder;
             IsMainScreenServer = info.IsMainScreenServer;
             foreach (var drive in info.Drives)
             {
                 Drives.Add(drive);
             }
-            GeneralSettings= info.GeneralSettings;
+            GeneralSettings = info.GeneralSettings;
             TakeAction.SetAllConnectionsInfo();
         }
         public string Hostname { get; private set; }
@@ -116,12 +116,12 @@ namespace ArtemisManagerUI
             }
         }
 
-        
-        public ObservableCollection<ModItem> InstalledMods { get;  set; }
-        
+
+        public ObservableCollection<ModItem> InstalledMods { get; set; }
 
 
-        public ObservableCollection<ModItem> InstalledMissions {get;  set;}
+
+        public ObservableCollection<ModItem> InstalledMissions { get; set; }
 
         private bool? artemisIsRunning = false;
 

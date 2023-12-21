@@ -57,7 +57,7 @@ namespace ArtemisManagerAction
             SetValue(value);
             UsingDefault = useDefault;
         }
-        private bool IsCommentLine(string line)
+        private static bool IsCommentLine(string line)
         {
             int posEqual = line.IndexOf('=');
             bool isComment = false;
@@ -106,7 +106,7 @@ namespace ArtemisManagerAction
             }
         }
 
-        public List<string> CommentLines { get; set; } = new();
+        public List<string> CommentLines { get; set; } = [];
         private string settingName = string.Empty;
         public string SettingName
         {
@@ -236,11 +236,7 @@ namespace ArtemisManagerAction
         }
         public string[] GetOutLines()
         {
-            List<string> retVal = new();
-            foreach (var comment in CommentLines)
-            {
-                retVal.Add(comment);
-            }
+            List<string> retVal = [.. CommentLines];
             StringBuilder sb = new();
             if (UsingDefault)
             {
@@ -250,7 +246,7 @@ namespace ArtemisManagerAction
             sb.Append('=');
             sb.Append(FileValue);
             retVal.Add(sb.ToString());
-            return retVal.ToArray();
+            return [.. retVal];
         }
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void DoChanged([CallerMemberName] string property = "")

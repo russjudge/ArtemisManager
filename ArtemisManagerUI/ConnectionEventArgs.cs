@@ -8,6 +8,7 @@ namespace ArtemisManagerUI
 {
     public class ConnectionEventArgs : EventArgs
     {
+        private ConnectionEventArgs() { throw new NotImplementedException(); }
         public ConnectionEventArgs(PCItem connection)
         {
             Connection = connection;

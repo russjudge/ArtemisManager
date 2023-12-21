@@ -8,6 +8,7 @@ namespace ArtemisManagerUI
 {
     public class DragStartedEventArgs : EventArgs
     {
+        private DragStartedEventArgs() { throw new NotImplementedException(); }
         public DragStartedEventArgs(object dragObject)
         {
             DragObject = dragObject;

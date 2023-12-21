@@ -24,7 +24,7 @@ namespace ArtemisManager
         static Mutex? Mutex;
 #pragma warning restore IDE0052 // Remove unread private members
         public static bool ProbablyUnattended { get; private set; }
-        private void CreateFolders()
+        private static void CreateFolders()
         {
             ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.ArtemisINIFolder);
             ModManager.CreateFolder(ArtemisManagerAction.ArtemisManager.ControlsINIFolder);
@@ -76,7 +76,7 @@ namespace ArtemisManager
 
         private void OnError(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-           
+
             try
             {
                 string workFile = Path.GetTempFileName() + ".txt";
@@ -85,29 +85,13 @@ namespace ArtemisManager
                 {
                     sw.WriteLine(e.Exception.ToString());
                     sw.WriteLine();
-                    //try
-                    //{
-                    //    this.Dispatcher.Invoke(new Action(() =>
-                    //    {
-                    //        if (TakeAction.MainWindow != null)
-                    //        {
-                    //            foreach (var line in TakeAction.MainWindow.Status)
-                    //            {
-                    //                sw.WriteLine(line);
-                    //            }
-                    //        }
-                    //    }));
-                    //}
-                    //catch
-                    //{
 
-                    //}
                 }
 
-               MessageBox.Show(string.Format("FATAL ERROR: --{0}--" +
-                        "{1}{1}Loading debugging information.{1}Please cut and paste this information into the \"Contact Us\" form at:{1}https://russjudge/contact{1}{1}" +
-                        "We need to exit now....", e.Exception.Message, Environment.NewLine), "FATAL ERROR", MessageBoxButton.OK, MessageBoxImage.Error
-                        );
+                MessageBox.Show(string.Format("FATAL ERROR: --{0}--" +
+                         "{1}{1}Loading debugging information.{1}Please cut and paste this information into the \"Contact Us\" form at:{1}https://russjudge/contact{1}{1}" +
+                         "We need to exit now....", e.Exception.Message, Environment.NewLine), "FATAL ERROR", MessageBoxButton.OK, MessageBoxImage.Error
+                         );
                 ProcessStartInfo startInfo = new(workFile)
                 {
                     UseShellExecute = true
@@ -120,7 +104,7 @@ namespace ArtemisManager
                 };
                 Process.Start(startInfo);
             }
-            catch (Exception ex)
+            catch
             {
 
             }

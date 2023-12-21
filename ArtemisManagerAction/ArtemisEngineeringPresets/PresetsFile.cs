@@ -9,19 +9,25 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace ArtemisManagerAction.ArtemisEngineeringPresets
 {
     [JsonSerializable(typeof(PresetsFile))]
+    [JsonSourceGenerationOptions(WriteIndented = true)]
+    internal partial class SourceGenerationContext : JsonSerializerContext
+    {
+
+    }
     public class PresetsFile : INotifyPropertyChanged, ISendableStringFile
     {
         public const int MaxPresets = 10;
         public const byte HeaderByte = 0xfe;
         public PresetsFile()
         {
-            
+
         }
         public void Initialize()
         {
@@ -62,7 +68,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
         private void LoadPresets(string file)
         {
             Presets.Clear();
-            List<Preset> workPresets = new();
+            List<Preset> workPresets = [];
             if (File.Exists(file))
             {
                 using (BinaryReader br = new(File.Open(file, FileMode.Open, FileAccess.Read)))
@@ -76,13 +82,13 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
                     }
                     for (int i = 0; i < MaxPresets; i++)
                     {
-                        List<int> energyLevels = new();
-                        List<int> coolantLevels = new();
-                        for (int j = 0; j < Preset.MaxStations; j++)
+                        List<int> energyLevels = [];
+                        List<int> coolantLevels = [];
+                        for (int j = 0; j < ArtemisEngineeringPresets.Preset.MaxStations; j++)
                         {
                             energyLevels.Add((int)Math.Round(br.ReadSingle() * 300));
                         }
-                        for (int j = 0; j < Preset.MaxStations; j++)
+                        for (int j = 0; j < ArtemisEngineeringPresets.Preset.MaxStations; j++)
                         {
                             coolantLevels.Add(Convert.ToInt32(br.ReadByte()));
                         }
@@ -105,7 +111,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
                     workPresets.Add(p);
                 }
             }
-            
+
             for (int i = 0; i < MaxPresets; i++)
             {
                 Presets.Add(workPresets[i]);
@@ -137,11 +143,11 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
                     bw.Write(new byte[] { HeaderByte, HeaderByte });
                     for (int j = 0; j < MaxPresets; j++)
                     {
-                        for (int i = 0; i < Preset.MaxStations; i++)
+                        for (int i = 0; i < ArtemisEngineeringPresets.Preset.MaxStations; i++)
                         {
                             bw.Write((float)Presets[j].SystemLevels[i].EnergyLevel / 300);
                         }
-                        for (int i = 0; i < Preset.MaxStations; i++)
+                        for (int i = 0; i < ArtemisEngineeringPresets.Preset.MaxStations; i++)
                         {
                             byte b = (byte)Presets[j].SystemLevels[i].CoolantLevel;
                             bw.Write(b);
@@ -155,12 +161,12 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             SaveFile = file;
             Save();
         }
-       
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        
+
         [JsonInclude()]
-        public ObservableCollection<Preset> Presets { get; set; } = new ObservableCollection<Preset>();
+        public ObservableCollection<Preset> Presets { get; set; } = [];
 
         protected void DoChanged([CallerMemberName] string property = "")
         {
@@ -177,11 +183,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
 
         public string GetSerializedString()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            return JsonSerializer.Serialize(this, options);
+            return JsonSerializer.Serialize(this, SourceGenerationContext.Default.PresetsFile);
         }
     }
 }

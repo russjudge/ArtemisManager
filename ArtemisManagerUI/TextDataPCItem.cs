@@ -23,9 +23,9 @@ namespace ArtemisManagerUI
         {
             Connection = pc;
             IsRemote = (pc.IP?.ToString() == IPAddress.Loopback.ToString());
-            DataFileList = new ObservableCollection<TextDataFile>();
+            DataFileList = [];
         }
-        
+
         public static readonly DependencyProperty IsRemoteProperty =
           DependencyProperty.Register(nameof(IsRemote), typeof(bool),
           typeof(TextDataPCItem));

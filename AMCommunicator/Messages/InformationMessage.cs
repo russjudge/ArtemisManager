@@ -11,11 +11,18 @@ namespace AMCommunicator.Messages
     {
         public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 
-        public InformationMessage() : base() { Data = Array.Empty<string>(); }
-        public InformationMessage(RequestInformationType requestType, string identifier = "", string[] data = null) : base()
+        public InformationMessage() : base() { Data = []; }
+        public InformationMessage(RequestInformationType requestType, string identifier = "", string[]? data = null) : base()
         {
             RequestType = requestType;
-            Data = data;
+            if (data == null)
+            {
+                Data = [];
+            }
+            else
+            {
+                Data = data;
+            }
             Identifier = identifier;
         }
 

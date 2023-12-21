@@ -58,31 +58,34 @@ namespace AMCommunicator.Messages.Tests
 
             var testItem = new PCActionTest(PCActionsTest.SendClientInformation, true);
 
-            var JSON = JsonSerializer.Serialize<PCActionTest>(testItem, options );
+            var JSON = JsonSerializer.Serialize<PCActionTest>(testItem, options);
 
             var resultItem = JsonSerializer.Deserialize<PCActionTest>(JSON, options);
+            if (resultItem == null)
+            {
 
+            }
 
         }
     }
-   
+
     public class PCActionTest
     {
-            public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
+        public const short ThisVersion = 0;  //Increment by 1 for each new release of the application that changes THIS NetworkMessage.
 
-            public PCActionTest() : base()
-            {
+        public PCActionTest() : base()
+        {
 
-            }
-            public PCActionTest(PCActionsTest action, bool force) : base()
-            {
-                Force = force;
-                Action = action;
-            }
+        }
+        public PCActionTest(PCActionsTest action, bool force) : base()
+        {
+            Force = force;
+            Action = action;
+        }
 
-            public PCActionsTest Action { get;  set; }
-            public bool Force { get;  set; }
-        
+        public PCActionsTest Action { get; set; }
+        public bool Force { get; set; }
+
     }
     public enum PCActionsTest : short
     {

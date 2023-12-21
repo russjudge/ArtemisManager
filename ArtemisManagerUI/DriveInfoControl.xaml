@@ -5,30 +5,32 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              HorizontalAlignment="Stretch" 
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <converter:NullToVisibility x:Key="NullToVisibility" />
-        <converter:ByteFormatter x:Key="ByteFormatter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
+        <russjudge:NullToVisibilityConverter x:Key="NullToVisibility" />
+        <russjudge:BytesToMBFormatter x:Key="ByteFormatter" />
     </UserControl.Resources>
     <GroupBox HorizontalAlignment="Stretch" >
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal" >
                 <TextBlock
                     
-                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                     Text="{Binding ElementName=uc, Path=Drive.Name}" />
                 <TextBlock
                     FontWeight="Bold"
                     Foreground="Green"
-                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityConverter}}"
                     Text="{Binding ElementName=uc, Path=Drive.Name}" />
                 <TextBlock
                     Padding="10,0,0,0"
                     FontStyle="Italic"
                     Foreground="Green"
-                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=uc, Path=Drive.IsAppDrive, Converter={StaticResource BoolToVisibilityConverter}}"
                     Text="** Application Drive **" />
             </StackPanel>
         </GroupBox.Header>

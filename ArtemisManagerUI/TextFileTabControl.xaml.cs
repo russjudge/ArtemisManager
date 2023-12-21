@@ -24,7 +24,7 @@ namespace ArtemisManagerUI
     {
         public TextFileTabControl()
         {
-            ConnectedPCs = new();
+            ConnectedPCs = [];
             if (TakeAction.ConnectedPCs != null)
             {
                 foreach (var PC in TakeAction.ConnectedPCs)
@@ -171,16 +171,7 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnSendFileRequest(object sender, FileRequestRoutedEventArgs e)
-        {
-            if (sender is StringPackageSenderControl ctl)
-            {
-                if (ctl.Tag is TextDataPCItem data)
-                {
-                    //e.File = data.SelectedSettingsFile.SettingsFile;
-                }
-            }
-        }
+
 
         private void OnTransmissionCompleted(object sender, RoutedEventArgs e)
         {

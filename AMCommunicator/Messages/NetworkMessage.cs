@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AMCommunicator.Messages
 {
-    
+
     [JsonDerivedType(typeof(AlertMessage), nameof(AlertMessage))]
     [JsonDerivedType(typeof(ArtemisActionMessage), nameof(ArtemisActionMessage))]
     [JsonDerivedType(typeof(ChangeAppSettingMessage), nameof(ChangeAppSettingMessage))]
@@ -31,21 +31,18 @@ namespace AMCommunicator.Messages
         {
             SetMessageVersion();
             Source = Network.GetMyIP()?.ToString();
-            Unspecified = Array.Empty<byte>();
+            Unspecified = [];
         }
         public short MessageVersion { get; set; }
         public string? Source { get; set; }
         public byte[] Unspecified { get; set; }
 
         protected abstract void SetMessageVersion();
+        public static readonly JsonSerializerOptions jsonSerializerOptions = new() { WriteIndented = true };
 
         public string GetJSON()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = false,
-            };
-            return JsonSerializer.Serialize<NetworkMessage>(this, options);
+            return JsonSerializer.Serialize<NetworkMessage>(this, jsonSerializerOptions);
         }
     }
 }

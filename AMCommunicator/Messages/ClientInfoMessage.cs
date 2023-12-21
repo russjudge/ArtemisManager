@@ -19,9 +19,9 @@ namespace AMCommunicator.Messages
         internal ClientInfoMessage() : base()
         {
             AppVersion = string.Empty;
-            InstalledMods = Array.Empty<string>();
-            InstalledMissions= Array.Empty<string>();
-            Drives = Array.Empty<DriveData>();
+            InstalledMods = [];
+            InstalledMissions = [];
+            Drives = [];
             GeneralSettings = string.Empty;
         }
         public ClientInfoMessage(
@@ -45,7 +45,7 @@ namespace AMCommunicator.Messages
                 {
                     if (nm.Version != null)
                     {
-                        AppVersion =  nm.Version.ToString();
+                        AppVersion = nm.Version.ToString();
                     }
                 }
             }
@@ -95,7 +95,7 @@ namespace AMCommunicator.Messages
         public long FreeSpaceOnAppDrive { get; set; } = 0;
 
         [Obsolete]
-        public string[] AllDrives { get; set; } = Array.Empty<string>();
+        public string[] AllDrives { get; set; } = [];
         public DriveData[] Drives { get; set; }
         public bool IsMainScreenServer { get; set; }
 

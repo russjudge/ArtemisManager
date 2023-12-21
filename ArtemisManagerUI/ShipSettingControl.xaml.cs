@@ -24,8 +24,8 @@ namespace ArtemisManagerUI
     {
         public ShipSettingControl()
         {
-            AvailableShips = new ObservableCollection<KeyValuePair<Ship, string>>
-            {
+            AvailableShips =
+            [
                 new(Ship.None, Ship.None.ToString()),
                 new(Ship.Artemis, Ship.Artemis.ToString()),
                 new(Ship.Intrepid, Ship.Intrepid.ToString()),
@@ -35,8 +35,8 @@ namespace ArtemisManagerUI
                 new(Ship.Hera, Ship.Hera.ToString()),
                 new(Ship.Ceres, Ship.Ceres.ToString()),
                 new(Ship.Diana, Ship.Diana.ToString())
-            };
-            AvailableResolutions = new();
+            ];
+            AvailableResolutions = [];
             InitializeComponent();
         }
         public static readonly DependencyProperty SettingsFileProperty =

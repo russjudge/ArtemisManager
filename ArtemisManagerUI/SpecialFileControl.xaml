@@ -5,10 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              mc:Ignorable="d" Name="uc" Unloaded="OnUnloaded">
     <UserControl.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
+        <russjudge:OppositeBoolConverter x:Key="OppositeBoolConverter" />
         <Style TargetType="CheckBox">
             <Setter Property="Margin" Value="0,5,15,5" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -49,14 +51,12 @@
             Grid.Column="1">
 
             <Button
-                Visibility="{Binding ElementName=uc, Path=IsImage, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=IsImage, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Visible|Collapsed'}"
                 Click="OnShowImage"
                 Width="32"
                 DockPanel.Dock="Right" ToolTip="Show Image">
                 <Image Source="{Binding ElementName=uc, Path=Image}" />
             </Button>
-            <!-- Button hidden for now: must use a special media player. Built-in SoundPlayer can only support wav files. -->
-            <!--Visibility="{Binding ElementName=uc, Path=IsSound, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"-->
             <Button
                 Visibility="Collapsed"
                 Click="OnPlaySound"
@@ -64,10 +64,10 @@
                 DockPanel.Dock="Right" ToolTip="Play Sound">
                 <StackPanel>
                     <Image
-                    Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                     Source="/ArtemisManagerUI;component/Resources/play.png" />
                     <Image
-                    Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                    Visibility="{Binding ElementName=uc, Path=IsPlaying, Converter={StaticResource BoolToVisibilityConverter}}"
                     Source="/ArtemisManagerUI;component/Resources/stopplaying.png" />
                 </StackPanel>
             </Button>

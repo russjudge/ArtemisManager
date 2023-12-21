@@ -24,14 +24,14 @@ namespace ArtemisManagerUI
     {
         public VideoScreenSettingControl()
         {
-            AvailableModes = new ObservableCollection<KeyValuePair<VideoMode, string>>
-            {
+            AvailableModes =
+            [
                 new(VideoMode.None, VideoMode.None.ToString()),
-                new (VideoMode.Windowed, VideoMode.Windowed.ToString()),
-                new (VideoMode.FullScreen, "Full Screen"),
-                new (VideoMode.FullScreenWindowed, "Full Screen Windowed")
-            };
-            AvailableResolutions = new();
+                new(VideoMode.Windowed, VideoMode.Windowed.ToString()),
+                new(VideoMode.FullScreen, "Full Screen"),
+                new(VideoMode.FullScreenWindowed, "Full Screen Windowed")
+            ];
+            AvailableResolutions = [];
             InitializeComponent();
         }
         public static readonly DependencyProperty SettingsFileProperty =

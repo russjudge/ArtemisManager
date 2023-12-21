@@ -9,6 +9,7 @@ namespace ArtemisManagerAction
     [AttributeUsage(AttributeTargets.Property)]
     internal class INISettingAttribute : Attribute
     {
+        private INISettingAttribute() { throw new NotImplementedException(); }
         public INISettingAttribute(int sequence, ClientServerType _clientServerType)
         {
             Sequence = sequence;

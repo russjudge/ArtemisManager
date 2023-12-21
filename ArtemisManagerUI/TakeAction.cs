@@ -34,19 +34,16 @@ namespace ArtemisManagerUI
             StatusUpdate?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
         public static event EventHandler<StatusUpdateEventArgs>? PopupEvent;
-        private static void RaisePopupEvent(string message, params object[] parameters)
-        {
-            PopupEvent?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
-        }
+
         public static PCItem? SourcePC { get; set; }
         public static ObservableCollection<PCItem>? ConnectedPCs { get; set; }
         public static event EventHandler<ConnectionEventArgs>? ConnectionAdded;
         public static event EventHandler<ConnectionEventArgs>? ConnectionRemoved;
-        public static PCItem thisMachine { get; private set; }
+        public static PCItem ThisMachine { get; private set; }
         static TakeAction()
         {
-            ConnectedPCs = new();
-            thisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback)
+            ConnectedPCs = [];
+            ThisMachine = new PCItem(Dns.GetHostName() + " (Local)", IPAddress.Loopback)
             {
                 AppVersion = GetAppVersion(),
                 IsMaster = SettingsAction.Current.IsMaster,
@@ -64,8 +61,8 @@ namespace ArtemisManagerUI
             };
 
 
-            AddConnection(thisMachine);
-            TakeAction.SourcePC = thisMachine;
+            AddConnection(ThisMachine);
+            TakeAction.SourcePC = ThisMachine;
             if (SettingsAction.Current.IsMaster)
             {
                 AddConnection(new PCItem("All Connections", IPAddress.Any));
@@ -76,7 +73,7 @@ namespace ArtemisManagerUI
             ConnectedPCs?.Add(item);
             ConnectionAdded?.Invoke(null, new ConnectionEventArgs(item));
             //SetAllConnectionsInfo();
-           
+
         }
         public static void RemoveConnection(PCItem item)
         {
@@ -94,7 +91,7 @@ namespace ArtemisManagerUI
             {
                 if (System.IO.File.Exists(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier)))
                 {
-                    List<byte> data = new();
+                    List<byte> data = [];
                     byte[] buffer = new byte[32768];
                     int bytesRead;
                     using (FileStream fs = new(Path.Combine(ModManager.ModArchiveFolder, itemRequestedIdentifier), FileMode.Open))
@@ -106,7 +103,7 @@ namespace ArtemisManagerUI
                             data.AddRange(buffer2);
                         }
                     }
-                    
+
                     var dataArr = data.ToArray();
                     if (requestSource.ToString() == IPAddress.Any.ToString() && ConnectedPCs != null)
                     {
@@ -178,7 +175,7 @@ namespace ArtemisManagerUI
                             }
                         }
                     });
-                    
+
                     WasProcessed = true;
                     break;
                 case PCActions.ShutdownPC:
@@ -188,7 +185,7 @@ namespace ArtemisManagerUI
                         CreateNoWindow = true
                     };
                     System.Diagnostics.Process.Start(startInfo2);
-                    
+
                     WasProcessed = true;
                     break;
                 case PCActions.SendClientInformation:
@@ -197,18 +194,18 @@ namespace ArtemisManagerUI
                     break;
                 case PCActions.AddAppToStartup:
                     CreateShortcutInStartup();
-                    thisMachine.AppInStartFolder = true;
+                    ThisMachine.AppInStartFolder = true;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
-                    
-                    
+
+
                     break;
                 case PCActions.RemoveAppFromStartup:
                     RemoveShortcutFromStartup();
-                    thisMachine.AppInStartFolder = false;
+                    ThisMachine.AppInStartFolder = false;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
-                    
+
                     break;
                 case PCActions.SetAsMainScreenServer:
                     var ip = Network.GetMyIP();
@@ -221,10 +218,10 @@ namespace ArtemisManagerUI
                     {
                         ArtemisManager.SetServerIP(ip);
                     }
-                    thisMachine.IsMainScreenServer = true;
+                    ThisMachine.IsMainScreenServer = true;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
-                    
+
                     break;
                 case PCActions.RemoveAsMainScreenServer:
                     IPAddress? ipx = Network.GetMyIP();
@@ -246,12 +243,12 @@ namespace ArtemisManagerUI
                         }
                     }
                     ArtemisManager.SetServerIP(ipx);
-                    thisMachine.IsMainScreenServer = false;
+                    ThisMachine.IsMainScreenServer = false;
                     SendClientInfo(IPAddress.Any);
                     WasProcessed = true;
-                    
+
                     break;
-                
+
                 default:
                     WasProcessed = false;
                     break;
@@ -259,7 +256,7 @@ namespace ArtemisManagerUI
             }
             return WasProcessed;
         }
-        
+
         public static void SetMainScreenServerIP()
         {
             var ip = GetMainScreenServerIP();
@@ -267,13 +264,13 @@ namespace ArtemisManagerUI
             ArtemisManager.SetServerIP(ip);
             if (ip != null)
             {
-                thisMachine.IsMainScreenServer = (ip.Equals(Network.MyIP) || ip.Equals(IPAddress.Loopback));
+                ThisMachine.IsMainScreenServer = (ip.Equals(Network.MyIP) || ip.Equals(IPAddress.Loopback));
             }
         }
         public static IPAddress? GetMainScreenServerIP()
         {
             IPAddress? ipx = Network.GetMyIP();
-            
+
             if (ConnectedPCs != null)
             {
                 foreach (var pc in ConnectedPCs)
@@ -294,7 +291,7 @@ namespace ArtemisManagerUI
         /// <returns></returns>
         public static System.Drawing.Size[] GetAvailableScreenResolutions()
         {
-            List<System.Drawing.Size> retVal = new();
+            List<System.Drawing.Size> retVal = [];
             //(gwmi - N "root\wmi" - Class WmiMonitorListedSupportedSourceModes)[0].MonitorSourceModes | select { "$($_.HorizontalActivePixels)x$($_.VerticalActivePixels)"}
             try
             {
@@ -331,9 +328,9 @@ namespace ArtemisManagerUI
             {
                 MessageBox.Show("There was an error getting available screen resolutions:" + Environment.NewLine + e.Message);
             }
-            return retVal.ToArray();
+            return [.. retVal];
         }
-       
+
         public static void SendClientInfo(IPAddress? source)
         {
             if (source != null)
@@ -432,8 +429,8 @@ namespace ArtemisManagerUI
                 RaiseStatusUpdate("Unable to check for update: {0}", ex.Message);
                 if (AlertIfCannotCheck)
                 {
-                    MessageBox.Show("Unable to check for update: "+ Environment.NewLine + ex.Message, "Update Check Failed");
-                    
+                    MessageBox.Show("Unable to check for update: " + Environment.NewLine + ex.Message, "Update Check Failed");
+
                 }
                 else
                 {
@@ -568,7 +565,7 @@ namespace ArtemisManagerUI
             if (asm != null)
             {
                 string target = Path.Combine(StartupFolder, "ArtemisManager");
-                using (StreamWriter sw = new (target))
+                using (StreamWriter sw = new(target))
                 {
                     sw.WriteLine("#!/usr/bin");
                     sw.WriteLine(asm.Location.Replace(".dll", ".exe") + " FROMSTARTUPFOLDER");
@@ -593,9 +590,9 @@ namespace ArtemisManagerUI
             //var asm = System.Reflection.Assembly.GetEntryAssembly();
             //if (asm != null)
             //{
-                //string appLocation = asm.Location.Replace(".dll", ".exe");
-               // Abraham.Windows.Shell.AutostartFolder.AddShortcut(appLocation, null, "Artemis Manager", string.Empty);
-                
+            //string appLocation = asm.Location.Replace(".dll", ".exe");
+            // Abraham.Windows.Shell.AutostartFolder.AddShortcut(appLocation, null, "Artemis Manager", string.Empty);
+
             var temp = Path.GetTempFileName() + ".vbs";
             var asm = System.Reflection.Assembly.GetEntryAssembly();
             if (asm != null)
@@ -607,7 +604,7 @@ namespace ArtemisManagerUI
                 using (StreamWriter sw = new(temp))
                 {
                     sw.WriteLine("Set oWS = WScript.CreateObject(\"WScript.Shell\")");
-                    
+
                     sw.WriteLine("sLinkFile = \"" + target + "\"");
                     sw.WriteLine("Set oLink = oWS.CreateShortcut(sLinkFile)");
                     sw.WriteLine("oLink.TargetPath = \"" + appLocation.Replace(".dll", ".exe") + " FROMSTARTUPFOLDER\"");
@@ -629,22 +626,22 @@ namespace ArtemisManagerUI
 
                 process.WaitForExit();
                 File.Delete(temp);
-                    
-                                /*
-                 * Set oWS = WScript.CreateObject("WScript.Shell")
+
+                /*
+ * Set oWS = WScript.CreateObject("WScript.Shell")
 sLinkFile = "C:\MyShortcut.LNK"
 Set oLink = oWS.CreateShortcut(sLinkFile)
-    oLink.TargetPath = "C:\Program Files\MyApp\MyProgram.EXE"
- '  oLink.Arguments = ""
- '  oLink.Description = "MyProgram"   
- '  oLink.HotKey = "ALT+CTRL+F"
- '  oLink.IconLocation = "C:\Program Files\MyApp\MyProgram.EXE, 2"
- '  oLink.WindowStyle = "1"   
- '  oLink.WorkingDirectory = "C:\Program Files\MyApp"
+oLink.TargetPath = "C:\Program Files\MyApp\MyProgram.EXE"
+'  oLink.Arguments = ""
+'  oLink.Description = "MyProgram"   
+'  oLink.HotKey = "ALT+CTRL+F"
+'  oLink.IconLocation = "C:\Program Files\MyApp\MyProgram.EXE, 2"
+'  oLink.WindowStyle = "1"   
+'  oLink.WorkingDirectory = "C:\Program Files\MyApp"
 oLink.Save
-                 * */
+ * */
             }
-            
+
         }
         public static void SaveEngineeringPreset(string filename, string JsonData)
         {
@@ -652,7 +649,7 @@ oLink.Save
             if (file != null)
             {
                 string target = Path.Combine(ArtemisManager.EngineeringPresetsFolder, filename);
-              
+
                 file.Save(target);
                 Network.Current?.SendInformation(IPAddress.Any, RequestInformationType.ListOfEngineeringPresets, string.Empty, ArtemisManager.GetEngineeringPresetFiles());
             }
@@ -724,7 +721,7 @@ oLink.Save
             }
             return success;
         }
-        public static bool DoChangeSetting(string setting, string? value, bool fromRemote)
+        public static bool DoChangeSetting(string setting, string? value)
         {
             if (setting == "NetworkPassword" || setting == "Password")
             {
@@ -733,37 +730,7 @@ oLink.Save
             else
             {
                 bool success = true;
-                //if (fromRemote)
-                //{
-                //    success = true;
-                //}
-                //else
-                //{
 
-
-                //    switch (System.Windows.MessageBox.Show("Do you want to change this setting on all connected peers?", "Change setting on peer-to-peer network", MessageBoxButton.YesNoCancel))
-                //    {
-                //        case MessageBoxResult.Cancel:
-                //            success = false;
-                //            break;
-                //        case MessageBoxResult.Yes:
-                //            success = true;
-                //            if (ConnectedPCs != null)
-                //            {
-                //                foreach (var pc in ConnectedPCs)
-                //                {
-                //                    if (pc.IP != null && value != null)
-                //                    {
-                //                        Network.Current?.SendChangeSetting(pc.IP, setting, value);
-                //                    }
-                //                }
-                //            }
-                //            break;
-                //        case MessageBoxResult.No:
-                //            success = true;
-                //            break;
-                //    }
-                //}
                 return success;
             }
         }
@@ -771,12 +738,12 @@ oLink.Save
         {
             return (address?.ToString() == AllConnections.ToString());
         }
-        
+
         public static bool IsLoopback(IPAddress? address)
         {
             return (address?.ToString() == SelfIP.ToString());
         }
-        
+
         public static void SetAllConnectionsInfo()
         {
             if (ConnectedPCs != null && ConnectedPCs.Count > AllConnectionsElement)
@@ -1021,7 +988,7 @@ oLink.Save
                 if (TakeAction.IsLoopback(address))
                 {
                     TakeArtemisAction.ProcessArtemisAction(address, action, JSON);
-                    
+
                 }
                 else
                 {

@@ -17,12 +17,12 @@ namespace ArtemisManagerAction
     {
         public static readonly string ModInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMods");
         public static readonly string MissionInstallFolder = Path.Combine(ModManager.DataFolder, "InstalledMissions");
-        
+
         public readonly static string ActivatedFolder = Path.Combine(ModManager.DataFolder, "Activated");
         public static readonly string MissionFolderPath = Path.Combine(ActivatedFolder, "dat", "Missions");
         public ModItem()
         {
-            
+
         }
         /// <summary>
         /// Creates a copy ModItem that is activated.
@@ -35,12 +35,12 @@ namespace ArtemisManagerAction
             }
             ModItem item;
             string targetPath = ActivatedFolder;
-            
+
             if (string.IsNullOrEmpty(SaveFile))
             {
                 SaveFile = GetSaveFile();
             }
-            
+
             if (!IsMission)
             {
 
@@ -64,15 +64,15 @@ namespace ArtemisManagerAction
                     PackageFile = PackageFile,
                     SaveFile = SaveFile
                 };
-                
+
                 item.Save(Path.Combine(ModManager.DataFolder, SaveFile));
-                
+
             }
             else
             {
                 item = this;
                 targetPath = MissionFolderPath;
-                
+
             }
             string sourcePath = Path.Combine(GetFullSavePath(), InstallFolder);
             ModManager.CopyFolder(sourcePath, targetPath);
@@ -82,7 +82,7 @@ namespace ArtemisManagerAction
 
             return item;
         }
-        
+
         public bool Uninstall()
         {
             bool retVal = false;
@@ -97,7 +97,7 @@ namespace ArtemisManagerAction
                 {
                     File.Delete(Path.Combine(GetFullSavePath(), SaveFile));
                 }
-               
+
 
                 retVal = true;
             }
@@ -175,7 +175,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        private string? requiredAretmisVersion ="2.8.0";
+        private string? requiredAretmisVersion = "2.8.0";
         public string? RequiredArtemisVersion
         {
             get { return requiredAretmisVersion; }
@@ -185,7 +185,7 @@ namespace ArtemisManagerAction
                 DoChanged();
             }
         }
-        private string[] compatibleArtemisVersions = Array.Empty<string>();
+        private string[] compatibleArtemisVersions = [];
         public string[] CompatibleArtemisVersions
         {
             get { return compatibleArtemisVersions; }
@@ -336,11 +336,7 @@ namespace ArtemisManagerAction
         }
         public string GetJSON()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = false
-            };
-            return JsonSerializer.Serialize(this, options);
+            return JsonSerializer.Serialize(this, NetworkMessage.jsonSerializerOptions);
         }
         public static ModItem? GetModItem(string jsonData)
         {
@@ -348,8 +344,8 @@ namespace ArtemisManagerAction
             {
                 return JsonSerializer.Deserialize<ModItem>(jsonData);
             }
-            catch (Exception ex)
-            { 
+            catch
+            {
                 return null;
             }
         }
@@ -366,7 +362,7 @@ namespace ArtemisManagerAction
         /// <returns></returns>
         public string GetInstallFolder()
         {
-            
+
             if (string.IsNullOrEmpty(InstallFolder))
             {
                 if (ModIdentifier == Guid.Empty)
@@ -385,7 +381,7 @@ namespace ArtemisManagerAction
                     InstallFolder = ModIdentifier.ToString();
                 }
             }
-            
+
             return InstallFolder;
         }
         /// <summary>
@@ -459,11 +455,11 @@ namespace ArtemisManagerAction
             {
                 return false;
             }
-                
+
         }
         public void Unpack()
         {
-            ModManager.CreateFolder(Path.Combine(ModInstallFolder,installFolder));
+            ModManager.CreateFolder(Path.Combine(ModInstallFolder, installFolder));
             using Stream stream = File.OpenRead(Path.Combine(ModManager.ModArchiveFolder, PackageFile));
             Unpack(stream);
         }
@@ -505,7 +501,7 @@ namespace ArtemisManagerAction
             }
             using (var fs = new FileStream(packageTarget, FileMode.CreateNew))
             {
-                fs.Write(package,0, package.Length);
+                fs.Write(package, 0, package.Length);
             }
             string installFolder = Path.Combine(ModInstallFolder, GetInstallFolder());
             ModManager.CreateFolder(installFolder);

@@ -17,16 +17,15 @@ namespace AMCommunicator.Messages
         {
 
             string typeParse = message.GetType().Name;
-            typeParse = typeParse.Substring(0,typeParse.Length - 7);
-            MessageCommand cmd;
-            if (Enum.TryParse<MessageCommand>(typeParse, out cmd))
+            typeParse = typeParse.Substring(0, typeParse.Length - 7);
+            if (Enum.TryParse<MessageCommand>(typeParse, out MessageCommand cmd))
             {
                 Command = cmd;
             }
             else
             {
                 Command = MessageCommand.UndefinedPackage;
-            }    
+            }
             //Command = Enum.Parse <MessageCommand>(typeParse);
 
             //if (message.GetType() == typeof(AlertMessage))
@@ -93,12 +92,12 @@ namespace AMCommunicator.Messages
             JSON = message.GetJSON();
             Length = JSON.Length;
         }
-        public NetworkMessageHeader(byte[] data) 
+        public NetworkMessageHeader(byte[] data)
         {
             Length = BitConverter.ToInt32(data, 0);  //Is ONLY the length of the JSON part.
             Command = (MessageCommand)BitConverter.ToInt16(data, 4);
             Version = BitConverter.ToInt16(data, 6);
-            
+
             JSON = System.Text.ASCIIEncoding.ASCII.GetString(data, 8, Length);
         }
         /// <summary>
@@ -107,25 +106,22 @@ namespace AMCommunicator.Messages
         public int Length { get; private set; }
         public MessageCommand Command { get; private set; }
         public short Version { get; private set; }
-        
+
         public string JSON { get; private set; }
         public byte[] GetBytes()
         {
-            List<byte> bytes = new();
-            bytes.AddRange(BitConverter.GetBytes(Length));
-            bytes.AddRange(BitConverter.GetBytes((short)Command));
-            bytes.AddRange(BitConverter.GetBytes(Version));
-            
-            bytes.AddRange(System.Text.ASCIIEncoding.ASCII.GetBytes(JSON));
-            return bytes.ToArray();
+            List<byte> bytes =
+            [
+                .. BitConverter.GetBytes(Length),
+                .. BitConverter.GetBytes((short)Command),
+                .. BitConverter.GetBytes(Version),
+                .. System.Text.ASCIIEncoding.ASCII.GetBytes(JSON),
+            ];
+            return [.. bytes];
         }
         public T? GetItem<T>()
         {
-            
-            JsonSerializerOptions options = new();
-            
-            return JsonSerializer.Deserialize<T>(JSON, options);
-
+            return JsonSerializer.Deserialize<T>(JSON, NetworkMessage.jsonSerializerOptions);
         }
     }
 }

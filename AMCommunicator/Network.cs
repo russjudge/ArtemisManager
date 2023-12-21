@@ -21,12 +21,12 @@ namespace AMCommunicator
 
         public static string Password { get; set; }
         private readonly ManualResetEvent mreSender = new(false);
-        
+
         private Network()
         {
-            
+
         }
-       
+
         public static Network? Current { get; private set; }
         public static Network GetNetwork()
         {
@@ -41,8 +41,8 @@ namespace AMCommunicator
             Password = string.Empty;
         }
         private static bool abort = false;
-        
-       
+
+
         public static int ConnectionPort { get; set; }
 
         private void Connect(IPAddress target, int port)
@@ -52,7 +52,7 @@ namespace AMCommunicator
             try
             {
                 Liveclient = new TcpClient(AddressFamily.InterNetwork);
-                
+
                 Liveclient.Connect(target, port);
                 if (Liveclient.Connected)
                 {
@@ -112,7 +112,7 @@ namespace AMCommunicator
             activeConnections.Clear();
             RaiseStatusUpdate("All connections halted");
         }
-        
+
         public void SendPing(IPAddress target)
         {
             if (activeConnections.TryGetValue(target, out var connection))
@@ -160,7 +160,7 @@ namespace AMCommunicator
             {
                 ChangeAppSettingMessage msg = new(settingName, settingTarget);
 
-                
+
                 Transmit(connection.Stream, msg);
             }
         }
@@ -230,7 +230,7 @@ namespace AMCommunicator
                         mod = modItem;
                     }
 
-                    List<byte[]> bufferList = new();
+                    List<byte[]> bufferList = [];
                     byte[] buffer;
                     int startPos = 0;
                     int length = MaxJSONBytes;
@@ -275,10 +275,10 @@ namespace AMCommunicator
         {
             if (activeConnections.TryGetValue(target, out var connection))
             {
-                string[] d; 
+                string[] d;
                 if (data == null)
                 {
-                    d = Array.Empty<string>();
+                    d = [];
                 }
                 else
                 {
@@ -289,7 +289,7 @@ namespace AMCommunicator
             }
         }
         //For tracking and processing on active connections.
-        private readonly Dictionary<IPAddress, ConnectionTracker> activeConnections = new();
+        private readonly Dictionary<IPAddress, ConnectionTracker> activeConnections = [];
 
         //ONLY for starting connections.
         private readonly Queue<ConnectionQueueItem> queuedClients = new();
@@ -300,12 +300,12 @@ namespace AMCommunicator
         void StartConnection()
         {
             IPAddress? remoteAddress = null;
-            string? hostname = "";
+
             bool disconnect = false;
             var queuedItem = queuedClients.Dequeue();
             try
             {
-                
+
                 var generalEndPoint = queuedItem.Client.Client.RemoteEndPoint;
                 if (generalEndPoint != null)
                 {
@@ -314,36 +314,39 @@ namespace AMCommunicator
                     remoteAddress ??= IPAddress.None;
                     if (remoteAddress != null && remoteAddress != MyIP && remoteAddress != IPAddress.None && remoteAddress != IPAddress.Any)  //Don't want to connect to self or broadcast.
                     {
+#pragma warning disable CA1864 // Prefer the 'IDictionary.TryAdd(TKey, TValue)' method
                         if (!activeConnections.ContainsKey(remoteAddress))
                         {
-                            hostname = Dns.GetHostEntry(remoteAddress).HostName;
-                            ConnectionTracker trackItem = new(hostname, remoteAddress, queuedItem.Client.GetStream(), queuedItem.Client.Client, queuedItem.Thread);
+                            //hostname = Dns.GetHostEntry(remoteAddress).HostName;
+                            ConnectionTracker trackItem = new(Dns.GetHostEntry(remoteAddress).HostName,
+                                    remoteAddress, queuedItem.Client.GetStream(), queuedItem.Client.Client, queuedItem.Thread);
+
                             if (trackItem.Stream != null)
                             {
                                 activeConnections.Add(remoteAddress, trackItem);
                                 TCPStarter.Set();
-                                RaiseConnectionReceived(remoteAddress, hostname);
+                                RaiseConnectionReceived(remoteAddress, trackItem.Hostname);
                                 byte[] buff;
                                 List<byte> buffer;
                                 int bytesRead = 0;
                                 if (!queuedItem.FromListener) // (from UDP broadcast receipt)
                                 {
-                                    RaiseStatusUpdate("(from UDP broadcast receipt) Sending Handshake to {0}:{1}", remoteAddress.ToString(), hostname);
+                                    RaiseStatusUpdate("(from UDP broadcast receipt) Sending Handshake to {0}:{1}", remoteAddress.ToString(), trackItem.Hostname);
                                     //MUST SEND handshake item first here.
                                     HandshakeMessage msg = new();
                                     Transmit(trackItem.Stream, msg);
-                                    
+
                                 }
                                 SendPCAction(remoteAddress, PCActions.SendClientInformation, true);
                                 do
                                 {
-                                    RaiseStatusUpdate("Beginning read of stream loop for {0}", hostname);
+                                    RaiseStatusUpdate("Beginning read of stream loop for {0}", trackItem.Hostname);
                                     do
                                     {
                                         buff = new byte[NetworkMessageHeader.JSONDefinitionLengthPosition + NetworkMessageHeader.JSONDefinitionLength];
-                                        buffer = new List<byte>();
+                                        buffer = [];
                                         bytesRead = trackItem.Stream.Read(buff, 0, buff.Length);
-                                        RaiseStatusUpdate("Read packet length: {0} bytes from {1}", bytesRead, hostname);
+                                        RaiseStatusUpdate("Read packet length: {0} bytes from {1}", bytesRead, trackItem.Hostname);
                                         if (bytesRead > 0)
                                         {
                                             byte[] wrkByte = new byte[bytesRead];
@@ -358,7 +361,9 @@ namespace AMCommunicator
                                     if (bytesRead > 0)
                                     {
 
+#pragma warning disable IDE0305 // Simplify collection initialization
                                         int msgLength = BitConverter.ToInt32(buffer.ToArray(), NetworkMessageHeader.JSONDefinitionLengthPosition) + NetworkMessageHeader.HeaderLength;
+#pragma warning restore IDE0305 // Simplify collection initialization
 
                                         RaiseStatusUpdate("Packet Length: {0}", msgLength);
                                         List<byte> newBuffer = new(buffer.ToArray());
@@ -375,18 +380,18 @@ namespace AMCommunicator
                                                 newBuffer.AddRange(wrkByte);
                                             }
                                         }
-                                        RaiseStatusUpdate("Finished reading Packet for host {0}.  Full packet size: {1} (includes Length property)", hostname, newBuffer.Count);
-                                        NetworkMessageHeader header = new(newBuffer.ToArray());
+                                        RaiseStatusUpdate("Finished reading Packet for host {0}.  Full packet size: {1} (includes Length property)", trackItem.Hostname, newBuffer.Count);
+                                        NetworkMessageHeader header = new([.. newBuffer]);
 
                                         if (!string.IsNullOrEmpty(header.JSON))
                                         {
-                                            RaiseStatusUpdate("{0} message received from {1}.  Processing...", header.Command, hostname);
-                                            disconnect = ProcessMessage(trackItem.Stream, header, hostname);
-                                            RaiseStatusUpdate("Done processing {0} from {1}...Disconnect required = {2}", header.Command, hostname, disconnect);
+                                            RaiseStatusUpdate("{0} message received from {1}.  Processing...", header.Command, trackItem.Hostname);
+                                            disconnect = ProcessMessage(trackItem.Stream, header, trackItem.Hostname);
+                                            RaiseStatusUpdate("Done processing {0} from {1}...Disconnect required = {2}", header.Command, trackItem.Hostname, disconnect);
                                         }
                                         else
                                         {
-                                            RaiseStatusUpdate("Unable to convert packet to a network message for packet form host {0}.  Disconnecting from host.", hostname);
+                                            RaiseStatusUpdate("Unable to convert packet to a network message for packet form host {0}.  Disconnecting from host.", trackItem.Hostname);
                                             disconnect = true;
                                         }
                                     }
@@ -402,8 +407,9 @@ namespace AMCommunicator
                         }
                         else
                         {
-                            RaiseStatusUpdate("Duplicate connection request--not connection to host: {0} - {1}", remoteAddress, hostname);
+                            RaiseStatusUpdate("Duplicate connection request--not connection to host: {0}", remoteAddress);
                         }
+#pragma warning restore CA1864 // Prefer the 'IDictionary.TryAdd(TKey, TValue)' method
                     }
                     else
                     {
@@ -432,11 +438,11 @@ namespace AMCommunicator
             }
             catch (System.IO.IOException e)
             {
-                RaiseStatusUpdate("IOException in StartConnection on Host {0}:{2}{1}", hostname, e.Message, Environment.NewLine);
+                RaiseStatusUpdate($"IOException in StartConnection on Host {remoteAddress}:{Environment.NewLine}{e.Message}");
             }
             catch (System.Net.Sockets.SocketException e)
             {
-                RaiseStatusUpdate("SocketException in StartConnection on Host {0}:{2}{1}", hostname, e.Message, Environment.NewLine);
+                RaiseStatusUpdate($"SocketException in StartConnection on Host {remoteAddress}:{Environment.NewLine}{e.Message}");
             }
             catch (Exception e)
             {
@@ -444,7 +450,7 @@ namespace AMCommunicator
             }
             finally
             {
-                RaiseStatusUpdate("Doing final cleanup of TCP connection to {0}", hostname);
+                RaiseStatusUpdate($"Doing final cleanup of TCP connection to {remoteAddress}");
                 if (remoteAddress != null)
                 {
                     RaiseStatusUpdate("Removing {0} from dictionary", remoteAddress);
@@ -456,17 +462,13 @@ namespace AMCommunicator
                     queuedItem.Client.Close();
                 }
             }
-            ConnectionClosed?.Invoke(this, new ConnectionRequestEventArgs(remoteAddress, hostname));
+            ConnectionClosed?.Invoke(this, new ConnectionRequestEventArgs(remoteAddress, string.Empty));
 
         }
         void RaiseFatal(Exception e)
         {
             FatalExceptionEncountered?.Invoke(this, new FatalExceptionEncounteredEventArgs(e));
         }
-        //void RaiseMessageVersionMismatch(short expected, short actual, IPAddress source)
-        //{
-        //    MessageVersionMismatch?.Invoke(this, new VersionMismatchEventArgs(expected, actual, source));
-        //}
         bool ProcessMessage(NetworkStream stream, NetworkMessageHeader? message, string hostname)
         {
             bool disconnect = false;
@@ -474,66 +476,66 @@ namespace AMCommunicator
             {
                 RaiseStatusUpdate("Processing command: {0} for host {1}", message.Command.ToString(), hostname);
             }
-            
+
             switch (message?.Command)
             {
                 case MessageCommand.Handshake:
-                    disconnect = ProcessHandshake(stream, message?.GetItem<HandshakeMessage>());
+                    disconnect = ProcessHandshake(message?.GetItem<HandshakeMessage>());
                     break;
                 case MessageCommand.ClientInfo:
-                    disconnect= ProcessClientInfoMessage(stream, message?.GetItem<ClientInfoMessage>());
+                    disconnect = ProcessClientInfoMessage(message?.GetItem<ClientInfoMessage>());
                     break;
                 case MessageCommand.RequestModPackage:
-                    disconnect = ProcessRequestModPackageItem(stream, message?.GetItem<RequestModPackageMessage>());
+                    disconnect = ProcessRequestModPackageItem(message?.GetItem<RequestModPackageMessage>());
                     break;
                 case MessageCommand.ModPackage:
                     disconnect = ProcessModPackage(stream, message?.GetItem<ModPackageMessage>());
                     break;
                 case MessageCommand.ChangePassword:
-                    ProcessPasswordChange(stream, message?.GetItem<ChangePasswordMessage>());
+                    ProcessPasswordChange(message?.GetItem<ChangePasswordMessage>());
                     break;
                 case MessageCommand.PCAction:
-                    disconnect = ProcessPCAction(stream, message?.GetItem<PCActionMessage>(), hostname);
+                    disconnect = ProcessPCAction(message?.GetItem<PCActionMessage>(), hostname);
                     break;
                 case MessageCommand.UpdateCheck:
                     break;
                 case MessageCommand.ArtemisAction:
-                    ProcessArtemisAction(stream, message?.GetItem<ArtemisActionMessage>());
+                    ProcessArtemisAction(message?.GetItem<ArtemisActionMessage>());
                     break;
                 case MessageCommand.Communication:
-                    disconnect = ProcessCommunication(stream, message?.GetItem<CommunicationMessage>());
+                    disconnect = ProcessCommunication(message?.GetItem<CommunicationMessage>());
                     break;
                 case MessageCommand.Ping:
                     disconnect = ProcessPing(stream, message?.GetItem<PingMessage>(), hostname);
                     break;
                 case MessageCommand.ChangeAppSetting:
-                    disconnect = ProcessChangeSetting(stream, message?.GetItem<ChangeAppSettingMessage>());
+                    disconnect = ProcessChangeSetting(message?.GetItem<ChangeAppSettingMessage>());
                     break;
                 case MessageCommand.Alert:
-                    disconnect = ProcessAlert(stream, message?.GetItem<AlertMessage>());
+                    disconnect = ProcessAlert(message?.GetItem<AlertMessage>());
                     break;
                 case MessageCommand.StringPackage:
-                    disconnect = ProcessStringPackage(stream, message?.GetItem<StringPackageMessage>());
+                    disconnect = ProcessStringPackage(message?.GetItem<StringPackageMessage>());
                     break;
                 case MessageCommand.UndefinedPackage:
-                    disconnect = ProcessUndefinedMessage(stream, message?.GetItem<NetworkMessage>()); 
+                    disconnect = ProcessUndefinedMessage(message?.GetItem<NetworkMessage>());
                     break;
                 case MessageCommand.RequestInformation:
-                    disconnect = ProcessInformationRequestMessage(stream, message?.GetItem<RequestInformationMessage>());
+                    disconnect = ProcessInformationRequestMessage(message?.GetItem<RequestInformationMessage>());
                     break;
                 case MessageCommand.Information:
-                    disconnect = ProcessInformationMessage(stream, message?.GetItem<InformationMessage>());
+                    disconnect = ProcessInformationMessage(message?.GetItem<InformationMessage>());
                     break;
-              
+
                 default:
                     RaiseStatusUpdate("Invalid Message command.  Ignored.  Check for software update to Artemis Manager.");
                     return false;
             }
-           
+
             return disconnect;
         }
 
-        
+
 
         public event EventHandler<ChangeSettingEventArgs>? ChangeSetting;
         public event EventHandler<StatusUpdateEventArgs>? StatusUpdated;
@@ -548,7 +550,9 @@ namespace AMCommunicator
         public event EventHandler<ActionCommandEventArgs>? ActionCommand;
         public event EventHandler<CommunicationMessageEventArgs>? CommunicationMessageReceived;
         public event EventHandler<CommunicationMessageEventArgs>? PasswordChanged;
+#pragma warning disable CS0067 // The event 'Network.MessageVersionMismatch' is never used
         public event EventHandler<VersionMismatchEventArgs>? MessageVersionMismatch;
+#pragma warning restore CS0067 // The event 'Network.MessageVersionMismatch' is never used
         public event EventHandler<AlertEventArgs>? AlertReceived;
         public event EventHandler<ClientInfoEventArgs>? ClientInfoReceived;
         public event EventHandler<ArtemisActionEventArgs>? ArtemisActionReceived;
@@ -613,7 +617,7 @@ namespace AMCommunicator
         //    }
         //    return false;
         //}
-        private bool ProcessInformationRequestMessage(NetworkStream? stream, RequestInformationMessage? msg)
+        private bool ProcessInformationRequestMessage(RequestInformationMessage? msg)
         {
             if (msg != null)
             {
@@ -641,7 +645,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        private bool ProcessInformationMessage(NetworkStream? stream, InformationMessage? msg)
+        private bool ProcessInformationMessage(InformationMessage? msg)
         {
             if (msg != null)
             {
@@ -674,7 +678,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        private bool ProcessUndefinedMessage(NetworkStream? stream, NetworkMessage? msg)
+        private bool ProcessUndefinedMessage(NetworkMessage? msg)
         {
             if (msg != null)
             {
@@ -684,12 +688,12 @@ namespace AMCommunicator
                     IP = IPAddress.Parse(msg.Source);
                 }
                 AlertReceived?.Invoke(this, new AlertEventArgs(IP, AlertItems.UndefinedMessageReceived,
-                    "Unknown messager received." +Environment.NewLine + "Be sure all versions of Artemis Manager are up-to-date."
-                    +Environment.NewLine + "The problem may also be that the developer forgot to add code to process this message."));
+                    "Unknown messager received." + Environment.NewLine + "Be sure all versions of Artemis Manager are up-to-date."
+                    + Environment.NewLine + "The problem may also be that the developer forgot to add code to process this message."));
             }
             return false;
         }
-        private bool ProcessStringPackage(NetworkStream? stream, StringPackageMessage? msg)
+        private bool ProcessStringPackage(StringPackageMessage? msg)
         {
             if (msg != null)
             {
@@ -716,7 +720,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        List<byte> buffer = new();
+        List<byte> buffer = [];
         private bool ProcessModPackage(NetworkStream? stream, ModPackageMessage? msg)
         {
             if (msg != null)
@@ -743,16 +747,18 @@ namespace AMCommunicator
                         if (msg.TransmissionCompleted)
                         {
                             var IP = IPAddress.Parse(msg.Source);
+#pragma warning disable IDE0305 // Simplify collection initialization
                             ModPackageReceived?.Invoke(this, new ModPackageEventArgs(IP, buffer.ToArray(), msg.ModItem));
+#pragma warning restore IDE0305 // Simplify collection initialization
                             SendPing(IP, string.Format("Package received for install. Bytes received: {0}", buffer.Count));
-                            buffer = new();
+                            buffer = [];
                         }
                     }
                 }
             }
             return false;
         }
-        private bool ProcessArtemisAction(NetworkStream? stream, ArtemisActionMessage? msg)
+        private bool ProcessArtemisAction(ArtemisActionMessage? msg)
         {
             if (msg != null)
             {
@@ -784,7 +790,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        private bool ProcessAlert(NetworkStream? stream, AlertMessage? msg)
+        private bool ProcessAlert(AlertMessage? msg)
         {
             if (msg != null)
             {
@@ -797,7 +803,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        private bool ProcessChangeSetting(NetworkStream? stream, ChangeAppSettingMessage? msg)
+        private bool ProcessChangeSetting(ChangeAppSettingMessage? msg)
         {
             if (msg != null)
             {
@@ -823,7 +829,7 @@ namespace AMCommunicator
             }
             return false;
         }
-        private bool ProcessPasswordChange(NetworkStream? stream, ChangePasswordMessage? msg)
+        private bool ProcessPasswordChange(ChangePasswordMessage? msg)
         {
             if (msg != null)
             {
@@ -850,9 +856,9 @@ namespace AMCommunicator
             {
                 return true;
             }
-            
+
         }
-        private bool ProcessCommunication(NetworkStream? stream, CommunicationMessage? msg)
+        private bool ProcessCommunication(CommunicationMessage? msg)
         {
             bool disconnect = false;
             if (msg != null)
@@ -874,7 +880,7 @@ namespace AMCommunicator
             }
             return disconnect;
         }
-        
+
         private bool ProcessPing(NetworkStream stream, PingMessage? msg, string hostname)
         {
             if (msg != null)
@@ -912,7 +918,7 @@ namespace AMCommunicator
         {
             ActionCommand?.Invoke(this, new ActionCommandEventArgs(action, force, source));
         }
-        private bool ProcessPCAction(NetworkStream stream, PCActionMessage? msg, string hostname)
+        private bool ProcessPCAction(PCActionMessage? msg, string hostname)
         {
             bool doDisconnect = false;
             if (msg != null)
@@ -966,7 +972,7 @@ namespace AMCommunicator
             return doDisconnect;
         }
 
-        private bool ProcessRequestModPackageItem(NetworkStream stream, RequestModPackageMessage? msg)
+        private bool ProcessRequestModPackageItem(RequestModPackageMessage? msg)
         {
             if (msg != null)
             {
@@ -994,7 +1000,7 @@ namespace AMCommunicator
             return false;
         }
 
-        private bool ProcessHandshake(NetworkStream stream, HandshakeMessage? message)
+        private bool ProcessHandshake(HandshakeMessage? message)
         {
             bool retVal = false;
             if (message != null)
@@ -1027,7 +1033,7 @@ namespace AMCommunicator
             }
             return retVal;
         }
-        private bool ProcessClientInfoMessage(NetworkStream stream, ClientInfoMessage? message)
+        private bool ProcessClientInfoMessage(ClientInfoMessage? message)
         {
             if (message != null)
             {
@@ -1055,6 +1061,7 @@ namespace AMCommunicator
 
         class ConnectionQueueItem
         {
+            private ConnectionQueueItem() { Client = new(); Thread = Thread.CurrentThread; FromListener = false; Stream = null; }
             public ConnectionQueueItem(TcpClient client, Thread thread, bool fromListener)
             {
                 this.Client = client;
@@ -1105,7 +1112,7 @@ namespace AMCommunicator
                     }
                 }
             }
-            catch (ThreadInterruptedException) 
+            catch (ThreadInterruptedException)
             {
             }
             catch (SocketException e)
@@ -1119,13 +1126,13 @@ namespace AMCommunicator
             }
             RaiseStatusUpdate("TCP Listener server HALTED.");
         }
-        
+
         private void ListenUDP()
         {
             using UdpClient client = new();
             IPEndPoint RemoteIpEndPoint = new(IPAddress.Any, ConnectionPort);
             activeConnections.Add(IPAddress.Any, new ConnectionTracker("UDP Listener Service", IPAddress.Any, null, client.Client, null));
-            
+
             client.Client.Bind(RemoteIpEndPoint);
             try
             {
@@ -1193,19 +1200,19 @@ namespace AMCommunicator
                     RaiseStatusUpdate("Restarting UDP Listener Service Loop...");
                 }
                 RaiseStatusUpdate("Abort = true--quitting UDP Listener.");
-                
+
             }
             catch (SocketException e)
             {
                 RaiseStatusUpdate("SocketException on UDPListener server:{1}{0}", e.Message, Environment.NewLine);
             }
-            catch (ThreadInterruptedException) 
+            catch (ThreadInterruptedException)
             {
                 RaiseStatusUpdate("ThreadInterruptedException received on UDP Listener");
             }
             RaiseStatusUpdate("UDP Listener server HALTED");
         }
-        
+
         private void RaiseConnectionReceived(IPAddress? address, string host)
         {
             ConnectionReceived?.Invoke(this, new ConnectionRequestEventArgs(address, host));
@@ -1224,23 +1231,23 @@ namespace AMCommunicator
             ThreadStart start = new(ListenTCP);
             Thread thd = new(start);
             thd.Start();
-           
+
             BroadcastMe();
             start = new ThreadStart(ListenUDP);
             thd = new(start);
             thd.Start();
         }
-        public static IPAddress? MyIP { get;private set; }
-        public static string MyHostname { get;private set; }
+        public static IPAddress? MyIP { get; private set; }
+        public static string MyHostname { get; private set; }
         public void BroadcastMe()
         {
             if (MyIP != null)
             {
                 RaiseStatusUpdate("Broadcasting to Peers");
                 using UdpClient client = new();
-                
-                string msg = string.Format("-AM-|{0}|{1}|{2}", MyIP?.ToString(), ConnectionPort, MyHostname );
-                client.EnableBroadcast=true;
+
+                string msg = string.Format("-AM-|{0}|{1}|{2}", MyIP?.ToString(), ConnectionPort, MyHostname);
+                client.EnableBroadcast = true;
                 client.ExclusiveAddressUse = false;
                 client.MulticastLoopback = false;
                 var bytes = System.Text.ASCIIEncoding.ASCII.GetBytes(msg);
@@ -1266,9 +1273,9 @@ namespace AMCommunicator
                 }
             }
             return retVal;
-            
+
         }
-        
+
         public static IPAddress GetSubnetMask(IPAddress address)
         {
             foreach (NetworkInterface adapter in NetworkInterface.GetAllNetworkInterfaces())
@@ -1286,6 +1293,6 @@ namespace AMCommunicator
             }
             throw new ArgumentException(string.Format("Can't find subnet mask for IP address '{0}'", address));
         }
-        
+
     }
 }

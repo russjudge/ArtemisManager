@@ -23,9 +23,9 @@ namespace ArtemisManagerUI
         {
             Connection = pc;
             IsRemote = (pc.IP?.ToString() == IPAddress.Loopback.ToString());
-            ArtemisSettingsFiles = new ObservableCollection<ArtemisINIFileListItem>();
+            ArtemisSettingsFiles = [];
         }
-        
+
         public static readonly DependencyProperty IsRemoteProperty =
           DependencyProperty.Register(nameof(IsRemote), typeof(bool),
           typeof(ArtemisINIPCItem));
@@ -67,7 +67,7 @@ namespace ArtemisManagerUI
            DependencyProperty.Register(nameof(SelectedSettingsFile), typeof(ArtemisINIFileListItem),
            typeof(ArtemisINIPCItem));
 
-      
+
 
         public ArtemisINIFileListItem SelectedSettingsFile
         {

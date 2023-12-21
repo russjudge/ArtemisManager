@@ -9,7 +9,8 @@ namespace AMCommunicator
 {
     public class ActionCommandEventArgs : EventArgs
     {
-        public ActionCommandEventArgs(PCActions action, bool force, IPAddress? source) 
+        private ActionCommandEventArgs() { Action = PCActions.DisconnectThisConnection; Force = false; }
+        public ActionCommandEventArgs(PCActions action, bool force, IPAddress? source)
         {
             this.Action = action;
             this.Force = force;
@@ -17,6 +18,6 @@ namespace AMCommunicator
         }
         public IPAddress? Source { get; private set; }
         public PCActions Action { get; private set; }
-        public bool Force { get;private set; }
+        public bool Force { get; private set; }
     }
 }

@@ -23,11 +23,15 @@ namespace AMCommunicator.Tests
         public void GetSubnetMaskTest()
         {
             var ip = Network.GetMyIP();
-            if (ip !=null)
+            if (ip != null)
             {
                 var mask = Network.GetSubnetMask(ip);
+                if (mask != null)
+                {
+
+                }
             }
-            
+
         }
     }
 }

@@ -9,6 +9,7 @@ namespace ArtemisManagerAction
     [AttributeUsage(AttributeTargets.Property)]
     internal class LocalINISettingAttribute : INISettingAttribute
     {
+        private LocalINISettingAttribute() : base(0, ClientServerType.Both) { throw new NotImplementedException(); }
         public LocalINISettingAttribute(int sequence, ClientServerType _clientServerType) : base(sequence, _clientServerType) { }
     }
 }

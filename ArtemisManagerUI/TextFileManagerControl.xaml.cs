@@ -655,7 +655,6 @@ namespace ArtemisManagerUI
                 FileInfo source = new(ofd.FileName);
 
                 string target = System.IO.Path.Combine(targetFolder, source.Name);
-                int i = 0;
                 bool OkayToSave = true;
                 if (File.Exists(target))
                 {

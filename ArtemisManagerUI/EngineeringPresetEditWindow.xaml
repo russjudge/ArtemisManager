@@ -4,12 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ArtemisManagerUI"
-        xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
         mc:Ignorable="d" Name="uc" Width="1200" Height="430"
         Title="Engineering Presets Edit" Icon="/ArtemisManagerUI;component/Resources/Presets.png">
-    <Window.Resources>
-        <converter:NullToBoolConverter x:Key="NullToBoolConverter" />
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-    </Window.Resources>
     <local:EngineeringPresetEditControl />
 </Window>

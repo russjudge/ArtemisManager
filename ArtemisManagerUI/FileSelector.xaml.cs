@@ -154,18 +154,18 @@ namespace ArtemisManagerUI
             {
                 initialDirectory = new System.IO.FileInfo(SelectedItem).DirectoryName;
             }
-            List<Tuple<string,string>>? filter= new List<Tuple<string,string>>();
+            List<Tuple<string, string>>? filter = [];
             if (!string.IsNullOrEmpty(Filter))
             {
                 string[] filters = Filter.Split('|');
-                for (int i = 0; i < filters.Length; i+=2)
+                for (int i = 0; i < filters.Length; i += 2)
                 {
                     if (i + 1 < filters.Length)
                     {
                         filter.Add(new(filters[i], filters[i + 1]));
                     }
                 }
-                if (filter.Count ==0)
+                if (filter.Count == 0)
                 {
                     filter = null;
                 }
@@ -192,9 +192,11 @@ namespace ArtemisManagerUI
         )
         {
             string? retVal;
-            var dlg = new CommonOpenFileDialog();
-            dlg.Title = title;
-            dlg.IsFolderPicker = isFolderPicker;
+            var dlg = new CommonOpenFileDialog
+            {
+                Title = title,
+                IsFolderPicker = isFolderPicker
+            };
             if (filters != null)
             {
                 foreach (Tuple<string, string> filter in filters)
@@ -216,7 +218,7 @@ namespace ArtemisManagerUI
             dlg.EnsureValidNames = true;
             dlg.Multiselect = false;
             dlg.ShowPlacesList = true;
-            
+
             if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 retVal = dlg.FileName;

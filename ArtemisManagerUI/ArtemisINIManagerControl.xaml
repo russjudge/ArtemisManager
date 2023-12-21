@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
         <converter:NullToBoolConverter x:Key="NullToBoolConverter" />
-        <converter:NullToVisibility x:Key="NullToVisibility" />
+        <russjudge:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
-        <converter:OppositeBoolConverter x:Key="OppositeBoolConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
+        <russjudge:OppositeBoolConverter x:Key="OppositeBoolConverter" />
     </UserControl.Resources>
 
     <DockPanel>
@@ -41,7 +42,7 @@
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/restore.png" />
                 </Button>
                 <Button
-                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                    Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                     HorizontalAlignment="Left" DockPanel.Dock="Bottom" Click="OnImportFile" ToolTip="Import artemis.ini settings file">
                     <Image Height="16" Source="/ArtemisManagerUI;component/Resources/import.png" />
                 </Button>
@@ -54,7 +55,7 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
-          
+
             <ListBox
                 HorizontalAlignment="Stretch"
                 SelectionMode="Single"
@@ -103,7 +104,7 @@
                                     </MenuItem>
                                     <Separator />
                                     <MenuItem
-                                        Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                                        Visibility="{Binding ElementName=uc, Path=IsRemote, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                                         CommandParameter="{Binding}"
                                         Header="_Export" Click="OnExportSettingsFile" >
                                         <MenuItem.Icon>
@@ -131,7 +132,7 @@
             IsRemote="{Binding ElementName=uc, Path=IsRemote, Mode=OneWay}"
             SavingSettings="OnSavingSettings"
             SettingsSaved="OnSettingsSaved"
-            Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibility}, ConverterParameter='Collapsed|Visible'}"
+            Visibility="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile, Converter={StaticResource NullToVisibilityConverter}, ConverterParameter='Collapsed|Visible'}"
             SettingsFile="{Binding ElementName=uc, Path=SelectedArtemisSettingsFile.SettingsFile, Mode=TwoWay}" />
     </DockPanel>
 </UserControl>

@@ -47,7 +47,7 @@ namespace ArtemisManagerAction
 
          */
 
-       public ArtemisINI() :base() { }
+        public ArtemisINI() : base() { }
 
         public ArtemisINI(string file) : base()
         {
@@ -63,7 +63,7 @@ namespace ArtemisManagerAction
         {
             ArtemisINI workFile = new(modFile.SaveFile);
             var properties = typeof(ArtemisINI).GetProperties();
-            var settingProperties = typeof(ArtemisINISetting).GetProperties();
+            //var settingProperties = typeof(ArtemisINISetting).GetProperties();
             foreach (var property in properties)
             {
                 if (property.PropertyType == typeof(ArtemisINISetting))
@@ -108,7 +108,7 @@ namespace ArtemisManagerAction
             }
         }
 
-        
+
 
 
 
@@ -262,12 +262,12 @@ namespace ArtemisManagerAction
         {
             get
             {
-                int height = 0;
-                int width = 0;
+                int height;
+                int width;
                 height = gameWindowHeight.GetIntValue();
-                
+
                 width = gameWindowWidth.GetIntValue();
-                
+
                 return new Size(width, height);
             }
             set
@@ -614,7 +614,7 @@ namespace ArtemisManagerAction
                 SetSetting(value);
             }
         }
-       
+
         public System.Drawing.Size OperatorLogoImageSize
         {
             get
@@ -704,9 +704,7 @@ namespace ArtemisManagerAction
             }
         }
         [LocalINISetting(38, ClientServerType.ClientOnly)]
-#pragma warning disable IDE1006 // Naming Styles
         public ArtemisINISetting damageEffectType
-#pragma warning restore IDE1006 // Naming Styles
         {
             get
             {

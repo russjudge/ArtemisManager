@@ -10,6 +10,7 @@ namespace ArtemisManagerUI
 {
     public class FileRequestRoutedEventArgs : RoutedEventArgs
     {
+        private FileRequestRoutedEventArgs() : base() { throw new NotImplementedException(); }
         public FileRequestRoutedEventArgs(RoutedEvent routedEvent) : base(routedEvent) { }
         public ISendableStringFile? File { get; set; } = null;
 

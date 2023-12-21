@@ -15,12 +15,12 @@ namespace ArtemisManagerUI
     public class SettingsAction : INotifyPropertyChanged
     {
 
-        public static readonly string[] SynchronizableSettings = new string[] {
+        public static readonly string[] SynchronizableSettings = [
             nameof(Settings.ConnectOnStart),
             nameof(Settings.ListeningPort),
             nameof(Settings.NetworkPassword)
-        };
-        
+        ];
+
         public bool SynchronizeEnabled { get; set; } = true;
         public static bool IsSynchronizable(string name)
         {
@@ -30,7 +30,7 @@ namespace ArtemisManagerUI
         {
 
         }
-            
+
         static SettingsAction()
         {
             if (Properties.Settings.Default.UpgradeRequired)
@@ -44,9 +44,9 @@ namespace ArtemisManagerUI
         }
         private SettingsAction()
         {
-           
+
         }
-       
+
         public event PropertyChangedEventHandler? PropertyChanged;
         void DoChanged([CallerMemberName] string property = "")
         {
@@ -67,7 +67,7 @@ namespace ArtemisManagerUI
                 }
                 DoSynchronizeAction(property, val);
             }
-            
+
         }
         private bool isChanged = false;
         public bool IsChanged
@@ -131,7 +131,7 @@ namespace ArtemisManagerUI
             if (SynchronizeEnabled && IsSynchronizable(name))
             {
                 //var result = TakeAction.DoChangeSetting(name, value);
-                if (TakeAction.DoChangeSetting(name, value, false))
+                if (TakeAction.DoChangeSetting(name, value))
                 {
                     this.Save();
                 }
@@ -195,8 +195,8 @@ namespace ArtemisManagerUI
             }
         }
 
-        private static SettingsAction instance = new();
-       
+        private static readonly SettingsAction instance = new();
+
         public static SettingsAction Current
         {
             get

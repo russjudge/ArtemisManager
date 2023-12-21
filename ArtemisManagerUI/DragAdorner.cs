@@ -13,8 +13,10 @@ namespace ArtemisManagerUI
 {
     public class DragAdorner : Adorner
     {
+#pragma warning disable IDE0044 // Add readonly modifier
         private UIElement? _child = null;
         private UIElement? _adornElement = null;
+#pragma warning restore IDE0044 // Add readonly modifier
 
         public DragAdorner(UIElement owner) : base(owner) { }
 
@@ -26,11 +28,15 @@ namespace ArtemisManagerUI
             _adornElement = adornElement;
             if (useVisualBrush)
             {
-                VisualBrush _brush = new VisualBrush(adornElement);
-                _brush.Opacity = opacity;
-                Rectangle r = new Rectangle();
-                r.RadiusX = 3;
-                r.RadiusY = 3;
+                VisualBrush _brush = new(adornElement)
+                {
+                    Opacity = opacity
+                };
+                Rectangle r = new()
+                {
+                    RadiusX = 3,
+                    RadiusY = 3
+                };
                 if (adornElement != null)
                 {
 
@@ -76,10 +82,7 @@ namespace ArtemisManagerUI
         private void UpdatePosition()
         {
             AdornerLayer adorner = (AdornerLayer)this.Parent;
-            if (adorner != null)
-            {
-                adorner.Update(this.AdornedElement);
-            }
+            adorner?.Update(this.AdornedElement);
         }
 
         protected override Visual? GetVisualChild(int index)
@@ -117,7 +120,7 @@ namespace ArtemisManagerUI
 
         public override GeneralTransform GetDesiredTransform(GeneralTransform transform)
         {
-            GeneralTransformGroup result = new GeneralTransformGroup();
+            GeneralTransformGroup result = new();
 
             result.Children.Add(base.GetDesiredTransform(transform));
             result.Children.Add(new TranslateTransform(_leftOffset, _topOffset));

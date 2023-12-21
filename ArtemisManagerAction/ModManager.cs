@@ -35,7 +35,7 @@ namespace ArtemisManagerAction
             {
                 if (modItem.LocalIdentifier.Equals(mod.LocalIdentifier)
                     || modItem.LocalIdentifier.Equals(mod.ModIdentifier)
-                    || (!modItem.ModIdentifier.Equals(Guid.Empty) 
+                    || (!modItem.ModIdentifier.Equals(Guid.Empty)
                     && (modItem.ModIdentifier.Equals(mod.LocalIdentifier)
                     || modItem.ModIdentifier.Equals(mod.ModIdentifier)))
                     || (!string.IsNullOrEmpty(mod.PackageFile) && modItem.PackageFile.Equals(mod.PackageFile)))
@@ -51,7 +51,7 @@ namespace ArtemisManagerAction
 
             var baseArtemisFiles = GetFiles(Path.Combine(ModItem.ModInstallFolder, baseArtemisFolder));
             var newModFiles = GetFiles(ModItem.ActivatedFolder);
-            List<string> workFiles = new();
+            List<string> workFiles = [];
             foreach (var file in newModFiles)
             {
                 workFiles.Add(file.Replace(ModItem.ActivatedFolder + "\\", string.Empty));
@@ -125,7 +125,7 @@ namespace ArtemisManagerAction
                 }
             }
 
-            return workFiles.ToArray();
+            return [.. workFiles];
         }
         private static ModItem? GetActiveBaseArtemis()
         {
@@ -159,29 +159,25 @@ namespace ArtemisManagerAction
                     {
                         File.Delete(mod.PackageFile);
                     }
-                    using (MemoryStream ms = new(Encoding.ASCII.GetBytes(mod.GetJSON())))
+                    using MemoryStream ms = new(Encoding.ASCII.GetBytes(mod.GetJSON()));
+                    using SharpCompress.Archives.Zip.ZipArchive? archive = SharpCompress.Archives.Zip.ZipArchive.Create();
+                    if (archive != null)
                     {
-                        using (SharpCompress.Archives.Zip.ZipArchive? archive = SharpCompress.Archives.Zip.ZipArchive.Create())
+                        archive.DeflateCompressionLevel = SharpCompress.Compressors.Deflate.CompressionLevel.BestCompression;
+                        foreach (var file in modifiedFiles)
                         {
-                            if (archive != null)
-                            {
-                                archive.DeflateCompressionLevel = SharpCompress.Compressors.Deflate.CompressionLevel.BestCompression;
-                                foreach (var file in modifiedFiles)
-                                {
-                                    archive.AddEntry(file, Path.Combine(ModItem.ActivatedFolder, file));
-                                }
-
-                                ms.Position = 0;
-                                if (string.IsNullOrEmpty(mod.SaveFile))
-                                {
-                                    mod.SaveFile = mod.GetSaveFile();
-                                }
-                                archive.AddEntry(mod.SaveFile, ms);
-
-                                var options = new SharpCompress.Writers.WriterOptions(CompressionType.Deflate);
-                                archive.SaveTo(mod.PackageFile, options);
-                            }
+                            archive.AddEntry(file, Path.Combine(ModItem.ActivatedFolder, file));
                         }
+
+                        ms.Position = 0;
+                        if (string.IsNullOrEmpty(mod.SaveFile))
+                        {
+                            mod.SaveFile = mod.GetSaveFile();
+                        }
+                        archive.AddEntry(mod.SaveFile, ms);
+
+                        var options = new SharpCompress.Writers.WriterOptions(CompressionType.Deflate);
+                        archive.SaveTo(mod.PackageFile, options);
                     }
                 }
             }
@@ -193,7 +189,7 @@ namespace ArtemisManagerAction
         }
         private static string[] GetFiles(string rootPath)
         {
-            List<string> retVal = new();
+            List<string> retVal = [];
             foreach (var dir in new DirectoryInfo(rootPath).GetDirectories())
             {
                 retVal.AddRange(GetFiles(dir.FullName));
@@ -202,9 +198,9 @@ namespace ArtemisManagerAction
             {
                 retVal.Add(file.FullName);
             }
-            return retVal.ToArray();
+            return [.. retVal];
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -218,7 +214,7 @@ namespace ArtemisManagerAction
                 if (package.Exists && !IsModInstalled(mod))
                 {
                     ModManager.CreateFolder(ModArchiveFolder);
-                    
+
                     File.Copy(packagedFile, Path.Combine(ModArchiveFolder, package.Name), true);
                     mod.PackageFile = package.Name;
                     mod.Save();
@@ -226,7 +222,7 @@ namespace ArtemisManagerAction
                 }
             }
         }
-      
+
         public static void CreateFolder(string? path)
         {
             if (!string.IsNullOrEmpty(path) && !Directory.Exists(path))

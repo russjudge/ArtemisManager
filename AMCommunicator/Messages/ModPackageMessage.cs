@@ -14,7 +14,7 @@ namespace AMCommunicator.Messages
         public ModPackageMessage() : base()
         {
             ModItem = string.Empty;
-            Data = Array.Empty<byte>();
+            Data = [];
             TransmissionCompleted = true;
         }
         public ModPackageMessage(string modItem, byte[] data, bool transmissionComplete)
@@ -23,7 +23,7 @@ namespace AMCommunicator.Messages
             Data = data;
             TransmissionCompleted = transmissionComplete;
         }
-    
+
         protected override void SetMessageVersion()
         {
             MessageVersion = ThisVersion;

@@ -16,7 +16,7 @@ namespace ArtemisManagerUI
     {
         public EngineeringPresetEditWindow()
         {
-            PresetFiles = new ObservableCollection<FileListItem>();
+            PresetFiles = [];
             foreach (var name in ArtemisManagerAction.ArtemisManager.GetEngineeringPresetFiles())
             {
                 PresetFiles.Add(new FileListItem(name.Substring(0, name.Length - 4)));
@@ -94,8 +94,10 @@ namespace ArtemisManagerUI
             }
         }
 
+#pragma warning disable IDE0044 // Add readonly modifier
         FileSystemWatcher? watcher;
-       
+#pragma warning restore IDE0044 // Add readonly modifier
+
 
         public static readonly DependencyProperty PresetFilesProperty =
           DependencyProperty.Register(nameof(PresetFiles), typeof(ObservableCollection<FileListItem>),
@@ -389,10 +391,7 @@ namespace ArtemisManagerUI
                     {
                         PresetsFile pf = new(System.IO.Path.Combine(ArtemisManager.EngineeringPresetsFolder, selectedFile.Name + ArtemisManager.DATFileExtension));
                         pf.Delete();
-                        if (PresetFiles.Contains(selectedFile))
-                        {
-                            PresetFiles.Remove(selectedFile);
-                        }
+                        PresetFiles.Remove(selectedFile);
                         if (SelectedFile != null && SelectedFile.SaveFile == selectedFile.Name + ArtemisManager.DATFileExtension)
                         {
                             SelectedFile = null;

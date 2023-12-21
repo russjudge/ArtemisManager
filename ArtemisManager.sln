@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		amBanner.jpg = amBanner.jpg
 		amBanner.pdn = amBanner.pdn
 		artemis.ini = artemis.ini
-		C:\Users\rjudge\Downloads\artemis1.pdn = C:\Users\rjudge\Downloads\artemis1.pdn
+		..\..\Users\rjudge\Downloads\artemis1.pdn = ..\..\Users\rjudge\Downloads\artemis1.pdn
 		changes.txt = changes.txt
 		controls.ini = controls.ini
 		Deploy.cmd = Deploy.cmd
@@ -34,8 +34,21 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerAction", "ArtemisManagerAction\ArtemisManagerAction.csproj", "{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{F2A4302C-5D71-4987-8F72-F3B8C9E2E51C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VersionBump", "VersionBump\VersionBump.csproj", "{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}"
+	ProjectSection(SolutionItems) = preProject
+		Resources\RussJudge.Deployer.deps.json = Resources\RussJudge.Deployer.deps.json
+		Resources\RussJudge.Deployer.dll = Resources\RussJudge.Deployer.dll
+		Resources\RussJudge.Deployer.exe = Resources\RussJudge.Deployer.exe
+		Resources\RussJudge.Deployer.pdb = Resources\RussJudge.Deployer.pdb
+		Resources\RussJudge.Deployer.runtimeconfig.json = Resources\RussJudge.Deployer.runtimeconfig.json
+		Resources\RussJudge.UpdateCheck.deps.json = Resources\RussJudge.UpdateCheck.deps.json
+		Resources\RussJudge.UpdateCheck.dll = Resources\RussJudge.UpdateCheck.dll
+		Resources\RussJudge.UpdateCheck.pdb = Resources\RussJudge.UpdateCheck.pdb
+		Resources\VersionBump.deps.json = Resources\VersionBump.deps.json
+		Resources\VersionBump.dll = Resources\VersionBump.dll
+		Resources\VersionBump.exe = Resources\VersionBump.exe
+		Resources\VersionBump.pdb = Resources\VersionBump.pdb
+		Resources\VersionBump.runtimeconfig.json = Resources\VersionBump.runtimeconfig.json
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerActionTests", "ArtemisManagerActionTests\ArtemisManagerActionTests.csproj", "{D9B06F4F-5871-40AF-B8A8-867D03B14495}"
 EndProject
@@ -73,9 +86,6 @@ Global
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FC2AB56-4D2C-4458-81FB-CD68F05785F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{666E9F78-6806-4FEE-9C4D-6A5CC2B8E0EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D9B06F4F-5871-40AF-B8A8-867D03B14495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9B06F4F-5871-40AF-B8A8-867D03B14495}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9B06F4F-5871-40AF-B8A8-867D03B14495}.Release|Any CPU.ActiveCfg = Release|Any CPU

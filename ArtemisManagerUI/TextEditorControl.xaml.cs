@@ -102,7 +102,7 @@ namespace ArtemisManagerUI
                         tp = RequestInformationType.SpecificControlINIFile;
                         break;
                 }
-                Network.Current?.SendInformation(IPAddress.Any, tp, Data.Name, new string[] { Data.Data });
+                Network.Current?.SendInformation(IPAddress.Any, tp, Data.Name, [Data.Data]);
 
             }
             else

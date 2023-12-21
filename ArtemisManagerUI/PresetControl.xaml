@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
-             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              Name="uc"
              mc:Ignorable="d" >
     <UserControl.Resources>
-        <converter:GreaterThanBrushConverter x:Key="GreaterThanBrushConverter" />
+        <russjudge:NumericComparisonToBrushAnimationConverter x:Key="NumericComparisonToBrushAnimationConverter" />
+
         <Style x:Key="{x:Type ListBoxItem}" TargetType="{x:Type ListBoxItem}">
             <!-- Possibly other setters -->
             <Setter Property="Focusable" Value="False" />
@@ -19,9 +20,10 @@
             DockPanel.Dock="Bottom"
             ToolTip="Normal Maximum coolant available is 8. It is not recommended to exceed distributing 8 units of coolant."
             Orientation="Horizontal">
+
             <Label
                 Name="totCoolLabel"
-                Foreground="{Binding PresetItem.TotalCoolantLevel, Mode=OneWay, ElementName=uc, Converter={StaticResource GreaterThanBrushConverter}, ConverterParameter='8|Red|Black'}"
+                Foreground="{Binding PresetItem.TotalCoolantLevel, Mode=OneWay, ElementName=uc, Converter={StaticResource NumericComparisonToBrushAnimationConverter}, ConverterParameter='&gt;|8|Red|Black'}"
                 FontWeight="Bold" Content="Total Allocated Coolant:" VerticalAlignment="Center" />
             <TextBlock
                 Foreground="{Binding Foreground, ElementName=totCoolLabel}"

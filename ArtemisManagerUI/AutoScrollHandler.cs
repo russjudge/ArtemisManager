@@ -22,7 +22,10 @@ namespace ArtemisManagerUI
                 FrameworkPropertyMetadataOptions.None,
                 ItemsSourcePropertyChanged));
 
-        private System.Windows.Controls.ListBox target;
+#pragma warning disable IDE0044 // Add readonly modifier
+        private ListBox target;
+        private bool disposedValue;
+#pragma warning restore IDE0044 // Add readonly modifier
 
         public AutoScrollHandler(System.Windows.Controls.ListBox target)
         {
@@ -31,10 +34,7 @@ namespace ArtemisManagerUI
             BindingOperations.SetBinding(this, ItemsSourceProperty, binding);
         }
 
-        public void Dispose()
-        {
-            BindingOperations.ClearBinding(this, ItemsSourceProperty);
-        }
+
 
         public IEnumerable ItemsSource
         {
@@ -70,6 +70,35 @@ namespace ArtemisManagerUI
             }
 
             this.target.ScrollIntoView(e.NewItems[e.NewItems.Count - 1]);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    BindingOperations.ClearBinding(this, ItemsSourceProperty);
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~AutoScrollHandler()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

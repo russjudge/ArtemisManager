@@ -3,12 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ArtemisManagerUI"
-             xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              Loaded="OnLoaded"
              mc:Ignorable="d" Name="uc"  >
     <UserControl.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
     </UserControl.Resources>
 
     <GroupBox
@@ -17,25 +17,25 @@
         <GroupBox.Header>
             <StackPanel Orientation="Horizontal">
                 <StackPanel
-                Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=IsMaster, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                 Orientation="Horizontal">
                     <Button
                         Click="OnActivateMod"
                         ToolTip="Activate mod."
-                        Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+                        Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource FalseBoolToVisibilityConverter}}">
                         <StackPanel Orientation="Horizontal">
                             <Image Height="24" Source="/ArtemisManagerUI;component/Resources/activate.png" />
                         </StackPanel>
                     </Button>
                     <StackPanel
                         Orientation="Horizontal"
-                        Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                        Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource FalseBoolToVisibilityConverter}}" >
                         <AdornerDecorator
-                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource FalseBoolToVisibilityConverter}}">
                             <Button
                                 Click="OnUninstallMod"
                                 ToolTip="Uninstall mod."
-                                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}">
+                                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource FalseBoolToVisibilityConverter}}">
                                 <StackPanel Orientation="Horizontal">
                                     <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
                                 </StackPanel>
@@ -44,7 +44,7 @@
                         <Button
                             Click="OnUninstallMod"
                             ToolTip="Uninstall mission."
-                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}">
+                            Visibility="{Binding ElementName=uc, Path=Mod.IsMission, Converter={StaticResource BoolToVisibilityConverter}}">
                             <StackPanel Orientation="Horizontal">
                                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/uninstall.png" />
                             </StackPanel>
@@ -58,7 +58,7 @@
         <DockPanel VerticalAlignment="Stretch" >
             <StackPanel
                 Orientation="Horizontal" DockPanel.Dock="Top"
-                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" >
+                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityConverter}}" >
                 <Label FontWeight="Bold" Content="{Binding Mod.Name, ElementName=uc, Mode=OneWay}" DockPanel.Dock="Top" />
                 <Label Content="Version:" FontWeight="Bold" />
                 <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Mod.Version}" />
@@ -66,7 +66,7 @@
             </StackPanel>
             <StackPanel
                 Orientation="Horizontal" 
-                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=Mod.IsActive, Converter={StaticResource BoolToVisibilityConverter}}"
                 DockPanel.Dock="Top">
 
                 <Label
@@ -79,7 +79,7 @@
 
             <StackPanel
                 Orientation="Horizontal" DockPanel.Dock="Top"
-                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}" >
+                Visibility="{Binding ElementName=uc, Path=Mod.IsArtemisBase, Converter={StaticResource FalseBoolToVisibilityConverter}}" >
                 <Label Content="Author:" FontWeight="Bold"  />
                 <TextBlock VerticalAlignment="Center" Text="{Binding ElementName=uc, Path=Mod.Author}" />
                 <Label Content="Requires Artemis Version:" FontWeight="Bold" />

@@ -4,6 +4,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
@@ -38,7 +41,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
         }
         void Initialize(bool isForOriginal)
         {
-            
+
 
             TotalCoolantLevel = 0;
             for (int i = 0; i < MaxStations; i++)
@@ -52,14 +55,6 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
 
                 SystemLevels[i] = s;
             }
-            //if (!isForOriginal)
-            //{
-            //    Original = new Preset(true);
-            //}
-            //else
-            //{
-            //    Original = null;
-            //}
 
         }
 
@@ -85,45 +80,15 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
         }
 
         readonly object lockObject = new();
-        
 
-        void SetOriginal()
-        {
-            //Original = new Preset(true);
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    Original.SystemLevels[i].EnergyLevel = this.SystemLevels[i].EnergyLevel;
-            //    Original.SystemLevels[i].CoolantLevel = this.SystemLevels[i].CoolantLevel;
-            //}
-        }
+
+
         public void AcceptChanges()
         {
             Changed = false;
-            SetOriginal();
+
         }
-        //public void RejectChanges()
-        //{
-        //    if (Original == null)
-        //    {
-        //        for (int i = 0; i < MaxStations; i++)
-        //        {
-        //            this.SystemLevels[i].EnergyLevel = 0;
-        //            this.SystemLevels[i].CoolantLevel = 0;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        for (int i = 0; i < MaxStations; i++)
-        //        {
-        //            this.SystemLevels[i].EnergyLevel = Original.SystemLevels[i].EnergyLevel;
-        //            this.SystemLevels[i].CoolantLevel = Original.SystemLevels[i].CoolantLevel;
-        //        }
-        //    }
-        //    Changed = false;
-        //}
 
-
-        //public Preset? Original { get; private set; } = null;
 
         int _index = 0;
 
@@ -155,7 +120,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             }
         }
 
-        public SystemLevel[] SystemLevels { get;  set; } = new SystemLevel[MaxStations];
+        public SystemLevel[] SystemLevels { get; set; } = new SystemLevel[MaxStations];
         int _totalCoolant = 0;
 
         public int TotalCoolantLevel
@@ -171,6 +136,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
             }
         }
 
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void DoChanged([CallerMemberName] string property = "")
         {
@@ -181,5 +147,7 @@ namespace ArtemisManagerAction.ArtemisEngineeringPresets
 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
+
+
     }
 }

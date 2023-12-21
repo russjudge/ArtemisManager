@@ -16,12 +16,12 @@ namespace AMCommunicator
             {
                 Source = IPAddress.Parse(message.Source);
             }
-            IsMaster= message.IsMaster;
+            IsMaster = message.IsMaster;
             AppVersion = message.AppVersion;
             ConnectOnStart = message.ConnectOnstart;
             InstalledMods = message.InstalledMods;
             InstalledMissions = message.InstalledMissions;
-            ArtemisIsRunning= message.ArtemisIsRunning;
+            ArtemisIsRunning = message.ArtemisIsRunning;
             IsUsingThisAppControlledArtemis = message.IsUsingThisAppControlledArtemis;
             AppInStartFolder = message.AppInStartFolder;
             Drives = message.Drives;
@@ -37,10 +37,10 @@ namespace AMCommunicator
         public bool ArtemisIsRunning { get; private set; }
         public bool IsUsingThisAppControlledArtemis { get; private set; }
         public bool AppInStartFolder { get; private set; }
-        [Obsolete]
+        [Obsolete("Here just for previous version support")]
         public long FreeSpaceOnAppSrive { get; private set; } = 0;
-        [Obsolete]
-        public string[] AllDrives { get; private set; } = Array.Empty<string>();
+        [Obsolete("Here just for previous version support")]
+        public string[] AllDrives { get; private set; } = [];
         public DriveData[] Drives { get; private set; }
         public bool IsMainScreenServer { get; private set; }
         public string GeneralSettings { get; private set; }

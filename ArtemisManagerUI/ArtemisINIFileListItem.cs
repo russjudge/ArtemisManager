@@ -10,7 +10,8 @@ namespace ArtemisManagerUI
 {
     public class ArtemisINIFileListItem : FileListItem
     {
+        private ArtemisINIFileListItem() : base(string.Empty) { throw new NotImplementedException(); }
         public ArtemisINIFileListItem(string name) : base(name) { }
-        public  ArtemisINI? INIFile { get => base.SettingsFile as ArtemisINI; set => base.SettingsFile = value; }
+        public ArtemisINI? INIFile { get => base.SettingsFile as ArtemisINI; set => base.SettingsFile = value; }
     }
 }

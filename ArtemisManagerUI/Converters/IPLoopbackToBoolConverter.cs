@@ -16,11 +16,11 @@ namespace ArtemisManagerUI.Converters
         {
             if (value is IPAddress client)
             {
-                bool retVal = default(bool);
+                bool retVal;
                 bool returnIfLoopback = true;
                 if (parameter is string parm)
                 {
-                    if (bool.TryParse(parm, out returnIfLoopback)) 
+                    if (bool.TryParse(parm, out returnIfLoopback))
                     {
                     }
                 }

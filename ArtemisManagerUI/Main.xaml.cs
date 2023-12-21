@@ -33,11 +33,11 @@ namespace ArtemisManagerUI
             try
             {
                 SettingsAction.Touch();
-                ArtemisUpgradeLinks = new();
-                ExternalToolsLinks = new();
+                ArtemisUpgradeLinks = [];
+                ExternalToolsLinks = [];
 
 
-                Status = new ObservableCollection<string>();
+                Status = [];
 
                 if (TakeAction.ConnectedPCs != null)
                 {
@@ -125,8 +125,10 @@ namespace ArtemisManagerUI
                     }
                 });
             });
-            timer = new DispatcherTimer(DispatcherPriority.Background, this.Dispatcher);
-            timer.Interval = new TimeSpan(0, 0, 5);
+            timer = new(DispatcherPriority.Background, Dispatcher)
+            {
+                Interval = new TimeSpan(0, 0, 5)
+            };
             timer.Tick += Timer_Tick;
 
             timer.Start();
@@ -138,7 +140,9 @@ namespace ArtemisManagerUI
             CheckArtemisSBSStatus();
         }
 
+#pragma warning disable IDE0044 // Add readonly modifier
         DispatcherTimer timer;
+#pragma warning restore IDE0044 // Add readonly modifier
         void CheckArtemisSBSStatus()
         {
             IsArtemisRunning = ArtemisManager.IsArtemisRunning();
@@ -459,7 +463,7 @@ namespace ArtemisManagerUI
                 if (!me.isLoading)
                 {
 
-                    if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString(), true))
+                    if (!TakeAction.DoChangeSetting(nameof(ConnectOnStart), me.ConnectOnStart.ToString()))
                     {
                         me.ConnectOnStart = SettingsAction.Current.ConnectOnStart;
                     }
@@ -792,36 +796,36 @@ namespace ArtemisManagerUI
                         break;
                     case RequestInformationType.SpecificArtemisINIFile:
                         string data = ArtemisManager.GetArtemisINIData(e.Identifier);
-                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, [data]);
                         break;
                     case RequestInformationType.ListOfEngineeringPresets:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetEngineeringPresetFiles());
                         break;
                     case RequestInformationType.SpecificEngineeringPreset:
                         data = ArtemisManager.GetEngineeringPresetData(e.Identifier);
-                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, [data]);
                         break;
                     case RequestInformationType.ListOfDMXCommandfiles:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetDMXCommandsFileList());
                         break;
                     case RequestInformationType.SpecificDMXCommandFile:
                         data = ArtemisManager.GetDMXCommandsData(e.Identifier);
-                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, [data]);
                         break;
                     case RequestInformationType.ListOfControLINIFiles:
                         MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, ArtemisManager.GetControlsINIFileList());
                         break;
                     case RequestInformationType.SpecificControlINIFile:
                         data = ArtemisManager.GetControlsINIData(e.Identifier);
-                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, new string[] { data });
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, [data]);
                         break;
                     case RequestInformationType.ListOfScreenResolutions:
-                        List<string> items = new();
+                        List<string> items = [];
                         foreach (var sz in TakeAction.GetAvailableScreenResolutions())
                         {
                             items.Add(sz.Width.ToString() + "x" + sz.Height.ToString());
                         }
-                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, items.ToArray());
+                        MyNetwork.SendInformation(e.Source, e.RequestType, e.Identifier, [.. items]);
                         break;
                 }
             }
@@ -873,11 +877,11 @@ namespace ArtemisManagerUI
                     {
                         if (item.IsMission)
                         {
-                            TakeAction.thisMachine.InstalledMissions.Add(item);
+                            TakeAction.ThisMachine.InstalledMissions.Add(item);
                         }
                         else
                         {
-                            TakeAction.thisMachine.InstalledMods.Add(item);
+                            TakeAction.ThisMachine.InstalledMods.Add(item);
                         }
                     }));
 
@@ -925,16 +929,16 @@ namespace ArtemisManagerUI
                         {
                             this.Dispatcher.Invoke(new Action(() =>
                             {
-                                TakeAction.thisMachine.InstalledMods.Clear();
+                                TakeAction.ThisMachine.InstalledMods.Clear();
 
                                 foreach (var mod in ArtemisManager.GetInstalledMods())
                                 {
-                                    TakeAction.thisMachine.InstalledMods.Add(mod);
+                                    TakeAction.ThisMachine.InstalledMods.Add(mod);
                                 }
-                                TakeAction.thisMachine.InstalledMissions.Clear();
+                                TakeAction.ThisMachine.InstalledMissions.Clear();
                                 foreach (var mod in ArtemisManager.GetInstalledMissions())
                                 {
-                                    TakeAction.thisMachine.InstalledMissions.Add(mod);
+                                    TakeAction.ThisMachine.InstalledMissions.Add(mod);
                                 }
                             }));
                         }
@@ -950,18 +954,18 @@ namespace ArtemisManagerUI
                                 {
                                     if (wasProcessed.Item2.IsMission)
                                     {
-                                        TakeAction.thisMachine.InstalledMissions.Clear();
+                                        TakeAction.ThisMachine.InstalledMissions.Clear();
                                         foreach (var mod in ArtemisManager.GetInstalledMissions())
                                         {
-                                            TakeAction.thisMachine.InstalledMissions.Add(mod);
+                                            TakeAction.ThisMachine.InstalledMissions.Add(mod);
                                         }
                                     }
                                     else
                                     {
-                                        TakeAction.thisMachine.InstalledMods.Clear();
+                                        TakeAction.ThisMachine.InstalledMods.Clear();
                                         foreach (var mod in ArtemisManager.GetInstalledMods())
                                         {
-                                            TakeAction.thisMachine.InstalledMods.Add(mod);
+                                            TakeAction.ThisMachine.InstalledMods.Add(mod);
                                         }
                                     }
                                 }
@@ -978,7 +982,7 @@ namespace ArtemisManagerUI
                             {
                                 if (wasProcessed.Item2.IsMission)
                                 {
-                                    foreach (var mod in TakeAction.thisMachine.InstalledMissions)
+                                    foreach (var mod in TakeAction.ThisMachine.InstalledMissions)
                                     {
                                         if (mod.LocalIdentifier == e.Identifier)
                                         {
@@ -988,16 +992,16 @@ namespace ArtemisManagerUI
                                 }
                                 else
                                 {
-                                    TakeAction.thisMachine.InstalledMods.Clear();
+                                    TakeAction.ThisMachine.InstalledMods.Clear();
 
                                     foreach (var mod in ArtemisManager.GetInstalledMods())
                                     {
-                                        TakeAction.thisMachine.InstalledMods.Add(mod);
+                                        TakeAction.ThisMachine.InstalledMods.Add(mod);
                                     }
-                                    TakeAction.thisMachine.InstalledMissions.Clear();
+                                    TakeAction.ThisMachine.InstalledMissions.Clear();
                                     foreach (var mod in ArtemisManager.GetInstalledMissions())
                                     {
-                                        TakeAction.thisMachine.InstalledMissions.Add(mod);
+                                        TakeAction.ThisMachine.InstalledMissions.Add(mod);
                                     }
                                 }
                             }
@@ -1007,9 +1011,9 @@ namespace ArtemisManagerUI
                         break;
                 }
             }
-           
+
         }
-        
+
         void LoadClientInfoData(ClientInfoEventArgs e)
         {
             if (Thread.CurrentThread != this.Dispatcher.Thread)
@@ -1033,7 +1037,7 @@ namespace ArtemisManagerUI
                             if (item.IP.ToString().Equals(e.Source.ToString()))
                             {
                                 item.LoadClientInfoData(e);
-                                
+
                             }
                         }
                     }
@@ -1090,7 +1094,7 @@ namespace ArtemisManagerUI
                         this.isLoading = true;
                         this.ConnectOnStart = bool.Parse(e.SettingValue);
                         UpdateAutoStart(this.ConnectOnStart);
-                        TakeAction.thisMachine.ConnectOnstart = this.ConnectOnStart;
+                        TakeAction.ThisMachine.ConnectOnstart = this.ConnectOnStart;
                         this.isLoading = false;
                     }));
                     break;
@@ -1099,9 +1103,9 @@ namespace ArtemisManagerUI
                     this.Dispatcher.Invoke(new Action(() =>
                     {
                         this.IsMaster = bool.Parse(e.SettingValue);
-                        TakeAction.thisMachine.IsMaster = this.IsMaster;
+                        TakeAction.ThisMachine.IsMaster = this.IsMaster;
                         PopupMessage = "Is Master changed to: " + e.SettingValue;
-                        
+
                     }));
                     break;
             }
@@ -1143,7 +1147,7 @@ namespace ArtemisManagerUI
             {
 
                 string file = string.Empty;
-                List<string> args = new();
+                List<string> args = [];
                 foreach (var arg in Environment.GetCommandLineArgs())
                 {
                     if (string.IsNullOrEmpty(file))
@@ -1156,7 +1160,7 @@ namespace ArtemisManagerUI
                     }
                 }
 
-                ProcessStartInfo startInfo = new(file.Replace(".dll", ".exe"), string.Join(" ", args.ToArray()));
+                ProcessStartInfo startInfo = new(file.Replace(".dll", ".exe"), string.Join(" ", [.. args]));
                 Process.Start(startInfo);
                 this.Dispatcher.Invoke(new Action<bool, IPAddress?>(ConsiderClosing), e.Force, e.Source);
                 return;
@@ -1178,16 +1182,16 @@ namespace ArtemisManagerUI
                             this.Dispatcher.Invoke(new Action(() =>
                             {
                                 this.InWindowsStartupFolder = TakeAction.IsThisAppInStartup();
-                                
+
                             }));
                             break;
-                        //case PCActions.SetAsMainScreenServer:
-                        //case PCActions.RemoveAsMainScreenServer:
-                        //    this.Dispatcher.Invoke(new Action(() =>
-                        //    {
-                                
-                        //    }));
-                        //    break;
+                            //case PCActions.SetAsMainScreenServer:
+                            //case PCActions.RemoveAsMainScreenServer:
+                            //    this.Dispatcher.Invoke(new Action(() =>
+                            //    {
+
+                            //    }));
+                            //    break;
                     }
                 }
             }
@@ -1236,8 +1240,8 @@ namespace ArtemisManagerUI
             //}
             //else
             //{
-                System.Windows.MessageBox.Show("FATAL Exception:\r\n" + Environment.NewLine + e.Message, "FATAL ERROR!!!", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+            System.Windows.MessageBox.Show("FATAL Exception:\r\n" + Environment.NewLine + e.Message, "FATAL ERROR!!!", MessageBoxButton.OK, MessageBoxImage.Error);
+            this.Close();
             //}
         }
         private void MyNetwork_FatalExceptionEncountered(object? sender, FatalExceptionEncounteredEventArgs e)
@@ -1468,17 +1472,17 @@ namespace ArtemisManagerUI
             item.Activate();
             Dispatcher.Invoke(new Action(() =>
             {
-                TakeAction.thisMachine.InstalledMods.Clear();
+                TakeAction.ThisMachine.InstalledMods.Clear();
                 foreach (var mod in ArtemisManager.GetInstalledMods())
                 {
-                    TakeAction.thisMachine.InstalledMods.Add(mod);
+                    TakeAction.ThisMachine.InstalledMods.Add(mod);
                 }
 
                 ArtemisChanged = false;
             }));
             TakeAction.SendClientInfo(IPAddress.Any);
         }
-       
+
         void SnapshotArtemis()
         {
             if (string.IsNullOrEmpty(ArtemisInstallFolder) || !System.IO.File.Exists(System.IO.Path.Combine(ArtemisInstallFolder, ArtemisManagerAction.ArtemisManager.ArtemisEXE)))
@@ -1498,12 +1502,12 @@ namespace ArtemisManagerUI
                 item.Activate();
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    TakeAction.thisMachine.InstalledMods.Clear();
+                    TakeAction.ThisMachine.InstalledMods.Clear();
                     foreach (var mod in ArtemisManager.GetInstalledMods())
                     {
-                        TakeAction.thisMachine.InstalledMods.Add(mod);
+                        TakeAction.ThisMachine.InstalledMods.Add(mod);
                     }
-                    
+
                     ArtemisChanged = false;
                 }));
                 TakeAction.SendClientInfo(IPAddress.Any);
@@ -1521,7 +1525,7 @@ namespace ArtemisManagerUI
 
         private void DeactivateAllButBase(Guid? activeIdentifier)
         {
-            foreach (var mod in TakeAction.thisMachine.InstalledMods)
+            foreach (var mod in TakeAction.ThisMachine.InstalledMods)
             {
                 if (mod.LocalIdentifier == activeIdentifier)
                 {
@@ -1533,7 +1537,7 @@ namespace ArtemisManagerUI
                 }
             }
         }
-       
+
 
         private void OnInstallMod(object sender, RoutedEventArgs e)
         {
@@ -1543,7 +1547,7 @@ namespace ArtemisManagerUI
             };
             if (win.ShowDialog() == true)
             {
-                TakeAction.thisMachine.InstalledMods.Add(win.Mod);
+                TakeAction.ThisMachine.InstalledMods.Add(win.Mod);
             }
         }
 
@@ -1568,7 +1572,7 @@ namespace ArtemisManagerUI
             };
             if (win.ShowDialog() == true)
             {
-                TakeAction.thisMachine.InstalledMods.Add(win.Mod);
+                TakeAction.ThisMachine.InstalledMods.Add(win.Mod);
             }
         }
 
@@ -1674,7 +1678,7 @@ namespace ArtemisManagerUI
                     };
                     if (win.ShowDialog() == true)
                     {
-                        TakeAction.thisMachine.InstalledMods.Add(win.Mod);
+                        TakeAction.ThisMachine.InstalledMods.Add(win.Mod);
                     }
                 }
                 //isDragging = false;
@@ -1739,7 +1743,7 @@ namespace ArtemisManagerUI
                     win.Title = "Install Mission";
                     if (win.ShowDialog() == true)
                     {
-                        TakeAction.thisMachine.InstalledMissions.Add(win.Mod);
+                        TakeAction.ThisMachine.InstalledMissions.Add(win.Mod);
                     }
                 }
             }
@@ -1762,7 +1766,7 @@ namespace ArtemisManagerUI
                 {
                     if (ctl.DataContext is ModItem mod)
                     {
-                        TakeAction.thisMachine.InstalledMods.Remove(mod);
+                        TakeAction.ThisMachine.InstalledMods.Remove(mod);
                     }
                 });
             }
@@ -1776,7 +1780,7 @@ namespace ArtemisManagerUI
                 {
                     if (ctl.DataContext is ModItem mod)
                     {
-                        TakeAction.thisMachine.InstalledMissions.Remove(mod);
+                        TakeAction.ThisMachine.InstalledMissions.Remove(mod);
                     }
                 });
             }
@@ -1794,15 +1798,15 @@ namespace ArtemisManagerUI
         {
             Dispatcher.Invoke(() =>
             {
-                TakeAction.thisMachine.InstalledMods.Clear();
+                TakeAction.ThisMachine.InstalledMods.Clear();
                 foreach (var mod in ArtemisManager.GetInstalledMods())
                 {
-                    TakeAction.thisMachine.InstalledMods.Add(mod);
+                    TakeAction.ThisMachine.InstalledMods.Add(mod);
                 }
-                TakeAction.thisMachine.InstalledMissions.Clear();
+                TakeAction.ThisMachine.InstalledMissions.Clear();
                 foreach (var mod in ArtemisManager.GetInstalledMissions())
                 {
-                    TakeAction.thisMachine.InstalledMissions.Add(mod);
+                    TakeAction.ThisMachine.InstalledMissions.Add(mod);
                 }
             });
         }
@@ -1923,7 +1927,7 @@ namespace ArtemisManagerUI
 
         }
 
-       
+
 
         private void OnSnapshotAretmisCosmos(object sender, RoutedEventArgs e)
         {

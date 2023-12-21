@@ -20,7 +20,7 @@ namespace ArtemisManagerUI
         public EngineeringPresetEditControl()
         {
             //
-            PresetFiles = new ObservableCollection<EngineeringPresetFileListItem>();
+            PresetFiles = [];
             InitializeComponent();
             ModManager.CreateFolder(ArtemisManager.EngineeringPresetsFolder);
             Initialize();
@@ -121,8 +121,8 @@ namespace ArtemisManagerUI
             {
                 if (item.Name == filename)
                 {
-                    var ini =JsonSerializer.Deserialize<PresetsFile>(data);
-                    
+                    var ini = JsonSerializer.Deserialize<PresetsFile>(data);
+
                     item.SettingsFile = ini;
                 }
             }
@@ -148,7 +148,7 @@ namespace ArtemisManagerUI
 
         private void Watcher_Renamed(object sender, RenamedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(e.Name) 
+            if (!string.IsNullOrEmpty(e.Name)
                 && !string.IsNullOrEmpty(e.OldName)
                 && e.Name.EndsWith(ArtemisManager.DATFileExtension))
             {
@@ -163,9 +163,9 @@ namespace ArtemisManagerUI
                             {
                                 item.SettingsFile.SaveFile = e.FullPath;
                             }
-                            item.Name = e.Name.Substring(0,e.Name.Length - 4);
+                            item.Name = e.Name.Substring(0, e.Name.Length - 4);
                             item.OriginalName = item.Name;
-                            
+
                             break;
                         }
                     }
@@ -287,7 +287,7 @@ namespace ArtemisManagerUI
                     {
                         PresetFiles.Add(new(match));
                     }
-                    
+
                 });
                 if (TargetClient != null)
                 {
@@ -300,7 +300,7 @@ namespace ArtemisManagerUI
 
 
         public static readonly DependencyProperty PresetFilesProperty =
-          DependencyProperty.Register(nameof(PresetFiles), 
+          DependencyProperty.Register(nameof(PresetFiles),
               typeof(ObservableCollection<EngineeringPresetFileListItem>),
           typeof(EngineeringPresetEditControl));
 
@@ -359,7 +359,7 @@ namespace ArtemisManagerUI
             string newFile = "NewPresets";
             string baseName = newFile;
             int i = 0;
-            bool isOkay = true;
+            bool isOkay;
             do
             {
                 isOkay = true;
@@ -413,7 +413,7 @@ namespace ArtemisManagerUI
                     string n = new FileInfo(presetsFile.SaveFile).Name;
                     string nm = n.Substring(0, n.Length - 4);
 
-                    string fullname = presetsFile.SaveFile;
+
                     if (System.Windows.MessageBox.Show(string.Format("Are you sure you want to delete {0}", nm), "Delete Presets file",
                         MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
@@ -458,11 +458,11 @@ namespace ArtemisManagerUI
                     if (System.IO.File.Exists(presetsFile?.SaveFile))
                     {
                         ArtemisManager.ActivateEngineeringPresetFile(presetsFile.SaveFile);
-                        
+
                     }
                     //File.Copy(presetsFile.SaveFile, System.IO.Path.Combine(ModItem.ActivatedFolder, ArtemisManager.ArtemisEngineeringFile), true);
                 }
-                
+
             }
         }
 
@@ -564,7 +564,7 @@ namespace ArtemisManagerUI
                         {
                             source.CopyTo(target.FullName, true);
                             //SelectedPresetFile.INIFile = work;
-                            
+
                         }
                     }
                 }
@@ -582,9 +582,9 @@ namespace ArtemisManagerUI
                     {
                         if (IsRemote)
                         {
-                            if (TargetClient != null )
+                            if (TargetClient != null)
                             {
-                                Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateEngineeringPresetsFile, Guid.Empty, selectedFile.Name );
+                                Network.Current?.SendArtemisAction(TargetClient, AMCommunicator.Messages.ArtemisActions.ActivateEngineeringPresetsFile, Guid.Empty, selectedFile.Name);
                             }
                         }
                         else
@@ -659,7 +659,7 @@ namespace ArtemisManagerUI
 
         private void OnSelectedFilenameTextChanged(object sender, RoutedEventArgs e)
         {
-            
+
             if (sender is TextBlockEditControl me)
             {
                 if (me.Tag is FileListItem selectedFile)

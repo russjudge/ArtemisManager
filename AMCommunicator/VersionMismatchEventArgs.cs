@@ -9,13 +9,14 @@ namespace AMCommunicator
 {
     public class VersionMismatchEventArgs
     {
+        private VersionMismatchEventArgs() { throw new NotImplementedException(); }
         public VersionMismatchEventArgs(short expectedVersion, short actualVersion, IPAddress source)
         {
             ExpectedVersion = expectedVersion;
             ActualVersion = actualVersion;
             Source = source;
         }
-    
+
         public short ExpectedVersion { get; private set; }
         public short ActualVersion { get; private set; }
         public IPAddress Source { get; private set; }

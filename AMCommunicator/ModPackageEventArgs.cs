@@ -9,6 +9,7 @@ namespace AMCommunicator
 {
     public class ModPackageEventArgs : EventArgs
     {
+        private ModPackageEventArgs() : base() { throw new NotImplementedException(); }
         public ModPackageEventArgs(IPAddress? source, byte[] data, string mod)
         {
             Source = source;
@@ -16,7 +17,7 @@ namespace AMCommunicator
             this.Mod = mod;
         }
         public IPAddress? Source { get; private set; }
-        public byte[] Data { get; private set; } = Array.Empty<byte>();
+        public byte[] Data { get; private set; } = [];
         public string Mod { get; private set; } = string.Empty;
     }
 }

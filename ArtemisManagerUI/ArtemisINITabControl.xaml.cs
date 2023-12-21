@@ -24,7 +24,7 @@ namespace ArtemisManagerUI
     {
         public ArtemisINITabControl()
         {
-            ConnectedPCs = new();
+            ConnectedPCs = [];
             if (TakeAction.ConnectedPCs != null)
             {
                 foreach (var PC in TakeAction.ConnectedPCs)
@@ -33,7 +33,7 @@ namespace ArtemisManagerUI
                     {
                         ConnectedPCs.Add(new(PC));
                     }
-                    
+
                 }
             }
             TakeAction.ConnectionAdded += TakeAction_ConnectionAdded;

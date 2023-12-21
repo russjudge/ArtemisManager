@@ -66,11 +66,11 @@ namespace ArtemisManagerUI
             }
         }
 
-       
+
 
         private void OnEngineeringPresets(object sender, RoutedEventArgs e)
         {
-            EngineeringPresetEditWindow win = new EngineeringPresetEditWindow();
+            EngineeringPresetEditWindow win = new();
             win.Show();
         }
 
@@ -107,7 +107,7 @@ namespace ArtemisManagerUI
 
         private void OnBackupDMXCommands(object sender, RoutedEventArgs e)
         {
-            ArtemisManagerAction.ArtemisManager.SaveDMXCommandsFile(System.IO.Path.Combine(ArtemisManagerAction.ModItem.ActivatedFolder,ArtemisManagerAction.ArtemisManager.ArtemisDATSubfolder, ArtemisManagerAction.ArtemisManager.DMXCommands));
+            ArtemisManagerAction.ArtemisManager.SaveDMXCommandsFile(System.IO.Path.Combine(ArtemisManagerAction.ModItem.ActivatedFolder, ArtemisManagerAction.ArtemisManager.ArtemisDATSubfolder, ArtemisManagerAction.ArtemisManager.DMXCommands));
             PopupMessage = "Backup of DMXcommands.xml complete.";
 
         }

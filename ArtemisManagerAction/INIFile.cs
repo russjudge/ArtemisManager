@@ -22,7 +22,7 @@ namespace ArtemisManagerAction
         }
         public void Deserialize(string data)
         {
-            List<string> settingNames = new();
+            List<string> settingNames = [];
             ArtemisINISetting setting = new();
             foreach (var line in data.Replace("\r", string.Empty).Split('\n'))
             {
@@ -103,7 +103,7 @@ namespace ArtemisManagerAction
         public override string ToString()
         {
             StringBuilder sb = new();
-            Dictionary<int, ArtemisINISetting> items = new();
+            Dictionary<int, ArtemisINISetting> items = [];
             foreach (var item in settingList)
             {
                 var prop = this.GetType().GetProperty(item.SettingName);
@@ -119,13 +119,13 @@ namespace ArtemisManagerAction
             }
             foreach (var key in items.Keys)
             {
-                
+
                 sb.AppendLine(items[key].ToString());
             }
             return sb.ToString();
         }
-        List<ArtemisINISetting> settingList = new();
-        Dictionary<string, ArtemisINISetting> _settings = new();
+        readonly List<ArtemisINISetting> settingList = [];
+        Dictionary<string, ArtemisINISetting> _settings = [];
         public Dictionary<string, ArtemisINISetting> Settings
         {
             get
@@ -249,11 +249,7 @@ namespace ArtemisManagerAction
         }
         public string GetJSON()
         {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = false
-            };
-            return JsonSerializer.Serialize(this, options);
+            return JsonSerializer.Serialize(this, NetworkMessage.jsonSerializerOptions);
         }
     }
 }

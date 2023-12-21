@@ -9,14 +9,15 @@ namespace AMCommunicator
 {
     public class InformationEventArgs : InformationRequestEventArgs
     {
+        private InformationEventArgs() : base(null, RequestInformationType.ListOfDMXCommandfiles, string.Empty) { throw new NotImplementedException(); }
         public InformationEventArgs(IPAddress? source, RequestInformationType requestType, string identifier, string[] data) : base(source, requestType, identifier)
         {
-            
+
             Data = data;
         }
-        
+
         public string[] Data { get; private set; }
         public bool Handled { get; set; } = false;
-        
+
     }
 }

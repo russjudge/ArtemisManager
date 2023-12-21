@@ -8,6 +8,7 @@ namespace ArtemisManagerUI
 {
     public class ChatMessage
     {
+        private ChatMessage() { throw new NotImplementedException(); }
         public ChatMessage(string source, string message)
         {
             Entry = DateTime.Now;

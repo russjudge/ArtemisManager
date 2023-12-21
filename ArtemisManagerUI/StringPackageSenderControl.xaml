@@ -4,47 +4,49 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ArtemisManagerUI"
+             xmlns:russjudge="clr-namespace:RussJudge.WPFValueConverters;assembly=RussJudge.WPFValueConverters"
              xmlns:converter="clr-namespace:ArtemisManagerUI.Converters"
              mc:Ignorable="d" Name="uc">
     <UserControl.Resources>
-        <converter:BoolToVisibilityParameterConverter x:Key="BoolToVisibilityParameterConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <russjudge:FalseBoolToVisibilityConverter x:Key="FalseBoolToVisibilityConverter" />
         <converter:IPLoopbackToVisibility x:Key="IPLoopbackToVisibility" />
     </UserControl.Resources>
     <GroupBox
         DockPanel.Dock="Top" Header="{Binding ElementName=uc, Path=Prompt, Mode=OneWay}">
         <DockPanel>
             <Button
-                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                 DockPanel.Dock="Right"
                 ToolTip="Send selected file to selected network peer client"
                 Click="OnSendSelectedFile"
                 HorizontalAlignment="Left" >
-                    <Image
+                <Image
                         Height="16" Source="/ArtemisManagerUI;component/Resources/send.png" />
 
             </Button>
             <Button
-                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}"
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
                 DockPanel.Dock="Left"
                 ToolTip="Received selected file to local client"
                 Click="OnReceiveSelectedFile"
                 HorizontalAlignment="Left" >
-                    <Image
+                <Image
                         Height="16" Source="/ArtemisManagerUI;component/Resources/receive.png" />
-                
+
             </Button>
             <TextBlock
                 Padding="5,0,5,0"
                 Text="Receive File" VerticalAlignment="Center"
-                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Visible|Collapsed'}" />
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
             <ComboBox
-                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource BoolToVisibilityParameterConverter}, ConverterParameter='Collapsed|Visible'}"
+                Visibility="{Binding ElementName=uc, Path=IsForReceive, Mode=OneWay, Converter={StaticResource FalseBoolToVisibilityConverter}}"
                 VerticalAlignment="Center" VerticalContentAlignment="Center"
                 SelectedItem="{Binding ElementName=uc, Path=SelectedTargetPC, Mode=TwoWay}"
                 ItemsSource="{Binding ElementName=uc, Path=ConnectedPCs}">
                 <ComboBox.ItemContainerStyle>
                     <Style TargetType="ComboBoxItem">
-                            <Setter
+                        <Setter
                                 Property="Visibility"
                                 Value="{Binding IP, Converter={StaticResource IPLoopbackToVisibility}, ConverterParameter=Collapsed|Visible}" />
                     </Style>
