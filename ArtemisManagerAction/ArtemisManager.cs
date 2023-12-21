@@ -829,6 +829,14 @@ namespace ArtemisManagerAction
                 {
                     string installFolder = Path.Combine(ModItem.ModInstallFolder, mod.InstallFolder);
                     string target = GetOriginalArtemisINIFile(installFolder);
+                    if (string.IsNullOrEmpty(target))
+                    {
+                        foreach (var fle in new DirectoryInfo(installFolder).GetFiles("*.exe"))
+                        {
+                            target = fle.FullName;
+                            break;
+                        }
+                    }
                     string target2 = Path.Combine(ArtemisINIFolder, new FileInfo(target).Name);
                     if (!string.IsNullOrEmpty(target))
                     {
@@ -845,6 +853,7 @@ namespace ArtemisManagerAction
                             }
                         }
                     }
+
                 }
             }
         }
