@@ -149,12 +149,7 @@
             </MenuItem>
 
             <MenuItem Header="_About" >
-                <MenuItem Click="OnLocalUpdateCheck" Header="_Check for update" >
-                    <MenuItem.Icon>
-                        <Image Source="/ArtemisManagerUI;component/Resources/update.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <Separator />
+
                 <MenuItem Click="OnAbout" Header="_About" >
                     <MenuItem.Icon>
                         <Image Source="/ArtemisManagerUI;component/Resources/about.png" />
@@ -167,9 +162,7 @@
             <Button DockPanel.Dock="Right" Click="OnAbout" ToolTip="About">
                 <Image Height="24" Source="/ArtemisManagerUI;component/Resources/about.png" />
             </Button>
-            <Button DockPanel.Dock="Right" ToolTip="Check for update to Artemis Manager" Click="OnLocalUpdateCheck">
-                <Image Height="24" Source="/ArtemisManagerUI;component/Resources/download (2).png" />
-            </Button>
+
 
             <Button
                 DockPanel.Dock="Right"

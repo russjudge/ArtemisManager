@@ -128,11 +128,7 @@
                         <Button ToolTip="Shutdown Peer PC" Click="OnShutdown" CommandParameter="{Binding}">
                             <Image Height="24" Source="/ArtemisManagerUI;component/Resources/shutdown.png" />
                         </Button>
-                        <Button
-                            Click="OnUpdateCheck" CommandParameter="{Binding}"
-                            ToolTip="Have Peer check for Software Update. Orders the peer to check for an update to this application and attempt to apply it if available.">
-                            <Image Height="24" Source="/ArtemisManagerUI;component/Resources/update.png" />
-                        </Button>
+
                     </WrapPanel>
                 </GroupBox>
                 <GroupBox

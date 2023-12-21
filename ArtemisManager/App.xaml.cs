@@ -35,6 +35,10 @@ namespace ArtemisManager
             ModManager.CreateFolder(ArtemisManagerAction.ModItem.ActivatedFolder);
             ModManager.CreateFolder(ArtemisManagerAction.ModItem.MissionInstallFolder);
         }
+        const string UpdateSoftwareSourceURL = "https://artemis.russjudge.com/software";
+        const string UpdateVersionDataURL = UpdateSoftwareSourceURL + "/artemismanager.version";
+        public static bool UpdateOnClose { get; private set; } = false;
+        public static string UpdateInstallerPath { get; private set; } = string.Empty;
         private void OnStartup(object sender, StartupEventArgs e)
         {
             Mutex = new Mutex(true, mutextName, out bool createdNew);
@@ -51,18 +55,29 @@ namespace ArtemisManager
                 CreateFolders();
                 if (!Debugger.IsAttached)
                 {
-                    Task.Run(async () =>
+                    var checker = new RussJudge.UpdateCheck.UpdateChecker(UpdateVersionDataURL);
+                    checker.CheckForUpdate(true).ContinueWith((Result) =>
                     {
-                        var result = TakeAction.UpdateCheck(false);
-                        if (result.Result.Item1)
+                        Console.WriteLine("Update check completed"); //, result = {0}", Result.Result.ToString());
+                        switch (Result.Result)
                         {
-                            if (await TakeAction.DoUpdate(true, result.Result.Item2))
-                            {
+                            case RussJudge.UpdateCheck.UpdateType.UpdateOnClose:
+                                UpdateOnClose = true;
+                                UpdateInstallerPath = checker.SetupFilePath;
                                 TakeAction.MustExit = true;
-                                Environment.Exit(0);
-                            }
+                                break;
+                            case RussJudge.UpdateCheck.UpdateType.UpdateNow:
+                                UpdateInstallerPath = checker.SetupFilePath;
+
+                                UpdateOnClose = true;
+                                TakeAction.MustExit = true;
+                                Shutdown(0);
+
+                                break;
                         }
+
                     });
+
                 }
             }
             else
@@ -107,6 +122,22 @@ namespace ArtemisManager
             catch
             {
 
+            }
+        }
+
+        private void OnExit(object sender, ExitEventArgs e)
+        {
+            if (UpdateOnClose && !string.IsNullOrEmpty(UpdateInstallerPath))
+            {
+                if (RussJudge.UpdateCheck.UpdateChecker.IsDownloadingSetupFile && RussJudge.UpdateCheck.UpdateChecker.LockingObject != null)
+                {
+                    RussJudge.UpdateCheck.UpdateChecker.LockingObject.WaitOne();
+                }
+                if (File.Exists(UpdateInstallerPath))
+                {
+                    Process.Start(UpdateInstallerPath);
+                }
+                UpdateOnClose = false;  //To ensure it doesn't get called twice by mistake.
             }
         }
     }

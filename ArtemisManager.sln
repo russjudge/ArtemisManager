@@ -54,8 +54,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerActionTests",
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ArtemisManagerSetup", "ArtemisManagerSetup\ArtemisManagerSetup.vdproj", "{4954523D-03CD-4C5C-B9A0-D907207E8DE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deploy", "Deploy\Deploy.csproj", "{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AretmisManager_UninstallCleanup", "AretmisManager_UninstallCleanup\AretmisManager_UninstallCleanup.csproj", "{1FA1B525-A021-41DE-B452-0CA82EE29B15}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtemisManagerUITests", "ArtemisManagerUITests\ArtemisManagerUITests.csproj", "{C655E240-A1E2-4EFC-9114-C50127C1AE49}"
@@ -92,9 +90,6 @@ Global
 		{D9B06F4F-5871-40AF-B8A8-867D03B14495}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4954523D-03CD-4C5C-B9A0-D907207E8DE2}.Debug|Any CPU.ActiveCfg = Debug
 		{4954523D-03CD-4C5C-B9A0-D907207E8DE2}.Release|Any CPU.ActiveCfg = Release
-		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F93AA927-6D5B-4D6B-9821-CDE5E9F3D195}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FA1B525-A021-41DE-B452-0CA82EE29B15}.Release|Any CPU.ActiveCfg = Release|Any CPU

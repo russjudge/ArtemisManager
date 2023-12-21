@@ -33,7 +33,7 @@ namespace ArtemisManagerUI
         {
             StatusUpdate?.Invoke(null, new StatusUpdateEventArgs(message, parameters));
         }
-        public static event EventHandler<StatusUpdateEventArgs>? PopupEvent;
+        //public static event EventHandler<StatusUpdateEventArgs>? PopupEvent;
 
         public static PCItem? SourcePC { get; set; }
         public static ObservableCollection<PCItem>? ConnectedPCs { get; set; }
@@ -157,27 +157,7 @@ namespace ArtemisManagerUI
                     System.Diagnostics.Process.Start(startInfo);
                     WasProcessed = true;
                     break;
-                case PCActions.CheckForUpdate:
-                    Task.Run(async () =>
-                    {
-                        var result = await UpdateCheck(false, source);
 
-                        if (result.Item1)
-                        {
-                            var result2 = await DoUpdate(false, result.Item2);
-                            if (result2)
-                            {
-                                if (source != null)
-                                {
-                                    Network.Current?.SendAlert(source, AMCommunicator.Messages.AlertItems.UpdateCheckSuccess, "Starting update");
-                                }
-                                Environment.Exit(0);
-                            }
-                        }
-                    });
-
-                    WasProcessed = true;
-                    break;
                 case PCActions.ShutdownPC:
                     ProcessStartInfo startInfo2 = new("shutdown", "/sg /t 0 /f")
                     {
@@ -394,98 +374,6 @@ namespace ArtemisManagerUI
                 }
             }
             return retVal;
-        }
-        const string UpdateSoftwareSourceURL = "https://artemis.russjudge.com/software";
-        const string UpdateVersionDataURL = UpdateSoftwareSourceURL + "/artemismanager.version";
-        const string UpdateSetupFileURL = UpdateSoftwareSourceURL + "/artemismanager.msi";
-        /// <summary>
-        /// Determines whether or not an update is available.
-        /// </summary>
-        /// <param name="AlertIfCannotCheck">send "true" to send an alert to the source that it could not access the website of the update to check.  Possible: have update transmitted from source.</param>
-        /// <returns></returns>
-        public async static Task<Tuple<bool, string>> UpdateCheck(bool AlertIfCannotCheck, IPAddress? source = null)
-        {
-            bool UpdateNeeded = false;
-            string setupFile = UpdateSetupFileURL;
-            string[] info;
-            try
-            {
-                using (HttpClient client = new())
-                {
-                    var data = await client.GetStringAsync(UpdateVersionDataURL);
-                    //line 1 = version
-                    //line 2 = setup file to download.
-                    info = data.Replace("\r", string.Empty).Split('\n');
-                    if (info.Length > 1)
-                    {
-                        UpdateNeeded = (info[0] != GetAppVersion());
-                    }
-                    setupFile = UpdateSoftwareSourceURL + "/" + info[1];
-                }
-                RaiseStatusUpdate("Update check complete. {0}", UpdateNeeded ? "Updated needed." : "No Update needed.");
-            }
-            catch (Exception ex)
-            {
-                RaiseStatusUpdate("Unable to check for update: {0}", ex.Message);
-                if (AlertIfCannotCheck)
-                {
-                    MessageBox.Show("Unable to check for update: " + Environment.NewLine + ex.Message, "Update Check Failed");
-
-                }
-                else
-                {
-                    if (source != null)
-                    {
-                        Network.Current?.SendAlert(source, AMCommunicator.Messages.AlertItems.UpdateCheckFail, "Unable to check for update: " + ex.Message);
-                    }
-                }
-                RaiseStatusUpdate("Update check failed: {0}", ex.Message);
-            }
-            //russjudge.com/software/artemismanager.version
-            //russjudge.com/software/artemismanager.msi
-
-            return new Tuple<bool, string>(UpdateNeeded, setupFile);
-        }
-        public static async Task<bool> DoUpdate(bool doPrompt, string setupURL)
-        {
-            //1. Download the msi file.
-            //2. Start the setup and exit.
-            if (doPrompt)
-            {
-                if (MessageBox.Show(string.Format("An update to Artemis Manager was found.{0}Do you wish to download the update?", Environment.NewLine),
-                    "Update Found", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-                {
-                    return false;
-                }
-            }
-            try
-            {
-                string installFile = Path.GetTempFileName() + ".msi";
-                using (HttpClient client = new())
-                {
-                    using Stream strm = await client.GetStreamAsync(setupURL);
-                    int bytesRead = 0;
-                    byte[] buffer = new byte[32768];
-
-                    using FileStream fs = new(installFile, FileMode.Create);
-                    while ((bytesRead = strm.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        fs.Write(buffer, 0, bytesRead);
-                    }
-                }
-                RaiseStatusUpdate("Starting update.");
-                ProcessStartInfo startInfo = new(installFile)
-                {
-                    UseShellExecute = true
-                };
-                Process.Start(startInfo);
-            }
-            catch (Exception ex)
-            {
-
-                RaiseStatusUpdate("Unable to perform update: " + ex.Message);
-            }
-            return true;
         }
 
         public static bool IsThisAppInStartup()

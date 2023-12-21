@@ -1576,30 +1576,6 @@ namespace ArtemisManagerUI
             }
         }
 
-        private void OnLocalUpdateCheck(object sender, RoutedEventArgs e)
-        {
-            UpdateStatus("Checking for update...");
-            Task.Run(async () =>
-            {
-                var result = TakeAction.UpdateCheck(true);
-                if (result.Result.Item1)
-                {
-                    var newResult = await TakeAction.DoUpdate(true, result.Result.Item2);
-                    if (newResult)
-                    {
-                        this.Dispatcher.Invoke(new Action(() => { this.Close(); }));
-                    }
-                }
-                else
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        System.Windows.MessageBox.Show("You are running the current version of Artemis Manager.", "Update Check", MessageBoxButton.OK, MessageBoxImage.Information);
-                    });
-                }
-                UpdateStatus("Update check complete.");
-            });
-        }
         private void OnTest(object sender, RoutedEventArgs e)
         {
             /*  Popup Test */
